@@ -1,0 +1,225 @@
+{extends '../_mainLayout.latte'}
+
+{block content}
+
+    <!-- Bootstrap Modal -->
+    <div class="modal fade flyout" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="confirmDeleteLabel">Benutzer löschen</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Bist du sicher, dass du diesen Benutzer löschen möchtest?</p>
+                    <input type="hidden" id="deleteUserId">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Abbrechen</button>
+                    <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Löschen</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+   <!-- Main Content -->
+    <div class="container py-4" style="flex:1">
+    <h1 class="mb-5">Benutzerverwaltung</h1>
+
+    {ifset $success}
+        <div class="alert alert-success d-flex align-items-center" role="alert">
+            <svg class="bi flex-shrink-0 me-2" role="img" aria-label="Success:"><use xlink:href="#check-circle-fill"/></svg>
+            <div>
+                {$success}
+            </div>
+        </div>
+    {/ifset}
+
+    {ifset $error}
+        <div class="alert alert-danger d-flex align-items-center" role="alert">
+            <svg class="bi flex-shrink-0 me-2" role="img" aria-label="Danger:"><use xlink:href="#exclamation-triangle-fill"/></svg>
+            <div>
+                {$error}
+            </div>
+        </div>
+    {/ifset}
+
+    {ifset $message}
+        <div class="alert alert-primary d-flex align-items-center" role="alert">
+            <svg class="bi flex-shrink-0 me-2" role="img" aria-label="Info:"><use xlink:href="#info-fill"/></svg>
+            <div>
+                {$message}
+            </div>
+        </div>
+    {/ifset}
+
+    <div class="d-flex justify-content-between align-items-left mb-3">
+        <!-- Dropdown links -->
+        <form method="get" class="usrPageSize">
+            <select name="pageSize"  class="form-select form-select-sm w-auto" onchange="this.form.submit()">
+                <option value="10" n:attr="selected => $pageSize == 10">10</option>
+                <option value="25" n:attr="selected => $pageSize == 25">25</option>
+                <option value="50" n:attr="selected => $pageSize == 50">50</option>
+            </select>
+        </form>
+
+        <!-- Suchfeld + Button rechts -->
+        <form id="tblHeadBar" method="get" class="d-flex align-items-center gap-2">
+            <div class="input-group"> 
+            <input type="text" name="search" id="searchInput" value="{$search}" placeholder="Suche Benutzer" class="form-control form-control-sm w-auto">
+            <button type="submit" class="btn btn-primary btn-sm"><i class="bi-search"></i></button>
+            <button type="button" class="btn btn-success btn-sm" onclick="window.location.href='/admin/showCreateUser'"><i class="bi-person-add"></i></button>
+            </div>
+        </form>
+    </div>
+
+    <!-- lade indicator -->
+    <div id="loadingIndicator" style="display: none; text-align: center;">
+        <div class="spinner-border" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+
+    <!-- Desktop-Version der Tabelle -->
+    <div class="table-responsive desktop-table">
+        <table class="table table-striped table-hover align-middle">
+            <thead class="table-dark">
+                <tr>
+                    <th>ID</th>
+                    <th>Ac</th>
+                    <th>2FA</th>
+                    <th>Enf</th>
+                    <th>Benutzername</th>
+                    <th>Email</th>                    
+                    <th>Aktionen</th>
+                </tr>
+            </thead>
+            <tbody id="userTableBody">
+                {foreach $users as $use}
+                    <tr>
+                        <td>{$use->id}</td>
+                        <td style="min-width:40px !important;text-align:center;">
+                            {if $use->username === 'super.admin'}
+                                <i id="accountStatus{$use->id}" class="bi-check-circle-fill text-secondary" data-bs-toggle="tooltip" title="Super-Admin-Account kann nicht geändert werden."></i>
+                            {elseif $use->status === 1}
+                                <i id="accountStatus{$use->id}" class="bi-check-circle-fill text-success" onclick="toggleUserAccountStatus({$use->id}, 'disable');" style="cursor:pointer;" data-bs-toggle="tooltip" title="Disable Useraccount."></i>
+                            {else}
+                                <i id="accountStatus{$use->id}" class="bi-x-circle-fill text-danger" onclick="toggleUserAccountStatus({$use->id}, 'enable');" style="cursor:pointer;" data-bs-toggle="tooltip" title="Enable Useraccount."></i>
+                            {/if}
+                        </td>
+                        <td style="min-width:40px !important;text-align:center;">
+                            {if $use->mfaSecret !== '' && $use->mfaEnabled === 1}
+                                <i id="mfaEnabled{$use->id}" class="bi-check-circle-fill text-success" data-bs-toggle="tooltip" title="Disable 2FA." onclick="toggleMfa({$use->id}, 'disable');" style="cursor:pointer;"></i>
+                            {elseif $use->mfaSecret !== '' && $use->mfaEnabled === 0}
+                                <i id="mfaEnabled{$use->id}" class="bi-x-circle-fill text-danger" data-bs-toggle="tooltip" title="Enable 2FA." onclick="toggleMfa({$use->id}, 'enable');" style="cursor:pointer;"></i>
+                            {elseif $use->mfaSecret === ''}
+                                <i id="mfaEnabled{$use->id}" class="bi-x-circle-fill text-secondary" data-bs-toggle="tooltip" title="User has not setup 2fa!"></i>
+                            {/if}
+                        </td>
+                        <td style="min-width:40px !important;text-align:center;">
+                            {if $use->username === 'super.admin'}
+                                <i class="bi-check-circle-fill text-secondary" data-bs-toggle="tooltip" title="2FA enforcement cannot be changed for super.admin."></i>
+                            {elseif $use->mfaSecret !== ''}
+                                <i class="bi-check-circle-fill text-secondary" data-bs-toggle="tooltip" title="2FA is configured already."></i>
+                            {elseif $use->mfaEnforced === 1}
+                                <i id="enforceStatus{$use->id}" class="bi-check-circle-fill text-warning" onclick="toggleMfaEnforcement({$use->id}, 'disable');" style="cursor:pointer;" data-bs-toggle="tooltip" title="Click to unenforce 2FA for user."></i>
+                            {else}
+                                <i id="enforceStatus{$use->id}" class="bi-x-circle-fill text-danger" onclick="toggleMfaEnforcement({$use->id}, 'enable');" style="cursor:pointer;" data-bs-toggle="tooltip" title="Click to enforce 2FA for user."></i>
+                            {/if}
+                        </td>
+                        <td class="text-nowrap">{$use->username}</td>
+                        <td class="w-100">{$use->email}</td>                        
+                        <td class="text-nowrap" style="white-space: nowrap; width: 1%;">
+                            {if $use->username === 'super.admin'}
+                                <button class="btn btn-sm btn-danger" disabled>
+                                    <i class="bi-trash-fill"></i>
+                                </button>
+                            {else}
+                                <a href="#" class="btn btn-sm btn-danger delete-user-btn" data-user-id="{$use->id}">
+                                    <i class="bi-trash-fill"></i>
+                                </a>
+                            {/if}
+                            <a href="/admin/showEditUser/{$use->id}" class="btn btn-sm btn-warning">
+                                <i class="bi-pencil-fill"></i>
+                            </a>
+                        </td>
+                    </tr>
+                {/foreach}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Mobile-Version als Cards -->
+    <div class="mobile-cards d-md-none" id="mobile-cards">
+        {foreach $users as $use}
+            <div class="card mb-3 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title">{$use->username}</h5>
+                    <p class="card-text">
+                        <strong>ID: </strong>{$use->id}<br>
+                        <strong>Email: </strong>{$use->email}<br>
+                        <strong>Status: </strong>
+                        {if $use->username === 'super.admin'}
+                                <i id="maccountStatus{$use->id}" class="bi-check-circle-fill text-secondary" data-bs-toggle="tooltip" title="Super-Admin-Account kann nicht geändert werden."></i>
+                            {elseif $use->status === 1}
+                                <i id="maccountStatus{$use->id}" class="bi-check-circle-fill text-success" onclick="toggleUserAccountStatus({$use->id}, 'disable');" style="cursor:pointer;" data-bs-toggle="tooltip" title="Disable Useraccount."></i>
+                            {else}
+                                <i id="maccountStatus{$use->id}" class="bi-x-circle-fill text-danger" onclick="toggleUserAccountStatus({$use->id}, 'enable');" style="cursor:pointer;" data-bs-toggle="tooltip" title="Enable Useraccount."></i>
+                            {/if}<br>
+                        <strong>2FA: </strong>
+                            {if $use->mfaSecret !== '' && $use->mfaEnabled === 1}
+                                <i id="mmfaEnabled{$use->id}" class="bi-check-circle-fill text-success" data-bs-toggle="tooltip" title="Disable 2FA." onclick="toggleMfa({$use->id}, 'disable');" style="cursor:pointer;"></i>
+                            {elseif $use->mfaSecret !== '' && $use->mfaEnabled === 0}
+                                <i id="mmfaEnabled{$use->id}" class="bi-x-circle-fill text-danger" data-bs-toggle="tooltip" title="Enable 2FA." onclick="toggleMfa({$use->id}, 'enable');" style="cursor:pointer;"></i>
+                            {elseif $use->mfaSecret === ''}
+                                <i id="mmfaEnabled{$use->id}" class="bi-x-circle-fill text-secondary" data-bs-toggle="tooltip" title="User has not setup 2fa!"></i>
+                            {/if}<br>
+                        <strong>2FA-Enf: </strong>
+                            {if $use->username === 'super.admin'}
+                                <i class="bi-check-circle-fill text-secondary" data-bs-toggle="tooltip" title="2FA enforcement cannot be changed for super.admin."></i>
+                            {elseif $use->mfaSecret !== ''}
+                                <i class="bi-check-circle-fill text-secondary" data-bs-toggle="tooltip" title="2FA is configured already."></i>
+                            {elseif $use->mfaEnforced === 1}
+                                <i id="menforceStatus{$use->id}" class="bi-check-circle-fill text-warning" onclick="toggleMfaEnforcement({$use->id}, 'disable');" style="cursor:pointer;" data-bs-toggle="tooltip" title="Click to unenforce 2FA for user."></i>
+                            {else}
+                                <i id="menforceStatus{$use->id}" class="bi-x-circle-fill text-danger" onclick="toggleMfaEnforcement({$use->id}, 'enable');" style="cursor:pointer;" data-bs-toggle="tooltip" title="Click to enforce 2FA for user."></i>
+                            {/if}<br>
+                    </p>
+                    {if $use->username === 'super.admin'}
+                        <button class="btn btn-sm btn-secondary" disabled>
+                            <i class="bi-trash-fill"></i> Löschen
+                        </button>
+                    {else}
+                        <a href="#" class="btn btn-sm btn-danger delete-user-btn" data-user-id="{$use->id}">
+                            <i class="bi-trash-fill"></i> Löschen
+                        </a>
+                    {/if}
+                    <a href="/admin/showEditUser/{$use->id}" class="btn btn-sm btn-warning">
+                        <i class="bi-pencil-fill"></i> Bearbeiten
+                    </a>
+                </div>
+            </div>
+        {/foreach}
+    </div>
+
+
+    <div class="d-flex justify-content-between align-items-center mt-3">
+        <div>Seite {$page} von {ceil($totalUsers / $pageSize)}</div>
+        <div>
+            {if $page > 1}
+                <a href="?page={$page - 1}&pageSize={$pageSize}&search={$search}" class="btn btn-outline-secondary btn-sm">
+                    Vorherige
+                </a>
+            {/if}
+            {if $page * $pageSize < $totalUsers}
+                <a href="?page={$page + 1}&pageSize={$pageSize}&search={$search}" class="btn btn-outline-secondary btn-sm">
+                    Nächste
+                </a>
+            {/if}
+        </div>
+    </div>
+</div>
+
+
+<script n:syntax="off" src="/js/admin/users.latte.js"></script>
+{/block}

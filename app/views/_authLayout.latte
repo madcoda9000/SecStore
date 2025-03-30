@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+    <head>        
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>{$title ? $title.' - '}</title>
+        <link rel="stylesheet" href="/bootstrap-5.3.3-dist/css/bootstrap.min.css" />
+        <link rel="stylesheet" href="/bootstrap-icons-1.11.3/font/bootstrap-icons.min.css" />  
+        <link rel="stylesheet" href="/css/_authLayout.latte-min.css" />
+        <script src="/js/startDarkmode-min.js"></script>        
+    </head>
+    <body>
+        {block content}{/block}     
+
+        <!-- Darkmode Toggle -->
+        <button id="darkmodeToggle" class="darkmode-toggle">
+            <i id="darkmodeIcon" class="bi bi-moon"></i>
+        </button>
+        
+        <!-- Bootstrap JS  -->
+        <script src="/bootstrap-5.3.3-dist/js/bootstrap.bundle.min.js" defer></script>
+
+        <!-- darkmode script -->
+        <script src="/js/darkmode-min.js"></script>>
+    </body>
+</html>
