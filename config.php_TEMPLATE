@@ -1,0 +1,77 @@
+<?php
+
+/**
+ * database credentials
+ */
+$db = [
+    'host' => 'YOUR_DB_SERVER_NAME',
+    'name' => 'SecStore_dev',
+    'user' => 'YOUR_DB_USERNAME',
+    'pass' => 'YOUR_DB_PASSWORD',
+];
+
+/**
+ * Logging settings
+ */
+$logging = [
+  'enableSqlLogging' => false,
+  'enableRequestLogging' => false,
+  'enableAuditLogging' => true,
+  'enableMailLogging' => true,
+  'enableSystemLogging' => true,
+];
+
+/**
+ * Application settings
+ * NOTE: Adjust address and port here
+ */
+$application = [
+  'appUrl' => 'http://localhost:8000',
+  'sessionTimeout' => 600,
+];
+
+/**
+ * CORS: define allowd Hosts
+ * NOTE: change this according to your setup
+ */
+$allowedHosts = [
+    'capacitor://localhost',
+    'ionic://localhost',
+    'http://localhost',
+    'http://localhost:4200',
+    'http://localhost:8080',
+    'http://localhost:8000',
+];
+
+/**
+ * Brute force settings
+ */
+$bruteForceSettings = [
+  'enableBruteForce' => true,
+  'maxAttempts' => 5,
+  'lockTime' => 1000,
+];
+
+/**
+ * Mail configuration
+ */
+$mail = [
+  'host' => 'YOUR_SMTP_SERVER',
+  'username' => 'YOUR_SMTP_USERNAME',
+  'password' => '********',
+  'encryption' => 'tls',
+  'port' => 587,
+  'fromEmail' => 'YOUR_SENDER_ADDRESS',
+  'fromName' => 'YOUR_FROM_NAME',
+  'enableWelcomeMail' => false,
+];
+
+// Alle Konfigurationen in einem Array zusammenfassen
+return [
+    'db' => $db,
+    'allowedHosts' => $allowedHosts,
+    'bruteForceSettings' => $bruteForceSettings,
+    'mail' => $mail,
+    'application' => $application,
+    'logging' => $logging,
+];
