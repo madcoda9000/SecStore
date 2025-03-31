@@ -214,6 +214,17 @@ class AuthController
         }
     }
 
+    /**
+     * Enables 2FA for the user.
+     *
+     * This method generates a new secret and QR code for the user, and stores
+     * the secret in the database. It also renders the enable_2fa template with
+     * the necessary data.
+     *
+     * @param bool $isMfaStartSetup If true, the user is starting the 2FA setup
+     *     process.
+     * @param int|null $usId The user ID to be used for enabling 2FA.
+     */
     public function enable2FA($isMfaStartSetup = false, $usId = null)
     {
 

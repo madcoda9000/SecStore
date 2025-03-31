@@ -207,6 +207,16 @@ class LogController
         self::listLogs('ERROR', $search, $page, $pageSize);
     }
 
+    /**
+     * Fetches a paginated list of mail logs from the database.
+     *
+     * This function is called through an AJAX request from the mail logs page.
+     * It retrieves the search query, page number and page size from the request
+     * query string and calls the `listLogs` method to retrieve the matching
+     * mail logs. It then returns a JSON response containing the list of mail
+     * logs, total number of mail logs, total number of pages, current page and
+     * page size.
+     */
     public static function fetchMailLogs()
     {
         $page = isset($_GET['page']) ? (int) $_GET['page'] : 1;

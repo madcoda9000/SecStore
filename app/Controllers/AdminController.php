@@ -67,6 +67,22 @@ class AdminController
         }
     }
 
+    /**
+     * Updates the logging settings.
+     *
+     * This method checks if the user is logged in and has the necessary
+     * privileges. If so, it updates the logging settings based on the
+     * provided form data. The method reads the existing configuration
+     * file, modifies the logging settings, and writes the updated
+     * configuration back to the file. If successful, it renders the
+     * settings page with a success message. If the user is not authenticated,
+     * it redirects to the login page.
+     *
+     * @param array $formData An associative array containing the new logging
+     * settings, with keys: 'enableSqlLogging', 'enableRequestLogging',
+     * 'enableAuditLogging', 'enableMailLogging', and 'enableSystemLogging'.
+     * @throws Exception If the configuration file cannot be read or updated.
+     */
     public function updateLogSettings($formData)
     {
         if (SessionUtil::get("user")["id"] === null) {
@@ -950,6 +966,14 @@ class AdminController
         ]);
     }
 
+    /**
+     * Renders the roles page.
+     *
+     * This method renders the roles page with the given parameters.
+     * It expects the user to be logged in. If the user is not logged in, it redirects to the login page.
+     * The parameter 'title' is set to 'Roles' and 'user' is set to the current user session.
+     * 'sessionTimeout' is set to the remaining session timeout.
+     */
     public static function showRoles()
     {
         Flight::latte()->render("admin/roles.latte", [

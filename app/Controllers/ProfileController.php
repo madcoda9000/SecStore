@@ -2,13 +2,13 @@
 
 namespace APP\Controllers;
 
+use Flight;
 use App\Models\User;
-use App\Utils\SessionUtil;
-use App\Utils\LogUtil;
 use App\Utils\LogType;
+use App\Utils\LogUtil;
+use App\Utils\SessionUtil;
 use RobThree\Auth\TwoFactorAuth;
 use RobThree\Auth\Providers\Qr\EndroidQrCodeProvider;
-use Flight;
 
 /**
  * Class Name: DashboardController
@@ -116,6 +116,14 @@ class ProfileController
         ]);
     }
 
+    /**
+     * Handles the email change form submission.
+     * Validates the new email address and updates it in the database.
+     * If successful, redirects to the logout page.
+     * If not, renders the profile page with an error message.
+     *
+     * @return void
+     */
     public function profileChangeEmail()
     {
         $user_id = SessionUtil::get('user')['id'];
@@ -226,6 +234,14 @@ class ProfileController
         }
     }
 
+    /**
+     * Disables MFA and resets the 2FA secret for the current user.
+     *
+     * This method disables MFA for the current user and resets the 2FA secret.
+     * If the user is not found, the user is redirected to the login page.
+     *
+     * @return void
+     */
     public function disableAndReset2FA()
     {
         $user = User::findUserById(SessionUtil::get('user')['id']);
