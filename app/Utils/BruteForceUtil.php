@@ -121,7 +121,6 @@ class BruteForceUtil
      * This method will delete all records of failed login attempts associated with the given email
      * and the current IP address from the 'failed_logins' table, effectively resetting the count.
      */
-
     public static function resetFailedLogins($email)
     {
         self::loadConfig();

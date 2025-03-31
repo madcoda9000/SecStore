@@ -67,7 +67,6 @@ class CorsUtil
      *
      * @return void
      */
-
     public function setupCors(): void
     {
         $request = Flight::request();
