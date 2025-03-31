@@ -600,8 +600,7 @@ class AdminController
         );
 
         // Prüfen, ob es eine AJAX-Anfrage ist
-        if (
-            !empty($_SERVER["HTTP_X_REQUESTED_WITH"]) &&
+        if (!empty($_SERVER["HTTP_X_REQUESTED_WITH"]) &&
             strtolower($_SERVER["HTTP_X_REQUESTED_WITH"]) == "xmlhttprequest"
         ) {
             // JSON-Antwort für AJAX
@@ -920,8 +919,7 @@ class AdminController
      */
     private static function handleResponse(bool $success, ?string $errorMessage = null)
     {
-        if (
-            !empty($_SERVER["HTTP_X_REQUESTED_WITH"]) &&
+        if (!empty($_SERVER["HTTP_X_REQUESTED_WITH"]) &&
             strtolower($_SERVER["HTTP_X_REQUESTED_WITH"]) === "xmlhttprequest"
         ) {
             Flight::json(["success" => $success]);

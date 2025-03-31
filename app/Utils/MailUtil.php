@@ -7,7 +7,8 @@ use Latte\Engine;
 use App\Utils\LogType;
 use App\Utils\LogUtil;
 
-class MailUtil {
+class MailUtil
+{
     private static $config;
 
     /**
@@ -16,7 +17,8 @@ class MailUtil {
      * This function is lazy and only loads the configuration the first time it is
      * called. Subsequent calls will return the previously loaded configuration.
      */
-    public static function loadConfig() {
+    public static function loadConfig()
+    {
         if (!self::$config) {
             self::$config = include __DIR__ . '/../../config.php';
         }
@@ -35,7 +37,8 @@ class MailUtil {
      * @return bool Returns true if the email was sent successfully, false otherwise.
      */
 
-    public static function sendMail($to, $subject, $template, $data = []) {
+    public static function sendMail($to, $subject, $template, $data = [])
+    {
         self::loadConfig();
 
         $mail = new PHPMailer(true);
@@ -59,14 +62,13 @@ class MailUtil {
             $templatePath = __DIR__ . '/../views/emails/' . $template . '.latte';
             $mail->Body = $latte->renderToString($templatePath, $data);
             
-            if($template == 'welcome' && self::$config['mail']['enableWelcomeMail'] === true) {
+            if ($template == 'welcome' && self::$config['mail']['enableWelcomeMail'] === true) {
                 LogUtil::logAction(LogType::MAIL, "MailUtil", "sendMail", "Welcome Mail an {$to} wurde versendet");
                 return $mail->send();
-            } else if ($template !== "welcome") {
+            } elseif ($template !== "welcome") {
                 LogUtil::logAction(LogType::MAIL, "MailUtil", "sendMail", "{$template} Mail an {$to} wurde versendet");
                 return $mail->send();
             }
-            
         } catch (Exception $e) {
             LogUtil::logAction(LogType::MAIL, "MailUtil", "sendMail", $e->getMessage());
             error_log("Mail konnte nicht gesendet werden: {$mail->ErrorInfo}");
@@ -74,4 +76,3 @@ class MailUtil {
         }
     }
 }
-?>

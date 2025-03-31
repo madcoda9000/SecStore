@@ -21,7 +21,8 @@ use Flight;
  * Änderungen:
  * - 1.0 (2025-02-24): Erstellt.
  */
-class LogController {
+class LogController
+{
 
     /**
      * Renders the audit logs view.
@@ -30,7 +31,8 @@ class LogController {
      * It provides the view with the title 'Audit Logs', the current user session, and the remaining session timeout.
      */
 
-    public static function showAuditLogs() {
+    public static function showAuditLogs()
+    {
         Flight::latte()->render('admin/logsAudit.latte', [
             'title' => 'Audit Logs',
             'user' => SessionUtil::get('user'),
@@ -48,7 +50,8 @@ class LogController {
      * logs, total number of audit logs, total number of pages, current page and
      * page size.
      */
-    public static function fetchAuditLogs() {
+    public static function fetchAuditLogs()
+    {
         $page = isset($_GET['page']) ? (int) $_GET['page'] : 1;
         $pageSize = isset($_GET['pageSize']) ? (int) $_GET['pageSize'] : 10;
         $search = isset($_GET['search']) ? trim($_GET['search']) : '';
@@ -62,7 +65,8 @@ class LogController {
      * It provides the view with the title 'System Logs', the current user session, and the remaining session timeout.
      */
 
-    public static function showSystemLogs() {
+    public static function showSystemLogs()
+    {
         Flight::latte()->render('admin/logsSystem.latte', [
             'title' => 'System Logs',
             'user' => SessionUtil::get('user'),
@@ -80,7 +84,8 @@ class LogController {
      * logs, total number of system logs, total number of pages, current page and
      * page size.
      */
-    public static function fetchSystemLogs() {
+    public static function fetchSystemLogs()
+    {
         $page = isset($_GET['page']) ? (int) $_GET['page'] : 1;
         $pageSize = isset($_GET['pageSize']) ? (int) $_GET['pageSize'] : 10;
         $search = isset($_GET['search']) ? trim($_GET['search']) : '';
@@ -93,7 +98,8 @@ class LogController {
      * This function uses the Latte templating engine to render the 'admin/logsRequest.latte' view.
      * It provides the view with the title 'Request Logs', the current user session, and the remaining session timeout.
      */
-    public static function showRequestLogs() {
+    public static function showRequestLogs()
+    {
         Flight::latte()->render('admin/logsRequest.latte', [
             'title' => 'Request Logs',
             'user' => SessionUtil::get('user'),
@@ -111,7 +117,8 @@ class LogController {
      * logs, total number of request logs, total number of pages, current page and
      * page size.
      */
-    public static function fetchRequestLogs() {
+    public static function fetchRequestLogs()
+    {
         $page = isset($_GET['page']) ? (int) $_GET['page'] : 1;
         $pageSize = isset($_GET['pageSize']) ? (int) $_GET['pageSize'] : 10;
         $search = isset($_GET['search']) ? trim($_GET['search']) : '';
@@ -124,7 +131,8 @@ class LogController {
      * This function utilizes the Latte templating engine to render the 'admin/logsDb.latte' view.
      * It provides the view with the title 'Database Logs', the current user session, and the remaining session timeout.
      */
-    public static function showDbLogs() {
+    public static function showDbLogs()
+    {
         Flight::latte()->render('admin/logsDb.latte', [
             'title' => 'Database Logs',
             'user' => SessionUtil::get('user'),
@@ -142,7 +150,8 @@ class LogController {
      * logs, total number of database logs, total number of pages, current page and
      * page size.
      */
-    public static function fetchDbLogs() {
+    public static function fetchDbLogs()
+    {
         $page = isset($_GET['page']) ? (int) $_GET['page'] : 1;
         $pageSize = isset($_GET['pageSize']) ? (int) $_GET['pageSize'] : 10;
         $search = isset($_GET['search']) ? trim($_GET['search']) : '';
@@ -156,7 +165,8 @@ class LogController {
      * It provides the view with the title 'Mail Logs', the current user session, and the remaining session timeout.
      */
 
-    public static function showMailLogs() {
+    public static function showMailLogs()
+    {
         Flight::latte()->render('admin/logsMail.latte', [
             'title' => 'Mail Logs',
             'user' => SessionUtil::get('user'),
@@ -170,7 +180,8 @@ class LogController {
      * This function uses the Latte templating engine to render the 'admin/logsError.latte' view.
      * It provides the view with the title 'Error Logs', the current user session, and the remaining session timeout.
      */
-    public static function showErrorLogs() {
+    public static function showErrorLogs()
+    {
         Flight::latte()->render('admin/logsError.latte', [
             'title' => 'Mail Logs',
             'user' => SessionUtil::get('user'),
@@ -188,14 +199,16 @@ class LogController {
      * logs, total number of error logs, total number of pages, current page and
      * page size.
      */
-    public static function fetchErrorLogs() {
+    public static function fetchErrorLogs()
+    {
         $page = isset($_GET['page']) ? (int) $_GET['page'] : 1;
         $pageSize = isset($_GET['pageSize']) ? (int) $_GET['pageSize'] : 10;
         $search = isset($_GET['search']) ? trim($_GET['search']) : '';
         self::listLogs('ERROR', $search, $page, $pageSize);
     }
 
-    public static function fetchMailLogs() {
+    public static function fetchMailLogs()
+    {
         $page = isset($_GET['page']) ? (int) $_GET['page'] : 1;
         $pageSize = isset($_GET['pageSize']) ? (int) $_GET['pageSize'] : 10;
         $search = isset($_GET['search']) ? trim($_GET['search']) : '';
@@ -212,7 +225,8 @@ class LogController {
      * @param int $page the page number to retrieve
      * @param int $pageSize the number of logs to retrieve per page
      */
-    private static function listLogs($logType, $search, $page, $pageSize) {        
+    private static function listLogs($logType, $search, $page, $pageSize)
+    {
         ORM::configure('logging', true);
 
         // Basis-Query erstellen
@@ -237,7 +251,7 @@ class LogController {
             ->limit($pageSize)
             ->find_array();
     
-        // letzte query loggen       
+        // letzte query loggen
         $queries = ORM::get_query_log();
         if (!empty($queries)) {
             $lastQuery = end($queries);
@@ -257,7 +271,5 @@ class LogController {
             'page' => $page,
             'pageSize' => $pageSize
         ]);
-    } 
-
+    }
 }
-?>

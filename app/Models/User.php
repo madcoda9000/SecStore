@@ -36,7 +36,8 @@ class User extends ORM
      * @param string $roles Die Rollen des Benutzers (z.B. "User" oder "Admin" oder mehere Rollen. Z.b. "User,IT,HR")
      * @return User|null Der neue Benutzer oder null, wenn der Benutzer nicht erstellt werden konnte
      */
-    public static function createUser($username, $email, $firstname, $lastname, $status, $password, $roles) {
+    public static function createUser($username, $email, $firstname, $lastname, $status, $password, $roles)
+    {
         ORM::configure('logging', true);
         $user = ORM::for_table(self::$_table)->create();
         $user->username = $username;
@@ -49,7 +50,7 @@ class User extends ORM
         $erg = $user->save() ? $user : null; // Rückgabe des Benutzers oder null
 
 
-        // letzte query loggen        
+        // letzte query loggen
         $queries = ORM::get_query_log();
         if (!empty($queries)) {
             $lastQuery = end($queries);
@@ -67,7 +68,8 @@ class User extends ORM
      * @param int $id The ID of the user to find.
      * @return mixed The user object if found, or false if not found.
      */
-    public static function findUserById($id) {
+    public static function findUserById($id)
+    {
         ORM::configure('logging', true);
         $erg = ORM::for_table(self::$_table)->where('id', $id)->find_one();
 
@@ -88,7 +90,8 @@ class User extends ORM
      * @param string $username The username of the user to find.
      * @return mixed The user object if found, or false if not found.
      */
-    public static function findUserByUsername($username) {
+    public static function findUserByUsername($username)
+    {
         ORM::configure('logging', true);
         $erg = self::findUserByField('username', $username);
 
@@ -97,7 +100,7 @@ class User extends ORM
         if (!empty($queries)) {
             $lastQuery = end($queries);
             LogUtil::logAction(LogType::SQL, 'LogController', 'listLogs', $lastQuery);
-        }    
+        }
 
         return $erg;
     }
@@ -108,7 +111,8 @@ class User extends ORM
      * @param string $email The email address of the user to find.
      * @return mixed The user object if found, or false if not found.
      */
-    public static function findUserByEmail($email) {
+    public static function findUserByEmail($email)
+    {
         return self::findUserByField('email', $email);
     }
 
@@ -118,7 +122,8 @@ class User extends ORM
      * @param string $token The reset token to find the user by.
      * @return mixed The user object if found, or false if not found.
      */
-    public static function findUserByResetToken($token) {
+    public static function findUserByResetToken($token)
+    {
         ORM::configure('logging', true);
         $erg = self::findUserByField('reset_token', $token);
 
@@ -139,7 +144,8 @@ class User extends ORM
      * @param mixed $value The value to search for.
      * @return mixed The user object if found, or false if not found.
      */
-    public static function findUserByField($field, $value) {
+    public static function findUserByField($field, $value)
+    {
         ORM::configure('logging', true);
         $erg = ORM::for_table(self::$_table)->where($field, $value)->find_one();
 
@@ -147,8 +153,8 @@ class User extends ORM
         $queries = ORM::get_query_log();
         if (!empty($queries)) {
             $lastQuery = end($queries);
-            LogUtil::logAction(LogType::SQL, 'LogController', 'listLogs', $lastQuery);  
-        }    
+            LogUtil::logAction(LogType::SQL, 'LogController', 'listLogs', $lastQuery);
+        }
 
         return $erg;
     }
@@ -160,15 +166,16 @@ class User extends ORM
      * @param string $email The email address to check for existence.
      * @return string A message indicating if the username or email already exists, or "false" if neither exists.
      */
-    public static function checkIfUserExists($username, $email) {
+    public static function checkIfUserExists($username, $email)
+    {
         ORM::configure('logging', true);
         $emailUser = ORM::for_table(self::$_table)->where('email', $email)->find_one();
         $nameUser = ORM::for_table(self::$_table)->where('username', $username)->find_one();
         $erg = "false";
 
-        if($emailUser !== false) {
+        if ($emailUser !== false) {
             $erg = "Email address exists already!";
-        } else if($nameUser !== false) {
+        } elseif ($nameUser !== false) {
             $erg = "Username exists already!";
         }
 
@@ -190,7 +197,8 @@ class User extends ORM
      * @param string $newStatus The new status to be set for the user.
      * @return bool True if the status was successfully updated, false otherwise.
      */
-    public static function updateUserStatus($id, $newStatus) {
+    public static function updateUserStatus($id, $newStatus)
+    {
         ORM::configure('logging', true);
         $user = self::findUserById($id);
         if ($user !== false) {
@@ -223,18 +231,21 @@ class User extends ORM
      * @param string $password The new password for the user, or null if password should not be changed.
      * @return bool True if the user was successfully updated, false otherwise.
      */
-    public static function updateuser($userId, $email, $username, $firstname, $lastname, $status, $roles, $password) {
+    public static function updateuser($userId, $email, $username, $firstname, $lastname, $status, $roles, $password)
+    {
         ORM::configure('logging', true);
         $user = self::findUserById($userId);
 
-        if ($user !== false) { 
+        if ($user !== false) {
             $user->email = $email;
             $user->username = $username;
             $user->firstname = $firstname;
             $user->lastname = $lastname;
             $user->status = $status;
             $user->roles = $roles;
-            if($password!==null) {$user->password = $password;}
+            if ($password!==null) {
+                $user->password = $password;
+            }
 
             $erg = $user->save();
 
@@ -245,7 +256,6 @@ class User extends ORM
                 LogUtil::logAction(LogType::SQL, 'LogController', 'listLogs', $lastQuery);
             }
             return $erg;
-
         }
         return false;
     }
@@ -257,14 +267,15 @@ class User extends ORM
      * @param string $new_email The new email address to be set for the user.
      * @return bool True if the email was successfully changed, false otherwise.
      */
-    public static function changeEmailAddress($id, $new_email) {
+    public static function changeEmailAddress($id, $new_email)
+    {
         ORM::configure('logging', true);
         $user = self::findUserById($id);
-        if($user !== false) {
+        if ($user !== false) {
             $user->email = $new_email;
             $erg = $user->save();
 
-            // letzte query loggen           
+            // letzte query loggen
             $queries = ORM::get_query_log();
             if (!empty($queries)) {
                 $lastQuery = end($queries);
@@ -272,7 +283,7 @@ class User extends ORM
             }
             
             return $erg;
-        } 
+        }
         return false;
     }
 
@@ -284,19 +295,20 @@ class User extends ORM
      * @return bool True if the token was successfully set and saved, false otherwise.
      */
 
-    public static function setResetToken($token, $email) {
+    public static function setResetToken($token, $email)
+    {
         ORM::configure('logging', true);
         $user = self::findUserByEmail($email);
-        if($user !== false) {
+        if ($user !== false) {
             $user->reset_token = $token;
             $erg =  $user->save();
 
-            // letzte query loggen  
+            // letzte query loggen
             $queries = ORM::get_query_log();
             if (!empty($queries)) {
                 $lastQuery = end($queries);
                 LogUtil::logAction(LogType::SQL, 'LogController', 'listLogs', $lastQuery);
-            }            
+            }
 
             return $erg;
         }
@@ -310,10 +322,11 @@ class User extends ORM
      * @param int $id The ID of the user for whom the token is to be set.
      * @return bool True if the token was successfully set and saved, false otherwise.
      */
-    public static function setMfaToken($token, $id) {
+    public static function setMfaToken($token, $id)
+    {
         ORM::configure('logging', true);
         $user = self::findUserById($id);
-        if($user !== false) {
+        if ($user !== false) {
             $user->mfaSecret = $token;
             $user->mfaEnabled = 0;
             $erg = $user->save();
@@ -337,10 +350,11 @@ class User extends ORM
      * @param int $id The ID of the user whose MFA is to be disabled.
      * @return bool True if MFA was successfully disabled and the secret was reset, false otherwise.
      */
-    public static function disableAndReset2fa($id) { 
+    public static function disableAndReset2fa($id)
+    {
         ORM::configure('logging', true);
         $user = self::findUserById($id);
-        if($user !== false) {
+        if ($user !== false) {
             $user->mfaSecret = '';
             $user->mfaEnabled = 0;
             $erg = $user->save();
@@ -363,10 +377,11 @@ class User extends ORM
      * @param int $id The ID of the user whose MFA is to be enforced.
      * @return bool True if MFA was successfully enforced, false otherwise.
      */
-    public static function enforceMfa($id) {
+    public static function enforceMfa($id)
+    {
         ORM::configure('logging', true);
         $user = self::findUserById($id);
-        if($user !== false) {
+        if ($user !== false) {
             $user->mfaEnforced = 1;
             $erg = $user->save();
 
@@ -388,10 +403,11 @@ class User extends ORM
      * @param int $id The ID of the user whose MFA enforcing is to be disabled.
      * @return bool True if MFA enforcing was successfully disabled, false otherwise.
      */
-    public static function unenforceMfa($id) {
+    public static function unenforceMfa($id)
+    {
         ORM::configure('logging', true);
         $user = self::findUserById($id);
-        if($user !== false) {
+        if ($user !== false) {
             $user->mfaEnforced = 0;
             $erg = $user->save();
 
@@ -414,14 +430,15 @@ class User extends ORM
      * @param int $id The ID of the user whose MFA is to be disabled.
      * @return bool True if MFA was successfully disabled, false otherwise.
      */
-    public static function disableMfaForUser($id) {
+    public static function disableMfaForUser($id)
+    {
         ORM::configure('logging', true);
         $user = self::findUserById($id);
-        if($user !== false) {
+        if ($user !== false) {
             $user->mfaEnabled = 0;
-            $erg = $user->save(); 
+            $erg = $user->save();
 
-            // letzte query loggen                       
+            // letzte query loggen
             $queries = ORM::get_query_log();
             if (!empty($queries)) {
                 $lastQuery = end($queries);
@@ -439,14 +456,15 @@ class User extends ORM
      * @param int $id The ID of the user whose MFA is to be enabled.
      * @return bool True if MFA was successfully enabled, false otherwise.
      */
-    public static function enableMfaForUser($id) {
+    public static function enableMfaForUser($id)
+    {
         ORM::configure('logging', true);
         $user = self::findUserById($id);
-        if($user !== false) {
+        if ($user !== false) {
             $user->mfaEnabled = 1;
-            $erg = $user->save(); 
+            $erg = $user->save();
 
-            // letzte query loggen                       
+            // letzte query loggen
             $queries = ORM::get_query_log();
             if (!empty($queries)) {
                 $lastQuery = end($queries);
@@ -468,10 +486,11 @@ class User extends ORM
      * @param int $id The ID of the user whose MFA setup is to be enabled.
      * @return bool True if MFA setup was successfully enabled, false otherwise.
      */
-    public static function enableMfaSetupForUser($id) {
+    public static function enableMfaSetupForUser($id)
+    {
         ORM::configure('logging', true);
         $user = self::findUserById($id);
-        if($user !== false) {
+        if ($user !== false) {
             $user->mfaStartSetup = 1;
             $erg = $user->save();
 
@@ -493,10 +512,11 @@ class User extends ORM
      * @param int $id The ID of the user whose MFA setup is to be disabled.
      * @return bool True if MFA setup was successfully disabled, false otherwise.
      */
-    public static function disableMfaSetupForUser($id) {
+    public static function disableMfaSetupForUser($id)
+    {
         ORM::configure('logging', true);
         $user = self::findUserById($id);
-        if($user !== false) {
+        if ($user !== false) {
             $user->mfaStartSetup = 0;
             $erg = $user->save();
 
@@ -523,10 +543,11 @@ class User extends ORM
      * @param string $password The new password to be set.
      * @return bool True if the password was successfully set and saved, false otherwise.
      */
-    public static function setNewPassword($userId, $password) {
+    public static function setNewPassword($userId, $password)
+    {
         ORM::configure('logging', true);
         $user = self::findUserById($userId);
-        if($user !== false) {
+        if ($user !== false) {
             $user->reset_token = '';
             $user->password = $password;
             $erg = $user->save();
@@ -549,10 +570,11 @@ class User extends ORM
      * @param int $id The ID of the user to delete.
      * @return bool True if the user was successfully deleted, false otherwise.
      */
-    public static function deleteUser($id) {
+    public static function deleteUser($id)
+    {
         ORM::configure('logging', true);
         $user = self::findUserById($id);
-        if ($user !==false) {            
+        if ($user !==false) {
             $erg = $user->delete();
 
             // letzte query loggen
@@ -574,7 +596,8 @@ class User extends ORM
      * @return array An array of user objects.
      */
 
-    public static function getAllUsers() {
+    public static function getAllUsers()
+    {
         ORM::configure('logging', true);
         $erg = ORM::for_table(self::$_table)->find_many();
 
@@ -597,7 +620,8 @@ class User extends ORM
      * @return array|null An associative array containing 'users' (the list of users) and 'totalUsers' (the total count of users), or null if no users are found.
      */
 
-    public static function getUsersPaged($offset, $pageSize, $search = null) {
+    public static function getUsersPaged($offset, $pageSize, $search = null)
+    {
         ORM::configure('logging', true);
         $query = ORM::forTable(self::$_table);
         if ($search) {
@@ -614,15 +638,13 @@ class User extends ORM
             LogUtil::logAction(LogType::SQL, 'LogController', 'listLogs', $lastQuery);
         }
 
-        if($users && $totalUsers) {
+        if ($users && $totalUsers) {
             return [
                 'users' => $users,
                 'totalUsers' => $totalUsers
             ];
         } else {
             return null;
-        }        
+        }
     }
 }
-
-?>

@@ -25,13 +25,15 @@ use App\Utils\LogUtil;
  * Änderungen:
  * - 1.0 (2025-02-24): Erstellt.
  */
-class AuthController {
+class AuthController
+{
 
     
     /**
      * Renders the registration form.
      */
-    public function showRegister() {
+    public function showRegister()
+    {
         Flight::latte()->render('register.latte', [
             'title' => 'Register'
         ]);
@@ -44,7 +46,8 @@ class AuthController {
      * Otherwise, renders the registration page with an error message.
      * It expects 'email', 'username', and 'password' fields in the POST request.
      */
-    public function register() {
+    public function register()
+    {
         
         $email = $_POST['email'];
         $user = $_POST['username'];
@@ -53,9 +56,9 @@ class AuthController {
         $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
         $userCheck = User::checkIfUserExists($user, $email);
 
-        if($userCheck === "false") {
+        if ($userCheck === "false") {
             $newUser = User::createUser($user, $email, $firstname, $lastname, 1, $password, 'User');
-            if($newUser !== null) {
+            if ($newUser !== null) {
                 LogUtil::logAction(LogType::AUDIT, 'AuthController', 'register', 'SUCCESS: registered new user.', $user->username);
                 MailUtil::sendMail($user->email, "SecStore: Welcome to SecStore", "welcome", ['name' => $user->firstname . ' ' . $user->lastname]);
                 Flight::latte()->render('register.latte', [
@@ -73,13 +76,12 @@ class AuthController {
             }
         } else {
             LogUtil::logAction(LogType::AUDIT, 'AuthController', 'register', 'FAILED: ', $userCheck);
-            Flight::latte()->render('register.latte', [                
+            Flight::latte()->render('register.latte', [
                 'title' => 'Register',
                 'error' => $userCheck
             ]);
             return;
-        }      
-        
+        }
     }
 
     
@@ -90,9 +92,10 @@ class AuthController {
      * This method is responsible for rendering the login page and providing the
      * necessary data to the template. It expects no parameters to be passed in.
      */
-    public function showLogin() {
+    public function showLogin()
+    {
         // prüfen ob benutzer bereits angemeldet ist aber 2fa noch fehlt
-        if(SessionUtil::get('2fa_user_id') !== null) {
+        if (SessionUtil::get('2fa_user_id') !== null) {
             Flight::latte()->render('2fa_verify.latte', [
                 'title' => 'Login'
             ]);
@@ -119,13 +122,14 @@ class AuthController {
      * a session flag is also set for admin access. In case of invalid credentials
      * or inactive status, an error message is rendered on the login page.
      */
-    public function login() {     
+    public function login()
+    {
         $username = $_POST['username'];
         $password = $_POST['password'];
 
         $user = User::findUserByUsername($username);
 
-        if($user === false) {
+        if ($user === false) {
             LogUtil::logAction(LogType::AUDIT, 'AuthController', 'login', 'FAILED: username not found.', $username);
             Flight::latte()->render('login.latte', [
                 'title' => 'Login',
@@ -144,10 +148,10 @@ class AuthController {
                 'sessionTimeout' => SessionUtil::getSessionTimeout(),
             ]);
             return;
-        }       
+        }
 
         // check for open password reset token
-        if($user !== false && !empty($user->reset_token) ) {
+        if ($user !== false && !empty($user->reset_token)) {
             LogUtil::logAction(LogType::AUDIT, 'AuthController', 'login', 'FAILED: user has an open password reset request.', $user->email);
             Flight::latte()->render('login.latte', [
                 'title' => 'Login',
@@ -157,8 +161,8 @@ class AuthController {
             return;
         }
 
-        if ($user !==false && password_verify($password, $user->password)) {            
-            if($user->status === 0) {
+        if ($user !==false && password_verify($password, $user->password)) {
+            if ($user->status === 0) {
                 LogUtil::logAction(LogType::AUDIT, 'AuthController', 'login', 'FAILED: user account deactivated.', $user->email);
                 Flight::latte()->render('login.latte', [
                     'title' => 'Login',
@@ -174,8 +178,8 @@ class AuthController {
 
       
             // prüfen ob user 2fa setup im profil aktiviert hat
-            if($user->mfaStartSetup === 1) {
-                User::disableMfaSetupForUser($user->id);   
+            if ($user->mfaStartSetup === 1) {
+                User::disableMfaSetupForUser($user->id);
                 SessionUtil::set('2fa_user_id', $user->id); // Temporär speichern
                 self::enable2FA(true, $user->id);
                 return;
@@ -185,7 +189,7 @@ class AuthController {
             if ($user->mfaEnabled === 1) {
                 SessionUtil::set('2fa_user_id', $user->id); // Temporär speichern
                 Flight::redirect('/2fa-verify');
-            } else if($user->mfaEnabled === 0 && $user->mfaEnforced === 1) {
+            } elseif ($user->mfaEnabled === 0 && $user->mfaEnforced === 1) {
                 SessionUtil::set('2fa_user_id', $user->id); // Temporär speichern
                 self::enable2FA();
             } else {
@@ -195,7 +199,7 @@ class AuthController {
                 // SessionUtil::set('email', $user->email);
                 SessionUtil::set('user', $user);
                 Flight::redirect('/home');
-            }            
+            }
         } else {
             // Fehlgeschlagener Loginversuch registrieren
             BruteForceUtil::recordFailedLogin($user->email);
@@ -211,9 +215,9 @@ class AuthController {
     }
 
     public function enable2FA($isMfaStartSetup = false, $usId = null)
-    {      
+    {
 
-        if($isMfaStartSetup && $usId) {
+        if ($isMfaStartSetup && $usId) {
             User::disableMfaSetupForUser($usId);
             SessionUtil::set('2fa_user_id', $usId);
         }
@@ -246,7 +250,8 @@ class AuthController {
      * @param bool $comesFrom2faEnable If true, the user comes from the
      *     enable-2fa page and 2FA is getting enabled for the user.
      */
-    public function show2faVerify($comesFrom2faEnable) {
+    public function show2faVerify($comesFrom2faEnable)
+    {
         $userId = $_SESSION['2fa_user_id'] ?? null;
         if (!$userId) {
             Flight::redirect('/login');
@@ -258,7 +263,7 @@ class AuthController {
         }
 
         // set2fa as enabled if the user comes from enable-2fa
-        if($comesFrom2faEnable && $comesFrom2faEnable === 'true') {
+        if ($comesFrom2faEnable && $comesFrom2faEnable === 'true') {
             User::enableMfaForUser($user->id);
         }
 
@@ -274,7 +279,7 @@ class AuthController {
      * with an error message.
      */
     public function verify2FA()
-    {        
+    {
         $userId = SessionUtil::get('2fa_user_id');
         if (!$userId) {
             Flight::redirect('/login');
@@ -283,7 +288,7 @@ class AuthController {
         $user = User::findUserById($userId);
         if ($user === false || $user->mfaSecret === '') {
             Flight::redirect('/login');
-        }        
+        }
 
         $request = Flight::request();
         $otp = $request->data->otp;
@@ -305,7 +310,8 @@ class AuthController {
     /**
      * Renders the forgot password page.
      */
-    public function showForgotPassword() {
+    public function showForgotPassword()
+    {
         Flight::latte()->render('forgot_password.latte', [
             'title' => 'Forgot Password'
         ]);
@@ -318,11 +324,12 @@ class AuthController {
      * Otherwise, renders the forgot password page with an error message.
      * It expects an 'email' field in the POST request.
      */
-    public function forgotPassword() {
+    public function forgotPassword()
+    {
         $email = $_POST['email'];
         $user = User::findUserByEmail($email);
 
-        if($user === false) {
+        if ($user === false) {
             LogUtil::logAction(LogType::AUDIT, 'AuthController', 'forgotPassword', 'FAILED: user by email not found.', $email);
             Flight::latte()->render('forgot_password.latte', [
                 'title' => 'Forgot Password',
@@ -335,8 +342,8 @@ class AuthController {
             $token = bin2hex(random_bytes(50));
             $erg = User::setResetToken($token, $email);
 
-            if($erg) {
-                $name = trim($user->firstname . ' ' . $user->lastname);                 
+            if ($erg) {
+                $name = trim($user->firstname . ' ' . $user->lastname);
                 MailUtil::sendMail($user->email, "SecStore: your password reset request", "pwReset", ['name' => $name, 'token' => $token]);
                 LogUtil::logAction(LogType::AUDIT, 'AuthController', 'forgotPassword', 'SUCCESS: requested pw reset.', $email);
                 Flight::latte()->render('forgot_password.latte', [
@@ -352,7 +359,6 @@ class AuthController {
                     'token' => ''
                 ]);
             }
-            
         } else {
             LogUtil::logAction(LogType::AUDIT, 'AuthController', 'forgotPassword', 'FAILED: user has an open reset pw request already.', $email);
             Flight::latte()->render('forgot_password.latte', [
@@ -370,7 +376,8 @@ class AuthController {
      * @param string $token The reset token to be used for password reset.
      */
 
-    public function showResetPassword($token) {
+    public function showResetPassword($token)
+    {
         Flight::latte()->render('reset_password.latte', [
             'title' => 'Reset Password',
             'token' => $token
@@ -384,13 +391,14 @@ class AuthController {
      * If the token is valid, the user's password is updated with the given new password.
      * Otherwise, an error is displayed.
      */
-    public function resetPassword() {
+    public function resetPassword()
+    {
         $token = $_POST['token'];
         $new_password = password_hash($_POST['new_password'], PASSWORD_DEFAULT);
         $user = User::findUserByResetToken($token);
         if ($user !== false) {
             $erg = User::setNewPassword($user->id, $new_password);
-            if($erg) {
+            if ($erg) {
                 LogUtil::logAction(LogType::AUDIT, 'AuthController', 'resetPassword', 'SUCCESS: saved new password.', $user->username);
                 Flight::latte()->render('login.latte', [
                     'title' => 'Login',
@@ -413,7 +421,7 @@ class AuthController {
             ]);
             return;
         }
-    }   
+    }
     
     /**
      * Updates the profile of the currently logged in user.
@@ -426,7 +434,8 @@ class AuthController {
      * If the update is successful, it renders the profile page with a success message.
      * Otherwise, it renders the profile page with an error message.
      */
-    public function updateProfile() {       
+    public function updateProfile()
+    {
         $user_id = SessionUtil::get('user')['id'];
         $email = $_POST['email'];
         $name = $_POST['name'];
@@ -446,5 +455,3 @@ class AuthController {
         }
     }
 }
-
-?>

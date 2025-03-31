@@ -1,5 +1,7 @@
 <?php
+
 namespace App\Utils;
+
 use ORM;
 
 /**
@@ -15,7 +17,8 @@ use ORM;
  * Änderungen:
  * - 1.0 (2025-02-24): Erstellt.
  */
-class BruteForceUtil {
+class BruteForceUtil
+{
 
     private static $maxAttempts;
     private static $lockTime;
@@ -30,7 +33,8 @@ class BruteForceUtil {
      * - lockTime: int, Sperrzeit in Sekunden
      */
     
-    public static function loadConfig() {
+    public static function loadConfig()
+    {
         $config = include __DIR__ . '/../../config.php'; // Konfigurationsdatei einbinden
         self::$maxAttempts = $config['bruteForceSettings']['maxAttempts'] ?? 5;
         self::$lockTime = $config['bruteForceSettings']['lockTime'] ?? 900;
@@ -41,7 +45,8 @@ class BruteForceUtil {
      * Liefert true, wenn die Brute-Force-Schutzfunktion aktiviert ist.
      * @return bool
      */
-    public static function isProtectionEnabled() {
+    public static function isProtectionEnabled()
+    {
         return self::$enabled;
     }
 
@@ -50,9 +55,12 @@ class BruteForceUtil {
      * Zeichnet einen fehlgeschlagenen Login-Versuch auf.
      * @param string $email Email-Adresse des Benutzers
      */
-    public static function recordFailedLogin($email) {
+    public static function recordFailedLogin($email)
+    {
         self::loadConfig();
-        if (!self::isProtectionEnabled()) return;
+        if (!self::isProtectionEnabled()) {
+            return;
+        }
 
         $ip = $_SERVER['REMOTE_ADDR'];
 
@@ -79,9 +87,12 @@ class BruteForceUtil {
      * @param string $email Email-Adresse des Benutzers
      * @return bool true, wenn der Benutzer fuer Login-Versuche gesperrt ist, false sonst
      */
-    public static function isLockedOut($email) {
+    public static function isLockedOut($email)
+    {
         self::loadConfig();
-        if (!self::isProtectionEnabled()) return false;
+        if (!self::isProtectionEnabled()) {
+            return false;
+        }
 
         $ip = $_SERVER['REMOTE_ADDR'];
         $failed = ORM::for_table('failed_logins')
@@ -106,14 +117,17 @@ class BruteForceUtil {
      * Resets failed login attempts for a specific user and IP address.
      *
      * @param string $email The email address of the user whose failed login attempts should be reset.
-     * 
+     *
      * This method will delete all records of failed login attempts associated with the given email
      * and the current IP address from the 'failed_logins' table, effectively resetting the count.
      */
 
-    public static function resetFailedLogins($email) {
+    public static function resetFailedLogins($email)
+    {
         self::loadConfig();
-        if (!self::isProtectionEnabled()) return;
+        if (!self::isProtectionEnabled()) {
+            return;
+        }
 
         $ip = $_SERVER['REMOTE_ADDR'];
         ORM::for_table('failed_logins')
@@ -125,4 +139,3 @@ class BruteForceUtil {
 
 // Konfiguration einmalig laden
 BruteForceUtil::loadConfig();
-?>

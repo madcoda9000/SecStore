@@ -23,16 +23,18 @@ use Flight;
  * Änderungen:
  * - 1.0 (2025-02-24): Erstellt.
  */
-class ProfileController {
+class ProfileController
+{
 
     /**
      * Shows the profile of the currently logged in user.
      */
-    public function showProfile() {
+    public function showProfile()
+    {
         $user = SessionUtil::get('user');
         $tfa = new TwoFactorAuth(new EndroidQrCodeProvider());
         $qrCodeUrl = '';
-        if($user->mfaSecret) {
+        if ($user->mfaSecret) {
             $secret = $user->mfaSecret; // Geheimen Schlüssel generieren
             $qrCodeUrl = $tfa->getQRCodeImageAsDataUri($user->username, $secret); // QR-Code generieren
         }
@@ -42,8 +44,8 @@ class ProfileController {
                 'user' => $user,
                 'sessionTimeout' => SessionUtil::getRemainingTime(),
                 'qrCodeUrl' => $qrCodeUrl,
-        ]);   
-        return;         
+        ]);
+        return;
     }
 
     
@@ -56,7 +58,8 @@ class ProfileController {
      * If not, it renders the profile page again with an error message.
      * @return void
      */
-    public function profileChangePassword() {
+    public function profileChangePassword()
+    {
         $user_id = SessionUtil::get('user')['id'];
         $user = User::findUserById($user_id);
 
@@ -110,10 +113,11 @@ class ProfileController {
             'user' => $user,
             'success' => 'Password changed successfully!',
             'sessionTimeout' => SessionUtil::getRemainingTime(),
-        ]);       
+        ]);
     }
 
-    public function profileChangeEmail() {
+    public function profileChangeEmail()
+    {
         $user_id = SessionUtil::get('user')['id'];
         $user = User::findUserById($user_id);
         $new_mail = $_POST['new_email'] ?? null;
@@ -123,7 +127,7 @@ class ProfileController {
             return;
         }
 
-        if(!$new_mail) {
+        if (!$new_mail) {
             Flight::latte()->render('profile.latte', [
                 'title' => 'Profile',
                 'user' => $user,
@@ -141,11 +145,11 @@ class ProfileController {
                 'sessionTimeout' => SessionUtil::getRemainingTime(),
             ]);
             return;
-        } 
+        }
 
         $erg = User::changeEmailAddress($user->id, $new_mail);
 
-        if($erg === false) {
+        if ($erg === false) {
             Flight::latte()->render('profile.latte', [
                 'title' => 'Profile',
                 'user' => $user,
@@ -173,8 +177,7 @@ class ProfileController {
             exit;
         }
 
-        return User::disableMfaForUser($user->id);    
-       
+        return User::disableMfaForUser($user->id);
     }
 
     /**
@@ -193,7 +196,7 @@ class ProfileController {
             exit;
         }
 
-        return User::enableMfaForUser($user->id);    
+        return User::enableMfaForUser($user->id);
     }
 
 
@@ -207,7 +210,8 @@ class ProfileController {
      * @return bool true if the setup process was started successfully,
      *     false otherwise.
      */
-    public static function initiate2faSetup() {
+    public static function initiate2faSetup()
+    {
         $user = User::findUserById(SessionUtil::get('user')['id']);
         if ($user === false) {
             Flight::redirect('/login');
@@ -215,11 +219,11 @@ class ProfileController {
 
         $erg = User::enableMfaSetupForUser($user->id);
         
-        if($erg) {
+        if ($erg) {
             return true;
         } else {
             return false;
-        }        
+        }
     }
 
     public function disableAndReset2FA()
@@ -229,7 +233,7 @@ class ProfileController {
             Flight::redirect('/login');
         }
 
-        User::disableAndReset2FA($user->id); 
+        User::disableAndReset2FA($user->id);
         Flight::redirect('/logout');
     }
 
@@ -237,10 +241,9 @@ class ProfileController {
      * Logs out the current user by destroying the session and redirecting to the login page.
      */
 
-    public function logout() {
+    public function logout()
+    {
         SessionUtil::destroy();
         Flight::redirect('/login');
     }
 }
-
-?>

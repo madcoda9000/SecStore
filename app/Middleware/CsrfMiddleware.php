@@ -26,12 +26,11 @@ class CsrfMiddleware
      */
     public function before(array $params): void
     {
-        if(Flight::request()->method == 'POST') {
+        if (Flight::request()->method == 'POST') {
             $token = Flight::request()->data->csrf_token;
-            if($token !== SessionUtil::get('csrf_token')) {
+            if ($token !== SessionUtil::get('csrf_token')) {
                 Flight::halt(403, 'Ungültiges CSRF-Token');
             }
         }
     }
 }
-?>

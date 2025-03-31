@@ -15,53 +15,53 @@ $csrfMiddleware = new CsrfMiddleware();
 
 
 // Startseite (Weiterleitung zu Login)
-Flight::route('/', function() {
+Flight::route('/', function () {
     Flight::redirect('/login');
 });
 
 // Registrierung
-Flight::route('GET /register', function() {
+Flight::route('GET /register', function () {
     LogUtil::logAction(LogType::REQUEST, 'routes.php', 'Flight:route', 'GET: /register');
     (new AuthController)->showRegister();
 });
-Flight::route('POST /register', function() use ($csrfMiddleware) {
+Flight::route('POST /register', function () use ($csrfMiddleware) {
     LogUtil::logAction(LogType::REQUEST, 'routes.php', 'Flight:route', 'POST: /register');
     $csrfMiddleware->before([]);
     (new AuthController)->register();
 });
 
 // Login
-Flight::route('GET /login', function() {
+Flight::route('GET /login', function () {
     LogUtil::logAction(LogType::REQUEST, 'routes.php', 'Flight:route', 'GET: /login');
     (new AuthController)->showLogin();
 });
-Flight::route('POST /login', function() use ($csrfMiddleware) {
+Flight::route('POST /login', function () use ($csrfMiddleware) {
     LogUtil::logAction(LogType::REQUEST, 'routes.php', 'Flight:route', 'POST: /login');
     $csrfMiddleware->before([]);
     (new AuthController)->login();
 });
 
 // 2fa
-Flight::route('GET /enable-2fa(/@comesFromSettings)', function($comesFromSettings) use ($csrfMiddleware) {
+Flight::route('GET /enable-2fa(/@comesFromSettings)', function ($comesFromSettings) use ($csrfMiddleware) {
     LogUtil::logAction(LogType::REQUEST, 'routes.php', 'Flight:route', 'GET: /enable-2fa');
     $csrfMiddleware->before([]);
     AuthCheckMiddleware::checkIfAuthenticated();
     (new ProfileController)->enable2FA($comesFromSettings);
 });
-Flight::route('GET /2fa-verify(/@comesFrom2faEnable?)', function($comesFrom2faEnable = null) use ($csrfMiddleware) {
+Flight::route('GET /2fa-verify(/@comesFrom2faEnable?)', function ($comesFrom2faEnable = null) use ($csrfMiddleware) {
     LogUtil::logAction(LogType::REQUEST, 'routes.php', 'Flight:route', 'GET: /2fa-verify');
     $csrfMiddleware->before([]);
     (new AuthController)->show2faVerify($comesFrom2faEnable);
 });
-Flight::route('POST /2fa-verify', function() use ($csrfMiddleware) {
+Flight::route('POST /2fa-verify', function () use ($csrfMiddleware) {
     LogUtil::logAction(LogType::REQUEST, 'routes.php', 'Flight:route', 'POST: /2fa-verify');
     $csrfMiddleware->before([]);
     (new AuthController)->verify2FA();
 });
-Flight::route('POST /disable-2fa', function() {
+Flight::route('POST /disable-2fa', function () {
     LogUtil::logAction(LogType::REQUEST, 'routes.php', 'Flight:route', 'POST: /disable-2fa');
     AuthCheckMiddleware::checkIfAuthenticated();
-    $_SESSION['last_activity'] = time();     
+    $_SESSION['last_activity'] = time();
     $erg = (new ProfileController)->disable2FA();
     if ($erg) {
         echo json_encode(["success" => true]);
@@ -69,10 +69,10 @@ Flight::route('POST /disable-2fa', function() {
         echo json_encode(["success" => false]);
     }
 });
-Flight::route('POST /enable-2fa', function() {
+Flight::route('POST /enable-2fa', function () {
     LogUtil::logAction(LogType::REQUEST, 'routes.php', 'Flight:route', 'POST: /enable-2fa');
     AuthCheckMiddleware::checkIfAuthenticated();
-    $_SESSION['last_activity'] = time();     
+    $_SESSION['last_activity'] = time();
     $erg = (new ProfileController)->enable2FA();
     if ($erg) {
         echo json_encode(["success" => true]);
@@ -82,11 +82,11 @@ Flight::route('POST /enable-2fa', function() {
 });
 
 // Passwort vergessen
-Flight::route('GET /forgot-password', function() {
+Flight::route('GET /forgot-password', function () {
     LogUtil::logAction(LogType::REQUEST, 'routes.php', 'Flight:route', 'GET: /forgot-password');
     (new AuthController)->showForgotPassword();
 });
-Flight::route('POST /forgot-password', function() use ($csrfMiddleware) {
+Flight::route('POST /forgot-password', function () use ($csrfMiddleware) {
     LogUtil::logAction(LogType::REQUEST, 'routes.php', 'Flight:route', 'POST: /forgot-password');
     $csrfMiddleware->before([]);
     (new AuthController)->forgotPassword();
@@ -94,44 +94,44 @@ Flight::route('POST /forgot-password', function() use ($csrfMiddleware) {
 
 // Passwort zurücksetzen
 Flight::route('GET /reset-password/@token', array(new AuthController, 'showResetPassword'));
-Flight::route('POST /reset-password', function() use ($csrfMiddleware) {
+Flight::route('POST /reset-password', function () use ($csrfMiddleware) {
     LogUtil::logAction(LogType::REQUEST, 'routes.php', 'Flight:route', 'POST: /reset-password');
     $csrfMiddleware->before([]);
     (new AuthController)->resetPassword();
 });
 
 // Home (geschützt)
-Flight::route('GET /home', function() {
+Flight::route('GET /home', function () {
     LogUtil::logAction(LogType::REQUEST, 'routes.php', 'Flight:route', 'GET: /home');
     AuthCheckMiddleware::checkIfAuthenticated();
     (new HomeController)->showHome();
 });
 
 // profile (geschützt)
-Flight::route('GET /profile', function() {
+Flight::route('GET /profile', function () {
     LogUtil::logAction(LogType::REQUEST, 'routes.php', 'Flight:route', 'GET: /profile');
     AuthCheckMiddleware::checkIfAuthenticated();
     (new ProfileController)->showProfile();
 });
-Flight::route('POST /profileChangePassword', function() use ($csrfMiddleware) {
+Flight::route('POST /profileChangePassword', function () use ($csrfMiddleware) {
     LogUtil::logAction(LogType::REQUEST, 'routes.php', 'Flight:route', 'POST: /profileChangePassword');
     AuthCheckMiddleware::checkIfAuthenticated();
     $csrfMiddleware->before([]);
     (new ProfileController)->profileChangePassword();
 });
-Flight::route('POST /profileChangeEmail', function() use ($csrfMiddleware) {
+Flight::route('POST /profileChangeEmail', function () use ($csrfMiddleware) {
     LogUtil::logAction(LogType::REQUEST, 'routes.php', 'Flight:route', 'POST: /profileChangeEmail');
     AuthCheckMiddleware::checkIfAuthenticated();
     $csrfMiddleware->before([]);
     (new ProfileController)->profileChangeEmail();
 });
-Flight::route('POST /disableAndReset2FA', function() use ($csrfMiddleware) {
+Flight::route('POST /disableAndReset2FA', function () use ($csrfMiddleware) {
     LogUtil::logAction(LogType::REQUEST, 'routes.php', 'Flight:route', 'POST: /disableAndReset2FA');
     AuthCheckMiddleware::checkIfAuthenticated();
     $csrfMiddleware->before([]);
     (new ProfileController)->disableAndReset2FA();
 });
-Flight::route('POST /initiate2faSetup', function() use ($csrfMiddleware) {
+Flight::route('POST /initiate2faSetup', function () use ($csrfMiddleware) {
     LogUtil::logAction(LogType::REQUEST, 'routes.php', 'Flight:route', 'POST: /initiate2faSetup');
     AuthCheckMiddleware::checkIfAuthenticated();
     $erg = (new ProfileController)->initiate2faSetup();
@@ -139,7 +139,7 @@ Flight::route('POST /initiate2faSetup', function() use ($csrfMiddleware) {
 });
 
 // admin settings (geschützt)
-Flight::route('GET /admin/settings', function() {
+Flight::route('GET /admin/settings', function () {
     LogUtil::logAction(LogType::REQUEST, 'routes.php', 'Flight:route', 'GET: /admin/settings');
     AuthCheckMiddleware::checkIfAuthenticated();
     AdminCheckMiddleware::checkForAdminRole();
@@ -176,7 +176,7 @@ Flight::route('GET /admin/showEditUser/@id', function ($id) {
     AdminCheckMiddleware::checkForAdminRole();
     (new AdminController)->showEditeUser($id);
 });
-Flight::route('POST /admin/updateUser', function  () use ($csrfMiddleware) {
+Flight::route('POST /admin/updateUser', function () use ($csrfMiddleware) {
     LogUtil::logAction(LogType::REQUEST, 'routes.php', 'Flight:route', 'POST: /admin/updateUser');
     AuthCheckMiddleware::checkIfAuthenticated();
     AdminCheckMiddleware::checkForAdminRole();
@@ -186,7 +186,7 @@ Flight::route('POST /admin/updateUser', function  () use ($csrfMiddleware) {
 Flight::route('GET /admin/showCreateUser', function () {
     LogUtil::logAction(LogType::REQUEST, 'routes.php', 'Flight:route', 'GET: /admin/showCreateUser');
     AuthCheckMiddleware::checkIfAuthenticated();
-    AdminCheckMiddleware::checkForAdminRole();    
+    AdminCheckMiddleware::checkForAdminRole();
     (new AdminController)->showCreateUser();
 });
 Flight::route('POST /admin/createUser', function () use ($csrfMiddleware) {
@@ -202,43 +202,43 @@ Flight::route('GET /admin/users', function () {
     AdminCheckMiddleware::checkForAdminRole();
     (new AdminController)->fetchUsersPaged();
 });
-Flight::route('POST /admin/deleteUser', function() {
+Flight::route('POST /admin/deleteUser', function () {
     LogUtil::logAction(LogType::REQUEST, 'routes.php', 'Flight:route', 'POST: /admin/deleteUser');
     AuthCheckMiddleware::checkIfAuthenticated();
     AdminCheckMiddleware::checkForAdminRole();
     (new AdminController)->deleteUser();
 });
-Flight::route('POST /admin/disableMfa', function() {
+Flight::route('POST /admin/disableMfa', function () {
     LogUtil::logAction(LogType::REQUEST, 'routes.php', 'Flight:route', 'POST: /admin/disableMfa');
     AuthCheckMiddleware::checkIfAuthenticated();
     AdminCheckMiddleware::checkForAdminRole();
     (new AdminController)->disableMfa();
 });
-Flight::route('POST /admin/enableMfa', function() {
+Flight::route('POST /admin/enableMfa', function () {
     LogUtil::logAction(LogType::REQUEST, 'routes.php', 'Flight:route', 'POST: /admin/enableMfa');
     AuthCheckMiddleware::checkIfAuthenticated();
     AdminCheckMiddleware::checkForAdminRole();
     (new AdminController)->enableMfa();
 });
-Flight::route('POST /admin/enableUser', function() {
+Flight::route('POST /admin/enableUser', function () {
     LogUtil::logAction(LogType::REQUEST, 'routes.php', 'Flight:route', 'POST: /admin/enableUser');
     AuthCheckMiddleware::checkIfAuthenticated();
     AdminCheckMiddleware::checkForAdminRole();
     (new AdminController)->enableUser();
 });
-Flight::route('POST /admin/disableUser', function() {
+Flight::route('POST /admin/disableUser', function () {
     LogUtil::logAction(LogType::REQUEST, 'routes.php', 'Flight:route', 'POST: /admin/disableUser');
     AuthCheckMiddleware::checkIfAuthenticated();
     AdminCheckMiddleware::checkForAdminRole();
     (new AdminController)->disableUser();
 });
-Flight::route('POST /admin/enforceMfa', function() {
+Flight::route('POST /admin/enforceMfa', function () {
     LogUtil::logAction(LogType::REQUEST, 'routes.php', 'Flight:route', 'POST: /admin/enforceMfa');
     AuthCheckMiddleware::checkIfAuthenticated();
     AdminCheckMiddleware::checkForAdminRole();
     (new AdminController)->enforceMfa();
 });
-Flight::route('POST /admin/unenforceMfa', function() {
+Flight::route('POST /admin/unenforceMfa', function () {
     LogUtil::logAction(LogType::REQUEST, 'routes.php', 'Flight:route', 'POST: /admin/unenforceMfa');
     AuthCheckMiddleware::checkIfAuthenticated();
     AdminCheckMiddleware::checkForAdminRole();
@@ -257,19 +257,19 @@ Flight::route('GET /admin/roles', function () {
     AdminCheckMiddleware::checkForAdminRole();
     (new AdminController)->listRoles();
 });
-Flight::route('POST /admin/roles/add', function() {
+Flight::route('POST /admin/roles/add', function () {
     LogUtil::logAction(LogType::REQUEST, 'routes.php', 'Flight:route', 'POST: /admin/roles/add');
     AuthCheckMiddleware::checkIfAuthenticated();
     AdminCheckMiddleware::checkForAdminRole();
     (new AdminController)->addRole();
 });
-Flight::route('GET /admin/roles/checkUsers', function() {
+Flight::route('GET /admin/roles/checkUsers', function () {
     LogUtil::logAction(LogType::REQUEST, 'routes.php', 'Flight:route', 'GET: /admin/roles/chekUsers');
     AuthCheckMiddleware::checkIfAuthenticated();
     AdminCheckMiddleware::checkForAdminRole();
     (new AdminController)->checkUsers();
 });
-Flight::route('POST /admin/roles/delete', function() {
+Flight::route('POST /admin/roles/delete', function () {
     LogUtil::logAction(LogType::REQUEST, 'routes.php', 'Flight:route', 'POST: /admin/roles/delete');
     AuthCheckMiddleware::checkIfAuthenticated();
     AdminCheckMiddleware::checkForAdminRole();
@@ -351,12 +351,11 @@ Flight::route('GET /admin/logs/fetchErrorlogs', function () {
 });
 
 // session routes
-Flight::route('POST /extend-session', function() {
+Flight::route('POST /extend-session', function () {
     session_regenerate_id(true);
-    $_SESSION['last_activity'] = time(); 
+    $_SESSION['last_activity'] = time();
     echo json_encode(["success" => true]);
 });
 
 // Logout
 Flight::route('/logout', array(new ProfileController, 'logout'));
-?>

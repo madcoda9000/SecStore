@@ -4,25 +4,12 @@ namespace App\Utils;
 
 use ORM;
 use App\Utils\SessionUtil;
-
-/**
- * Logy type enum declaration
- */
-enum LogType: string
-{
-    case ERROR = 'ERROR';
-    case AUDIT = 'AUDIT';
-    case REQUEST = 'REQUEST';
-    case SYSTEM = 'SYSTEM';
-    case MAIL = 'MAIL';
-    case SQL = 'SQL';
-}
-
+use App\Utils\LogType;
 
 /**
  * Class Name: LogUtil
  *
- * Hilfsklasse zur implementierung Logging Funktionalitäten 
+ * Hilfsklasse zur implementierung Logging Funktionalitäten
  *
  * @package App\Utils
  * @author Sascha Heimann
@@ -40,7 +27,7 @@ class LogUtil
      * Loads the configuration settings from config.php file.
      *
      * This method is designed to be lazy-loaded, meaning it will only load
-     * the configuration the first time it is invoked. Successive calls will 
+     * the configuration the first time it is invoked. Successive calls will
      * return the pre-loaded configuration to avoid redundant file operations.
      */
     public static function loadConfig()
@@ -52,7 +39,7 @@ class LogUtil
 
     /**
      * Writes a log entry into the database.
-     * 
+     *
      * @param LogType $type  The type of the log entry (e.g. 'Error', 'Audit', 'Request', 'System', 'Mail')
      * @param string $file    The file of the log entry (e.g. 'LoginController', 'RegisterController', 'ForgotPasswordController')
      * @param string $method  The method of the log entry (e.g. 'login', 'register', 'forgotPassword')
@@ -65,19 +52,19 @@ class LogUtil
         if (self::$config['logging']['enableSqlLogging'] === true && $type == LogType::SQL) {
             $context = "$file/$method";
             self::log($type, $context, $message);
-        } else if (self::$config['logging']['enableMailLogging'] === true && $type == LogType::MAIL) {
+        } elseif (self::$config['logging']['enableMailLogging'] === true && $type == LogType::MAIL) {
             $context = "$file/$method";
             self::log($type, $context, $message);
-        } else if (self::$config['logging']['enableSystemLogging'] === true && $type == LogType::SYSTEM) {
+        } elseif (self::$config['logging']['enableSystemLogging'] === true && $type == LogType::SYSTEM) {
             $context = "$file/$method";
             self::log($type, $context, $message);
-        } else if (self::$config['logging']['enableAuditLogging'] === true && $type == LogType::AUDIT) {
+        } elseif (self::$config['logging']['enableAuditLogging'] === true && $type == LogType::AUDIT) {
             $context = "$file/$method";
             self::log($type, $context, $message);
-        } else if (self::$config['logging']['enableRequestLogging'] === true && $type == LogType::REQUEST) {
+        } elseif (self::$config['logging']['enableRequestLogging'] === true && $type == LogType::REQUEST) {
             $context = "$file/$method";
             self::log($type, $context, $message);
-        } else if ($type == LogType::ERROR) {
+        } elseif ($type == LogType::ERROR) {
             $context = "$file/$method";
             self::log($type, $context, $message);
         }
@@ -86,7 +73,7 @@ class LogUtil
 
     /**
      * Writes a log entry into the database.
-     * 
+     *
      * @param LogType $type  The type of the log entry (e.g. 'Error', 'Audit', 'Request', 'System')
      * @param string $context  The context of the log entry (e.g. 'Login', 'Register', 'Forgot Password')
      * @param string $message  The message of the log entry
@@ -121,7 +108,7 @@ class LogUtil
 
     /**
      * Schreibt eine Lognachricht in eine Datei unter app/logs/.
-     * 
+     *
      * @param string $message Die zu speichernde Nachricht
      * @param string $filename Name der Datei (z. B. 'error.log')
      */
@@ -140,11 +127,11 @@ class LogUtil
 
     /**
      * Ruft eine Liste von Log-Einträgen ab, optional gefiltert nach einem Zeitraum und mit Pagination.
-     * 
+     *
      * @param int      $page    Die aktuelle Seite (Standard: 1)
      * @param int      $perPage Anzahl der Einträge pro Seite (Standard: 100)
      * @param int|null $since   Anzahl der Tage, aus denen Logs geladen werden sollen (optional)
-     * 
+     *
      * @return array Liste der Log-Einträge als assoziative Arrays.
      */
     public static function getLogs(int $page = 1, int $perPage = 100, ?int $since = null): array
@@ -165,9 +152,9 @@ class LogUtil
 
     /**
      * Gibt die Gesamtanzahl der Log-Einträge zurück, optional gefiltert nach einem Zeitraum.
-     * 
+     *
      * @param int|null $since Anzahl der Tage, aus denen Logs gezählt werden sollen (optional)
-     * 
+     *
      * @return int Gesamtanzahl der Logs
      */
     public static function getTotalLogCount(?int $since = null): int
@@ -184,9 +171,9 @@ class LogUtil
 
     /**
      * Deletes a log entry with the given ID.
-     * 
+     *
      * @param int $id The ID of the log entry to be deleted.
-     * 
+     *
      * @return bool True if the log entry was successfully deleted, false otherwise.
      */
     public static function deleteLog($id)
@@ -202,7 +189,7 @@ class LogUtil
     /**
      * Retrieves the IP address of the client, taking into account the HTTP_X_FORWARDED_FOR and HTTP_CLIENT_IP headers.
      * If none of those headers are present, falls back to REMOTE_ADDR.
-     * 
+     *
      * @return string The client's IP address
      */
     private static function getIpAddress()

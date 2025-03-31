@@ -19,7 +19,8 @@ use Flight;
  * Änderungen:
  * - 1.0 (2025-02-24): Erstellt.
  */
-class HomeController {
+class HomeController
+{
 
     /**
      * Shows the dashboard.
@@ -27,7 +28,8 @@ class HomeController {
      * If the user is not logged in, it redirects to the login page.
      * Otherwise, it renders the dashboard template with the title "Dashboard".
      */
-    public function showHome() {
+    public function showHome()
+    {
         Flight::latte()->render('home.latte', ['title' => 'Home', 'sessionTimeout' => SessionUtil::getRemainingTime(), 'user' => SessionUtil::get('user')]);
     }
 
@@ -35,10 +37,9 @@ class HomeController {
      * Logs out the current user by destroying the session and redirecting to the login page.
      */
 
-    public function logout() {
+    public function logout()
+    {
         SessionUtil::destroy();
         Flight::redirect('/login');
     }
 }
-
-?>

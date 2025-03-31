@@ -31,7 +31,8 @@ class CorsUtil
      * @return void
      */
 
-    function set_allowedHosts($hostsArr) {
+    public function setAllowedHosts($hostsArr)
+    {
         $this->allowedHosts = $hostsArr;
     }
     /**
@@ -40,7 +41,8 @@ class CorsUtil
      * @return mixed The current list of allowed hosts.
      */
 
-    function get_allowedHosts() {
+    public function getAllowedHosts()
+    {
         return $this->allowedHosts;
     }
 
@@ -49,7 +51,8 @@ class CorsUtil
      *
      * @param array $allowedHostsArray List of hosts allowed for CORS requests.
      */
-    function __construct($allowedHostsArray) {
+    public function __construct($allowedHostsArray)
+    {
         $this->set_allowedHosts($allowedHostsArray);
     }
 
@@ -78,7 +81,8 @@ class CorsUtil
         if ($request->method === 'OPTIONS') {
             if ($request->getVar('HTTP_ACCESS_CONTROL_REQUEST_METHOD') !== '') {
                 $response->header(
-                    'Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS, HEAD'
+                    'Access-Control-Allow-Methods',
+                    'GET, POST, PUT, DELETE, PATCH, OPTIONS, HEAD'
                 );
             }
             if ($request->getVar('HTTP_ACCESS_CONTROL_REQUEST_HEADERS') !== '') {
@@ -102,7 +106,7 @@ class CorsUtil
      */
     private function allowOrigins(): void
     {
-        // ACHTUNG: allowedHosts ist defniert in config.php!        
+        // ACHTUNG: allowedHosts ist defniert in config.php!
 
         $request = Flight::request();
 
@@ -112,4 +116,3 @@ class CorsUtil
         }
     }
 }
-?>

@@ -17,18 +17,17 @@ use App\Utils\SessionUtil;
  * Änderungen:
  * - 1.0 (2025-02-24): Erstellt.
  */
-class AuthCheckMiddleware {
+class AuthCheckMiddleware
+{
 
     
     /**
      * Checks if a user is authenticated and redirects to login if not.
      */
-    public static function checkIfAuthenticated() {
+    public static function checkIfAuthenticated()
+    {
         if (SessionUtil::get('user') === null) {
             Flight::redirect('/login');
         }
     }
-
 }
-
-?>

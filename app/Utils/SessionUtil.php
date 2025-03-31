@@ -25,7 +25,8 @@ class SessionUtil
      * This function is lazy and only loads the configuration the first time it is
      * called. Subsequent calls will return the previously loaded configuration.
      */
-    public static function loadConfig() {
+    public static function loadConfig()
+    {
         if (!self::$config) {
             self::$config = include __DIR__ . '/../../config.php';
         }
@@ -48,7 +49,8 @@ class SessionUtil
      *
      * @return int The session timeout in seconds.
      */
-    public static function getSessionTimeout(): int {
+    public static function getSessionTimeout(): int
+    {
         self::loadConfig();
         return self::$config['application']['sessionTimeout'];
     }
@@ -70,7 +72,7 @@ class SessionUtil
      *
      * @param string $key The name of the session variable.
      * @param mixed $default The default value to return if the session variable is not set.
-     * 
+     *
      * @return mixed The value of the session variable, or the default value if it is not set.
      */
 
@@ -83,7 +85,7 @@ class SessionUtil
      * Checks if a session variable exists.
      *
      * @param string $key The name of the session variable.
-     * 
+     *
      * @return bool True if the session variable exists, false if it does not.
      */
     public static function has(string $key): bool
@@ -99,4 +101,3 @@ class SessionUtil
         session_destroy();
     }
 }
-?>

@@ -64,7 +64,7 @@ $app->before('start', [$CorsUtil, 'setupCors']);
 /*
  * Load the routes file.
  * A route is really just a URL, but saying route makes you sound cooler.
- * When someone hits that URL, you point them to a function or method 
+ * When someone hits that URL, you point them to a function or method
  * that will handle the request.
  */
 require '../app/routes.php';
@@ -100,7 +100,7 @@ $app->before('start', function () use ($config, $app) {
     $timeout = $isUnlimited ? (60 * 60 * 24 * 30) : $defaultTimeout;
 
     // default Session-Cookie-Parameter setzen, bevor die Session gestartet wird
-    ini_set('session.gc_maxlifetime', $timeout);    
+    ini_set('session.gc_maxlifetime', $timeout);
     ini_set('session.use_cookies', 1);
 
     session_set_cookie_params([
@@ -150,7 +150,6 @@ $app->before('start', function () use ($config, $app) {
         session_regenerate_id(true);
         $_SESSION['created'] = time();
     }
-    
 });
 
 // 404 - Not Found automatisch abfangen
@@ -178,7 +177,7 @@ $app->map('error', function (Throwable $ex) use ($app) {
 });
 
 // Add the headers in a filter
-Flight::before('start', function() use ($app) {
+Flight::before('start', function () use ($app) {
     // Set the X-Frame-Options header to prevent clickjacking
     $app->response()->header('X-Frame-Options', 'SAMEORIGIN');
 
