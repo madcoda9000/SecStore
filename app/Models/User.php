@@ -21,7 +21,7 @@ use App\Utils\LogUtil;
  */
 class User extends ORM
 {
-    protected static $_table = 'users'; // Der Tabellenname
+    protected static $tableName = 'users'; // Der Tabellenname
 
     
     
@@ -39,7 +39,7 @@ class User extends ORM
     public static function createUser($username, $email, $firstname, $lastname, $status, $password, $roles)
     {
         ORM::configure('logging', true);
-        $user = ORM::for_table(self::$_table)->create();
+        $user = ORM::for_table(self::$tableName)->create();
         $user->username = $username;
         $user->email = $email;
         $user->firstname = $firstname;
@@ -71,7 +71,7 @@ class User extends ORM
     public static function findUserById($id)
     {
         ORM::configure('logging', true);
-        $erg = ORM::for_table(self::$_table)->where('id', $id)->find_one();
+        $erg = ORM::for_table(self::$tableName)->where('id', $id)->find_one();
 
         // letzte query loggen
         $queries = ORM::get_query_log();
@@ -147,7 +147,7 @@ class User extends ORM
     public static function findUserByField($field, $value)
     {
         ORM::configure('logging', true);
-        $erg = ORM::for_table(self::$_table)->where($field, $value)->find_one();
+        $erg = ORM::for_table(self::$tableName)->where($field, $value)->find_one();
 
         // letzte query loggen
         $queries = ORM::get_query_log();
@@ -169,8 +169,8 @@ class User extends ORM
     public static function checkIfUserExists($username, $email)
     {
         ORM::configure('logging', true);
-        $emailUser = ORM::for_table(self::$_table)->where('email', $email)->find_one();
-        $nameUser = ORM::for_table(self::$_table)->where('username', $username)->find_one();
+        $emailUser = ORM::for_table(self::$tableName)->where('email', $email)->find_one();
+        $nameUser = ORM::for_table(self::$tableName)->where('username', $username)->find_one();
         $erg = "false";
 
         if ($emailUser !== false) {
@@ -599,7 +599,7 @@ class User extends ORM
     public static function getAllUsers()
     {
         ORM::configure('logging', true);
-        $erg = ORM::for_table(self::$_table)->find_many();
+        $erg = ORM::for_table(self::$tableName)->find_many();
 
         // letzte query loggen
         $queries = ORM::get_query_log();
@@ -623,7 +623,7 @@ class User extends ORM
     public static function getUsersPaged($offset, $pageSize, $search = null)
     {
         ORM::configure('logging', true);
-        $query = ORM::forTable(self::$_table);
+        $query = ORM::forTable(self::$tableName);
         if ($search) {
             $query->whereLike('username', "%$search%");
         }
