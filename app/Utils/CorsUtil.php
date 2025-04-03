@@ -53,7 +53,7 @@ class CorsUtil
      */
     public function __construct($allowedHostsArray)
     {
-        $this->set_allowedHosts($allowedHostsArray);
+        $this->setAllowedHosts($allowedHostsArray);
     }
 
     /**
@@ -109,7 +109,7 @@ class CorsUtil
 
         $request = Flight::request();
 
-        if (in_array($request->getVar('HTTP_ORIGIN'), $this->get_allowedHosts(), true) === true) {
+        if (in_array($request->getVar('HTTP_ORIGIN'), $this->getAllowedHosts(), true) === true) {
             $response = Flight::response();
             $response->header("Access-Control-Allow-Origin", $request->getVar('HTTP_ORIGIN'));
         }
