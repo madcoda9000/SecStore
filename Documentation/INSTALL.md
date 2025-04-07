@@ -28,6 +28,8 @@ Stellen Sie sicher, dass Ihr System die folgenden Anforderungen erfüllt:
 - **Composer**: Installiert und konfiguriert
 - **Datenbank**: MySql oder MariaDB
 
+**NOTE:** If you're using ubuntu or an ubuntu derivate, you can use the Ubuntu_setup_php_dev_env.sh script to install the neccessary packages.
+
 ## Installation
 
 1. **Repository klonen**  
