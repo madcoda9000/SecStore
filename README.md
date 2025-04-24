@@ -14,26 +14,25 @@ Die Anwendung unterstützt eine breite Palette von Sicherheitsfunktionen wie Log
 
 - 🔑 Login mit Benutzername & Passwort  
 - 📝 Registrierung (optional mit Begrüßungsmail)  
-- 🔐 Zwei-Faktor-Authentifizierung (TOTP)  
+- 🔐 Zwei-Faktor-Authentifizierung (TOTP) (Per User erzwingbar)
 - 🔁 Passwort zurücksetzen via E-Mail  
 - 👤 Benutzerprofil bearbeiten (Passwort, 2FA, Name, E-Mail)  
 - 🛡️ Brute-Force-Schutz  
 - 🧑‍💼 Admin-Bereich zur Benutzerverwaltung  
 - 🌘 Dark-Mode mit Umschaltung  
-- 🔍 Audit-, Mail- und System-Logging  
+- 🔍 Audit-, Mail- und System-Logging  (optional: Database und Request Logging)
 - 📦 REST-konformes API-Backend  
 - ⚙️ Automatische Datenbank-Migration  
 - 🚀 CLI-Tool zum Generieren sicherer Schlüssel  
-
+- 🛡️ konfigurierbarer Sessiontimer
 ---
 
 ## 📸 Screenshots
 
-> *(Optional: Screenshots von Login, Dashboard und Admin-Bereich können hier eingefügt werden)*
-
 ```md
-![Login](screenshots/login.png)
-![Dashboard](screenshots/dashboard.png)
+![Audit-Logs](Screenshots/AuditLogs.png)
+![Usermanagement](Screenshots/Users.png)
+![User-Profile](Screenshots/UserProfile.png)
 ```
 
 ---
