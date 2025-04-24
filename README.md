@@ -18,7 +18,7 @@ Die Anwendung unterstützt eine breite Palette von Sicherheitsfunktionen wie Log
 - 🔁 Passwort zurücksetzen via E-Mail  
 - 👤 Benutzerprofil bearbeiten (Passwort, 2FA, Name, E-Mail)  
 - 🛡️ Brute-Force-Schutz  
-- 🧑‍💼 Admin-Bereich zur Benutzerverwaltung  
+- 🧑‍💼 Admin-Bereich zur Benutzerverwaltung, Rollenverwaltung  
 - 🌘 Dark-Mode mit Umschaltung  
 - 🔍 Audit-, Mail- und System-Logging  (optional: Database und Request Logging)
 - 📦 REST-konformes API-Backend  
@@ -29,9 +29,12 @@ Die Anwendung unterstützt eine breite Palette von Sicherheitsfunktionen wie Log
 
 ## 📸 Screenshots
 
+[Login](Documentation/Screenshots/Login.png)\
+[Register](Documentation/Screenshots/Register.png)\
 [Audit-Logs](Documentation/Screenshots/AuditLogs.png)\
 [Usermanagement](Documentation/Screenshots/Users.png)\
 [User-Profile](Documentation/Screenshots/UserProfile.png)\
+[Settings](Documentation/Screenshots/Settings.png)\
 
 
 ---
