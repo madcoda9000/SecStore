@@ -31,6 +31,9 @@ body {
   white-space: nowrap; /* Verhindert Zeilenumbrüche in der Aktionen-Spalte */
   width: 1%; /* Hält die Spalte so klein wie möglich */
 }
+.nav-link {
+  color: var(--bs-secondary);
+}
 
 /* style for mobile offcanvas menu */
 .offcanvas {
