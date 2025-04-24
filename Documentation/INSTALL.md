@@ -81,8 +81,14 @@ Stellen Sie sicher, dass Ihr System die folgenden Anforderungen erfüllt:
    'http://localhost:8080',
    ];
    ```
+   Diese Einstellung ist für einen reibungslosen Betrieb sehr wichtig, da bei fehlerhafter konfiguration der Anwendung der Zugriff nauf das API-Backend verweigert wird!
    
-     Diese Einstellung ist für einen reibungslosen Betrieb sehr wichtig, da bei fehlerhafter konfiguration der Anwendung der Zugriff nauf das API-Backend verweigert wird!
+    **security ($security)**
+    Hier muss ein ein sicherer Schlüssel hinterlegt werden. Den Schlüssel können sie mit dem mitgelieferten cli Tool 'generate_key.php' erstellen.
+
+    ```code
+    php generate_key.php
+    ```
 
 5. **Datenbank einrichten**  
      Eine manuelle Einrichtung ist nicht erforderlich. Die Datenbank und Tabellen werden beim start der Anwendung automatisch erstellt, vorrausgesetzt Sie haben in der Konfigurationsdatei (config.php) die entsprechenden Zugangsdaten eingetragen.
