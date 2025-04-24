@@ -1,133 +1,168 @@
-# Installation der Anwendung
+# 🛠️ Installation der SecStore-Anwendung
 
 Diese Anleitung beschreibt die Schritte zur Installation und Einrichtung der Anwendung.
 
-## Voraussetzungen
+---
+
+## ✅ Voraussetzungen
 
 Stellen Sie sicher, dass Ihr System die folgenden Anforderungen erfüllt:
 
-- **PHP**: Version 8.3 oder höher
+- **PHP**: Version **8.3 oder höher**
 - Aktivierte PHP-Erweiterungen:
-  - `curl`
-  - `json`
-  - `openssl`
-  - `pdo`
-  - `pdo_mysql`
-  - `xml`
-  - `xmlwriter`
-  - `simplexml`
-  - `zip`
-  - `bcmath`
-  - `gd`
-  - `ctype`
-  - `iconv`
-  - `fileinfo`
-  - `mbstring`
-  - `tokenizer`
-  - `filter`
+  - `curl`, `json`, `openssl`, `pdo`, `pdo_mysql`, `xml`, `xmlwriter`, `simplexml`
+  - `zip`, `bcmath`, `gd`, `ctype`, `iconv`, `fileinfo`, `mbstring`, `tokenizer`, `filter`
 - **Composer**: Installiert und konfiguriert
-- **Datenbank**: MySql oder MariaDB
+- **Datenbank**: MySQL oder MariaDB
 
-**NOTE:** If you're using ubuntu or an ubuntu derivate, you can use the Ubuntu_setup_php_dev_env.sh script to install the neccessary packages.
+💡 **Hinweis für Ubuntu-Nutzer**  
+Verwenden Sie das mitgelieferte Script `Ubuntu_setup_php_dev_env.sh`, um alle erforderlichen Pakete automatisch zu installieren.
 
-## Installation
+---
 
-1. **Repository klonen**  
-     Klonen Sie das Repository in das gewünschte Verzeichnis:
-   
-   ```bash
-   git clone https://github.com/madcoda9000/SecStore.git
-   cd SecStore
-   ```
+## 🚀 Installation
 
-2. **Abhängigkeiten installieren**  
-     Installieren Sie die benötigten PHP-Pakete mit Composer:
-   
-   ```bash
-   composer install
-   ```
+### 1. Repository klonen
 
-3. **Berechtigungen Überprüfen**
-    Stellen Sie sicher, dass das `cache` verzeichnis für den Webserver Benutzer beschreibbar ist.
+```bash
+git clone https://github.com/madcoda9000/SecStore.git
+cd SecStore
+```
 
-4. **Konfiguration anpassen**  
-   
-     Kopieren Sie die Beispiel-Konfigurationsdatei und passen Sie sie an:
-   
-   ```bash
-   cp config.php_TEMPLATE config.php
-   ```
-   
-     Bearbeiten Sie die `config.php`-Datei und tragen Sie die entsprechenden Werte ein.
-   
-     **Datenbank ($db)**
-     Tragen Sie in diesem Abschnitt die entsprechenden Werte für Ihren Datenbankserver ein.
-   
-     **Mail ($mail)**
-     Tragen Sie in diesem Abschnitt die entsprechenden Werte für Ihren Mailserver ein.
-   
-     **Cors ($allowedHosts)**
-     Hier müssen Sie die Ihrem Webserver entsprechnden http werte erstzen. Wenn Sie die Anwendung z.b. auf http://localhost:8080 publiziert haben, sollte der Eintrag wie folgt aussehen:
-   
-   ```code
-   /**
-   * CORS: define allowd Hosts
-   * NOTE: change this according to your setup
-   */
-   $allowedHosts = [
-   'capacitor://localhost',
-   'ionic://localhost',
-   'http://localhost',
-   'http://localhost:8080',
-   ];
-   ```
-   Diese Einstellung ist für einen reibungslosen Betrieb sehr wichtig, da bei fehlerhafter konfiguration der Anwendung der Zugriff nauf das API-Backend verweigert wird!
-   
-    **security ($security)**
-    Hier muss ein ein sicherer Schlüssel hinterlegt werden. Den Schlüssel können sie mit dem mitgelieferten cli Tool 'generate_key.php' erstellen.
+### 2. Abhängigkeiten installieren
 
-    ```code
-    php generate_key.php
-    ```
+```bash
+composer install
+```
 
-5. **Datenbank einrichten**  
-     Eine manuelle Einrichtung ist nicht erforderlich. Die Datenbank und Tabellen werden beim start der Anwendung automatisch erstellt, vorrausgesetzt Sie haben in der Konfigurationsdatei (config.php) die entsprechenden Zugangsdaten eingetragen.
+### 3. Berechtigungen setzen
 
-6. **Webserver konfigurieren**  
-     Richten Sie Ihren Webserver (z. B. Apache oder Nginx) so ein, dass er auf das `public`-Verzeichnis der Anwendung zeigt.
+Stellen Sie sicher, dass das Verzeichnis `cache` für den Webserver-Benutzer **beschreibbar** ist:
 
-## Entwicklungstools (optional)
+```bash
+chmod -R 775 cache
+chown -R www-data:www-data cache
+```
 
-Für die Entwicklung stehen folgende Tools zur Verfügung:
+(Anpassen je nach Webserver-Nutzer)
 
-- **PHP CS Fixer**: Code-Formatierung
-  
-  ```bash
-  vendor/bin/php-cs-fixer fix
-  ```
-- **PHP CodeSniffer**: Code-Qualitätsprüfung
-  
-  ```bash
-  vendor/bin/phpcs
-  ```
+### 4. Konfiguration anpassen
 
-## Starten der Anwendung
+```bash
+cp config.php_TEMPLATE config.php
+```
 
-**Integrierter Webserver**
-Sollten Sie keinen eigenen Webserver betreiben, können Sie die Anwendung über den integrierten PHP-Server (für Entwicklungszwecke oder zum testen) starten:
+Bearbeiten Sie nun `config.php` und tragen Sie Ihre Werte ein:
+
+#### 🔧 Datenbank (`$db`)
+Zugangsdaten zur Datenbank eintragen.
+
+#### 📧 Mail (`$mail`)
+SMTP-Server konfigurieren.
+
+#### 🌐 CORS (`$allowedHosts`)
+Erlaubte Ursprünge für Frontend-Zugriffe eintragen, z. B.:
+
+```php
+$allowedHosts = [
+  'http://localhost:8080',
+  'capacitor://localhost',
+  'ionic://localhost',
+];
+```
+
+❗ Eine falsche Konfiguration blockiert API-Zugriffe im Frontend!
+
+#### 🔐 Sicherheit (`$security`)
+
+Generieren Sie einen sicheren Schlüssel mit dem CLI-Tool:
+
+```bash
+php generate_key.php
+```
+
+Tragen Sie den erzeugten Schlüssel in `config.php` ein:
+
+```php
+'key' => 'HIER_IHR_GEHEIMSCHLÜSSEL',
+```
+
+---
+
+## 🛠️ Datenbank einrichten
+
+Es ist **keine manuelle Einrichtung** erforderlich.  
+Die Datenbanktabellen werden automatisch beim ersten Start der Anwendung erstellt – vorausgesetzt, die Zugangsdaten sind korrekt konfiguriert.
+
+---
+
+## 🌍 Webserver konfigurieren
+
+Richten Sie Ihren Apache- oder Nginx-Server so ein, dass er auf das Verzeichnis `public/` zeigt.
+
+Beispiel Apache vHost:
+
+```apache
+<VirtualHost *:80>
+    ServerName secstore.local
+    DocumentRoot /pfad/zur/anwendung/public
+
+    <Directory /pfad/zur/anwendung/public>
+        AllowOverride All
+        Require all granted
+    </Directory>
+</VirtualHost>
+```
+
+---
+
+## 🧪 Entwicklungstools (optional)
+
+### Code-Formatierung mit PHP CS Fixer
+
+```bash
+vendor/bin/php-cs-fixer fix
+```
+
+### Code-Prüfung mit PHP CodeSniffer
+
+```bash
+vendor/bin/phpcs
+```
+
+---
+
+## ▶️ Anwendung starten
+
+### 💻 Lokale Entwicklung (integrierter Webserver)
 
 ```bash
 php -S localhost:8000 -t public
 ```
 
-Besuchen Sie die Anwendung unter [http://localhost:8000](http://localhost:8000).
+Zugriff über: [http://localhost:8000](http://localhost:8000)
 
-**Apache oder Nginx**
-Sollten Sie einen eigenen Webserver betreiben, können Sie die Anwendung unter dem von Ihnen konfigurierten Port erreichn. Z.b. http://localhost oder https://localhost
+### 🌐 Produktivbetrieb (Apache oder Nginx)
 
-## Anmeldung
+Zugriff über Ihren eingerichteten Host, z. B.:  
+[http://secstore.local](http://secstore.local)
 
-Nach erfolgreicher Installation können Sie sich mit den folgenden Zugangsdaten anmelden:
+---
 
-**Username**: super.admin
-**Passwort**: Test1000!
+## 🔐 Standard-Zugangsdaten
+
+Nach der Installation können Sie sich mit folgendem Benutzer anmelden:
+
+- **Benutzername**: `super.admin`  
+- **Passwort**: `Test1000!`
+
+⚠️ **Bitte ändern Sie diese Zugangsdaten nach dem ersten Login!**
+
+---
+
+## ✅ Erfolgreiche Installation
+
+🎉 Wenn Sie diese Schritte abgeschlossen haben, ist Ihre Anwendung bereit zur Nutzung!  
+Bei Fragen oder Problemen schauen Sie bitte in die Dokumentation oder melden sich im Projekt-Repository.
+
+---
