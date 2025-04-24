@@ -34,7 +34,7 @@ Die Anwendung unterstützt eine breite Palette von Sicherheitsfunktionen wie Log
 [Audit-Logs](Documentation/Screenshots/AuditLogs.png)\
 [Usermanagement](Documentation/Screenshots/Users.png)\
 [User-Profile](Documentation/Screenshots/UserProfile.png)\
-[Settings](Documentation/Screenshots/Settings.png)\
+[Settings](Documentation/Screenshots/Settings.png)
 
 
 ---
