@@ -30,9 +30,9 @@ Die Anwendung unterstützt eine breite Palette von Sicherheitsfunktionen wie Log
 ## 📸 Screenshots
 
 ```md
-![Audit-Logs](Screenshots/AuditLogs.png)
-![Usermanagement](Screenshots/Users.png)
-![User-Profile](Screenshots/UserProfile.png)
+[Audit-Logs](Screenshots/AuditLogs.png)
+[Usermanagement](Screenshots/Users.png)
+[User-Profile](Screenshots/UserProfile.png)
 ```
 
 ---
