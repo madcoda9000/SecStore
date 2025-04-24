@@ -17,28 +17,30 @@
               <li class="nav-item">
                 <a class="nav-link" href="/home">Home</a>
               </li>
-              <li class="nav-item">
-                <a class="nav-link" href="/admin/settings">Settings</a>
-              </li>
-              <!-- Dropdowns -->
-              <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">Administration</a>
-                <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                  <li><a class="dropdown-item" href="/admin/users">Users</a></li>
-                  <li><a class="dropdown-item" href="/admin/showRoles">Roles</a></li>
-                </ul>
-              </li>
-              <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown2" role="button" data-bs-toggle="dropdown" aria-expanded="false">Logs</a>
-                <ul class="dropdown-menu" aria-labelledby="navbarDropdown2">
-                  <li><a class="dropdown-item" href="/admin/logsAudit">Audit Logs</a></li>
-                  <li><a class="dropdown-item" href="/admin/logsRequest">Request Logs</a></li>
-                  <li><a class="dropdown-item" href="/admin/logsSystem">System Logs</a></li>
-                  <li><a class="dropdown-item" href="/admin/logsDb">Database Logs</a></li>
-                  <li><a class="dropdown-item" href="/admin/logsMail">Mail Logs</a></li>
-                  <li><a class="dropdown-item" href="/admin/logsError">Error Logs</a></li>
-                </ul>
-              </li>
+              {if in_array('Admin', explode(',', $user->roles))}
+                <li class="nav-item">
+                  <a class="nav-link" href="/admin/settings">Settings</a>
+                </li>
+                <!-- Dropdowns -->
+                <li class="nav-item dropdown">
+                  <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">Administration</a>
+                  <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                    <li><a class="dropdown-item" href="/admin/users">Users</a></li>
+                    <li><a class="dropdown-item" href="/admin/showRoles">Roles</a></li>
+                  </ul>
+                </li>
+                <li class="nav-item dropdown">
+                  <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown2" role="button" data-bs-toggle="dropdown" aria-expanded="false">Logs</a>
+                  <ul class="dropdown-menu" aria-labelledby="navbarDropdown2">
+                    <li><a class="dropdown-item" href="/admin/logsAudit">Audit Logs</a></li>
+                    <li><a class="dropdown-item" href="/admin/logsRequest">Request Logs</a></li>
+                    <li><a class="dropdown-item" href="/admin/logsSystem">System Logs</a></li>
+                    <li><a class="dropdown-item" href="/admin/logsDb">Database Logs</a></li>
+                    <li><a class="dropdown-item" href="/admin/logsMail">Mail Logs</a></li>
+                    <li><a class="dropdown-item" href="/admin/logsError">Error Logs</a></li>
+                  </ul>
+                </li>
+              {/if}
             </ul>
           </div>
         </div>

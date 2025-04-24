@@ -11,7 +11,7 @@ Stellen Sie sicher, dass Ihr System die folgenden Anforderungen erfüllt:
 - **PHP**: Version **8.3 oder höher**
 - Aktivierte PHP-Erweiterungen:
   - `curl`, `json`, `openssl`, `pdo`, `pdo_mysql`, `xml`, `xmlwriter`, `simplexml`
-  - `zip`, `bcmath`, `gd`, `ctype`, `iconv`, `fileinfo`, `mbstring`, `tokenizer`, `filter`
+  - `zip`, `bcmath`, `gd`, `ctype`, `iconv`, `fileinfo`, `mbstring`, `tokenizer`, `filter`, `php-ldap`
 - **Composer**: Installiert und konfiguriert
 - **Datenbank**: MySQL oder MariaDB
 

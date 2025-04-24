@@ -72,9 +72,21 @@
             <div class="accordion" id="accordionExample">
                 <div class="accordion-item">
                     <h2 class="accordion-header">
-                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-                            <i class="bi-key" style="margin-right:15px;;"></i>Change your password..
-                        </button>
+                        <button class="accordion-button collapsed {if $user->ldapEnabled === 1} bg-warning text-dark fw-bold{/if}"
+                            {if $user->ldapEnabled === 1}disabled title="Deaktiviert wegen LDAP-Authentifizierung"{/if}
+                            type="button" 
+                            data-bs-toggle="collapse" 
+                            data-bs-target="#collapseOne" 
+                            aria-expanded="true" 
+                            aria-controls="collapseOne">                        
+                        <i class="bi-key" style="margin-right:15px;"></i>
+                        
+                        {if $user->ldapEnabled === 1}
+                            Password change not possible because LDAP authenticated!
+                        {else}
+                            Change your password..
+                        {/if}
+                    </button>
                     </h2>
                     <div id="collapseOne" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
                     <div class="accordion-body">

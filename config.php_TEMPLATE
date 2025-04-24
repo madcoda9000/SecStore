@@ -31,6 +31,16 @@ $application = [
 ];
 
 /**
+* LDAP settings
+**/
+$ldapSettings = [
+  'ldapHost' => 'YOUR_LDAP_HOST',
+  'ldapPort' => 'YOUR_LDAP_PORT',
+  'domainPrefix' => 'YOUR_DOMAIN_PREFIX z.b.: DOMAINNAME\\',
+  '' => '',
+];
+
+/**
  * CORS: define allowd Hosts
  * NOTE: change this according to your setup
  */
@@ -70,7 +80,7 @@ $mail = [
 * security
 */
 $security = [
-  key => 'ENTER_YOUR_SECRET_KEY_HERE',
+  'key' => 'ENTER_YOUR_SECRET_KEY_HERE',
 ];
 
 // Alle Konfigurationen in einem Array zusammenfassen
@@ -82,4 +92,5 @@ return [
     'application' => $application,
     'logging' => $logging,
     'security' => $security,
+    'ldapSettings' => $ldapSettings,
 ];

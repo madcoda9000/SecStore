@@ -23,7 +23,9 @@ sudo apt-get install -y \
     php8.3-redis \
     php8.3-pdo \
     php8.3-gd \
-    php8.3-xdebug
+    php8.3-xdebug \
+    php8.3-ldap \
+    php8.3-openssl \    
 
 # 3. install composer
 curl -sS https://getcomposer.org/installer -o /tmp/composer-setup.php

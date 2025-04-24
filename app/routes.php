@@ -169,6 +169,12 @@ Flight::route('POST /admin/updateBruteforceSettings', function () {
     AdminCheckMiddleware::checkForAdminRole();
     (new AdminController)->updateBruteForceSettings(Flight::request()->data);
 });
+Flight::route('POST /admin/updateLdapSettings', function () {
+    LogUtil::logAction(LogType::REQUEST, 'routes.php', 'Flight:route', 'POST: /admin/updateLdapSettings');
+    AuthCheckMiddleware::checkIfAuthenticated();
+    AdminCheckMiddleware::checkForAdminRole();
+    (new AdminController)->updateLdapSettings(Flight::request()->data);
+});
 // admin user routes (geschützt)
 Flight::route('GET /admin/showEditUser/@id', function ($id) {
     LogUtil::logAction(LogType::REQUEST, 'routes.php', 'Flight:route', 'GET: /admin/showEditUser');

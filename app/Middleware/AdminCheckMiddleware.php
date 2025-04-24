@@ -31,7 +31,7 @@ class AdminCheckMiddleware
         if (isset($user)) {
             $roles = explode(',', $user->roles);
             if (!in_array('Admin', $roles)) {
-                Flight::halt(403, 'Access denied.');
+                throw new \Exception("Access denied.", 403);
             }
         }
     }

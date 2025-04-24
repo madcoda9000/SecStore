@@ -85,7 +85,7 @@
         <table class="table table-striped table-hover align-middle">
             <thead class="table-dark">
                 <tr>
-                    <th>ID</th>
+                    <th>Type</th>
                     <th>Ac</th>
                     <th>2FA</th>
                     <th>Enf</th>
@@ -97,7 +97,13 @@
             <tbody id="userTableBody">
                 {foreach $users as $use}
                     <tr>
-                        <td>{$use->id}</td>
+                        <td>
+                            {if $use->ldapEnabled === 1}
+                                <i class="bi-hdd-network-fill text-teal" data-bs-toggle="tooltip" title="LDAP-User"></i>
+                            {else}  
+                                <i class="bi-database-fill text-indigo" data-bs-toggle="tooltip" title="Local-User"></i>
+                            {/if}
+                        </td>
                         <td style="min-width:40px !important;text-align:center;">
                             {if $use->username === 'super.admin'}
                                 <i id="accountStatus{$use->id}" class="bi-check-circle-fill text-secondary" data-bs-toggle="tooltip" title="Super-Admin-Account kann nicht geändert werden."></i>

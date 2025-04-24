@@ -31,6 +31,12 @@
             <input type="text" class="form-control" id="username" name="username" required>
             <div class="invalid-feedback">Bitte geben Sie einen Benutzernamen ein.</div>
         </div>
+        <div class="alert alert-info d-flex align-items-center" role="alert">
+            <svg class="bi flex-shrink-0 me-2" role="img" aria-label="Info:"><use xlink:href="#info-fill"/></svg>
+            <div>
+                NOTE: if you enable ldap for this user, simply generate any password. The password is not used at login. Instead the user have to use his ldap password on login.
+            </div>
+        </div>
         <label for="password" class="form-label">Passwort</label>
         <div class="input-group mb-3">            
             <input type="password" class="form-control" id="password" name="password" required>   
@@ -42,6 +48,13 @@
             </button>         
         </div>
         <div class="invalid-feedback">Bitte geben Sie ein Passwort ein.</div>
+
+        <div class="input-group mb-3">
+            <input class="form-check-input" type="checkbox" name="ldapEnabled" id="ldapEnabled">
+            <label for="ldapEnabled" class="form-check-label">
+                Enable Ldap-Login
+            </label>
+        </div> 
         
         <div class="mb-3">
             <label for="status" class="form-label">Status</label>

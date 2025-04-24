@@ -54,6 +54,7 @@ class AdminController
                     "bruteForceSettings" => $config["bruteForceSettings"],
                     "application" => $config["application"],
                     "logging" => $config["logging"],
+                    "ldap" => $config["ldapSettings"],
                     "title" => "Settings",
                     "user" => $user,
                     "sessionTimeout" => SessionUtil::getRemainingTime(),
@@ -62,6 +63,102 @@ class AdminController
                 //Flight::redirect('/login');
                 echo "403";
             }
+        } else {
+            Flight::redirect("/login");
+        }
+    }
+
+    
+    /**
+     * Updates the LDAP settings in the configuration file based on the provided form data.
+     *
+     * @param array $formData An associative array containing the new LDAP settings:
+     *                        - 'ldapHost': The hostname of the LDAP server (string).
+     *                        - 'ldapPort': The port number for the LDAP server (integer, defaults to 636 if null).
+     *                        - 'domainPrefix': The domain prefix for LDAP authentication (string).
+     *
+     * @throws Exception If the configuration file cannot be read or if there is an error
+     *                   while replacing the configuration content.
+     *
+     * This method performs the following steps:
+     * 1. Verifies if the user is logged in by checking the session. If not, redirects to the login page.
+     * 2. Retrieves the current user from the session.
+     * 3. Constructs a new LDAP configuration array based on the provided form data.
+     * 4. Reads the existing configuration file and replaces the `$ldapSettings` array with the new configuration.
+     * 5. Saves the updated configuration back to the file.
+     * 6. Logs the action for auditing purposes.
+     * 7. Renders the settings page with a success message and updated configuration data.
+     *
+     * If the user is not found or the session is invalid, the method redirects to the login page.
+     */
+    public function updateLdapSettings($formData)
+    {
+        if (SessionUtil::get("user")["id"] === null) {
+            Flight::redirect("/login");
+        }
+        $user = User::findUserById(SessionUtil::get("user")["id"]);
+        if ($user !== false) {
+            $newConfig = [
+                "ldapHost" => $formData["ldapHost"] === null ? '' : $formData["ldapHost"],
+                "ldapPort" => $formData["ldapPort"] === null ? 636  : (int) $formData["ldapPort"],
+                "domainPrefix" => $formData["domainPrefix"] === null ? '' : addslashes($formData["domainPrefix"]),
+            ];
+
+            // Alte Konfiguration einlesen
+            $configFile = "../config.php";
+            $config = include $configFile;
+            // Alte Datei als Text laden
+            $configContent = file_get_contents($configFile);
+            if ($configContent === false) {
+                throw new Exception("Konfigurationsdatei konnte nicht gelesen werden.");
+            }
+
+            // Aktuelles `$ldapSettings`-Array suchen und ersetzen
+            $pattern = '/(\$ldapSettings\s*=\s*\[)(.*?)(\];)/s';
+
+            // Neues Mail-Array als formatierter PHP-Code
+            $newldapArray = var_export($newConfig, true);
+            $newldapArray = preg_replace("/^array \(/", "[", $newldapArray);
+            $newldapArray = preg_replace('/\)$/', "]", $newldapArray);
+            $newldapArray = preg_replace('/=> \n\s+/', "=> ", $newldapArray); // Mehrzeilige Werte schöner formatieren
+
+            // Neuen Mail-Block zusammenbauen
+            $replacement = '$ldapSettings = ' . $newldapArray . ";";
+
+            // Neuen Config-Code generieren
+            $newConfigContent = preg_replace($pattern, $replacement, $configContent);
+
+            if ($newConfigContent === null) {
+                throw new Exception("Fehler beim Ersetzen der Konfiguration.");
+            }
+
+            // Datei mit neuem Inhalt speichern
+            file_put_contents($configFile, $newConfigContent);
+
+            // nue config laden
+            $savedconfig = include $configFile;
+
+            // log action
+            LogUtil::logAction(
+                LogType::AUDIT,
+                "AdminController",
+                "updateLogSettings",
+                "SUCCESS: saved Logsettings.",
+                $user->username
+            );
+
+            // template redner und meldung ausgeben
+            Flight::latte()->render("admin/settings.latte", [
+                "success" => "Settings saved successfully!",
+                "mail" => $savedconfig["mail"],
+                "bruteForceSettings" => $savedconfig["bruteForceSettings"],
+                "application" => $savedconfig["application"],
+                "logging" => $savedconfig["logging"],
+                "ldap" => $savedconfig["ldapSettings"],
+                "title" => "Settings",
+                "user" => $user,
+                "sessionTimeout" => SessionUtil::getRemainingTime(),
+            ]);
         } else {
             Flight::redirect("/login");
         }
@@ -148,6 +245,7 @@ class AdminController
                 "bruteForceSettings" => $savedconfig["bruteForceSettings"],
                 "application" => $savedconfig["application"],
                 "logging" => $savedconfig["logging"],
+                "ldap" => $savedconfig["ldapSettings"],
                 "title" => "Settings",
                 "user" => $user,
                 "sessionTimeout" => SessionUtil::getRemainingTime(),
@@ -241,6 +339,7 @@ class AdminController
                 "bruteForceSettings" => $savedconfig["bruteForceSettings"],
                 "application" => $savedconfig["application"],
                 "logging" => $savedconfig["logging"],
+                "ldap" => $savedconfig["ldapSettings"],
                 "title" => "Settings",
                 "user" => $user,
                 "sessionTimeout" => SessionUtil::getRemainingTime(),
@@ -322,6 +421,7 @@ class AdminController
                 "bruteForceSettings" => $savedconfig["bruteForceSettings"],
                 "application" => $savedconfig["application"],
                 "logging" => $savedconfig["logging"],
+                "ldap" => $savedconfig["ldapSettings"],
                 "title" => "Settings",
                 "user" => $user,
                 "sessionTimeout" => SessionUtil::getRemainingTime(),
@@ -409,6 +509,7 @@ class AdminController
                 "bruteForceSettings" => $savedconfig["bruteForceSettings"],
                 "application" => $savedconfig["application"],
                 "logging" => $savedconfig["logging"],
+                "ldap" => $savedconfig["ldapSettings"],
                 "title" => "Settings",
                 "user" => $user,
                 "sessionTimeout" => SessionUtil::getRemainingTime(),
@@ -489,13 +590,14 @@ class AdminController
         $status = isset($_POST["status"]) ? $_POST["status"] : 0;
         $roles = isset($_POST["roles"]) ? $_POST["roles"] : "";
         $userCheck = User::checkIfUserExists($user, $email);
+        $ldapEnabled = isset($_POST["ldapEnabled"]) ? $_POST["ldapEnabled"] : false;
 
         if ($userCheck !== "false") {
             Flight::json(["success" => false, "message" => "User exists already!"]);
             return;
         }
 
-        $newUser = User::createUser($user, $email, $firstname, $lastname, $status, $password, $roles);
+        $newUser = User::createUser($user, $email, $firstname, $lastname, $status, $password, $roles, $ldapEnabled == true ? 1 : 0);
 
         if (!$newUser) {
             Flight::json(["success" => false, "message" => "Error while saving the nes user!"]);
@@ -565,14 +667,15 @@ class AdminController
         $status = isset($_POST["status"]) ? $_POST["status"] : 0;
         $roles = isset($_POST["roles"]) ? $_POST["roles"] : "";
         $password = isset($_POST["password"]) ? password_hash($_POST["password"], PASSWORD_DEFAULT) : null;
-
-        $erg = User::updateuser($userId, $email, $username, $firstname, $lastname, $status, $roles, $password);
+        $ldapEnabled = isset($_POST["ldapEnabled"]) ? $_POST["ldapEnabled"] : 0;
+   
+        $erg = User::updateuser($userId, $email, $username, $firstname, $lastname, $status, $roles, $password, $ldapEnabled);
 
         // log action
         LogUtil::logAction(LogType::AUDIT, "AdminController", "updateUser", "SUCCESS: updated user " . $username . ".");
 
         if ($erg === true) {
-            Flight::json(["success" => true, "message" => "User updated successfully."]);
+            Flight::json(["success" => true, "message" => "User updated successfully." . $ldapEnabled . ""]);
         } else {
             Flight::json(["success" => false, "message" => "ERROR: user could not be updated!."]);
         }

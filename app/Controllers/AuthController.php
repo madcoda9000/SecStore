@@ -11,6 +11,7 @@ use App\Utils\BruteForceUtil;
 use App\Utils\MailUtil;
 use App\Utils\LogType;
 use App\Utils\LogUtil;
+use App\Utils\LdapUtil;
 
 /**
  * Class Name: AuthController
@@ -110,17 +111,46 @@ class AuthController
     }
 
     
+    
     /**
-     * Authenticates a user using their email and password.
+     * Handles the login process for a user.
      *
-     * This function expects the following POST parameters:
-     * - email
-     * - password
+     * This method performs the following steps:
+     * 1. Retrieves the username and password from the POST request.
+     * 2. Attempts to find the user by their username.
+     * 3. Checks for various conditions that may prevent login:
+     *    - If the username is not found.
+     *    - If the user account is locked due to brute-force attempts.
+     *    - If the user has an open password reset request.
+     * 4. Authenticates the user:
+     *    - If LDAP is enabled for the user, authentication is performed against the LDAP server.
+     *    - Otherwise, the password is verified against the stored hash.
+     * 5. Handles successful authentication:
+     *    - Ensures the user account is active.
+     *    - Resets failed login attempts.
+     *    - Logs the successful login.
+     *    - Checks if the user has enabled or is required to enable 2FA (Two-Factor Authentication).
+     *      - If 2FA setup is in progress, it redirects to the setup process.
+     *      - If 2FA is enabled, it redirects to the 2FA verification process.
+     *      - If 2FA is enforced but not enabled, it redirects to enable 2FA.
+     *      - Otherwise, it sets the user session and redirects to the home page.
+     * 6. Handles failed authentication:
+     *    - Records the failed login attempt.
+     *    - Logs the failed login attempt.
+     *    - Renders the login page with an appropriate error message.
      *
-     * If the credentials are valid and the account is active, it sets the session
-     * for the user and redirects to the dashboard. If the user has an 'Admin' role,
-     * a session flag is also set for admin access. In case of invalid credentials
-     * or inactive status, an error message is rendered on the login page.
+     * Logging:
+     * - Logs various actions such as failed login attempts, account lockouts, and successful logins.
+     *
+     * Error Handling:
+     * - Provides user-friendly error messages for different failure scenarios.
+     *
+     * Security:
+     * - Implements brute-force protection.
+     * - Supports LDAP authentication.
+     * - Enforces 2FA if required.
+     *
+     * @return void
      */
     public function login()
     {
@@ -161,7 +191,24 @@ class AuthController
             return;
         }
 
-        if ($user !==false && password_verify($password, $user->password)) {
+        // check if we have to authenticate against an ldap server
+        $isAuthenticated = false;
+        if ($user->ldapEnabled === 1) {
+            $isAuthenticated = LdapUtil::authenticate($username, $password);
+            if ($isAuthenticated === false) {
+                LogUtil::logAction(LogType::AUDIT, 'AuthController', 'login', 'FAILED: ' . $user->username . ': ldap authentication failed.', $user->email);
+                Flight::latte()->render('login.latte', [
+                    'title' => 'Login',
+                    'error' => 'LDAP authentication failed.',
+                    'sessionTimeout' => SessionUtil::getSessionTimeout(),
+                ]);
+                return;
+            }
+        } else {
+            $isAuthenticated = password_verify($password, $user->password);
+        }
+
+        if ($user !==false && $isAuthenticated === true) {
             if ($user->status === 0) {
                 LogUtil::logAction(LogType::AUDIT, 'AuthController', 'login', 'FAILED: user account deactivated.', $user->email);
                 Flight::latte()->render('login.latte', [
@@ -174,9 +221,12 @@ class AuthController
 
             // Login erfolgreich -> fehlgeschlagene Versuche zurücksetzen
             BruteForceUtil::resetFailedLogins($user->email);
-            LogUtil::logAction(LogType::AUDIT, 'AuthController', 'login', 'SUCCESS: user logged in successfully.', $user->email);
-
-      
+            if ($user->ldapEnabled===1) {
+                LogUtil::logAction(LogType::AUDIT, 'AuthController', 'login', 'SUCCESS: ' . $user->username . ': LDAP-Login successful.', $user->username);
+            } else {
+                LogUtil::logAction(LogType::AUDIT, 'AuthController', 'login', 'SUCCESS: ' . $user->username . ': DB-Login successful.', $user->username);
+            }
+            
             // prüfen ob user 2fa setup im profil aktiviert hat
             if ($user->mfaStartSetup === 1) {
                 User::disableMfaSetupForUser($user->id);

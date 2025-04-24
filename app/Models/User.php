@@ -36,7 +36,7 @@ class User extends ORM
      * @param string $roles Die Rollen des Benutzers (z.B. "User" oder "Admin" oder mehere Rollen. Z.b. "User,IT,HR")
      * @return User|null Der neue Benutzer oder null, wenn der Benutzer nicht erstellt werden konnte
      */
-    public static function createUser($username, $email, $firstname, $lastname, $status, $password, $roles)
+    public static function createUser($username, $email, $firstname, $lastname, $status, $password, $roles, $ldapEnabled = 0)
     {
         ORM::configure('logging', true);
         $user = ORM::for_table(self::$tableName)->create();
@@ -47,6 +47,7 @@ class User extends ORM
         $user->status = $status;
         $user->password = $password;
         $user->roles = $roles;
+        $user->ldapEnabled = $ldapEnabled; // LDAP-Flag setzen
         $erg = $user->save() ? $user : null; // Rückgabe des Benutzers oder null
 
 
@@ -231,7 +232,7 @@ class User extends ORM
      * @param string $password The new password for the user, or null if password should not be changed.
      * @return bool True if the user was successfully updated, false otherwise.
      */
-    public static function updateuser($userId, $email, $username, $firstname, $lastname, $status, $roles, $password)
+    public static function updateuser($userId, $email, $username, $firstname, $lastname, $status, $roles, $password, $ldapEnabled = 0)
     {
         ORM::configure('logging', true);
         $user = self::findUserById($userId);
@@ -243,6 +244,7 @@ class User extends ORM
             $user->lastname = $lastname;
             $user->status = $status;
             $user->roles = $roles;
+            $user->ldapEnabled = $ldapEnabled; // LDAP-Flag setzen
             if ($password!==null) {
                 $user->password = $password;
             }

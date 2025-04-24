@@ -34,7 +34,8 @@
         <div class="alert alert-info d-flex align-items-center" role="alert">
             <svg class="bi flex-shrink-0 me-2" role="img" aria-label="Info:"><use xlink:href="#info-fill"/></svg>
             <div>
-                NOTE: if you don't want to change the users password, simply leave the field empty.
+                NOTE: if you don't want to change the users password, simply leave the field empty.<br>
+                If you enable ldap for this user, simply generate any password. The password is not used at login. Instead the user have to use his ldap password on login.
             </div>
         </div>
 
@@ -48,6 +49,13 @@
                 <i id="generatePasswordIcon" class="bi-arrow-clockwise text-info"></i>
             </button>         
         </div>
+
+        <div class="input-group mb-3">
+            <input style="margin-right:15px;" class="form-check-input" type="checkbox" name="ldapEnabled" id="ldapEnabled" value="{$userToEdit['ldapEnabled']==1 ? true : false}" {if $userToEdit['ldapEnabled'] == 1}checked{/if}>
+            <label for="ldapEnabled" class="form-check-label">
+                Enable Ldap-Login {$userToEdit['ldapEnabled']}
+            </label>
+        </div> 
         
         <div class="mb-3">
             <label for="status" class="form-label">Status</label>

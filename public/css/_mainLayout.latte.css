@@ -35,6 +35,18 @@ body {
   color: var(--bs-secondary);
 }
 
+.text-indigo {
+  color: var(--bs-indigo);
+}
+
+.text-cyan {
+  color: var(--bs-cyan);
+}
+
+.text-teal {
+  color: var(--bs-teal);
+}
+
 /* style for mobile offcanvas menu */
 .offcanvas {
   max-width:70% !important;
