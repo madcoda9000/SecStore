@@ -1,7 +1,19 @@
 <?php
-
 namespace App\Utils;
 
+/**
+ * Class Name: EncryptionUtil
+ *
+ * Hilfsklasse zur implementierung ver / ent Schlüsselung.
+ *
+ * @package App\Utils
+ * @author Sascha Heimann
+ * @version 1.0
+ * @since 2025-04-24
+ *
+ * Änderungen:
+ * - 1.0 (2025-04-24): Erstellt.
+ */
 class EncryptionUtil
 {
     // AES-256-CBC ist sicherer als AES-128-CBC
