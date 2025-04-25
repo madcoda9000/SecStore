@@ -50,7 +50,15 @@ $app->set('flight.views.path', '../app/views');
  * configure latte template engine
  */
 $app->register('latte', LatteEngine::class, [], function (LatteEngine $latte) use ($app) {
-    $latte->setTempDirectory('../cache/');
+    $cacheDir = '../cache/';
+
+    // Prüfen, ob das Cache-Verzeichnis beschreibbar ist
+    if (!is_writable($cacheDir)) {
+        LogUtil::logAction(LogType::ERROR, 'index', 'latte->cacheCheck', "ERROR: Cache directory '$cacheDir' is not writable.");
+        Flight::halt(500, "Cache directory '$cacheDir' is not writable by the web server.");
+    }
+
+    $latte->setTempDirectory($cacheDir);
     $latte->setLoader(new \Latte\Loaders\FileLoader($app->get('flight.views.path')));
 });
 

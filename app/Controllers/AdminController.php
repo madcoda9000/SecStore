@@ -48,7 +48,9 @@ class AdminController
         if ($user !== false) {
             $roles = explode(",", $user->roles);
             if (in_array("Admin", $roles)) {
-                $config = include "../config.php";
+                $configFile = "../config.php";
+                $config = include $configFile;
+                $isWritable = is_writable($configFile);
                 Flight::latte()->render("admin/settings.latte", [
                     "mail" => $config["mail"],
                     "bruteForceSettings" => $config["bruteForceSettings"],
@@ -58,10 +60,11 @@ class AdminController
                     "title" => "Settings",
                     "user" => $user,
                     "sessionTimeout" => SessionUtil::getRemainingTime(),
+                    "configWritable" => $isWritable,
                 ]);
             } else {
-                //Flight::redirect('/login');
-                echo "403";
+                http_response_code(403);
+                throw new \Exception("Access denied: Admin role required.", 403);
             }
         } else {
             Flight::redirect("/login");

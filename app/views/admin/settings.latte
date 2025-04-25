@@ -23,6 +23,12 @@
             </div>
         {/ifset}
 
+        {if !$configWritable}
+            <div class="alert alert-warning" role="alert">
+                <strong>Warning:</strong> The configuration file is not writable by the web server. Changes cannot be saved!
+            </div>
+        {/if}
+
         <div class="accordion" id="accordionExample">
             <div class="accordion-item">
                 <h2 class="accordion-header">
