@@ -1,7 +1,6 @@
 {extends '_authLayout.latte'}
 
-{block content}
-    <script src="/js/login.latte-min.js"></script>
+{block content}    
     <div class="container">
         <div class="card p-4 shadow-sm login-card" style="width: 100%; max-width: 400px;">
             <h3 class="text-center">{$title}</h3>
@@ -15,12 +14,26 @@
                     <input type="password" class="form-control" id="password" name="password">
                 </div>
                 <input type="hidden" name="csrf_token" value="{$_SESSION['csrf_token']}">
-                <button type="submit" class="btn btn-primary w-100">Anmelden</button>
+                <button id="loginBtn" type="submit" class="btn btn-primary w-100 d-flex justify-content-center align-items-center gap-2">
+                    <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true" id="loginSpinner"></span>
+                    <span id="loginText">Anmelden</span>
+                </button>
             </form>
             {ifset $error}
                 <div class="alert alert-danger mt-3" role="alert">
                     {$error}
                 </div>
+                <script>
+                    document.addEventListener("DOMContentLoaded", function () {
+                        const loginBtn = document.getElementById("loginBtn");
+                        const loginSpinner = document.getElementById("loginSpinner");
+                        const loginText = document.getElementById("loginText");
+
+                        loginSpinner.classList.add("d-none");
+                        loginText.textContent = "Anmelden";
+                        loginBtn.removeAttribute("disabled");
+                    });
+                </script>
             {/ifset}
             {ifset $message}
                 <div class="alert alert-primary" role="alert">

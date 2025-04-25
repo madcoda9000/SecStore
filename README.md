@@ -13,6 +13,7 @@ Die Anwendung unterstützt eine breite Palette von Sicherheitsfunktionen wie Log
 ## ✨ Features
 
 - 🔑 Login mit Benutzername & Passwort  
+- 🔑 Optional LDAP-Authentifizierung (per User) 
 - 📝 Registrierung (optional mit Begrüßungsmail)  
 - 🔐 Zwei-Faktor-Authentifizierung (TOTP) (Per User erzwingbar)
 - 🔁 Passwort zurücksetzen via E-Mail  

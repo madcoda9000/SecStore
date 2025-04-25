@@ -42,5 +42,16 @@ document.addEventListener("DOMContentLoaded", function () {
         if (!isValid) {
             event.preventDefault(); // Verhindert das Absenden des Formulars, wenn Fehler vorliegen
         }
+
+        if (isValid) {
+            const loginBtn = document.getElementById("loginBtn");
+            const loginSpinner = document.getElementById("loginSpinner");
+            const loginText = document.getElementById("loginText");
+
+            // Spinner anzeigen und Text ändern
+            loginSpinner.classList.remove("d-none");
+            loginText.textContent = "Bitte warten...";
+            loginBtn.setAttribute("disabled", "true");
+        }
     });
 });
