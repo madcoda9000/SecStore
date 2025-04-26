@@ -8,6 +8,7 @@ use Latte\Engine as LatteEngine;
 use App\Utils\CorsUtil;
 use App\Utils\LogUtil;
 use App\Utils\LogType;
+use App\Utils\TranslationUtil;
 
 /**
  * log all errors to a file
@@ -47,9 +48,28 @@ $app = Flight::app();
 $app->set('flight.views.path', '../app/views');
 
 /**
+ * init translation util
+ */
+if (isset($_GET['lang']) && in_array($_GET['lang'], ['en', 'de'])) {
+    TranslationUtil::setLang($_GET['lang']);
+    header('Location: ' . strtok($_SERVER["REQUEST_URI"], '?'));
+    exit;
+}
+
+TranslationUtil::init();
+$app->set('trans', fn($key) => TranslationUtil::t($key));
+$app->set('lang', TranslationUtil::getLang());
+
+
+/**
  * configure latte template engine
  */
 $app->register('latte', LatteEngine::class, [], function (LatteEngine $latte) use ($app) {
+
+    // make translation available in latte templates
+    $latte->addFunction('trans', fn($s) => $app->get('trans')($s));
+    
+    // Setze den Cache-Ordner für Latte
     $cacheDir = '../cache/';
 
     // Prüfen, ob das Cache-Verzeichnis beschreibbar ist

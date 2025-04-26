@@ -12,6 +12,7 @@ use App\Utils\MailUtil;
 use App\Utils\LogType;
 use App\Utils\LogUtil;
 use App\Utils\LdapUtil;
+use App\Utils\TranslationUtil;
 
 /**
  * Class Name: AuthController
@@ -36,7 +37,8 @@ class AuthController
     public function showRegister()
     {
         Flight::latte()->render('register.latte', [
-            'title' => 'Register'
+            'title' => TranslationUtil::t('register.title'),
+            'lang' => Flight::get('lang'),
         ]);
     }
 
@@ -98,7 +100,7 @@ class AuthController
         // prüfen ob benutzer bereits angemeldet ist aber 2fa noch fehlt
         if (SessionUtil::get('2fa_user_id') !== null) {
             Flight::latte()->render('2fa_verify.latte', [
-                'title' => 'Login'
+                'title' => 'Login',
             ]);
             return;
         }
@@ -106,6 +108,8 @@ class AuthController
         Flight::latte()->render('login.latte', [
             'title' => 'Login',
             'sessionTimeout' => SessionUtil::getSessionTimeout(),
+            'trans' => Flight::get('trans'),
+            'lang' => Flight::get('lang'),
         ]);
         return;
     }

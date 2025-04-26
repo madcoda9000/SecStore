@@ -5,6 +5,7 @@ namespace APP\Models;
 use ORM;
 use App\Utils\LogType;
 use App\Utils\LogUtil;
+use App\Utils\TranslationUtil;
 
 /**
  * Class Name: User

@@ -3,20 +3,20 @@
 {block content}    
     <div class="container">
         <div class="card p-4 shadow-sm login-card" style="width: 100%; max-width: 400px;">
-            <h3 class="text-center">{$title}</h3>
+            <h3 class="text-center">{trans('login.title')}</h3>
             <form method="POST" action="/login" class="mt-3">
                 <div class="mb-3">
-                    <label for="username" class="form-label">Benutzername</label>
+                    <label for="username" class="form-label">{trans('login.username')}</label>
                     <input type="text" class="form-control" id="username" name="username">
                 </div>
                 <div class="mb-3">
-                    <label for="password" class="form-label">Passwort</label>
+                    <label for="password" class="form-label">{trans('login.password')}</label>
                     <input type="password" class="form-control" id="password" name="password">
                 </div>
                 <input type="hidden" name="csrf_token" value="{$_SESSION['csrf_token']}">
                 <button id="loginBtn" type="submit" class="btn btn-primary w-100 d-flex justify-content-center align-items-center gap-2">
                     <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true" id="loginSpinner"></span>
-                    <span id="loginText">Anmelden</span>
+                    <span id="loginText">{trans('login.submit')}</span>
                 </button>
             </form>
             {ifset $error}
@@ -41,8 +41,33 @@
                 </div>
             {/ifset}
             <div class="p-3" style="display:flex; flex-direction:column; justify-content:center; align-items:center; gap:5;">
-                <a href="/forgot-password">Passwort vergessen?</a>
-                <a href="/register">Registrieren</a>
+                <a href="/forgot-password">{trans('login.forgot')}</a>
+                <a href="/register">{trans('login.register')}</a>
+                <form method="get" action="" class="mt-3">
+                    <div class="dropdown">
+                        <button class="btn btn-outline-none dropdown-toggle d-flex align-items-center gap-2" type="button" id="langMenu" data-bs-toggle="dropdown" aria-expanded="false">
+                            <img src="/img/flags/{$lang}.svg" alt="{$lang}" width="20" height="14">
+                            <span class="d-none d-md-inline">
+                                {if $lang === 'de'}{trans('language.german')}{elseif $lang === 'en'}{trans('language.english')}{/if}
+                            </span>
+                        </button>
+                        <ul class="dropdown-menu" aria-labelledby="langMenu">
+                            <li>
+                                <a class="dropdown-item d-flex align-items-center gap-2" href="?lang=de">
+                                    <img src="/img/flags/de.svg" alt="Deutsch" width="20" height="14">
+                                    {trans('language.german')}
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item d-flex align-items-center gap-2" href="?lang=en">
+                                    <img src="/img/flags/en.svg" alt="English" width="20" height="14">
+                                    {trans('language.english')}
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </form>
+
             </div>
         </div>
     </div>
