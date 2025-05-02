@@ -22,10 +22,10 @@
             <div class="container py-3">
                 <div class="doubbleDivContainer">
                     <div class="divLeft text-secondary" >
-                        <p>&copy; 2025 Fancy Website. Alle Rechte vorbehalten.</p>
+                        <p>{trans('footer.copyright')}</p>
                     </div>
                     <div class="divRight text-secondary" style="color:var(--bs-secondary-text);">
-                        Sessiontimeout in:&nbsp;<span id="remainingSessionTime" class="text-warning">00:00:00</span>
+                        {trans('footer.sessionTimeout')}&nbsp;<span id="remainingSessionTime" class="text-warning">00:00:00</span>
                     </div>
                 </div>                 
             </div>
@@ -48,7 +48,7 @@
 
         <!-- configure and run sessiontimeout notification -->
         <div id="session-data" data-session-timeout="{$sessionTimeout}"></div>
-        <script src="/js/_mainLayout.latte-min.js"></script>
+        <script src="/js/_mainlayout.latte-min.js"></script>
         
     </body>
 </html>

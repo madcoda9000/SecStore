@@ -3,10 +3,10 @@
 {block content}
 
 <div class="container py-4" style="flex:1">
-    <h1 class="mb-5">View - Databaselogs</h1>
+    <h1 class="mb-5">{trans('logs.database.title')}</h1>
     <div class="d-flex justify-content-between mb-3">
         <div>
-            <label for="pageSize" class="me-2 desktop-pager-label">Einträge pro Seite:</label>
+            <label for="pageSize" class="me-2 desktop-pager-label">{trans('pager.pageSize')}:</label>
             <select id="pageSize" class="form-select d-inline w-auto">
                 <option value="10">10</option>
                 <option value="50">50</option>
@@ -15,7 +15,7 @@
         </div>
         <div>
             <div class="input-group">
-                <input type="text" id="search" class="form-control" placeholder="Search...">
+                <input type="text" id="search" class="form-control" placeholder="{trans('logs.search')}">
             </div>
         </div>
     </div>
@@ -23,7 +23,7 @@
     <!-- lade indicator -->
     <div id="loadingSpinner" style="display: none; text-align: center;">
         <div class="spinner-border" role="status">
-            <span class="visually-hidden">Loading...</span>
+            <span class="visually-hidden">L{trans('logs.loading')}</span>
         </div>
     </div>     
 
@@ -31,11 +31,11 @@
         <thead>
             <tr>
                 <th>#</th>
-                <th>Type</th>
-                <th>Date</th>
-                <th>user</th>
-                <th>Context</th>
-                <th>Message</th>
+                <th>{trans('logs.type')}</th>
+                <th>{trans('logs.date')}</th>
+                <th>{trans('logs.user')}</th>
+                <th>{trans('logs.context')}</th>
+                <th>{trans('logs.message')}</th>
             </tr>
         </thead>
         <tbody id="logTableBody">
@@ -54,6 +54,13 @@
 </div>
 
 <!-- include js -->
+<script>
+    const messages = {
+        msg4: {trans('pager.page')},
+        msg5: {trans('pager.of')},
+        msg6: {trans('logs.error1')},
+    };
+</script>
 <script n:syntax=off src="/js/admin/logsDb.latte-min.js"></script>
 
 <!-- fetch logs initial -->

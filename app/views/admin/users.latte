@@ -7,16 +7,16 @@
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="confirmDeleteLabel">Benutzer löschen</h5>
+                    <h5 class="modal-title" id="confirmDeleteLabel">{trans('users.modal.title.1')}</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <p>Bist du sicher, dass du diesen Benutzer löschen möchtest?</p>
+                    <p>{trans('users.modal.msg.1')}</p>
                     <input type="hidden" id="deleteUserId">
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Abbrechen</button>
-                    <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Löschen</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{trans('users.modal.btn.cancel')}</button>
+                    <button type="button" class="btn btn-danger" id="confirmDeleteBtn">{trans('users.modal.btn.delete')}</button>
                 </div>
             </div>
         </div>
@@ -24,7 +24,7 @@
 
    <!-- Main Content -->
     <div class="container py-4" style="flex:1">
-    <h1 class="mb-5">Benutzerverwaltung</h1>
+    <h1 class="mb-5">{trans('users.title')}</h1>
 
     {ifset $success}
         <div class="alert alert-success d-flex align-items-center" role="alert">
@@ -56,7 +56,8 @@
     <div class="d-flex justify-content-between align-items-left mb-3">
         <!-- Dropdown links -->
         <form method="get" class="usrPageSize">
-            <select name="pageSize"  class="form-select form-select-sm w-auto" onchange="this.form.submit()">
+        <label for="pageSize" class="me-2 desktop-pager-label">{trans('pager.pageSize')}:</label>
+            <select name="pageSize"  class="d-inline form-select form-select-sm w-auto" onchange="this.form.submit()">
                 <option value="10" n:attr="selected => $pageSize == 10">10</option>
                 <option value="25" n:attr="selected => $pageSize == 25">25</option>
                 <option value="50" n:attr="selected => $pageSize == 50">50</option>
@@ -66,7 +67,7 @@
         <!-- Suchfeld + Button rechts -->
         <form id="tblHeadBar" method="get" class="d-flex align-items-center gap-2">
             <div class="input-group"> 
-            <input type="text" name="search" id="searchInput" value="{$search}" placeholder="Suche Benutzer" class="form-control form-control-sm w-auto">
+            <input type="text" name="search" id="searchInput" value="{$search}" placeholder="{trans('users.search')}" class="form-control form-control-sm w-auto">
             <button type="submit" class="btn btn-primary btn-sm"><i class="bi-search"></i></button>
             <button type="button" class="btn btn-success btn-sm" onclick="window.location.href='/admin/showCreateUser'"><i class="bi-person-add"></i></button>
             </div>
@@ -76,7 +77,7 @@
     <!-- lade indicator -->
     <div id="loadingIndicator" style="display: none; text-align: center;">
         <div class="spinner-border" role="status">
-            <span class="visually-hidden">Loading...</span>
+            <span class="visually-hidden">{trans('users.loading')}</span>
         </div>
     </div>
 
@@ -89,7 +90,7 @@
                     <th>Ac</th>
                     <th>2FA</th>
                     <th>Enf</th>
-                    <th>Benutzername</th>
+                    <th>{trans('users.username')}</th>
                     <th>Email</th>                    
                     <th>Aktionen</th>
                 </tr>
@@ -99,38 +100,38 @@
                     <tr>
                         <td>
                             {if $use->ldapEnabled === 1}
-                                <i class="bi-hdd-network-fill text-teal" data-bs-toggle="tooltip" title="LDAP-User"></i>
+                                <i class="bi-hdd-network-fill text-teal" data-bs-toggle="tooltip" title="{trans('users.popup.ldapuser')}"></i>
                             {else}  
-                                <i class="bi-database-fill text-indigo" data-bs-toggle="tooltip" title="Local-User"></i>
+                                <i class="bi-database-fill text-indigo" data-bs-toggle="tooltip" title="{trans('users.popup.dbuser')}"></i>
                             {/if}
                         </td>
                         <td style="min-width:40px !important;text-align:center;">
                             {if $use->username === 'super.admin'}
-                                <i id="accountStatus{$use->id}" class="bi-check-circle-fill text-secondary" data-bs-toggle="tooltip" title="Super-Admin-Account kann nicht geändert werden."></i>
+                                <i id="accountStatus{$use->id}" class="bi-check-circle-fill text-secondary" data-bs-toggle="tooltip" title="{trans('users.popup.noDisableUser')}"></i>
                             {elseif $use->status === 1}
-                                <i id="accountStatus{$use->id}" class="bi-check-circle-fill text-success" onclick="toggleUserAccountStatus({$use->id}, 'disable');" style="cursor:pointer;" data-bs-toggle="tooltip" title="Disable Useraccount."></i>
+                                <i id="accountStatus{$use->id}" class="bi-check-circle-fill text-success" onclick="toggleUserAccountStatus({$use->id}, 'disable');" style="cursor:pointer;" data-bs-toggle="tooltip" title="{trans('users.popup.disableUser')}"></i>
                             {else}
-                                <i id="accountStatus{$use->id}" class="bi-x-circle-fill text-danger" onclick="toggleUserAccountStatus({$use->id}, 'enable');" style="cursor:pointer;" data-bs-toggle="tooltip" title="Enable Useraccount."></i>
+                                <i id="accountStatus{$use->id}" class="bi-x-circle-fill text-danger" onclick="toggleUserAccountStatus({$use->id}, 'enable');" style="cursor:pointer;" data-bs-toggle="tooltip" title="{trans('users.popup.activateUser')}"></i>
                             {/if}
                         </td>
                         <td style="min-width:40px !important;text-align:center;">
                             {if $use->mfaSecret !== '' && $use->mfaEnabled === 1}
-                                <i id="mfaEnabled{$use->id}" class="bi-check-circle-fill text-success" data-bs-toggle="tooltip" title="Disable 2FA." onclick="toggleMfa({$use->id}, 'disable');" style="cursor:pointer;"></i>
+                                <i id="mfaEnabled{$use->id}" class="bi-check-circle-fill text-success" data-bs-toggle="tooltip" title="{trans('users.popup.disable2fa')}" onclick="toggleMfa({$use->id}, 'disable');" style="cursor:pointer;"></i>
                             {elseif $use->mfaSecret !== '' && $use->mfaEnabled === 0}
-                                <i id="mfaEnabled{$use->id}" class="bi-x-circle-fill text-danger" data-bs-toggle="tooltip" title="Enable 2FA." onclick="toggleMfa({$use->id}, 'enable');" style="cursor:pointer;"></i>
+                                <i id="mfaEnabled{$use->id}" class="bi-x-circle-fill text-danger" data-bs-toggle="tooltip" title="{trans('users.popup.enable2fa')}" onclick="toggleMfa({$use->id}, 'enable');" style="cursor:pointer;"></i>
                             {elseif $use->mfaSecret === ''}
-                                <i id="mfaEnabled{$use->id}" class="bi-x-circle-fill text-secondary" data-bs-toggle="tooltip" title="User has not setup 2fa!"></i>
+                                <i id="mfaEnabled{$use->id}" class="bi-x-circle-fill text-secondary" data-bs-toggle="tooltip" title="{trans('users.popup.no2fa')}"></i>
                             {/if}
                         </td>
                         <td style="min-width:40px !important;text-align:center;">
                             {if $use->username === 'super.admin'}
-                                <i class="bi-check-circle-fill text-secondary" data-bs-toggle="tooltip" title="2FA enforcement cannot be changed for super.admin."></i>
+                                <i class="bi-check-circle-fill text-secondary" data-bs-toggle="tooltip" title="{trans('users.popup.no2faforadmin')}"></i>
                             {elseif $use->mfaSecret !== ''}
-                                <i class="bi-check-circle-fill text-secondary" data-bs-toggle="tooltip" title="2FA is configured already."></i>
+                                <i class="bi-check-circle-fill text-secondary" data-bs-toggle="tooltip" title="{trans('users.popup.2faconfigured')}"></i>
                             {elseif $use->mfaEnforced === 1}
-                                <i id="enforceStatus{$use->id}" class="bi-check-circle-fill text-warning" onclick="toggleMfaEnforcement({$use->id}, 'disable');" style="cursor:pointer;" data-bs-toggle="tooltip" title="Click to unenforce 2FA for user."></i>
+                                <i id="enforceStatus{$use->id}" class="bi-check-circle-fill text-warning" onclick="toggleMfaEnforcement({$use->id}, 'disable');" style="cursor:pointer;" data-bs-toggle="tooltip" title="{trans('users.popup.2faenforce')}"></i>
                             {else}
-                                <i id="enforceStatus{$use->id}" class="bi-x-circle-fill text-danger" onclick="toggleMfaEnforcement({$use->id}, 'enable');" style="cursor:pointer;" data-bs-toggle="tooltip" title="Click to enforce 2FA for user."></i>
+                                <i id="enforceStatus{$use->id}" class="bi-x-circle-fill text-danger" onclick="toggleMfaEnforcement({$use->id}, 'enable');" style="cursor:pointer;" data-bs-toggle="tooltip" title="{trans('users.popup.2faunenforce')}"></i>
                             {/if}
                         </td>
                         <td class="text-nowrap">{$use->username}</td>
@@ -193,15 +194,15 @@
                     </p>
                     {if $use->username === 'super.admin'}
                         <button class="btn btn-sm btn-secondary" disabled>
-                            <i class="bi-trash-fill"></i> Löschen
+                            <i class="bi-trash-fill"></i> {trans('users.btn.delete')}
                         </button>
                     {else}
                         <a href="#" class="btn btn-sm btn-danger delete-user-btn" data-user-id="{$use->id}">
-                            <i class="bi-trash-fill"></i> Löschen
+                            <i class="bi-trash-fill"></i> {trans('users.btn.delete')}
                         </a>
                     {/if}
                     <a href="/admin/showEditUser/{$use->id}" class="btn btn-sm btn-warning">
-                        <i class="bi-pencil-fill"></i> Bearbeiten
+                        <i class="bi-pencil-fill"></i> {trans('users.btn.edit')}
                     </a>
                 </div>
             </div>
@@ -210,16 +211,16 @@
 
 
     <div class="d-flex justify-content-between align-items-center mt-3">
-        <div>Seite {$page} von {ceil($totalUsers / $pageSize)}</div>
+        <div>{trans('pager.page')} {$page} {trans('pager.of')} {ceil($totalUsers / $pageSize)}</div>
         <div>
             {if $page > 1}
                 <a href="?page={$page - 1}&pageSize={$pageSize}&search={$search}" class="btn btn-outline-secondary btn-sm">
-                    Vorherige
+                    {trans('pager.prev')}
                 </a>
             {/if}
             {if $page * $pageSize < $totalUsers}
                 <a href="?page={$page + 1}&pageSize={$pageSize}&search={$search}" class="btn btn-outline-secondary btn-sm">
-                    Nächste
+                    {trans('pager.next')}
                 </a>
             {/if}
         </div>

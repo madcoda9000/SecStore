@@ -3,10 +3,10 @@
 {block content}
 
 <div class="container py-4" style="flex:1">
-<h1 class="mb-5">Rollenverwaltung</h1>
+<h1 class="mb-5">{trans('roles.title')}</h1>
     <div class="d-flex justify-content-between mb-3">
         <div>
-            <label for="pageSize" class="me-2">Einträge pro Seite:</label>
+            <label for="pageSize" class="me-2">{trans('pager.pageSize')}:</label>
             <select id="pageSize" class="form-select d-inline w-auto">
                 <option value="10">10</option>
                 <option value="50">50</option>
@@ -15,8 +15,8 @@
         </div>
         <div>
             <div class="input-group">
-                <input type="text" id="search" class="form-control" placeholder="Suche Rolle...">
-                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addRoleModal">Neue Rolle erstellen</button>
+                <input type="text" id="search" class="form-control" placeholder="{trans('roles.search')}">
+                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addRoleModal">{trans('roles.new')}</button>
             </div>
         </div>
     </div>
@@ -24,7 +24,7 @@
     <!-- lade indicator -->
     <div id="loadingSpinner" style="display: none; text-align: center;">
         <div class="spinner-border" role="status">
-            <span class="visually-hidden">Loading...</span>
+            <span class="visually-hidden">{trans('roles.loading')}</span>
         </div>
     </div>
 
@@ -32,8 +32,8 @@
         <thead>
             <tr>
                 <th>#</th>
-                <th>Rollenname</th>
-                <th>Aktionen</th>
+                <th>{trans('roles.name')}</th>
+                <th>{trans('roles.actions')}</th>
             </tr>
         </thead>
         <tbody id="rolesTableBody">
@@ -55,15 +55,15 @@
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Neue Rolle erstellen</h5>
+                <h5 class="modal-title">{trans('roles.modal.new.title')}</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
-                <input type="text" id="newRoleName" class="form-control" placeholder="Rollenname">
+                <input type="text" id="newRoleName" class="form-control" placeholder="{trans('roles.modal.new.name')}">
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Schließen</button>
-                <button type="button" class="btn btn-primary" onclick="addRole()">Speichern</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{trans('roles.modal.new.btn.cancel')}</button>
+                <button type="button" class="btn btn-primary" onclick="addRole()">{trans('roles.modal.new.btn.create')}</button>
             </div>
         </div>
     </div>
@@ -74,21 +74,36 @@
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Rolle löschen</h5>
+                <h5 class="modal-title">{trans('roles.modal.delete.title')}</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
                 <p id="deleteMessage"></p>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Abbrechen</button>
-                <button type="button" class="btn btn-danger" id="deleteConfirmBtn">Löschen</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{trans('roles.modal.new.btn.cancel')}</button>
+                <button type="button" class="btn btn-danger" id="deleteConfirmBtn">{trans('roles.modal.delete.btn.delete')}</button>
             </div>
         </div>
     </div>
 </div>
 
 <!-- include js -->
+<script>
+    const messages = {
+        msg1: {trans('roles.modal.delete.btn.delete')},
+        msg2: {trans('roles.error1')},
+        msg3: {trans('roles.error2')},
+        msg4: {trans('pager.page')},
+        msg5: {trans('pager.of')},
+        msg6: {trans('roles.role')},
+        msg7: {trans('roles.success')},
+        msg8: {trans('roles.error1')},
+        msg9: {trans('roles.qs.1')},
+        msg10: {trans('roles.qs.2')},
+        msg11: {trans('roles.success2')},
+    };
+</script>
 <script n:syntax="off" src="/js/admin/roles.latte-min.js"></script>
 
 <!-- fetch roles intial -->

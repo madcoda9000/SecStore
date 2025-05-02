@@ -30,7 +30,6 @@ use App\Utils\TranslationUtil;
 class AuthController
 {
 
-    
     /**
      * Renders the registration form.
      */
@@ -41,7 +40,6 @@ class AuthController
             'lang' => Flight::get('lang'),
         ]);
     }
-
 
     /**
      * Handles user registration by inserting the new user's data into the database.
@@ -65,29 +63,30 @@ class AuthController
                 LogUtil::logAction(LogType::AUDIT, 'AuthController', 'register', 'SUCCESS: registered new user.', $user->username);
                 MailUtil::sendMail($user->email, "SecStore: Welcome to SecStore", "welcome", ['name' => $user->firstname . ' ' . $user->lastname]);
                 Flight::latte()->render('register.latte', [
-                    'title' => 'Register',
-                    'message' => 'Account created successfully!'
+                    'title' => TranslationUtil::t('register.title'),
+                    'message' => TranslationUtil::t('register.msg.success'),
+                    'lang' => Flight::get('lang'),
                 ]);
                 return;
             } else {
                 LogUtil::logAction(LogType::AUDIT, 'AuthController', 'register', 'ERROR: could not create new user.', $user->username);
                 Flight::latte()->render('register.latte', [
-                    'title' => 'Register',
-                    'error' => 'There was an error creating your account!'
+                    'title' => TranslationUtil::t('register.title'),
+                    'error' => TranslationUtil::t('register.msg,errorGeneral'),
+                    'lang' => Flight::get('lang'),
                 ]);
                 return;
             }
         } else {
             LogUtil::logAction(LogType::AUDIT, 'AuthController', 'register', 'FAILED: ', $userCheck);
             Flight::latte()->render('register.latte', [
-                'title' => 'Register',
-                'error' => $userCheck
+                'title' => TranslationUtil::t('register.title'),
+                'error' => $userCheck,
+                'lang' => Flight::get('lang'),
             ]);
             return;
         }
     }
-
-    
     
     /**
      * Renders the login page.
@@ -100,15 +99,15 @@ class AuthController
         // prüfen ob benutzer bereits angemeldet ist aber 2fa noch fehlt
         if (SessionUtil::get('2fa_user_id') !== null) {
             Flight::latte()->render('2fa_verify.latte', [
-                'title' => 'Login',
+                'title' => TranslationUtil::t('2fa_verify.title'),
+                'lang' => Flight::get('lang'),
             ]);
             return;
         }
 
         Flight::latte()->render('login.latte', [
-            'title' => 'Login',
+            'title' => TranslationUtil::t('login.title'),
             'sessionTimeout' => SessionUtil::getSessionTimeout(),
-            'trans' => Flight::get('trans'),
             'lang' => Flight::get('lang'),
         ]);
         return;
@@ -166,9 +165,10 @@ class AuthController
         if ($user === false) {
             LogUtil::logAction(LogType::AUDIT, 'AuthController', 'login', 'FAILED: username not found.', $username);
             Flight::latte()->render('login.latte', [
-                'title' => 'Login',
-                'error' => 'Wrong usernamen or password.',
+                'title' => TranslationUtil::t('login.title'),
+                'error' => TranslationUtil::t('login.msg.error6'),
                 'sessionTimeout' => SessionUtil::getSessionTimeout(),
+                'lang' => Flight::get('lang'),
             ]);
             return;
         }
@@ -177,8 +177,9 @@ class AuthController
         if (BruteForceUtil::isLockedOut($user->email)) {
             LogUtil::logAction(LogType::AUDIT, 'AuthController', 'login', 'FAILED: user account locked out for 15min.', $user->email);
             Flight::latte()->render('login.latte', [
-                'title' => 'Login',
-                'error' => 'Zu viele fehlgeschlagene Versuche. Bitte warte 15 Minuten.',
+                'title' => TranslationUtil::t('login.title'),
+                'lang' => Flight::get('lang'),
+                'error' => TranslationUtil::t('login.msg.error5'),
                 'sessionTimeout' => SessionUtil::getSessionTimeout(),
             ]);
             return;
@@ -188,8 +189,9 @@ class AuthController
         if ($user !== false && !empty($user->reset_token)) {
             LogUtil::logAction(LogType::AUDIT, 'AuthController', 'login', 'FAILED: user has an open password reset request.', $user->email);
             Flight::latte()->render('login.latte', [
-                'title' => 'Login',
-                'error' => 'Open password reset request. Please conatct Administrator.',
+                'title' => TranslationUtil::t('login.title'),
+                'lang' => Flight::get('lang'),
+                'error' => TranslationUtil::t('login.msg.error4'),
                 'sessionTimeout' => SessionUtil::getSessionTimeout(),
             ]);
             return;
@@ -202,8 +204,9 @@ class AuthController
             if ($isAuthenticated === false) {
                 LogUtil::logAction(LogType::AUDIT, 'AuthController', 'login', 'FAILED: ' . $user->username . ': ldap authentication failed.', $user->email);
                 Flight::latte()->render('login.latte', [
-                    'title' => 'Login',
-                    'error' => 'LDAP authentication failed.',
+                    'title' => TranslationUtil::t('login.title'),
+                    'lang' => Flight::get('lang'),
+                    'error' => TranslationUtil::t('login.msg.error3'),
                     'sessionTimeout' => SessionUtil::getSessionTimeout(),
                 ]);
                 return;
@@ -216,8 +219,9 @@ class AuthController
             if ($user->status === 0) {
                 LogUtil::logAction(LogType::AUDIT, 'AuthController', 'login', 'FAILED: user account deactivated.', $user->email);
                 Flight::latte()->render('login.latte', [
-                    'title' => 'Login',
-                    'error' => 'Account inactive. Please conatct Administrator.',
+                    'title' => TranslationUtil::t('login.title'),
+                    'lang' => Flight::get('lang'),
+                    'error' => TranslationUtil::t('login.msg.error2'),
                     'sessionTimeout' => SessionUtil::getSessionTimeout(),
                 ]);
                 return;
@@ -260,8 +264,9 @@ class AuthController
             LogUtil::logAction(LogType::AUDIT, 'AuthController', 'login', 'FAILED: wrong credentials.', $user->email);
 
             Flight::latte()->render('login.latte', [
-                'title' => 'Login',
-                'error' => 'Falsche Zugangsdaten',
+                'title' => TranslationUtil::t('login.title'),
+                'lang' => Flight::get('lang'),
+                'error' => TranslationUtil::t('login.msg.error1'),
                 'sessionTimeout' => SessionUtil::getSessionTimeout(),
             ]);
             return;
@@ -299,7 +304,14 @@ class AuthController
         User::setMfaToken($secret, $user->id);
 
         // An das Template übergeben
-        Flight::latte()->render('enable_2fa.latte', ['title' => '2FA Einrichten', 'user' => $user, 'qrCodeUrl' => $qrCodeUrl, 'secret' => $secret, 'enforced' => $user->mfaEnforced]);
+        Flight::latte()->render('enable_2fa.latte', [
+            'title' => TranslationUtil::t('2fasetup.title'),
+            'lang' => Flight::get('lang'),
+            'user' => $user,
+            'qrCodeUrl' => $qrCodeUrl,
+            'secret' => $secret,
+            'enforced' => $user->mfaEnforced
+        ]);
     }
 
     /**
@@ -332,7 +344,10 @@ class AuthController
             User::enableMfaForUser($user->id);
         }
 
-        Flight::latte()->render('2fa_verify.latte', ['title' => '2FA-Code eingeben']);
+        Flight::latte()->render('2fa_verify.latte', [
+            'title' => TranslationUtil::t('2faverify.title'),
+            'lang' => Flight::get('lang'),
+        ]);
     }
 
     /**
@@ -368,7 +383,11 @@ class AuthController
             unset($_SESSION['2fa_user_id']); // Session aufräumen
             Flight::redirect('/home');
         } else {
-            Flight::latte()->render('2fa_verify.latte', ['title' => '2FA', 'error' => 'Ungültiger Code']);
+            Flight::latte()->render('2fa_verify.latte', [
+                'title' => TranslationUtil::t('2faverify.title'),
+                'lang' => Flight::get('lang'),
+                'error' => TranslationUtil::t('2faverify.msg.error1'),
+            ]);
         }
     }
     
@@ -378,7 +397,8 @@ class AuthController
     public function showForgotPassword()
     {
         Flight::latte()->render('forgot_password.latte', [
-            'title' => 'Forgot Password'
+            'title' => TranslationUtil::t('forgot.title'),
+            'lang' => Flight::get('lang'),
         ]);
         return;
     }
@@ -397,8 +417,9 @@ class AuthController
         if ($user === false) {
             LogUtil::logAction(LogType::AUDIT, 'AuthController', 'forgotPassword', 'FAILED: user by email not found.', $email);
             Flight::latte()->render('forgot_password.latte', [
-                'title' => 'Forgot Password',
-                'error' => 'E-Mail nicht gefunden'
+                'title' => TranslationUtil::t('login.title'),
+                'lang' => Flight::get('lang'),
+                'error' => TranslationUtil::t('forgot.msg.errorEmail'),
             ]);
             return;
         }
@@ -412,23 +433,26 @@ class AuthController
                 MailUtil::sendMail($user->email, "SecStore: your password reset request", "pwReset", ['name' => $name, 'token' => $token]);
                 LogUtil::logAction(LogType::AUDIT, 'AuthController', 'forgotPassword', 'SUCCESS: requested pw reset.', $email);
                 Flight::latte()->render('forgot_password.latte', [
-                    'title' => 'Reset Password',
-                    'message' => 'Mail send. Please take a look into your inbox.)',
+                    'title' => TranslationUtil::t('login.title'),
+                    'lang' => Flight::get('lang'),
+                    'message' => TranslationUtil::t('forgot.msg.success'),
                 ]);
                 return;
             } else {
                 LogUtil::logAction(LogType::AUDIT, 'AuthController', 'forgotPassword', 'FAILED: token could not be saved.', $email);
                 Flight::latte()->render('reset_password.latte', [
-                    'title' => 'Reset Password',
-                    'error' => 'ERROR: Unable to save token!',
+                    'title' => TranslationUtil::t('login.title'),
+                    'lang' => Flight::get('lang'),
+                    'error' => TranslationUtil::t('forgot.msg.errorGeneral'),
                     'token' => ''
                 ]);
             }
         } else {
             LogUtil::logAction(LogType::AUDIT, 'AuthController', 'forgotPassword', 'FAILED: user has an open reset pw request already.', $email);
             Flight::latte()->render('forgot_password.latte', [
-                'title' => 'Forgot Password',
-                'error' => 'User already has an open pw reset token!'
+                'title' => TranslationUtil::t('login.title'),
+                'lang' => Flight::get('lang'),
+                'error' => TranslationUtil::t('forgot.msg.errorOpenRequest'),
             ]);
             return;
         }
@@ -444,7 +468,8 @@ class AuthController
     public function showResetPassword($token)
     {
         Flight::latte()->render('reset_password.latte', [
-            'title' => 'Reset Password',
+            'title' => TranslationUtil::t('reset.title'),
+            'lang' => Flight::get('lang'),
             'token' => $token
         ]);
         return;
@@ -458,6 +483,17 @@ class AuthController
      */
     public function resetPassword()
     {
+        if (!isset($_POST['token']) || $_POST['new_password'] === '') {
+            LogUtil::logAction(LogType::AUDIT, 'AuthController', 'resetPassword', 'FAILED: token or new password not set.', '');
+            Flight::latte()->render('reset_password.latte', [
+                'title' => TranslationUtil::t('login.title'),
+                'lang' => Flight::get('lang'),
+                'error' => TranslationUtil::t('reset.msg.errorGeneral'),
+                'token' => 'dfhrtfgjkfgkjifg'
+            ]);
+            return;
+        }
+        
         $token = $_POST['token'];
         $new_password = password_hash($_POST['new_password'], PASSWORD_DEFAULT);
         $user = User::findUserByResetToken($token);
@@ -467,22 +503,27 @@ class AuthController
                 LogUtil::logAction(LogType::AUDIT, 'AuthController', 'resetPassword', 'SUCCESS: saved new password.', $user->username);
                 Flight::latte()->render('login.latte', [
                     'title' => 'Login',
-                    'message' => 'PW reset successful. Please login.'
+                    'message' => TranslationUtil::t('reset.msg.success'),
+                    'lang' => Flight::get('lang'),
                 ]);
                 return;
             } else {
                 LogUtil::logAction(LogType::AUDIT, 'AuthController', 'resetPassword', 'FAILED: new pw could not be saved.', $user->username);
                 Flight::latte()->render('login.latte', [
                     'title' => 'Login',
-                    'message' => 'ERROR: new password could not be saved!'
+                    'lang' => Flight::get('lang'),
+                    'message' => TranslationUtil::t('reset.msg.errorGeneral'),
+                    'token' => $token
                 ]);
                 return;
             }
         } else {
-            LogUtil::logAction(LogType::AUDIT, 'AuthController', 'resetPassword', 'FAILED: invalid reset token.', $user->username);
+            LogUtil::logAction(LogType::AUDIT, 'AuthController', 'resetPassword', 'FAILED: invalid reset token.');
             Flight::latte()->render('reset_password.latte', [
                 'title' => 'Reset Password',
-                'error' => 'Ungültiger Token!'
+                'lang' => Flight::get('lang'),
+                'error' => TranslationUtil::t('reset.msg.errorToken'),
+                'token' => $token
             ]);
             return;
         }

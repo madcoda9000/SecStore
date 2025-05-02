@@ -1,4 +1,5 @@
-document.getElementById("registerForm").onsubmit = function (event) {
+
+document.getElementById("registerForm").onsubmit = function (event) {  
   let isValid = true;
   let errorMessage = "";
 
@@ -14,27 +15,27 @@ document.getElementById("registerForm").onsubmit = function (event) {
 
   // Validierungen durchführen
   if (username.value.trim() === "" || username.value.length < 3) {
-    showError(username, "Der Benutzername muss mindestens 3 Zeichen lang sein.");
+    showError(username, messages.val3);
     isValid = false;
   }
 
   if (email.value.trim() === "" || !validateEmail(email.value)) {
-    showError(email, "Bitte eine gültige E-Mail-Adresse eingeben.");
+    showError(email, messages.val6);
     isValid = false;
   }
 
   if (firstname.value.trim() === "") {
-    showError(firstname, "Der Vorname darf nicht leer sein.");
+    showError(firstname, messages.val1);
     isValid = false;
   }
 
   if (lastname.value.trim() === "") {
-    showError(lastname, "Der Nachname darf nicht leer sein.");
+    showError(lastname, messages.val2);
     isValid = false;
   }
 
   if (password.value.length < 12) {
-    showError(password, "Das Passwort muss mindestens 12 Zeichen lang sein.");
+    showError(password, messages.val4);
     isValid = false;
   }
 
@@ -110,8 +111,6 @@ document.getElementById("togglePassword").addEventListener("click", function () 
     eyeIcon.classList.remove("bi-eye-slash");
     eyeIcon.classList.add("bi-eye");
   }
-
-  lucide.createIcons(); // Icons neu rendern
 });
 
 // Passwort generieren

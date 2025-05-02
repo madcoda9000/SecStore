@@ -6,6 +6,7 @@ use App\Models\User;
 use App\Utils\SessionUtil;
 use App\Utils\LogType;
 use App\Utils\LogUtil;
+use App\Utils\TranslationUtil;
 use ORM;
 use Flight;
 use Exception;
@@ -64,7 +65,7 @@ class AdminController
                 ]);
             } else {
                 http_response_code(403);
-                throw new \Exception("Access denied: Admin role required.", 403);
+                throw new \Exception(TranslationUtil::t("error1"), 403);
             }
         } else {
             Flight::redirect("/login");
@@ -113,7 +114,7 @@ class AdminController
             // Alte Datei als Text laden
             $configContent = file_get_contents($configFile);
             if ($configContent === false) {
-                throw new Exception("Konfigurationsdatei konnte nicht gelesen werden.");
+                throw new Exception(TranslationUtil::t("error2"));
             }
 
             // Aktuelles `$ldapSettings`-Array suchen und ersetzen
@@ -132,7 +133,7 @@ class AdminController
             $newConfigContent = preg_replace($pattern, $replacement, $configContent);
 
             if ($newConfigContent === null) {
-                throw new Exception("Fehler beim Ersetzen der Konfiguration.");
+                throw new Exception(TranslationUtil::t("error3"));
             }
 
             // Datei mit neuem Inhalt speichern
@@ -152,7 +153,7 @@ class AdminController
 
             // template redner und meldung ausgeben
             Flight::latte()->render("admin/settings.latte", [
-                "success" => "Settings saved successfully!",
+                "success" => TranslationUtil::t("settings.success1"),
                 "mail" => $savedconfig["mail"],
                 "bruteForceSettings" => $savedconfig["bruteForceSettings"],
                 "application" => $savedconfig["application"],
@@ -204,7 +205,7 @@ class AdminController
             // Alte Datei als Text laden
             $configContent = file_get_contents($configFile);
             if ($configContent === false) {
-                throw new Exception("Konfigurationsdatei konnte nicht gelesen werden.");
+                throw new Exception(TranslationUtil::t("error2"));
             }
 
             // Aktuelles `$logging`-Array suchen und ersetzen
@@ -223,7 +224,7 @@ class AdminController
             $newConfigContent = preg_replace($pattern, $replacement, $configContent);
 
             if ($newConfigContent === null) {
-                throw new Exception("Fehler beim Ersetzen der Konfiguration.");
+                throw new Exception(TranslationUtil::t("error3"));
             }
 
             // Datei mit neuem Inhalt speichern
@@ -243,7 +244,7 @@ class AdminController
 
             // template redner und meldung ausgeben
             Flight::latte()->render("admin/settings.latte", [
-                "success" => "Settings saved successfully!",
+                "success" => TranslationUtil::t("settings.success1"),
                 "mail" => $savedconfig["mail"],
                 "bruteForceSettings" => $savedconfig["bruteForceSettings"],
                 "application" => $savedconfig["application"],
@@ -298,7 +299,7 @@ class AdminController
             // Alte Datei als Text laden
             $configContent = file_get_contents($configFile);
             if ($configContent === false) {
-                throw new Exception("Konfigurationsdatei konnte nicht gelesen werden.");
+                throw new Exception(TranslationUtil::t("error2"));
             }
 
             // Aktuelles `$mail`-Array suchen und ersetzen
@@ -317,7 +318,7 @@ class AdminController
             $newConfigContent = preg_replace($pattern, $replacement, $configContent);
 
             if ($newConfigContent === null) {
-                throw new Exception("Fehler beim Ersetzen der Konfiguration.");
+                throw new Exception(TranslationUtil::t("error3"));
             }
 
             // Datei mit neuem Inhalt speichern
@@ -337,7 +338,7 @@ class AdminController
 
             // template redner und meldung ausgeben
             Flight::latte()->render("admin/settings.latte", [
-                "success" => "Settings saved successfully!",
+                "success" => TranslationUtil::t("settings.success1"),
                 "mail" => $savedconfig["mail"],
                 "bruteForceSettings" => $savedconfig["bruteForceSettings"],
                 "application" => $savedconfig["application"],
@@ -380,7 +381,7 @@ class AdminController
             // Alte Datei als Text laden
             $configContent = file_get_contents($configFile);
             if ($configContent === false) {
-                throw new Exception("Konfigurationsdatei konnte nicht gelesen werden.");
+                throw new Exception(TranslationUtil::t("error2"));
             }
 
             // Aktuelles `$application`-Array suchen und ersetzen
@@ -399,7 +400,7 @@ class AdminController
             $newConfigContent = preg_replace($pattern, $replacement, $configContent);
 
             if ($newConfigContent === null) {
-                throw new Exception("Fehler beim Ersetzen der Konfiguration.");
+                throw new Exception(TranslationUtil::t("error3"));
             }
 
             // Datei mit neuem Inhalt speichern
@@ -419,7 +420,7 @@ class AdminController
 
             // template redner und meldung ausgeben
             Flight::latte()->render("admin/settings.latte", [
-                "success" => "Settings saved successfully!",
+                "success" => TranslationUtil::t("settings.success1"),
                 "mail" => $savedconfig["mail"],
                 "bruteForceSettings" => $savedconfig["bruteForceSettings"],
                 "application" => $savedconfig["application"],
@@ -468,7 +469,7 @@ class AdminController
             // Alte Datei als Text laden
             $configContent = file_get_contents($configFile);
             if ($configContent === false) {
-                throw new Exception("Konfigurationsdatei konnte nicht gelesen werden.");
+                throw new Exception(TranslationUtil::t("error2"));
             }
 
             // Aktuelles `$bruteForceSettings`-Array suchen und ersetzen
@@ -487,7 +488,7 @@ class AdminController
             $newConfigContent = preg_replace($pattern, $replacement, $configContent);
 
             if ($newConfigContent === null) {
-                throw new Exception("Fehler beim Ersetzen der Konfiguration.");
+                throw new Exception(TranslationUtil::t("error3"));
             }
 
             // Datei mit neuem Inhalt speichern
@@ -507,7 +508,7 @@ class AdminController
 
             // template redner und meldung ausgeben
             Flight::latte()->render("admin/settings.latte", [
-                "success" => "Settings saved successfully!",
+                "success" => TranslationUtil::t("settings.success1"),
                 "mail" => $savedconfig["mail"],
                 "bruteForceSettings" => $savedconfig["bruteForceSettings"],
                 "application" => $savedconfig["application"],
@@ -568,7 +569,7 @@ class AdminController
         $roles = ORM::for_table("roles")->find_array();
 
         Flight::latte()->render("admin/createUser.latte", [
-            "title" => "Create User",
+            "title" => TranslationUtil::t("user.new.title"),
             "user" => SessionUtil::get("user"),
             "sessionTimeout" => SessionUtil::getRemainingTime(),
             "roles" => $roles,
@@ -596,18 +597,18 @@ class AdminController
         $ldapEnabled = isset($_POST["ldapEnabled"]) ? $_POST["ldapEnabled"] : false;
 
         if ($userCheck !== "false") {
-            Flight::json(["success" => false, "message" => "User exists already!"]);
+            Flight::json(["success" => false, "message" => TranslationUtil::t("user.new.error1")]);
             return;
         }
 
         $newUser = User::createUser($user, $email, $firstname, $lastname, $status, $password, $roles, $ldapEnabled == true ? 1 : 0);
 
         if (!$newUser) {
-            Flight::json(["success" => false, "message" => "Error while saving the nes user!"]);
+            Flight::json(["success" => false, "message" => TranslationUtil::t("user.new.error2")]);
         }
 
         LogUtil::logAction(LogType::AUDIT, "AdminController", "createUser", "SUCCESS: created new user.");
-        Flight::json(["success" => true, "message" => "User created successfully!"]);
+        Flight::json(["success" => true, "message" => TranslationUtil::t("user.new.success")]);
     }
 
     /**
@@ -628,7 +629,7 @@ class AdminController
         $roles = ORM::for_table("roles")->find_array();
 
         Flight::latte()->render("admin/editUser.latte", [
-            "title" => "Edit User",
+            "title" => TranslationUtil::t("user.edit.title"),
             "user" => SessionUtil::get("user"),
             "sessionTimeout" => SessionUtil::getRemainingTime(),
             "roles" => $roles,
@@ -678,9 +679,9 @@ class AdminController
         LogUtil::logAction(LogType::AUDIT, "AdminController", "updateUser", "SUCCESS: updated user " . $username . ".");
 
         if ($erg === true) {
-            Flight::json(["success" => true, "message" => "User updated successfully." . $ldapEnabled . ""]);
+            Flight::json(["success" => true, "message" => TranslationUtil::t('user.edit.success') . $ldapEnabled . ""]);
         } else {
-            Flight::json(["success" => false, "message" => "ERROR: user could not be updated!."]);
+            Flight::json(["success" => false, "message" => TranslationUtil::t("user.edit.error1")]);
         }
     }
 
@@ -1083,7 +1084,7 @@ class AdminController
     public static function showRoles()
     {
         Flight::latte()->render("admin/roles.latte", [
-            "title" => "Roles",
+            "title" => TranslationUtil::t("roles.title"),
             "user" => SessionUtil::get("user"),
             "sessionTimeout" => SessionUtil::getRemainingTime(),
         ]);
@@ -1102,7 +1103,7 @@ class AdminController
         $roleName = Flight::request()->query["role"] ?? null;
 
         if (!$roleName) {
-            Flight::json(["error" => "Kein Rollenname angegeben"], 400);
+            Flight::json(["error" => TranslationUtil::t('roles.error3')], 400);
             return;
         }
 
@@ -1204,7 +1205,7 @@ class AdminController
                 $lastQuery = end($queries);
                 LogUtil::logAction(LogType::SQL, "LogController", "listLogs", $lastQuery);
             }
-            Flight::json(["success" => false, "message" => "Role already exists."]);
+            Flight::json(["success" => false, "message" => TranslationUtil::t("roles.error5")]);
             return;
         }
 
@@ -1228,7 +1229,7 @@ class AdminController
             SessionUtil::get("user")["username"]
         );
 
-        Flight::json(["success" => true, "message" => "Role added successfully.", "role" => $role->as_array()]);
+        Flight::json(["success" => true, "message" => TranslationUtil::t('roles.error6'), "role" => $role->as_array()]);
     }
 
     /**

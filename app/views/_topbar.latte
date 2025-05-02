@@ -9,35 +9,35 @@
         <!-- Offcanvas for Mobile Menu -->
         <div class="offcanvas offcanvas-start" tabindex="-1" id="navbarOffcanvas" aria-labelledby="navbarOffcanvasLabel">
           <div class="offcanvas-header">
-            <h5 id="navbarOffcanvasLabel">Menu</h5>
+            <h5 id="navbarOffcanvasLabel">{trans('menu.name')}</h5>
             <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
           </div>
           <div class="offcanvas-body">
             <ul class="navbar-nav">
               <li class="nav-item">
-                <a class="nav-link" href="/home">Home</a>
+                <a class="nav-link" href="/home">{trans('menu.home')}</a>
               </li>
               {if in_array('Admin', explode(',', $user->roles))}
                 <li class="nav-item">
-                  <a class="nav-link" href="/admin/settings">Settings</a>
+                  <a class="nav-link" href="/admin/settings">{trans('menu.settings')}</a>
                 </li>
                 <!-- Dropdowns -->
                 <li class="nav-item dropdown">
-                  <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">Administration</a>
+                  <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">{trans('menu.admin')}</a>
                   <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                    <li><a class="dropdown-item" href="/admin/users">Users</a></li>
-                    <li><a class="dropdown-item" href="/admin/showRoles">Roles</a></li>
+                    <li><a class="dropdown-item" href="/admin/users">{trans('menu.admin.users')}</a></li>
+                    <li><a class="dropdown-item" href="/admin/showRoles">{trans('menu.admin.roles')}</a></li>
                   </ul>
                 </li>
                 <li class="nav-item dropdown">
-                  <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown2" role="button" data-bs-toggle="dropdown" aria-expanded="false">Logs</a>
+                  <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown2" role="button" data-bs-toggle="dropdown" aria-expanded="false">{trans('menu.logs')}</a>
                   <ul class="dropdown-menu" aria-labelledby="navbarDropdown2">
-                    <li><a class="dropdown-item" href="/admin/logsAudit">Audit Logs</a></li>
-                    <li><a class="dropdown-item" href="/admin/logsRequest">Request Logs</a></li>
-                    <li><a class="dropdown-item" href="/admin/logsSystem">System Logs</a></li>
-                    <li><a class="dropdown-item" href="/admin/logsDb">Database Logs</a></li>
-                    <li><a class="dropdown-item" href="/admin/logsMail">Mail Logs</a></li>
-                    <li><a class="dropdown-item" href="/admin/logsError">Error Logs</a></li>
+                    <li><a class="dropdown-item" href="/admin/logsAudit">{trans('menu.logs.access')}</a></li>
+                    <li><a class="dropdown-item" href="/admin/logsRequest">{trans('menu.logs.request')}</a></li>
+                    <li><a class="dropdown-item" href="/admin/logsSystem">{trans('menu.logs.system')}</a></li>
+                    <li><a class="dropdown-item" href="/admin/logsDb">{trans('menu.logs.database')}</a></li>
+                    <li><a class="dropdown-item" href="/admin/logsMail">{trans('menu.logs.mail')}</a></li>
+                    <li><a class="dropdown-item" href="/admin/logsError">{trans('menu.logs.error')}</a></li>
                   </ul>
                 </li>
               {/if}
@@ -53,8 +53,8 @@
           <div class="dropdown">
             <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">{$user->username}</button>
             <ul class="dropdown-menu">
-              <li><a class="dropdown-item" href="/profile">Profile</a></li>
-              <li><a class="dropdown-item" href="/logout">Logout</a></li>
+              <li><a class="dropdown-item" href="/profile">{trans('menu.profile')}</a></li>
+              <li><a class="dropdown-item" href="/logout">{trans('menu.logout')}</a></li>
             </ul>
           </div>
         </div>

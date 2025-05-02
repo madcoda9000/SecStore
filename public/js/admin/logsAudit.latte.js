@@ -51,7 +51,7 @@ function fetchLogs() {
 
       updatePagination(data.page, data.totalPages);
     })
-    .catch((error) => console.error("Fehler beim Laden der Logs:", error))
+    .catch((error) => console.error(messages.msg6, error))
     .finally(() => {
       spinner.style.display = "none";
     });
@@ -62,7 +62,7 @@ function updatePagination(current, total) {
   let paginationInfo = document.getElementById("paginationInfo");
 
   pagination.innerHTML = "";
-  paginationInfo.textContent = `Seite ${current} von ${total}`;
+  paginationInfo.textContent = `${messages.msg4} ${current} ${messages.msg5} ${total}`;
 
   let maxVisiblePages = 5; // Anzahl der sichtbaren Seitenlinks
   let startPage = Math.max(1, current - Math.floor(maxVisiblePages / 2));

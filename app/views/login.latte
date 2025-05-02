@@ -30,7 +30,7 @@
                         const loginText = document.getElementById("loginText");
 
                         loginSpinner.classList.add("d-none");
-                        loginText.textContent = "Anmelden";
+                        loginText.textContent = {trans('login.submit')};
                         loginBtn.removeAttribute("disabled");
                     });
                 </script>
@@ -71,6 +71,13 @@
             </div>
         </div>
     </div>
+    <script>
+        const messages = {
+            'val1': {trans('login.msg.val1')},
+            'val2': {trans('login.msg.val2')},
+            'val3': {trans('login.msg.val3')},
+        };
+    </script>
     <script src="/js/login.latte-min.js"></script>
     <script>
         let sessTT = {$sessionTimeout};

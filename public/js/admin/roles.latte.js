@@ -28,7 +28,7 @@ function fetchRoles() {
                     <td>${role.id}</td>
                     <td>${role.roleName}</td>
                     <td>
-                        <button class="btn btn-danger btn-sm" onclick="confirmDelete(${role.id}, '${role.roleName}')">Löschen</button>
+                        <button class="btn btn-danger btn-sm" onclick="confirmDelete(${role.id}, '${role.roleName}')">${messages.msg1}</button>
                     </td>
                 </tr>`;
         tbody.innerHTML += row;
@@ -36,7 +36,7 @@ function fetchRoles() {
 
       updatePagination(data.page, data.totalPages);
     })
-    .catch((error) => console.error("Fehler beim Laden der Rollen:", error))
+    .catch((error) => console.error(messages.msg3, error))
     .finally(() => {
       // Spinner ausblenden
       spinner.style.display = "none";
@@ -48,7 +48,7 @@ function updatePagination(current, total) {
   let paginationInfo = document.getElementById("paginationInfo");
 
   pagination.innerHTML = "";
-  paginationInfo.textContent = `Seite ${current} von ${total}`;
+  paginationInfo.textContent = `${messages.msg4} ${current} ${messages.msg5} ${total}`;
 
   let maxVisiblePages = 5; // Anzahl der sichtbaren Seitenlinks
   let startPage = Math.max(1, current - Math.floor(maxVisiblePages / 2));
@@ -117,7 +117,7 @@ function addRole() {
     fetchRoles();
     document.getElementById("newRoleName").value = "";
     bootstrap.Modal.getInstance(document.getElementById("addRoleModal")).hide();
-    showToast(`Rolle "${roleName}" erfolgreich erstellt!`, "success", "Success");
+    showToast(`${messages.msg6} "${roleName}" ${messages.msg7}`, "success", "Success");
   });
 }
 
@@ -127,12 +127,12 @@ function confirmDelete(id, roleName) {
     .then((data) => {
       if (data.inUse) {
         showToast(
-          `Rolle "${roleName}" kann nicht gelöscht werden, da sie noch Benutzern zugewiesen ist!`,
+          `${messages.msg6} "${roleName}" ${messages.msg8}`,
           "warning",
           "Warning"
         );
       } else {
-        document.getElementById("deleteMessage").textContent = `Soll die Rolle "${roleName}" wirklich gelöscht werden?`;
+        document.getElementById("deleteMessage").textContent = `${messages.msg9} "${roleName}" ${messages.msg10}`;
         document.getElementById("deleteConfirmBtn").onclick = function () {
           deleteRole(id);
         };
@@ -151,6 +151,6 @@ function deleteRole(id) {
   }).then(() => {
     fetchRoles();
     bootstrap.Modal.getInstance(document.getElementById("confirmDeleteModal")).hide();
-    showToast(`Rolle "${roleName}" erfolgreich gelöscht!`, "success", "Success");
+    showToast(`${messages.msg6} "${roleName}" ${messages11}`, "success", "Success");
   });
 }

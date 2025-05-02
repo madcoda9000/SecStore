@@ -18,10 +18,11 @@ Die Anwendung unterstützt eine breite Palette von Sicherheitsfunktionen wie Log
 - 🔐 Zwei-Faktor-Authentifizierung (TOTP) (Per User erzwingbar)
 - 🔁 Passwort zurücksetzen via E-Mail  
 - 👤 Benutzerprofil bearbeiten (Passwort, 2FA, Name, E-Mail)  
+- 👤 Mehrsprachig (zur Zeit EN und DE)
 - 🛡️ Brute-Force-Schutz  
 - 🧑‍💼 Admin-Bereich zur Benutzerverwaltung, Rollenverwaltung  
 - 🌘 Dark-Mode mit Umschaltung  
-- 🔍 Audit-, Mail- und System-Logging  (optional: Database und Request Logging)
+- 🔍 Audit-, Mail-, Error-, Datenbank-, Request- und System-Logging 
 - 📦 REST-konformes API-Backend  
 - ⚙️ Automatische Datenbank-Migration  
 - 🚀 CLI-Tool zum Generieren sicherer Schlüssel  

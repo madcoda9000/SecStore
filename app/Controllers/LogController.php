@@ -5,6 +5,7 @@ namespace App\Controllers;
 use App\Utils\LogType;
 use App\Utils\LogUtil;
 use App\Utils\SessionUtil;
+use App\Utils\TranslationUtil;
 use ORM;
 use Flight;
 
@@ -34,7 +35,7 @@ class LogController
     public static function showAuditLogs()
     {
         Flight::latte()->render('admin/logsAudit.latte', [
-            'title' => 'Audit Logs',
+            'title' => TranslationUtil::t('logs.audit.title'),
             'user' => SessionUtil::get('user'),
             'sessionTimeout' => SessionUtil::getRemainingTime()
         ]);
@@ -68,7 +69,7 @@ class LogController
     public static function showSystemLogs()
     {
         Flight::latte()->render('admin/logsSystem.latte', [
-            'title' => 'System Logs',
+            'title' => TranslationUtil::t('logs.audit.system'),
             'user' => SessionUtil::get('user'),
             'sessionTimeout' => SessionUtil::getRemainingTime()
         ]);
@@ -101,7 +102,7 @@ class LogController
     public static function showRequestLogs()
     {
         Flight::latte()->render('admin/logsRequest.latte', [
-            'title' => 'Request Logs',
+            'title' => TranslationUtil::t('logs.audit.request'),
             'user' => SessionUtil::get('user'),
             'sessionTimeout' => SessionUtil::getRemainingTime()
         ]);
@@ -134,7 +135,7 @@ class LogController
     public static function showDbLogs()
     {
         Flight::latte()->render('admin/logsDb.latte', [
-            'title' => 'Database Logs',
+            'title' => TranslationUtil::t('logs.audit.database'),
             'user' => SessionUtil::get('user'),
             'sessionTimeout' => SessionUtil::getRemainingTime()
         ]);
@@ -168,10 +169,28 @@ class LogController
     public static function showMailLogs()
     {
         Flight::latte()->render('admin/logsMail.latte', [
-            'title' => 'Mail Logs',
+            'title' => TranslationUtil::t('logs.audit.mail'),
             'user' => SessionUtil::get('user'),
             'sessionTimeout' => SessionUtil::getRemainingTime()
         ]);
+    }
+
+    /**
+     * Fetches a paginated list of mail logs from the database.
+     *
+     * This function is called through an AJAX request from the mail logs page.
+     * It retrieves the search query, page number and page size from the request
+     * query string and calls the `listLogs` method to retrieve the matching
+     * mail logs. It then returns a JSON response containing the list of mail
+     * logs, total number of mail logs, total number of pages, current page and
+     * page size.
+     */
+    public static function fetchMailLogs()
+    {
+        $page = isset($_GET['page']) ? (int) $_GET['page'] : 1;
+        $pageSize = isset($_GET['pageSize']) ? (int) $_GET['pageSize'] : 10;
+        $search = isset($_GET['search']) ? trim($_GET['search']) : '';
+        self::listLogs('MAIL', $search, $page, $pageSize);
     }
 
     /**
@@ -183,7 +202,7 @@ class LogController
     public static function showErrorLogs()
     {
         Flight::latte()->render('admin/logsError.latte', [
-            'title' => 'Mail Logs',
+            'title' => TranslationUtil::t('logs.audit.error'),
             'user' => SessionUtil::get('user'),
             'sessionTimeout' => SessionUtil::getRemainingTime()
         ]);
@@ -205,24 +224,6 @@ class LogController
         $pageSize = isset($_GET['pageSize']) ? (int) $_GET['pageSize'] : 10;
         $search = isset($_GET['search']) ? trim($_GET['search']) : '';
         self::listLogs('ERROR', $search, $page, $pageSize);
-    }
-
-    /**
-     * Fetches a paginated list of mail logs from the database.
-     *
-     * This function is called through an AJAX request from the mail logs page.
-     * It retrieves the search query, page number and page size from the request
-     * query string and calls the `listLogs` method to retrieve the matching
-     * mail logs. It then returns a JSON response containing the list of mail
-     * logs, total number of mail logs, total number of pages, current page and
-     * page size.
-     */
-    public static function fetchMailLogs()
-    {
-        $page = isset($_GET['page']) ? (int) $_GET['page'] : 1;
-        $pageSize = isset($_GET['pageSize']) ? (int) $_GET['pageSize'] : 10;
-        $search = isset($_GET['search']) ? trim($_GET['search']) : '';
-        self::listLogs('MAIL', $search, $page, $pageSize);
     }
 
     /**

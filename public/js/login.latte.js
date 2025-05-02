@@ -25,7 +25,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         // username Validierung
         if (usernameInput.value.trim() === "") {
-            showError(usernameInput, "Bitte gib deinen Benutzernamen ein.");
+            showError(usernameInput, messages.val1);
             isValid = false;
         } else {
             clearError(usernameInput);
@@ -33,7 +33,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         // Passwort Validierung
         if (passwordInput.value.trim() === "") {
-            showError(passwordInput, "Bitte gib ein Passwort ein.");
+            showError(passwordInput, messages.val2);
             isValid = false;
         } else {
             clearError(passwordInput);
@@ -50,7 +50,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
             // Spinner anzeigen und Text ändern
             loginSpinner.classList.remove("d-none");
-            loginText.textContent = "Bitte warten...";
+            loginText.textContent = messages.val3;
             loginBtn.setAttribute("disabled", "true");
         }
     });

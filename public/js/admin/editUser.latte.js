@@ -16,21 +16,21 @@ document.addEventListener("DOMContentLoaded", function () {
     roleError.style.display = "none";
 
     if (selectedRoles.length === 0) {
-      roleError.innerText = "Bitte wählen Sie mindestens eine Rolle.";
+      roleError.innerText = messages.error1;
       roleError.style.display = "block";
       roleError.classList.add("text-danger");
       roleError.classList.remove("text-info");
       return false;
     }
     if (selectedRoles.includes("User") && selectedRoles.length > 1) {
-      roleError.innerText = "Die Rolle 'User' kann nicht mit anderen Rollen kombiniert werden.";
+      roleError.innerText = messages.error2;
       roleError.style.display = "block";
       roleError.classList.add("text-danger");
       roleError.classList.remove("text-info");
       return false;
     }
     if (selectedRoles.includes("Admin") && selectedRoles.length > 1) {
-      roleError.innerText = "Die Rolle 'Admin' kann nicht mit anderen Rollen kombiniert werden.";
+      roleError.innerText = messages.error4;
       roleError.style.display = "block";
       roleError.classList.add("text-danger");
       roleError.classList.remove("text-info");
@@ -38,7 +38,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
     roleError.classList.add("text-info");
     roleError.classList.remove("text-danger");
-    roleError.innerText = "Bitte wählen Sie eine oder mehrere Rollen.";
+    roleError.innerText = messages.error4;
     return true;
   }
 

@@ -176,9 +176,9 @@ class User extends ORM
         $erg = "false";
 
         if ($emailUser !== false) {
-            $erg = "Email address exists already!";
+            $erg = TranslationUtil::t('register.msg.errorEmail');
         } elseif ($nameUser !== false) {
-            $erg = "Username exists already!";
+            $erg = TranslationUtil::t('register.msg.errorUsername');
         }
 
         // letzte query loggen

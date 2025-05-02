@@ -9,6 +9,7 @@ use App\Utils\LogUtil;
 use App\Utils\SessionUtil;
 use RobThree\Auth\TwoFactorAuth;
 use RobThree\Auth\Providers\Qr\EndroidQrCodeProvider;
+use App\Utils\TranslationUtil;
 
 /**
  * Class Name: DashboardController

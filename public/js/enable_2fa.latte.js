@@ -7,7 +7,7 @@ document.addEventListener("DOMContentLoaded", function () {
         copyButton.addEventListener("click", function () {
             navigator.clipboard.writeText(secretText.innerText)
                 .then(() => modal.show()) // Zeigt das Modal bei Erfolg an
-                .catch(() => alert("❌ Fehler beim Kopieren!"));
+                .catch(() => alert(messages.error1));
         });
     }
 });
