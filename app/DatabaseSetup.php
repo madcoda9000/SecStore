@@ -109,6 +109,111 @@ try {
         $pdo->exec("INSERT INTO roles (roleName) VALUES ('User')");
     }
 
+     // prüfen ob tabelle ticket_categories existiert
+     $stmt = $pdo->query("SHOW TABLES LIKE 'ticket_categories'");
+    if ($stmt->rowCount() == 0) {
+        $pdo->exec("CREATE TABLE ticket_categories (
+             id INT(11) AUTO_INCREMENT PRIMARY KEY,
+             name VARCHAR(100) NOT NULL
+         ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;");
+        //echo "Tabelle 'ticket_categories' wurde erstellt.\n";
+        // insert default values
+        $pdo->exec("INSERT INTO ticket_categories (name) VALUES
+             ('Technischer Support'),
+             ('Abrechnnung'),
+             ('Allgemain'),
+             ('Zugang / Login')");
+    }
+ 
+     // prüfen ob tabelle ticket_priorities existiert
+     $stmt = $pdo->query("SHOW TABLES LIKE 'ticket_priorities'");
+    if ($stmt->rowCount() == 0) {
+        $pdo->exec("CREATE TABLE ticket_priorities (
+             id INT(11) AUTO_INCREMENT PRIMARY KEY,
+             label VARCHAR(100) NOT NULL,
+             sort_order INT DEFAULT 0
+         ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;");
+        //echo "Tabelle 'ticket_priorities' wurde erstellt.\n";
+        // insert default values
+        $pdo->exec("INSERT INTO ticket_priorities (label, sort_order) VALUES
+             ('Niedrig', 1),
+             ('Mittel', 2),
+             ('Hoch', 3),
+             ('Kritisch', 4)");
+    }
+ 
+     // prüfen ob tabelle ticket_statuses existiert
+     $stmt = $pdo->query("SHOW TABLES LIKE 'ticket_statuses'");
+    if ($stmt->rowCount() == 0) {
+        $pdo->exec("CREATE TABLE ticket_statuses (
+             id INT(11) AUTO_INCREMENT PRIMARY KEY,
+             label VARCHAR(100) NOT NULL,
+             sort_order INT DEFAULT 0
+         ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;");
+        //echo "Tabelle 'ticket_statuses' wurde erstellt.\n";
+        // insert default values
+        $pdo->exec("INSERT INTO ticket_statuses (label, sort_order) VALUES
+             ('Offen', 1),
+             ('In Bearbeitung', 2),
+             ('Erledigt', 3),
+             ('Geschlossen', 4)");
+    }
+
+    // prüfen ob tabelle tickets existiert
+    $stmt = $pdo->query("SHOW TABLES LIKE 'tickets'");
+    if ($stmt->rowCount() == 0) {
+        $pdo->exec("CREATE TABLE tickets (
+             id INT(11) AUTO_INCREMENT PRIMARY KEY,
+             user_id INT NOT NULL,
+             assigned_to INT DEFAULT NULL,
+             category_id INT NOT NULL,
+             priority_id INT NOT NULL,
+             status_id INT NOT NULL,
+             subject VARCHAR(255) NOT NULL,
+             description TEXT NOT NULL,
+             created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+             updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+             FOREIGN KEY (user_id) REFERENCES users(id),
+             FOREIGN KEY (assigned_to) REFERENCES users(id),
+             FOREIGN KEY (category_id) REFERENCES ticket_categories(id),
+             FOREIGN KEY (priority_id) REFERENCES ticket_priorities(id),
+             FOREIGN KEY (status_id) REFERENCES ticket_statuses(id)
+         ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;");
+        //echo "Tabelle 'tickets' wurde erstellt.\n";
+    }
+
+    // prüfen ob tabelle ticket_comments existiert
+    $stmt = $pdo->query("SHOW TABLES LIKE 'ticket_comments'");
+    if ($stmt->rowCount() == 0) {
+        $pdo->exec("CREATE TABLE ticket_comments (
+            id INT(11) AUTO_INCREMENT PRIMARY KEY,
+            ticket_id INT NOT NULL,
+            user_id INT NOT NULL,
+            message TEXT NOT NULL,
+            is_internal BOOLEAN DEFAULT FALSE,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (ticket_id) REFERENCES tickets(id),
+            FOREIGN KEY (user_id) REFERENCES users(id)
+        ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;");
+        //echo "Tabelle 'ticket_comments' wurde erstellt.\n";
+    }
+
+    // prüfen ob tabelle ticket_attachments existiert
+    $stmt = $pdo->query("SHOW TABLES LIKE 'ticket_attachments'");
+    if ($stmt->rowCount() == 0) {
+        $pdo->exec("CREATE TABLE ticket_attachments (
+            id INT(11) AUTO_INCREMENT PRIMARY KEY,
+            ticket_id INT NOT NULL,
+            filename VARCHAR(255) NOT NULL,
+            filepath VARCHAR(255) NOT NULL,
+            uploaded_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (ticket_id) REFERENCES tickets(id)
+        ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;");
+        //echo "Tabelle 'ticket_attachments' wurde erstellt.\n";
+    }
+
+     
+
     unset($pdo);
 } catch (PDOException $e) {
     die("Fehler beim Initialisieren der Datenbank: " . $e->getMessage());
