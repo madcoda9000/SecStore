@@ -54,9 +54,7 @@ body {
 .offcanvas-body ul {
   border:none !important;
 }
-.offcanvas-body .nav-link {
-  color: #333 !important;
-}
+
 .offcanvas-body .nav-link.active {
   color: var(--bs-primary) !important;
 }

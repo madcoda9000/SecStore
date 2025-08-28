@@ -60,8 +60,8 @@ class AuthController
         if ($userCheck === "false") {
             $newUser = User::createUser($user, $email, $firstname, $lastname, 1, $password, 'User');
             if ($newUser !== null) {
-                LogUtil::logAction(LogType::AUDIT, 'AuthController', 'register', 'SUCCESS: registered new user.', $user->username);
-                MailUtil::sendMail($user->email, "SecStore: Welcome to SecStore", "welcome", ['name' => $user->firstname . ' ' . $user->lastname]);
+                LogUtil::logAction(LogType::AUDIT, 'AuthController', 'register', 'SUCCESS: registered new user.', $user);
+                MailUtil::sendMail($email, "SecStore: Welcome to SecStore", "welcome", ['name' => $firstname . ' ' . $lastname]);
                 Flight::latte()->render('register.latte', [
                     'title' => TranslationUtil::t('register.title'),
                     'message' => TranslationUtil::t('register.msg.success'),
@@ -69,7 +69,7 @@ class AuthController
                 ]);
                 return;
             } else {
-                LogUtil::logAction(LogType::AUDIT, 'AuthController', 'register', 'ERROR: could not create new user.', $user->username);
+                LogUtil::logAction(LogType::AUDIT, 'AuthController', 'register', 'ERROR: could not create new user.', $user);
                 Flight::latte()->render('register.latte', [
                     'title' => TranslationUtil::t('register.title'),
                     'error' => TranslationUtil::t('register.msg,errorGeneral'),

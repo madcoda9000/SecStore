@@ -477,4 +477,5 @@ composer.lock
 config.php
 
 # latte cache
-cache/*
+cache/*.php
+cache/*.php.lock

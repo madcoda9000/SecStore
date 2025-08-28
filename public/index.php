@@ -204,6 +204,7 @@ $app->map('error', function (Throwable $ex) use ($app) {
     ]);
 });
 
+
 // Add the headers in a filter
 Flight::before('start', function () use ($app) {
     // Set the X-Frame-Options header to prevent clickjacking
