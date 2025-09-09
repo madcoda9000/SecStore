@@ -357,51 +357,6 @@ Flight::route('GET /admin/logs/fetchErrorlogs', function () {
     (new LogController)->fetchErrorLogs();
 });
 
-// Ticket routes
-// Erstelle ein Ticket
-Flight::route('POST /ticket/create', function () {
-    LogUtil::logAction(LogType::REQUEST, 'routes.php', 'Flight:route', 'POST: /ticket/create');
-    AuthCheckMiddleware::checkIfAuthenticated();
-    (new TicketController)->createTicket();
-});
-
-// Ticket-Status aktualisieren
-Flight::route('POST /ticket/update', function () {
-    LogUtil::logAction(LogType::REQUEST, 'routes.php', 'Flight:route', 'POST: /ticket/update');
-    AuthCheckMiddleware::checkIfAuthenticated();
-    (new TicketController)->updateTicketStatus();
-});
-
-// Kommentare zu einem Ticket anzeigen
-Flight::route('GET /ticket/comments/@ticket_id', function ($ticket_id) {
-    LogUtil::logAction(LogType::REQUEST, 'routes.php', 'Flight:route', 'GET: /ticket/comments/@ticket_id');
-    AuthCheckMiddleware::checkIfAuthenticated();
-    (new TicketController)->showTicketComments($ticket_id);
-});
-
-// Kommentar zu einem Ticket hinzufügen
-Flight::route('POST /ticket/comment', function () {
-    LogUtil::logAction(LogType::REQUEST, 'routes.php', 'Flight:route', 'POST: /ticket/comment');
-    AuthCheckMiddleware::checkIfAuthenticated();
-    (new TicketController)->addCommentToTicket();
-});
-
-// Tickets mit Paging abrufen
-Flight::route('GET /admin/ticket/list', function () {
-    LogUtil::logAction(LogType::REQUEST, 'routes.php', 'Flight:route', 'GET: /admin/ticket/list');
-    AuthCheckMiddleware::checkIfAuthenticated();
-    AdminCheckMiddleware::checkForAdminRole();
-    (new TicketController)->getTicketsWithPaging();
-});
-
-// Eigene Tickets des Benutzers mit Paging abrufen
-Flight::route('GET /ticket/user/list', function () {
-    LogUtil::logAction(LogType::REQUEST, 'routes.php', 'Flight:route', 'GET: /ticket/user/list');
-    AuthCheckMiddleware::checkIfAuthenticated();
-    (new TicketController)->getUserTicketsWithPaging();
-});
-
-
 // session routes
 Flight::route('POST /extend-session', function () {
     session_regenerate_id(true);
