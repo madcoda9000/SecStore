@@ -110,6 +110,7 @@ class AdminController
 
             // Alte Konfiguration einlesen
             $configFile = "../config.php";
+            $isWritable = is_writable($configFile);
             $config = include $configFile;
             // Alte Datei als Text laden
             $configContent = file_get_contents($configFile);
@@ -162,6 +163,7 @@ class AdminController
                 "title" => "Settings",
                 "user" => $user,
                 "sessionTimeout" => SessionUtil::getRemainingTime(),
+                "configWritable" => $isWritable,
             ]);
         } else {
             Flight::redirect("/login");
@@ -201,6 +203,7 @@ class AdminController
 
             // Alte Konfiguration einlesen
             $configFile = "../config.php";
+            $isWritable = is_writable($configFile);
             $config = include $configFile;
             // Alte Datei als Text laden
             $configContent = file_get_contents($configFile);
@@ -253,6 +256,7 @@ class AdminController
                 "title" => "Settings",
                 "user" => $user,
                 "sessionTimeout" => SessionUtil::getRemainingTime(),
+                "configWritable" => $isWritable,
             ]);
         } else {
             Flight::redirect("/login");
@@ -295,6 +299,7 @@ class AdminController
 
             // Alte Konfiguration einlesen
             $configFile = "../config.php";
+            $isWritable = is_writable($configFile);
             $config = include $configFile;
             // Alte Datei als Text laden
             $configContent = file_get_contents($configFile);
@@ -347,6 +352,7 @@ class AdminController
                 "title" => "Settings",
                 "user" => $user,
                 "sessionTimeout" => SessionUtil::getRemainingTime(),
+                "configWritable" => $isWritable,
             ]);
         } else {
             Flight::redirect("/login");
@@ -377,6 +383,7 @@ class AdminController
 
             // Alte Konfiguration einlesen
             $configFile = "../config.php";
+            $isWritable = is_writable($configFile);
             $config = include $configFile;
             // Alte Datei als Text laden
             $configContent = file_get_contents($configFile);
@@ -429,6 +436,7 @@ class AdminController
                 "title" => "Settings",
                 "user" => $user,
                 "sessionTimeout" => SessionUtil::getRemainingTime(),
+                "configWritable" => $isWritable,
             ]);
         } else {
             Flight::redirect("/login");
@@ -465,6 +473,7 @@ class AdminController
 
             // Alte Konfiguration einlesen
             $configFile = "../config.php";
+            $isWritable = is_writable($configFile);
             $config = include $configFile;
             // Alte Datei als Text laden
             $configContent = file_get_contents($configFile);
@@ -517,6 +526,7 @@ class AdminController
                 "title" => "Settings",
                 "user" => $user,
                 "sessionTimeout" => SessionUtil::getRemainingTime(),
+                "configWritable" => $isWritable,
             ]);
         } else {
             Flight::redirect("/login");
