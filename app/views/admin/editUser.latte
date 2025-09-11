@@ -2,7 +2,7 @@
 
 {block content}
 <div class="container py-4" style="flex:1">
-<h1 class="mb-5">{trans('user.edit.title')}</h1>
+<h1 class="mb-5"><span class="bi bi-person-fill">&nbsp;{trans('user.edit.title')}</h1>
     <form id="userForm" class="needs-validation" novalidate>
         <input type="hidden" name="id" value="{$userToEdit['id']}">
         <input type="hidden" name="csrf_token" value="{$_SESSION['csrf_token']}">

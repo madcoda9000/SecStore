@@ -20,13 +20,13 @@ document.addEventListener("DOMContentLoaded", function () {
     function applyDarkmode(dark) {
     if (dark) {
         htmlElement.setAttribute("data-bs-theme", "dark");
-        icon.classList.remove("bi-moon");
-        icon.classList.add("bi-sun");
+        icon.classList.remove("bi-moon-fill", "text-primary");
+        icon.classList.add("bi-sun-fill", "text-white");
         localStorage.setItem("darkmode", "enabled");
     } else {
         htmlElement.setAttribute("data-bs-theme", "light");
-        icon.classList.remove("bi-sun");
-        icon.classList.add("bi-moon");
+        icon.classList.remove("bi-sun-fill", "text-primary");
+        icon.classList.add("bi-moon-fill", "text-white");
         localStorage.setItem("darkmode", "disabled");
     }
     }

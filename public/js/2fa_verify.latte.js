@@ -7,6 +7,7 @@ document.addEventListener("DOMContentLoaded", function () {
         hiddenInput.value = Array.from(inputs).map(i => i.value).join("");
         submitButton.disabled = hiddenInput.value.length !== 6;
         if (hiddenInput.value.length === 6) {
+            
             document.getElementById("otp-form").submit();
         }
     }

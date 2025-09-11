@@ -24,7 +24,7 @@
 
    <!-- Main Content -->
     <div class="container py-4" style="flex:1">
-    <h1 class="mb-5">{trans('users.title')}</h1>
+    <h1 class="mb-5"><span class="bi bi-person-square">&nbsp;{trans('users.title')}</h1>
 
     {ifset $success}
         <div class="alert alert-success d-flex align-items-center" role="alert">
@@ -84,7 +84,7 @@
     <!-- Desktop-Version der Tabelle -->
     <div class="table-responsive desktop-table">
         <table class="table table-striped table-hover align-middle">
-            <thead class="table-dark">
+            <thead >
                 <tr>
                     <th>Type</th>
                     <th>Ac</th>
