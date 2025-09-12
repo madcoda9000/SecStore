@@ -35,10 +35,23 @@ class AuthController
      */
     public function showRegister()
     {
-        Flight::latte()->render('register.latte', [
-            'title' => TranslationUtil::t('register.title'),
-            'lang' => Flight::get('lang'),
-        ]);
+        $connOkay = MailUtil::checkConnection();
+        if (!$connOkay) {
+            Flight::latte()->render('register.latte', [
+                'title' => TranslationUtil::t('register.title'),
+                'lang' => Flight::get('lang'),
+                'error' => TranslationUtil::t('register.msg.val7'),
+                'smtpInvalid' => true
+            ]);
+            return;
+        } else {
+            Flight::latte()->render('register.latte', [
+                'title' => TranslationUtil::t('register.title'),
+                'lang' => Flight::get('lang'),
+                'smtpInvalid' => false
+            ]);
+            return;
+        }        
     }
 
     /**
@@ -401,11 +414,25 @@ class AuthController
      */
     public function showForgotPassword()
     {
-        Flight::latte()->render('forgot_password.latte', [
-            'title' => TranslationUtil::t('forgot.title'),
-            'lang' => Flight::get('lang'),
-        ]);
-        return;
+        $connOkay = MailUtil::checkConnection();
+
+        if (!$connOkay) {
+            Flight::latte()->render('forgot_password.latte', [
+                'title' => TranslationUtil::t('forgot.title'),
+                'lang' => Flight::get('lang'),
+                'error' => TranslationUtil::t('register.msg.val7'),
+                'error' => TranslationUtil::t('register.msg.val7'),
+                'smtpInvalid' => true
+            ]);
+            return;
+        } else {
+            Flight::latte()->render('forgot_password.latte', [
+                'title' => TranslationUtil::t('forgot.title'),
+                'lang' => Flight::get('lang'),
+                'smtpInvalid' => false
+            ]);
+            return;
+        }       
     }
 
     /**

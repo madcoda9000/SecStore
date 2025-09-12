@@ -36,6 +36,7 @@ return [
     'register.msg.val4' => 'The password must have 12 characters at least.',
     'register.msg.val5' => 'Email should not be empty.',
     'register.msg.val6' => 'The entered email is invalid.',
+    'register.msg.val7' => 'SMTP connection is incorrectly configured! Please contact the administrator.',
     'forgot.title' => 'Forgot your password?',
     'forgot.email' => 'Email',
     'forgot.submit' => 'Reset password',

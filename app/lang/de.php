@@ -36,6 +36,7 @@ return [
     'register.msg.val4' => 'Das Passwort muss mind. 12 Zeichen lang sein.',
     'register.msg.val5' => 'Die E-Mail darf nicht leer sein.',
     'register.msg.val6' => 'Die E-Mail ist ungültig.',
+    'register.msg.val7' => 'SMTP Verbindung fehlerhaft konfiguriert! Bitte wenden Sie sich an den Administrator.',
     'forgot.title' => 'Passwort vergessen?',
     'forgot.email' => 'E-Mail',
     'forgot.submit' => 'Passwort zurücksetzen',

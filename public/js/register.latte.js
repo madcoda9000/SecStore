@@ -43,6 +43,9 @@ document.getElementById("registerForm").onsubmit = function (event) {
   if (!isValid) {
     event.preventDefault();
   }
+
+  document.getElementById('loader').style.display = 'inline-block'; // Kreisel anzeigen
+  document.getElementById('submitButton').disabled = true; // Button deaktivieren
 };
 
 // Funktion zur Anzeige der Fehlermeldungen

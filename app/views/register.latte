@@ -27,14 +27,33 @@
                     </button>
                 </div>
                 <input type="hidden" name="csrf_token" value="{$_SESSION['csrf_token']}">
-                <button type="submit" class="btn btn-primary w-100">{trans('register.submit')}</button>
+                <button type="submit" class="btn btn-primary w-100" {if $smtpInvalid}disabled{/if} id="submitButton">
+                    <span id="loader" style="display:none;" class="btnloader"></span> 
+                    {trans('register.submit')}
+                </button>
             </form>
             <div id="error-message" style="color: #fff; display: none;"></div>
             {ifset $error}
-            <p>{$error}</p>
+            <div class="alert alert-danger mt-3" role="alert">
+                <div class="d-flex gap-4">
+                    <span><i class="bi bi-exclamation-circle-fill text-danger"></i></span>
+                    <div class="d-flex flex-column gap-2">
+                    <h6 class="mb-0 text-danger">Error!</h6>
+                    <p class="mb-0">{$error}</p>
+                    </div>
+                </div>
+            </div>
             {/ifset}
             {ifset $message}
-                <p>{$message}</p>
+                <div class="alert alert-primary mt-3" role="alert">
+                <div class="d-flex gap-4">
+                    <span><i class="bi bi-exclamation-circle-fill text-primary"></i></span>
+                    <div class="d-flex flex-column gap-2">
+                    <h6 class="mb-0 text-primary">Info!</h6>
+                    <p class="mb-0">{$message}</p>
+                    </div>
+                </div>
+                </div>
             {/ifset}
             <div class="p-3" style="display:flex; flex-direction:column; justify-content:center; align-items:center; gap:5;">
             <a href="/login">{trans('register.loginLink')}</a>
