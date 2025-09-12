@@ -24,19 +24,6 @@ error_reporting(E_ALL ^ E_DEPRECATED);
  */
 require '../vendor/autoload.php';
 
-/*
- * Load the config file
- */
-$config = [];
-try {
-    if (!file_exists('../config.php')) {
-        throw new Exception('Config file not found. Please create a config.php file.');
-    }
-    $config = include __DIR__ . '/../config.php';
-} catch (Exception $e) {
-    Flight::halt(500, $e->getMessage());
-}
-
 // It is better practice to not use static methods for everything. It makes your
 // app much more difficult to unit test easily.
 // This is important as it connects any static calls to the same $app object
@@ -81,6 +68,24 @@ $app->register('latte', LatteEngine::class, [], function (LatteEngine $latte) us
     $latte->setTempDirectory($cacheDir);
     $latte->setLoader(new \Latte\Loaders\FileLoader($app->get('flight.views.path')));
 });
+
+/*
+ * Load the config file
+ */
+$config = [];
+try {
+    if (!file_exists('../config.php')) {
+        throw new Exception('Config file not found. Please create a config.php file.');
+    }
+    $config = include __DIR__ . '/../config.php';
+} catch (Exception $e) {
+    //Flight::halt(500, $e->getMessage());
+    $app->latte()->render("errors/error.latte", [
+        'code' => 500,
+        'message' => $e->getMessage()
+    ]);
+    Flight::halt();
+}
 
 
 /**

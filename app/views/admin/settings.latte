@@ -110,6 +110,18 @@
                                 <label for="sessionTimeout">{trans('settings.app.sessionTimeout')}:</label>
                                 <input class="form-control" type="number" name="sessionTimeout" id="sessionTimeout" value="{$application['sessionTimeout']}" required>
                             </div>
+                            <div class="form-check mb-3">                                
+                                <input class="form-check-input" type="checkbox" name="allowPublicRegister" id="allowPublicRegister" n:attr="checked: $application['allowPublicRegister']">
+                                <label for="allowPublicRegister" class="form-check-label">
+                                {trans('settings.app.allowPublicRegister')}
+                                </label>
+                            </div>
+                            <div class="form-check mb-3">                                
+                                <input class="form-check-input" type="checkbox" name="allowPublicPasswordReset" id="allowPublicPasswordReset" n:attr="checked: $application['allowPublicPasswordReset']">
+                                <label for="allowPublicPasswordReset" class="form-check-label">
+                                {trans('settings.app.allowPublicPasswordReset')}
+                                </label>
+                            </div>
                             <input type="hidden" name="csrf_token" value="{$_SESSION['csrf_token']}">
                             <button class="btn btn-primary w-100" type="submit">{trans('settings.app.submit')}</button>
                         </form>

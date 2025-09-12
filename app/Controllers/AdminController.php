@@ -379,6 +379,8 @@ class AdminController
             $newConfig = [
                 "appUrl" => $formData["appUrl"],
                 "sessionTimeout" => (int) $formData["sessionTimeout"],
+                "allowPublicRegister" => (bool) $formData["allowPublicRegister"],
+                "allowPublicPasswordReset" => (bool) $formData["allowPublicPasswordReset"]
             ];
 
             // Alte Konfiguration einlesen

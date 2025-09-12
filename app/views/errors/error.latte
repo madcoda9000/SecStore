@@ -8,9 +8,9 @@
         <h2 class="display-4">{$title}</h2>
         <div class="error-details mb-4">
             Sorry, an error has occurred. 
-            <pre class="mb-3">
+            <pre class="mb-3" >
                 {ifset $message}
-                    {$message}
+                    <center>{$message}</center>
                 {/ifset}
             </pre>
         </div>

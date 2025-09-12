@@ -110,6 +110,8 @@ return [
     'settings.app.url' => 'Application URL',
     'settings.app.sessionTimeout' => 'Session timeout (in seconds)',
     'settings.app.submit' => 'Save application settings',
+    'settings.app.allowPublicRegister' => 'Show register link on login page?',
+    'settings.app.allowPublicPasswordReset' => 'Show password reset link on login page?',
     'settings.title.brute' => 'Brute force settings',
     'settings.brute.enable' => 'Enable brute force protection?',
     'settings.brute.lockoutTime' => 'Lockout time (in seconds)',

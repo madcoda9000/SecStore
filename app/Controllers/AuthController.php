@@ -100,12 +100,17 @@ class AuthController
         if (SessionUtil::get('2fa_user_id') !== null) {
             Flight::latte()->render('2fa_verify.latte', [
                 'title' => TranslationUtil::t('2fa_verify.title'),
+                'sessionTimeout' => SessionUtil::getSessionTimeout(),
                 'lang' => Flight::get('lang'),
             ]);
             return;
         }
 
+        $configFile = "../config.php";
+        $config = include $configFile;
+
         Flight::latte()->render('login.latte', [
+            "application" => $config["application"],
             'title' => TranslationUtil::t('login.title'),
             'sessionTimeout' => SessionUtil::getSessionTimeout(),
             'lang' => Flight::get('lang'),

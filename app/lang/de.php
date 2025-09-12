@@ -110,6 +110,8 @@ return [
     'settings.app.url' => 'Anwendungs-URL',
     'settings.app.sessionTimeout' => 'Sitzungs-Timeout (in Sekunden)',
     'settings.app.submit' => 'Anwendungseinstellungen speichern',
+    'settings.app.allowPublicRegister' => 'Register Link auf Anmeldeseite anzeigen?',
+    'settings.app.allowPublicPasswordReset' => 'Passwort Reset auf Anmeldeseite anzeigen?',
     'settings.title.brute' => 'Brute-Force-Einstellungen',
     'settings.brute.enable' => 'Brute-Force-Schutz aktivieren?',
     'settings.brute.lockoutTime' => 'Sperrzeit (in Sekunden)',

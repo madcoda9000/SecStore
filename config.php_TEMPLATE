@@ -28,6 +28,8 @@ $logging = [
 $application = [
   'appUrl' => 'http://localhost:8000',
   'sessionTimeout' => 600,
+  'allowPublicRegister' => false,
+  'alloPublicPasswordReset' => false,
 ];
 
 /**
