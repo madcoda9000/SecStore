@@ -67,10 +67,10 @@ body {
 
 /* Darkmode Fix für Navbar & Footer */
 [data-bs-theme="dark"] .navbar {
-  background-color: #111 !important;
+  background-color: var(--bs-dark) !important;
 }
 [data-bs-theme="dark"] .footer {
-  background-color: #111 !important;
+  background-color: var(--bs-dark) !important;
   color: #ddd;
 }
 
