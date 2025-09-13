@@ -14,6 +14,9 @@ Die Anwendung unterstützt eine breite Palette von Sicherheitsfunktionen wie Log
 
 - 🔑 Login mit Benutzername & Passwort  
 - 🔑 Optional LDAP-Authentifizierung (per User) 
+- 🔑 Passworthashes werden durch BCRYPT erzeugt (60 Zeichen)
+- 🔑 Alle Formulare durch CSRF geschützt
+- 🔑 Umfangreiche Content Security Policy (inkl. XSS Protection)
 - 📝 Registrierung (optional mit Begrüßungsmail)  
 - 🔐 Zwei-Faktor-Authentifizierung (TOTP) (Per User erzwingbar)
 - 🔁 Passwort zurücksetzen via E-Mail  
@@ -23,9 +26,8 @@ Die Anwendung unterstützt eine breite Palette von Sicherheitsfunktionen wie Log
 - 🧑‍💼 Admin-Bereich zur Benutzerverwaltung, Rollenverwaltung  
 - 🌘 Dark-Mode mit Umschaltung  
 - 🔍 Audit-, Mail-, Error-, Datenbank-, Request- und System-Logging 
-- 📦 REST-konformes API-Backend  
 - ⚙️ Automatische Datenbank-Migration  
-- 🚀 CLI-Tool zum Generieren sicherer Schlüssel  
+- 🚀 CLI-Tool zum Generieren sicherer Schlüssel (bin2hex 64 Zeichen, 256-Bit) 
 - 🛡️ konfigurierbarer Sessiontimer
 ---
 
