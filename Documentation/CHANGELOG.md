@@ -1,169 +1,172 @@
 # 📋 Changelog
 
-Alle wichtigen Änderungen an SecStore werden in dieser Datei dokumentiert.
+All notable changes to SecStore are documented in this file.
 
-Das Format basiert auf [Keep a Changelog](https://keepachangelog.com/de/1.0.0/),
-und dieses Projekt folgt [Semantic Versioning](https://semver.org/lang/de/).
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
-## [Unreleased] - Nächste Version
-### Geplant
-- Docker-Container Support
-- API-Endpoints für externe Integration
-- Backup/Restore-Funktionalität
-- Advanced Security Analytics
+## [Unreleased] - Next Version
+### Planned
+- Docker container support
+- API endpoints for external integration
+- Backup/restore functionality
+- Advanced security analytics
 
 ---
 
 ## [1.3.0] - 2025-01-15
-### ✨ Neu hinzugefügt
-- **Security Dashboard** mit Echtzeit-Übersicht über Bedrohungen
-- **Rate Limiting System** mit konfigurierbaren Scopes nach Sensitivität
-- **Rate Limiting Statistiken** und Live-Monitoring
-- **Session Fingerprinting** zum Schutz vor Session-Hijacking
-- **Automatische Session-ID Regeneration** alle 30 Minuten
-- **Content Security Policy (CSP)** mit XSS-Schutz und HSTS
+### ✨ Added
+- **Security Dashboard** with real-time threat overview
+- **Rate Limiting System** with configurable scopes based on sensitivity
+- **Rate Limiting Statistics** and live monitoring
+- **Session Fingerprinting** to protect against session hijacking
+- **Automatic Session ID Regeneration** every 30 minutes
+- **Content Security Policy (CSP)** with XSS protection and HSTS
 
-### 🔄 Geändert
-- Verbesserte Admin-Oberfläche mit modernerer UI
-- Optimierte Datenbankabfragen für bessere Performance
-- Erweiterte Logging-Kategorien (SQL, Security, Mail)
+### 🔄 Changed
+- Improved admin interface with more modern UI
+- Optimized database queries for better performance
+- Extended logging categories (SQL, Security, Mail)
 
-### 🐛 Behoben
-- Session-Timeout-Probleme bei gleichzeitigen Benutzern
-- CSRF-Token-Validierung in AJAX-Requests
-- Memory Leaks bei längeren Admin-Sessions
+### 🐛 Fixed
+- Session timeout issues with concurrent users
+- CSRF token validation in AJAX requests
+- Memory leaks during extended admin sessions
 
 ---
 
 ## [1.2.0] - 2024-12-20
-### ✨ Neu hinzugefügt
-- **LDAP-Integration** mit per-User-Konfiguration
-- **Rollenbasierte Zugriffskontrolle** mit flexiblem Rollensystem
-- **Mail-Template-System** mit Latte-Engine
-- **Mehrsprachigkeit** (Deutsch und Englisch)
-- **Dark-Mode** mit Benutzer-Präferenzen
+### ✨ Added
+- **LDAP Integration** with per-user configuration
+- **Role-based Access Control** with flexible role system
+- **Mail Template System** with Latte engine
+- **Multi-language Support** (German and English)
+- **Dark Mode** with user preferences
 
-### 🔄 Geändert
-- Migration von PHP 8.1 auf PHP 8.3 Mindestanforderung
-- Überarbeitung der Datenbankstruktur für bessere Skalierbarkeit
-- Verbessertes Error-Handling mit detaillierten Log-Informationen
+### 🔄 Changed
+- Migration from PHP 8.1 to PHP 8.3 minimum requirement
+- Redesigned database structure for better scalability
+- Improved error handling with detailed log information
 
 ---
 
 ## [1.1.0] - 2024-11-10
-### ✨ Neu hinzugefügt
-- **Zwei-Faktor-Authentifizierung (2FA)** mit TOTP-Unterstützung
-- **QR-Code-Generierung** für 2FA-Setup
-- **2FA-Erzwingung** durch Administratoren pro Benutzer
-- **Brute-Force-Schutz** mit konfigurierbaren Parametern
-- **Audit-Logging** für alle sicherheitsrelevanten Aktionen
-- **Passwort-Reset-Funktionalität** via E-Mail
+### ✨ Added
+- **Two-Factor Authentication (2FA)** with TOTP support
+- **QR Code Generation** for 2FA setup
+- **2FA Enforcement** by administrators per user
+- **Brute-Force Protection** with configurable parameters
+- **Audit Logging** for all security-relevant actions
+- **Password Reset Functionality** via email
 
-### 🔄 Geändert
-- Erweiterte Benutzerprofile mit 2FA-Management
-- Verbesserte E-Mail-Templates für bessere Benutzererfahrung
-- Optimierte Session-Verwaltung mit Fingerprinting
+### 🔄 Changed
+- Extended user profiles with 2FA management
+- Improved email templates for better user experience
+- Optimized session management with fingerprinting
 
-### 🔒 Sicherheit
-- BCRYPT-Passwort-Hashing (60 Zeichen) implementiert
-- CSRF-Schutz für alle Formulare aktiviert
-- Session-Security durch User-Agent/Accept-Language-Validierung
+### 🔒 Security
+- BCRYPT password hashing (60 characters) implemented
+- CSRF protection activated for all forms
+- Session security through User-Agent/Accept-Language validation
 
 ---
 
 ## [1.0.0] - 2024-10-01 🎉
-### ✨ Erste Veröffentlichung
-- **Core Authentication System** mit Login/Logout
-- **Benutzerregistrierung** (optional aktivierbar)
-- **Admin-Panel** zur Benutzerverwaltung
-- **E-Mail-System** mit SMTP-Unterstützung und Begrüßungsmails
-- **Konfigurierbare Settings** über Web-Interface
-- **Automatische Datenbank-Migration** und -Setup
-- **CLI-Tool** zum Generieren sicherer Schlüssel
+### ✨ First Release
+- **Core Authentication System** with login/logout
+- **User Registration** (optionally activatable)
+- **Admin Panel** for user management
+- **Email System** with SMTP support and welcome emails
+- **Configurable Settings** via web interface
+- **Automatic Database Migration** and setup
+- **CLI Tool** for generating secure keys
 
-### 🛠️ Technischer Stack
-- **PHP 8.3+** als Mindestanforderung
-- **Flight PHP Microframework** für schlanke Performance  
-- **Latte Template Engine** für moderne Templates
-- **MariaDB/MySQL** mit UTF8MB4-Unterstützung
-- **Idiorm + Paris ORM** für Datenbankoperationen
-- **PHPMailer** für zuverlässigen E-Mail-Versand
+### 🛠️ Technical Stack
+- **PHP 8.3+** as minimum requirement
+- **Flight PHP Microframework** for lean performance  
+- **Latte Template Engine** for modern templates
+- **MariaDB/MySQL** with UTF8MB4 support
+- **Idiorm + Paris ORM** for database operations
+- **PHPMailer** for reliable email sending
 
-### 📦 Kern-Features
-- Responsive Design mit Bootstrap 5
-- Minimalistisches und modernes Interface
-- Vollständige CRUD-Operationen für Benutzer
-- Konfigurierbare Session-Timeouts
-- Umfangreiche Fehlerbehandlung und Logging
-- PSR-12-konforme Codequalität
+### 📦 Core Features
+- Responsive design with Bootstrap 5
+- Minimalist and modern interface
+- Complete CRUD operations for users
+- Configurable session timeouts
+- Comprehensive error handling and logging
+- PSR-12 compliant code quality
 
 ---
 
 ## [0.9.0] - 2024-09-15
-### 🔧 Beta-Release
-- Erste funktionsfähige Version für Testing
-- Grundlegende Authentication-Features
-- Admin-Interface Prototyp
-- Database-Schema finalisiert
+### 🔧 Beta Release
+- First public beta version
+- Basic authentication system
+- User management interface
+- Email integration
+- Initial security features
+
+### 🐛 Known Issues
+- Session handling needed improvement
+- Limited error handling
+- Basic logging only
+- No 2FA support yet
 
 ---
 
-## [0.5.0] - 2024-08-20
-### 🚀 Alpha-Release
-- Projekt-Setup und Grundstruktur
-- Flight PHP Framework Integration
-- Erste Controller und Models
-- Database Setup Scripts
+## [0.8.0] - 2024-08-30
+### 🔧 Alpha Release
+- Initial alpha version
+- Core authentication framework
+- Basic database schema
+- Simple user interface
+- SMTP email functionality
+
+### ⚠️ Development Status
+- Alpha stage - not recommended for production
+- Limited features
+- Frequent breaking changes
+- Basic security implementations
 
 ---
 
-## [0.1.0] - 2024-08-01
-### 🌱 Projekt-Start
-- Repository initialisiert
-- Grundlegende Projektstruktur erstellt
-- Dependency Management mit Composer
-- Entwicklungsumgebung konfiguriert
+## [0.7.0] - 2024-08-15
+### 🔧 Pre-Alpha
+- Project initialization
+- Basic PHP framework setup
+- Database design
+- Development environment setup
+- Initial code structure
 
 ---
 
-## 📝 Legende
+## 📝 Release Notes Guidelines
 
-- ✨ **Neu hinzugefügt** - Neue Features und Funktionalitäten
-- 🔄 **Geändert** - Änderungen an bestehenden Features
-- ⚠️ **Deprecated** - Features, die in Zukunft entfernt werden
-- ❌ **Entfernt** - Entfernte Features
-- 🐛 **Behoben** - Bugfixes
-- 🔒 **Sicherheit** - Sicherheitsverbesserungen und -fixes
+### Version Numbering
+- **Major (X.0.0)**: Breaking changes, major new features
+- **Minor (X.Y.0)**: New features, backwards compatible
+- **Patch (X.Y.Z)**: Bug fixes, security patches
 
----
-
-## 🚀 Migration Guide
-
-### Von 1.2.x zu 1.3.0
-- **Rate Limiting:** Neue `$rateLimiting`-Konfiguration in `config.php` erforderlich
-- **Session Security:** Bestehende Sessions werden einmalig invalidiert
-- **Database:** Automatische Migration der `logs`-Tabelle für neue Security-Logs
-
-### Von 1.1.x zu 1.2.0
-- **PHP Version:** Update auf PHP 8.3+ erforderlich
-- **LDAP Config:** Neue `$ldapSettings`-Sektion in `config.php` hinzufügen
-- **Database:** Neue `roles`-Tabelle wird automatisch erstellt
-
-### Von 1.0.x zu 1.1.0  
-- **2FA Setup:** Bestehende Benutzer müssen 2FA neu konfigurieren
-- **Database:** Migration der `users`-Tabelle für 2FA-Spalten
-- **Mail Templates:** Neue E-Mail-Templates werden automatisch verwendet
+### Change Categories
+- ✨ **Added**: New features
+- 🔄 **Changed**: Changes in existing functionality
+- 🗑️ **Deprecated**: Soon-to-be removed features
+- 🐛 **Fixed**: Bug fixes
+- 🔒 **Security**: Security improvements
+- ⚠️ **Breaking**: Breaking changes
 
 ---
 
-## 🤝 Contributing
+## 🔗 Links
 
-Interessiert an der Mitarbeit? Schauen Sie sich unsere [Contributing Guidelines](CONTRIBUTING.md) an!
-
-**Changelog-Format:** Wir folgen den [Keep a Changelog](https://keepachangelog.com/) Konventionen für konsistente und nachvollziehbare Release-Notes.
+- **Repository**: [GitHub](https://github.com/madcoda9000/SecStore)
+- **Issues**: [Bug Reports](https://github.com/madcoda9000/SecStore/issues)
+- **Discussions**: [Community](https://github.com/madcoda9000/SecStore/discussions)
+- **Documentation**: [Wiki](https://github.com/madcoda9000/SecStore/wiki)
 
 ---
 
-*Letztes Update: Januar 2025*
+*For detailed upgrade instructions and migration guides, check our [Documentation](Documentation/)*

@@ -1,244 +1,291 @@
 # 🔒 Security Policy
 
-SecStore nimmt Sicherheit sehr ernst. Als Authentifizierungs- und Benutzerverwaltungsplattform implementieren wir strenge Sicherheitsmaßnahmen zum Schutz von Benutzerdaten und zur Verhinderung unbefugten Zugriffs.
+## 🚨 Reporting Security Vulnerabilities
+
+**We take the security of SecStore seriously.** If you discover a security vulnerability, please help us keep SecStore secure by following responsible disclosure practices.
+
+### **How to Report**
+
+**Please DO NOT report security vulnerabilities via public GitHub issues!**
+
+Instead, please send us a private report to: **security@your-domain.com**
+
+### **What to Include in Your Report**
+
+1. **Description** of the vulnerability
+2. **Steps to reproduce** the issue  
+3. **Proof of concept** (if possible)
+4. **Impact assessment** (how severe is it?)
+5. **Suggested fix** (if you have one)
+6. **Your contact information** for follow-up
+
+### **Our Response Process**
+
+1. **Acknowledgment** within 48 hours
+2. **Initial assessment** within 5 business days
+3. **Regular updates** on progress every 7 days
+4. **Fix development** and testing
+5. **Security patch release**
+6. **Public disclosure** after the fix (with your consent)
 
 ---
 
-## 🚨 Sicherheitslücken melden
+## 🛡️ Supported Versions
 
-### Responsible Disclosure
+We provide security updates for the following versions:
 
-Wenn Sie eine Sicherheitslücke in SecStore entdecken, melden Sie diese bitte **verantwortungsvoll**:
+| Version | Supported | End of Life |
+|---------|-----------|-------------|
+| 1.3.x   | ✅ Full support | - |
+| 1.2.x   | ✅ Security updates | 2025-06-01 |
+| 1.1.x   | ⚠️ Critical fixes only | 2025-03-01 |
+| 1.0.x   | ❌ Not supported | 2024-12-01 |
+| < 1.0   | ❌ Not supported | - |
 
-**✅ Sicher melden über:**
-- 📧 **E-Mail:** [Sicherheitskontakt einfügen] mit Betreff "SecStore Security"
-
-**❌ NICHT öffentlich melden über:**
-- GitHub Issues (diese sind öffentlich sichtbar)
-- Soziale Medien oder Foren
-- Öffentliche Mailinglisten
-
-### Was Sie in Ihrer Meldung angeben sollten
-
-Bitte includen Sie folgende Informationen:
-
-- **Beschreibung** der Sicherheitslücke
-- **Schritte zur Reproduktion** (wenn möglich)
-- **Betroffene Versionen** von SecStore
-- **Potentielle Auswirkungen** der Schwachstelle
-- **Ihre Kontaktdaten** für Rückfragen
-
-### Unser Prozess
-
-1. **Bestätigung** innerhalb von 48 Stunden
-2. **Analyse** und Bewertung der Schwachstelle
-3. **Fix entwickeln** und testen
-4. **Koordinierter Release** mit Security-Updates
-5. **Öffentliche Bekanntgabe** nach dem Fix (mit Ihrer Zustimmung)
+> **💡 Recommendation:** Always update to the latest stable version for optimal security.
 
 ---
 
-## 🛡️ Unterstützte Versionen
+## 🔐 Security Features of SecStore
 
-Wir stellen Sicherheitsupdates für folgende Versionen bereit:
+### Authentication & Authorization
+- ✅ **BCRYPT password hashing** (60 characters, salted)
+- ✅ **Two-Factor Authentication (2FA)** with TOTP standard
+- ✅ **Role-based access control** (RBAC)
+- ✅ **LDAP integration** with secure authentication
+- ✅ **Brute-force protection** with configurable parameters
 
-| Version | Unterstützt | End of Life |
-|---------|-------------|-------------|
-| 1.3.x   | ✅ Vollständig | - |
-| 1.2.x   | ✅ Sicherheitsupdates | 2025-06-01 |
-| 1.1.x   | ⚠️ Kritische Fixes nur | 2025-03-01 |
-| 1.0.x   | ❌ Nicht unterstützt | 2024-12-01 |
-| < 1.0   | ❌ Nicht unterstützt | - |
+### Session Security
+- ✅ **Session fingerprinting** (User-Agent/Accept-Language validation)
+- ✅ **Automatic session ID regeneration** every 30 minutes
+- ✅ **Configurable session timeouts**
+- ✅ **Secure session cookies** (HttpOnly, SameSite, Secure)
 
-> **💡 Empfehlung:** Aktualisieren Sie immer auf die neueste stabile Version für optimale Sicherheit.
-
----
-
-## 🔐 Sicherheitsfeatures von SecStore
-
-### Authentifizierung & Autorisierung
-- ✅ **BCRYPT-Passwort-Hashing** (60 Zeichen, Salted)
-- ✅ **Zwei-Faktor-Authentifizierung (2FA)** mit TOTP-Standard
-- ✅ **Rollenbasierte Zugriffskontrolle** (RBAC)
-- ✅ **LDAP-Integration** mit sicherer Authentifizierung
-- ✅ **Brute-Force-Schutz** mit konfigurierbaren Parametern
-
-### Session-Sicherheit
-- ✅ **Session-Fingerprinting** (User-Agent/Accept-Language-Validierung)
-- ✅ **Automatische Session-ID-Regeneration** alle 30 Minuten
-- ✅ **Konfigurierbare Session-Timeouts**
-- ✅ **Sichere Session-Cookies** (HttpOnly, SameSite, Secure)
-
-### Angriffsprävention
-- ✅ **CSRF-Schutz** für alle Formulare
-- ✅ **Rate Limiting** mit granularen Scopes nach Sensitivität
-- ✅ **Content Security Policy (CSP)** mit XSS-Schutz
+### Attack Prevention
+- ✅ **CSRF protection** for all forms
+- ✅ **Rate limiting** with granular scopes based on sensitivity
+- ✅ **Content Security Policy (CSP)** with XSS protection
 - ✅ **HTTP Strict Transport Security (HSTS)**
-- ✅ **X-Frame-Options, X-Content-Type-Options** Headers
+- ✅ **X-Frame-Options, X-Content-Type-Options** headers
 
-### Überwachung & Logging
-- ✅ **Security Dashboard** mit Echtzeit-Bedrohungsübersicht
-- ✅ **Audit-Logging** aller sicherheitsrelevanten Aktionen
-- ✅ **Rate-Limiting-Statistiken** und Violation-Tracking
-- ✅ **Umfassende Log-Kategorien** (Security, Audit, System, Error)
+### Monitoring & Logging
+- ✅ **Security dashboard** with real-time threat overview
+- ✅ **Audit logging** of all security-relevant actions
+- ✅ **Rate limiting statistics** and violation tracking
+- ✅ **Comprehensive log categories** (Security, Audit, System, Error)
 
 ---
 
-## 🎯 Sicherheits-Best-Practices
+## 🎯 Security Best Practices
 
-### Für Administratoren
+### For Administrators
 
-#### Server-Konfiguration
+#### Server Configuration
 ```bash
-# HTTPS erzwingen
+# Force HTTPS
 # Apache
 Redirect 301 / https://yourdomain.com/
 
 # Nginx  
 return 301 https://$server_name$request_uri;
 
-# Sichere PHP-Einstellungen
+# Secure PHP settings
 expose_php = Off
 display_errors = Off
 log_errors = On
 ```
 
-#### Dateiberechtigungen
+#### File Permissions
 ```bash
-# Konfigurationsdatei schützen (aber webserver-beschreibbar lassen)
+# Protect config file (but keep webserver-writable)
 chmod 664 config.php
 chown www-data:www-data config.php
 
-# Cache-Verzeichnis
+# Cache directory
 chmod 755 cache/
 chown www-data:www-data cache/
 
-# Logs vor öffentlichem Zugriff schützen
+# Protect logs from public access
 chmod 640 /var/log/secstore/
 ```
 
-#### Firewall-Konfiguration
+#### Firewall Configuration
 ```bash
-# Nur notwendige Ports öffnen
+# Only open necessary ports
 ufw allow 22/tcp    # SSH
-ufw allow 80/tcp    # HTTP (für HTTPS-Redirect)
+ufw allow 80/tcp    # HTTP (for HTTPS redirect)
 ufw allow 443/tcp   # HTTPS
 ufw enable
 ```
 
-### Für Entwickler
+### For Developers
 
-#### Sichere Coding-Practices
-- **Niemals** Passwörter oder Secrets in Code committen
-- **Immer** prepared statements für Datenbankabfragen verwenden
-- **Immer** Input-Validierung und Sanitization durchführen
-- **CSRF-Token** in allen staatverändernden Operationen verwenden
+#### Secure Coding Practices
+- **Never** commit passwords or secrets in code
+- **Always** use prepared statements for database queries
+- **Always** perform input validation and sanitization
+- **Use CSRF tokens** in all state-changing operations
 
-#### Development-Umgebung
+#### Development Environment
 ```bash
-# Debug-Modus nur in Development
-ini_set('display_errors', '1'); // NUR in Development!
+# Debug mode ONLY in development
+ini_set('display_errors', '1'); // ONLY in development!
 
-# Produktionsumgebung
-ini_set('display_errors', '0');
-ini_set('log_errors', '1');
+# Use environment variables for secrets
+DB_PASSWORD=secret_here
+MAIL_PASSWORD=mail_secret_here
+
+# Never commit config files
+echo "config.php" >> .gitignore
+echo ".env" >> .gitignore
+```
+
+#### Code Quality
+```bash
+# Use provided pre-commit hook
+cp preCommitHook.sh .git/hooks/pre-commit
+chmod +x .git/hooks/pre-commit
+
+# Check code standards
+vendor/bin/phpcs app/
+vendor/bin/php-cs-fixer fix
 ```
 
 ---
 
-## ⚠️ Bekannte Sicherheitsüberlegungen
+## 🔍 Security Testing
 
-### Rate Limiting
-- **Konfiguration prüfen:** Zu restriktive Limits können DoS-ähnliche Effekte haben
-- **Whitelist-IPs:** Admin-IPs können vom Rate Limiting ausgenommen werden
-- **Monitoring:** Überwachen Sie Rate-Limit-Violations auf ungewöhnliche Muster
+### Automated Testing
+We recommend running these security tests regularly:
 
-### Session Management
-- **Session-Fixation:** Sessions werden automatisch bei Login/Logout regeneriert
-- **Concurrent Sessions:** Ein Benutzer = eine aktive Session (konfigurierbar)
-- **Timeout-Warnungen:** Benutzer werden vor Session-Ablauf gewarnt
+```bash
+# SQL injection testing
+sqlmap -u "http://localhost:8000/login" --forms --dbs
 
-### LDAP-Integration
-- **TLS/SSL verwenden:** LDAP-Verbindungen sollten immer verschlüsselt sein
-- **Bind-Credentials:** LDAP-Service-Account mit minimalen Rechten verwenden
-- **Fallback-Authentication:** Lokale Auth als Backup zu LDAP konfigurieren
+# CSRF testing
+csrf-detector --url http://localhost:8000
 
-### E-Mail-Security
-- **SMTP-TLS:** E-Mail-Versand immer über verschlüsselte Verbindungen
-- **Rate-Limiting:** E-Mail-Versand ist rate-limited (Spam-Schutz)
-- **Template-Injection:** E-Mail-Templates sind gegen Injection-Angriffe geschützt
+# XSS testing
+xsser --url "http://localhost:8000/search?q=test"
 
----
+# SSL/TLS testing
+testssl.sh yourdomain.com
+```
 
-## 🚀 Security Updates
-
-### Update-Benachrichtigungen
-
-**📬 Abonnieren Sie Sicherheitsupdates:**
-- **GitHub Releases:** Watch-Funktion für automatische Benachrichtigungen
-- **Security Advisories:** GitHub Security Advisories aktivieren
-- **Changelog:** Regelmäßig [CHANGELOG.md](CHANGELOG.md) prüfen
-
-### Update-Prozess
-
-1. **Backup erstellen** vor jedem Update
-   ```bash
-   # Datenbank-Backup
-   mysqldump -u root -p secstore > backup_$(date +%Y%m%d).sql
-   
-   # Dateien-Backup  
-   tar -czf secstore_backup_$(date +%Y%m%d).tar.gz /path/to/secstore
-   ```
-
-2. **Staging-Umgebung** testen vor Produktion
-3. **Funktionstest** nach Update durchführen
+### Manual Testing Checklist
+- [ ] Session fixation prevention
+- [ ] CSRF token validation
+- [ ] XSS protection in all inputs
+- [ ] SQL injection prevention
+- [ ] File upload security
+- [ ] Access control verification
+- [ ] Password complexity enforcement
+- [ ] Rate limiting functionality
+- [ ] Error message information disclosure
+- [ ] Directory traversal protection
 
 ---
 
-## ⚖️ Rechtliche Hinweise
+## 🚨 Security Headers
 
-### Safe Harbor
+SecStore automatically sets these security headers:
 
-Wir verpflichten uns zu:
+```http
+# Content Security Policy
+Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'
 
-- **Keine rechtlichen Schritte** gegen Sicherheitsforscher, die sich an diese Richtlinien halten
-- **Schnelle und faire Bearbeitung** aller Sicherheitsmeldungen
-- **Anerkennung** Ihrer Beiträge (wenn gewünscht)
+# XSS Protection
+X-XSS-Protection: 1; mode=block
 
-### Grenzen
+# Content Type Options
+X-Content-Type-Options: nosniff
 
-**Erlaubt:**
-- ✅ Automatisierte Vulnerability-Scanner auf eigenen Instanzen
-- ✅ Source-Code-Analyse
-- ✅ Responsible Disclosure
+# Frame Options
+X-Frame-Options: SAMEORIGIN
 
-**Nicht erlaubt:**
-- ❌ Social Engineering gegen SecStore-Nutzer
-- ❌ DoS/DDoS-Angriffe auf Live-Systeme
-- ❌ Datenzugriff/-manipulation ohne Erlaubnis
-- ❌ Öffentliche Disclosure vor koordinierter Veröffentlichung
+# Strict Transport Security (HTTPS only)
+Strict-Transport-Security: max-age=31536000; includeSubDomains
 
----
-
-## 📚 Weiterführende Ressourcen
-
-### Standards & Frameworks
-- **OWASP Top 10:** [owasp.org/www-project-top-ten](https://owasp.org/www-project-top-ten/)
-- **OWASP ASVS:** Application Security Verification Standard
-- **NIST Cybersecurity Framework**
-
-### Tools & Testing
-- **OWASP ZAP:** Web Application Security Scanner
-- **Nikto:** Web Server Scanner
-- **SQLMap:** SQL Injection Testing
-
-### Secure Development
-- **OWASP Secure Coding Practices**
-- **SANS Secure Programming Guidelines**
-- **PHP Security Best Practices**
+# Referrer Policy
+Referrer-Policy: strict-origin-when-cross-origin
+```
 
 ---
 
-*Letzte Aktualisierung: Januar 2025*
+## 🔄 Security Updates
 
-**Sicherheit ist ein kontinuierlicher Prozess. Helfen Sie uns dabei, SecStore sicher zu halten!** 🛡️
+### Automatic Updates
+- **Security patches** are released as soon as possible
+- **Critical vulnerabilities** get priority fixes within 24-48 hours
+- **Non-critical issues** are included in regular releases
+
+### Update Notification
+- Follow our [GitHub releases](https://github.com/madcoda9000/SecStore/releases) for notifications
+- Subscribe to security advisories
+- Check the [changelog](CHANGELOG.md) regularly
+
+### Manual Updates
+```bash
+# Check for updates
+composer update --no-dev
+
+# Backup before updating
+mysqldump secstore > backup_before_update.sql
+
+# Update dependencies
+composer install --no-dev --optimize-autoloader
+
+# Clear cache
+rm -rf cache/*
+
+# Check for database migrations
+php migrate.php
+```
+
+---
+
+## 📋 Security Checklist for Production
+
+### Pre-Deployment
+- [ ] Change all default passwords
+- [ ] Enable HTTPS with valid SSL certificate
+- [ ] Configure firewall rules
+- [ ] Set proper file permissions
+- [ ] Disable debug mode
+- [ ] Configure secure session settings
+- [ ] Set up database backups
+- [ ] Configure log rotation
+- [ ] Test security headers
+- [ ] Verify CSRF protection
+
+### Post-Deployment
+- [ ] Monitor security logs
+- [ ] Set up intrusion detection
+- [ ] Configure automated backups
+- [ ] Test disaster recovery procedures
+- [ ] Set up monitoring alerts
+- [ ] Schedule security scans
+- [ ] Document incident response procedures
+- [ ] Train administrators on security practices
+
+---
+
+## 🔗 Security Resources
+
+### External Security Tools
+- **OWASP ZAP**: Web application security scanner
+- **Nmap**: Network security scanner
+- **Burp Suite**: Web vulnerability scanner
+- **Nikto**: Web server scanner
+
+### Security References
+- [OWASP Top 10](https://owasp.org/www-project-top-ten/)
+- [SANS Security Guidelines](https://www.sans.org/)
+- [PHP Security Best Practices](https://www.php.net/manual/en/security.php)
+- [MySQL Security Guidelines](https://dev.mysql.com/doc/refman/8.0/en/security-guidelines.html)
+
+---
+
+> **🛡️ Remember**: Security is a shared responsibility. Stay informed, keep updated, and follow best practices!
+
+**SecStore Security Team** ❤️ *Thank you for helping keep SecStore secure!*

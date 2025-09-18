@@ -1,43 +1,43 @@
-# 🔐 SecStore - Vollständige Installationsanleitung
+# 🔐 SecStore - Complete Installation Guide
 
 ![PHP Version](https://img.shields.io/badge/PHP-%3E=8.3-blue?logo=php)
 ![Database](https://img.shields.io/badge/Database-MySQL%2FMariaDB-orange)
 ![License](https://img.shields.io/github/license/madcoda9000/SecStore?color=green)
 
-**SecStore** ist eine moderne, sichere Benutzerverwaltungs- und Authentifizierungsplattform. Diese Anleitung führt Sie durch die komplette Installation und Konfiguration.
+**SecStore** is a modern, secure user management and authentication platform. This guide walks you through the complete installation and configuration.
 
 ---
 
-## 📋 Inhaltsverzeichnis
+## 📋 Table of Contents
 
-- [🔧 Systemanforderungen](#-systemanforderungen)
-- [🚀 Schnellstart (Automatische Installation)](#-schnellstart-automatische-installation)
-- [⚙️ Manuelle Installation](#️-manuelle-installation)
-- [🗄️ Datenbank-Setup](#️-datenbank-setup)
-- [📁 Konfiguration](#-konfiguration)
-- [🌐 Webserver-Konfiguration](#-webserver-konfiguration)
-- [✅ Installation überprüfen](#-installation-überprüfen)
-- [🔒 Post-Installation Sicherheit](#-post-installation-sicherheit)
-- [🛠️ Entwicklungsumgebung](#️-entwicklungsumgebung)
+- [🔧 System Requirements](#-system-requirements)
+- [🚀 Quick Start (Automatic Installation)](#-quick-start-automatic-installation)
+- [⚙️ Manual Installation](#️-manual-installation)
+- [🗄️ Database Setup](#️-database-setup)
+- [📁 Configuration](#-configuration)
+- [🌐 Webserver Configuration](#-webserver-configuration)
+- [✅ Verify Installation](#-verify-installation)
+- [🔒 Post-Installation Security](#-post-installation-security)
+- [🛠️ Development Environment](#️-development-environment)
 - [🔧 Troubleshooting](#-troubleshooting)
 - [📞 Support](#-support)
 
 ---
 
-## 🔧 Systemanforderungen
+## 🔧 System Requirements
 
-### **Mindestanforderungen:**
+### **Minimum Requirements:**
 
-| Komponente | Version | Hinweise |
-|------------|---------|----------|
-| **PHP** | ≥ 8.3 | CLI-Version erforderlich |
-| **Datenbank** | MySQL ≥ 8.0 oder MariaDB ≥ 10.4 | UTF8MB4-Unterstützung |
-| **Webserver** | Apache 2.4+ oder Nginx 1.18+ | Optional für Produktion |
-| **Composer** | Latest | Dependency-Management |
-| **Speicher** | ≥ 512 MB RAM | Für PHP-Prozesse |
-| **Festplatte** | ≥ 100 MB | Für Anwendung + Dependencies |
+| Component | Version | Notes |
+|-----------|---------|-------|
+| **PHP** | ≥ 8.3 | CLI version required |
+| **Database** | MySQL ≥ 8.0 or MariaDB ≥ 10.4 | UTF8MB4 support |
+| **Webserver** | Apache 2.4+ or Nginx 1.18+ | Optional for production |
+| **Composer** | Latest | Dependency management |
+| **Memory** | ≥ 512 MB RAM | For PHP processes |
+| **Disk** | ≥ 100 MB | For application + dependencies |
 
-### **Erforderliche PHP-Extensions:**
+### **Required PHP Extensions:**
 ```
 ✓ curl        ✓ json       ✓ openssl    ✓ pdo
 ✓ pdo_mysql   ✓ xml        ✓ zip        ✓ bcmath
@@ -45,492 +45,528 @@
 ✓ ldap        ✓ imagick    ✓ redis      ✓ xdebug
 ```
 
-### **Unterstützte Betriebssysteme:**
+### **Supported Operating Systems:**
 - ✅ **Ubuntu** 20.04+ / Debian 11+
 - ✅ **Fedora** 35+ / CentOS Stream 9+
 - ✅ **Rocky Linux** 9+ / AlmaLinux 9+
-- ✅ **macOS** 12+ (mit Homebrew)
-- ✅ **Windows** 10+ (mit WSL2 empfohlen)
+- ✅ **macOS** 12+ (with Homebrew)
+- ✅ **Windows** 10+ (WSL2 recommended)
 
 ---
 
-## 🚀 Schnellstart (Automatische Installation)
+## 🚀 Quick Start (Automatic Installation)
 
-Die einfachste Methode ist unser automatisches Setup-Script:
+The easiest method is our automatic setup script:
 
-### **1. Script herunterladen und ausführen:**
+### **1. Download and run script:**
 
 ```bash
-# Script herunterladen (falls nicht bereits vorhanden)
+# Download script (if not already present)
 curl -O https://your-domain.com/secstore_setup.sh
 
-# Ausführbar machen
+# Make executable
 chmod +x secstore_setup.sh
 
-# Installation starten
+# Start installation
 ./secstore_setup.sh
 ```
 
-### **2. Was das Script automatisch macht:**
+### **2. What the script does automatically:**
 
-- 🔍 **System-Erkennung**: Automatische Erkennung von Debian/Ubuntu/Fedora
-- 📦 **PHP-Installation**: Neueste LTS-Version (8.3+) mit allen Modulen
-- 🎼 **Composer**: Globale Installation und Konfiguration
-- 🛠️ **Dev-Tools**: PHP CodeSniffer und PHP-CS-Fixer
-- 📂 **Projekt-Setup**: Abhängigkeiten installieren mit `composer install`
+- 🔍 **System detection**: Automatic detection of Debian/Ubuntu/Fedora
+- 📦 **PHP installation**: Latest LTS version (8.3+) with all modules
+- 🎼 **Composer**: Global installation and configuration
+- 🛠️ **Dev tools**: PHP CodeSniffer and PHP-CS-Fixer
+- 📂 **Project setup**: Install dependencies with `composer install`
 
-### **3. Nach der automatischen Installation:**
+### **3. After automatic installation:**
 
-Springe zu [🗄️ Datenbank-Setup](#️-datenbank-setup) und [📁 Konfiguration](#-konfiguration).
+Jump to [🗄️ Database Setup](#️-database-setup) and [📁 Configuration](#-configuration).
 
 ---
 
-## ⚙️ Manuelle Installation
+## ⚙️ Manual Installation
 
-Falls Sie die Installation manuell durchführen möchten:
-
-### **Schritt 1: PHP 8.3+ installieren**
+### **Step 1: Install PHP 8.3+**
 
 #### **Ubuntu/Debian:**
 ```bash
-# Ondrej PHP Repository hinzufügen
-sudo apt update
-sudo apt install -y software-properties-common
+# Add PPA for latest PHP versions
 sudo add-apt-repository ppa:ondrej/php -y
 sudo apt update
 
-# PHP 8.3 CLI installieren
-sudo apt install -y php8.3-cli
+# Install PHP and required extensions
+sudo apt install -y php8.3 php8.3-cli php8.3-fpm php8.3-mysql \
+    php8.3-xml php8.3-curl php8.3-mbstring php8.3-zip \
+    php8.3-bcmath php8.3-gd php8.3-intl php8.3-soap \
+    php8.3-redis php8.3-imagick php8.3-ldap
 
-# Erforderliche PHP-Module
-sudo apt install -y php8.3-curl php8.3-mysql php8.3-zip \
-    php8.3-xml php8.3-mbstring php8.3-bcmath php8.3-gd \
-    php8.3-intl php8.3-soap php8.3-redis php8.3-imagick \
-    php8.3-ldap php8.3-xdebug
+# Install Apache/Nginx (choose one)
+sudo apt install apache2 libapache2-mod-php8.3
+# OR
+sudo apt install nginx php8.3-fpm
 ```
 
-#### **Fedora/CentOS/RHEL:**
+#### **Fedora/CentOS/Rocky Linux:**
 ```bash
-# Remi Repository aktivieren
+# Install Remi repository
+sudo dnf install -y epel-release
 sudo dnf install -y https://rpms.remirepo.net/fedora/remi-release-$(rpm -E %fedora).rpm
-sudo dnf module enable -y php:remi-8.3
 
-# PHP und Module installieren
-sudo dnf install -y php-cli php-curl php-mysqlnd php-zip \
-    php-xml php-mbstring php-bcmath php-gd php-intl \
-    php-soap php-redis php-imagick php-ldap php-xdebug
+# Install PHP and extensions
+sudo dnf module reset php
+sudo dnf module enable php:remi-8.3 -y
+sudo dnf install -y php php-cli php-fpm php-mysql php-xml \
+    php-curl php-mbstring php-zip php-bcmath php-gd \
+    php-intl php-soap php-redis php-imagick php-ldap
+
+# Install web server
+sudo dnf install -y httpd
+# OR
+sudo dnf install -y nginx
 ```
 
-### **Schritt 2: Composer installieren**
+#### **macOS (with Homebrew):**
+```bash
+# Install PHP via Homebrew
+brew install php@8.3
+brew install composer
+
+# Link PHP version
+brew unlink php && brew link php@8.3 --force
+
+# Install additional extensions
+brew install php-redis php-imagick
+```
+
+### **Step 2: Install Composer**
 
 ```bash
-# Composer herunterladen und installieren
-php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
-php composer-setup.php --quiet
+# Download and install Composer globally
+curl -sS https://getcomposer.org/installer | php
 sudo mv composer.phar /usr/local/bin/composer
-sudo chmod +x /usr/local/bin/composer
-rm composer-setup.php
+chmod +x /usr/local/bin/composer
+
+# Verify installation
+composer --version
 ```
 
-### **Schritt 3: Development Tools installieren**
+### **Step 3: Install MariaDB/MySQL**
 
+#### **Ubuntu/Debian:**
 ```bash
-# PHP CodeSniffer und CS-Fixer global installieren
-composer global require squizlabs/php_codesniffer=*
-composer global require friendsofphp/php-cs-fixer
+# Install MariaDB
+sudo apt install -y mariadb-server mariadb-client
 
-# Composer bin-Verzeichnis zu PATH hinzufügen
-echo 'export PATH="$HOME/.composer/vendor/bin:$PATH"' >> ~/.bashrc
-source ~/.bashrc
+# Secure installation
+sudo mysql_secure_installation
 ```
 
-### **Schritt 4: SecStore herunterladen**
+#### **Fedora/CentOS/Rocky Linux:**
+```bash
+# Install MariaDB
+sudo dnf install -y mariadb-server mariadb
+
+# Start and enable service
+sudo systemctl start mariadb
+sudo systemctl enable mariadb
+
+# Secure installation
+sudo mysql_secure_installation
+```
+
+### **Step 4: Download SecStore**
 
 ```bash
-# Projekt klonen oder herunterladen
+# Download via Git
 git clone https://github.com/madcoda9000/SecStore.git
 cd SecStore
 
-# Abhängigkeiten installieren
-composer install --no-dev --optimize-autoloader
+# OR download ZIP
+wget https://github.com/madcoda9000/SecStore/archive/main.zip
+unzip main.zip && cd SecStore-main
 ```
 
----
-
-## 🗄️ Datenbank-Setup
-
-**✨ Vollautomatisches Setup!**
-
-SecStore übernimmt das komplette Datenbank-Setup automatisch beim ersten Start:
-
-- 🗄️ **Datenbank-Erstellung:** Wird automatisch erstellt, falls nicht vorhanden
-- 📋 **Tabellen:** Alle erforderlichen Tabellen werden automatisch angelegt  
-- 👤 **Admin-Benutzer:** Standard-Admin wird automatisch erstellt
-- 🔄 **Migration:** Datenbankstruktur wird bei Updates automatisch angepasst
-
-> **📝 Wichtig:** Stellen Sie sicher, dass die Datenbank-Zugangsdaten in der `config.php` korrekt hinterlegt sind. SecStore benötigt einen MySQL/MariaDB-Benutzer mit ausreichenden Rechten zum Erstellen von Datenbanken und Tabellen.
-
-**Empfohlene Datenbankbenutzer-Berechtigungen:**
-```sql
--- Minimale Rechte für SecStore-Benutzer
-GRANT CREATE, ALTER, SELECT, INSERT, UPDATE, DELETE ON *.* TO 'secstore_user'@'localhost';
-```
-
----
-
-## 📁 Konfiguration
-
-### **1. Konfigurationsdatei erstellen:**
+### **Step 5: Install Dependencies**
 
 ```bash
-# Im SecStore-Projektverzeichnis
-cp config.php_TEMPLATE config.php
+# Install project dependencies
+composer install --no-dev --optimize-autoloader
+
+# For development (with dev tools)
+composer install
 ```
 
-### **2. Grundkonfiguration in `config.php`:**
+---
+
+## 🗄️ Database Setup
+
+### **Step 1: Create Database and User**
+
+```sql
+-- Connect to MySQL/MariaDB as root
+mysql -u root -p
+
+-- Create database
+CREATE DATABASE secstore CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- Create user and grant permissions
+CREATE USER 'secstore_user'@'localhost' IDENTIFIED BY 'secure_password_here';
+GRANT ALL PRIVILEGES ON secstore.* TO 'secstore_user'@'localhost';
+FLUSH PRIVILEGES;
+
+-- Exit MySQL
+exit;
+```
+
+### **Step 2: Import Database Schema**
+
+```bash
+# Import the schema
+mysql -u secstore_user -p secstore < database/schema.sql
+
+# Verify tables were created
+mysql -u secstore_user -p secstore -e "SHOW TABLES;"
+```
+
+---
+
+## 📁 Configuration
+
+### **Step 1: Create Configuration File**
+
+```bash
+# Copy template
+cp config.php_TEMPLATE config.php
+
+# Make writable for web server
+chmod 664 config.php
+chown www-data:www-data config.php  # Ubuntu/Debian
+# OR
+chown apache:apache config.php      # RHEL/CentOS/Fedora
+```
+
+### **Step 2: Configure Database Connection**
+
+Edit `config.php` and update database settings:
 
 ```php
-<?php
-// Datenbank-Konfiguration
-$db = [
-    'host' => 'localhost',
-    'name' => 'secstore',
-    'user' => 'secstore_user',
-    'pass' => 'IhrSicheresPasswort'
-];
-
-// Anwendungs-Einstellungen
-$application = [
-    'appUrl' => 'https://ihr-domain.com',
-    'sessionTimeout' => 1800, // 30 Minuten
-    'allowPublicRegister' => true,
-    'allowPublicPasswordReset' => true,
-];
-
-// E-Mail-Konfiguration
-$mail = [
-    'host' => 'smtp.ihrmailserver.com',
-    'username' => 'noreply@ihr-domain.com',
-    'password' => 'IhrMailPasswort',
-    'encryption' => 'tls', // oder 'ssl'
-    'port' => 587,
-    'fromEmail' => 'noreply@ihr-domain.com',
-    'fromName' => 'SecStore System',
-    'enableWelcomeMail' => true,
-];
-
-// LDAP-Einstellungen (optional)
-$ldapSettings = [
-    'host' => 'ldap.ihr-domain.com',
-    'port' => 636,
-    'domainPrefix' => 'DOMAIN\\',
-];
-
-// Brute-Force-Schutz
-$bruteForceSettings = [
-    'enabled' => true,
-    'maxAttempts' => 5,
-    'lockoutTime' => 900, // 15 Minuten
-];
-
-// Logging-Konfiguration
-$logging = [
-    'enableSystemLogging' => true,
-    'enableAuditLogging' => true,
-    'enableSqlLogging' => false, // Nur für Debugging
-    'enableRequestLogging' => false, // Nur für Debugging
-    'enableMailLogging' => true,
-];
-
-// Rate-Limiting
-$rateLimiting = [
-    'enabled' => true,
-    
-    // Custom Limits (überschreibt Defaults)
-    'limits' => [
-        // Authentifizierung - sehr restriktiv
-        'login' => ['requests' => 5, 'window' => 300], // 5 Versuche in 5 Minuten
-        'register' => ['requests' => 3, 'window' => 300], // 3 Registrierungen in 5 Minuten
-        'forgot-password' => ['requests' => 3, 'window' => 600], // 3 Passwort-Resets in 10 Minuten
-        'reset-password' => ['requests' => 3, 'window' => 300], // 3 Reset-Versuche in 5 Minuten
-        '2fa' => ['requests' => 5, 'window' => 300], // 5 2FA-Versuche in 5 Minuten
-        
-        // Admin Bereiche - restriktiv
-        'admin' => ['requests' => 50, 'window' => 3600], // 50 Admin-Actions pro Stunde
-        
-        // Globales Limit als Fallback
-        'global' => ['requests' => 100, 'window' => 3600] // 100 Requests pro Stunde
+// Database Configuration
+$config = [
+    'database' => [
+        'host' => 'localhost',
+        'port' => 3306,
+        'name' => 'secstore',
+        'user' => 'secstore_user',
+        'pass' => 'secure_password_here',
+        'charset' => 'utf8mb4'
     ],
     
-    // Erweiterte Einstellungen
-    'settings' => [
-        'cleanup_interval' => 3600, // Bereinigung alle 60 Minuten
-        'block_duration' => 300, // Blockierung für 5 Minuten
-        'log_violations' => true, // Verstöße protokollieren
-        'notify_admin' => false, // Admin bei wiederholten Verstößen benachrichtigen
-        'whitelist_admin' => true, // Admin-IPs von Rate-Limiting ausschließen
-        'grace_period' => 60, // Kulanzzeit in Sekunden
+    // Application Settings
+    'app' => [
+        'url' => 'https://yourdomain.com',
+        'session_timeout' => 3600,  // 1 hour
+        'timezone' => 'Europe/Berlin'
+    ],
+    
+    // Email Configuration (optional)
+    'email' => [
+        'enabled' => true,
+        'smtp_host' => 'smtp.yourmailserver.com',
+        'smtp_port' => 587,
+        'smtp_username' => 'your@email.com',
+        'smtp_password' => 'your_email_password',
+        'from_email' => 'noreply@yourdomain.com',
+        'from_name' => 'SecStore System'
     ]
 ];
-
-// Erlaubte Hosts für CORS
-$allowedHosts = [
-    'https://ihr-domain.com',
-    'https://www.ihr-domain.com',
-];
-
-// Geheimer Schlüssel (mit generate_key.php generieren)
-$secretKey = 'IhrGeheimer256BitSchluesselHier';
-
-return [
-    'db' => $db,
-    'mail' => $mail,
-    'application' => $application,
-    'ldapSettings' => $ldapSettings,
-    'bruteForceSettings' => $bruteForceSettings,
-    'logging' => $logging,
-    'rateLimiting' => $rateLimiting,
-    'allowedHosts' => $allowedHosts,
-    'secretKey' => $secretKey,
-];
-?>
 ```
 
-### **3. Sicheren Schlüssel generieren:**
+### **Step 3: Generate Encryption Key**
 
 ```bash
-# Geheimen Schlüssel generieren
+# Generate secure encryption key
 php generate_key.php
+
+# The key is automatically written to config.php
 ```
 
-> **📝 Wichtig:** Kopieren Sie den generierten Schlüssel und tragen Sie ihn in Ihrer `config.php` als `$secretKey` ein!
-
-### **4. Verzeichnis-Berechtigungen setzen:**
+### **Step 4: Set Directory Permissions**
 
 ```bash
-# Cache-Verzeichnis beschreibbar machen
+# Cache directory
+mkdir -p cache
 chmod 755 cache
-chown www-data:www-data cache  # oder entsprechender Webserver-User
+chown www-data:www-data cache  # Ubuntu/Debian
+# OR
+chown apache:apache cache      # RHEL/CentOS/Fedora
 
-# Konfigurationsdatei für Webserver beschreibbar machen (für Admin-Settings)
+# Config file (readable by web server)
 chmod 664 config.php
-chown www-data:www-data config.php  # oder entsprechender Webserver-User
 ```
-
-> **🔒 Sicherheitshinweis:** Die config.php muss vom Webserver beschreibbar sein, damit die Admin-Einstellungen im Web-Interface funktionieren. SecStore prüft automatisch, ob die Datei beschreibbar ist.
 
 ---
 
-## 🌐 Webserver-Konfiguration
+## 🌐 Webserver Configuration
 
-### **Option 1: PHP Built-in Server (Entwicklung)**
+### **Apache Configuration**
 
-```bash
-# Entwicklungsserver starten
-php -S localhost:8000 -t public
-
-# Anwendung öffnen
-open http://localhost:8000
-```
-
-### **Option 2: Apache-Konfiguration**
-
+#### **Virtual Host Example:**
 ```apache
 <VirtualHost *:80>
-    ServerName ihr-domain.com
-    DocumentRoot /path/to/SecStore/public
+    ServerName yourdomain.com
+    DocumentRoot /var/www/secstore/public
     
-    <Directory /path/to/SecStore/public>
-        Options -Indexes
+    # Redirect to HTTPS
+    Redirect permanent / https://yourdomain.com/
+</VirtualHost>
+
+<VirtualHost *:443>
+    ServerName yourdomain.com
+    DocumentRoot /var/www/secstore/public
+    
+    # SSL Configuration
+    SSLEngine on
+    SSLCertificateFile /path/to/your.crt
+    SSLCertificateKeyFile /path/to/your.key
+    
+    # Security Headers
+    Header always set X-Frame-Options "SAMEORIGIN"
+    Header always set X-Content-Type-Options "nosniff"
+    Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains"
+    
+    # PHP Configuration
+    <Directory /var/www/secstore/public>
         AllowOverride All
         Require all granted
+        DirectoryIndex index.php
         
-        # URL Rewriting aktivieren
+        # Enable mod_rewrite
         RewriteEngine On
         RewriteCond %{REQUEST_FILENAME} !-f
         RewriteCond %{REQUEST_FILENAME} !-d
         RewriteRule ^(.*)$ index.php [QSA,L]
     </Directory>
     
-    # Sicherheit
-    <Directory /path/to/SecStore>
+    # Protect sensitive directories
+    <Directory /var/www/secstore/app>
         Require all denied
     </Directory>
     
-    <Directory /path/to/SecStore/public>
-        Require all granted
+    <Directory /var/www/secstore/cache>
+        Require all denied
     </Directory>
+    
+    # Error and Access Logs
+    ErrorLog ${APACHE_LOG_DIR}/secstore_error.log
+    CustomLog ${APACHE_LOG_DIR}/secstore_access.log combined
 </VirtualHost>
 ```
 
-### **Option 3: Nginx-Konfiguration**
+#### **Enable Apache Modules:**
+```bash
+# Enable required modules
+sudo a2enmod rewrite ssl headers
 
+# Restart Apache
+sudo systemctl restart apache2
+```
+
+### **Nginx Configuration**
+
+#### **Server Block Example:**
 ```nginx
+# HTTP (redirect to HTTPS)
 server {
     listen 80;
-    server_name ihr-domain.com;
-    root /path/to/SecStore/public;
+    server_name yourdomain.com;
+    return 301 https://$server_name$request_uri;
+}
+
+# HTTPS
+server {
+    listen 443 ssl http2;
+    server_name yourdomain.com;
+    root /var/www/secstore/public;
     index index.php;
     
-    # Security headers
-    add_header X-Frame-Options DENY;
-    add_header X-Content-Type-Options nosniff;
-    add_header X-XSS-Protection "1; mode=block";
+    # SSL Configuration
+    ssl_certificate /path/to/your.crt;
+    ssl_certificate_key /path/to/your.key;
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_ciphers ECDHE-RSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-GCM-SHA384;
     
-    location / {
-        try_files $uri $uri/ /index.php?$query_string;
-    }
+    # Security Headers
+    add_header X-Frame-Options "SAMEORIGIN" always;
+    add_header X-Content-Type-Options "nosniff" always;
+    add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
     
+    # PHP-FPM
     location ~ \.php$ {
-        fastcgi_pass unix:/run/php/php8.3-fpm.sock;
+        fastcgi_pass unix:/var/run/php/php8.3-fpm.sock;
         fastcgi_index index.php;
         fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
         include fastcgi_params;
     }
     
-    # Deny access to sensitive files
-    location ~ /\. {
-        deny all;
+    # Pretty URLs
+    location / {
+        try_files $uri $uri/ /index.php?$query_string;
     }
     
-    location ~ ^/(app|config\.php|composer\.(json|lock)) {
+    # Protect sensitive directories
+    location ~ /(app|cache|config\.php) {
         deny all;
+        return 404;
     }
+    
+    # Logs
+    access_log /var/log/nginx/secstore_access.log;
+    error_log /var/log/nginx/secstore_error.log;
 }
 ```
 
+#### **Test and Restart Nginx:**
+```bash
+# Test configuration
+sudo nginx -t
+
+# Restart Nginx
+sudo systemctl restart nginx
+```
+
 ---
 
-## ✅ Installation überprüfen
+## ✅ Verify Installation
 
-### **1. Erste Anmeldung:**
+### **1. First Login:**
 
-- **URL:** `http://ihr-domain.com` (oder `http://localhost:8000`)
-- **Benutzername:** `super.admin`
-- **Passwort:** `Test1000!`
+- **URL:** `http://your-domain.com` (or `http://localhost:8000`)
+- **Username:** `super.admin`
+- **Password:** `Test1000!`
 
-> **⚠️ Wichtig:** Ändern Sie das Standard-Passwort sofort nach der ersten Anmeldung!
+> **⚠️ Important:** Change the default password immediately after first login!
 
-### **2. System-Status prüfen:**
+### **2. Check System Status:**
 
 ```bash
-# PHP-Version überprüfen
+# Check PHP version
 php --version
 
-# Erforderliche Module überprüfen
+# Check required modules
 php -m | grep -E "(curl|mysql|zip|xml|mbstring|bcmath|gd|intl|soap|redis|imagick|ldap)"
 
-# Composer-Version
+# Check Composer version
 composer --version
 
-# Projektabhängigkeiten
+# Check project dependencies
 composer show
 ```
 
-### **3. Funktions-Tests:**
+### **3. Function Tests:**
 
-- ✅ Anmeldung mit Standard-Account
-- ✅ Benutzer-Dashboard erreichbar
-- ✅ Admin-Bereich zugänglich
-- ✅ E-Mail-Versand (in Einstellungen testen)
-- ✅ Registrierung (falls aktiviert)
-- ✅ Passwort-Reset (falls aktiviert)
+- ✅ Login with default account
+- ✅ User dashboard accessible
+- ✅ Admin area accessible
+- ✅ Email sending (test in settings)
+- ✅ Registration (if enabled)
+- ✅ Password reset (if enabled)
 
 ---
 
-## 🔒 Post-Installation Sicherheit
+## 🔒 Post-Installation Security
 
-### **1. Sofort nach Installation:**
+### **1. Immediately after installation:**
 
 ```bash
-# Standard-Admin-Passwort ändern
-# -> Im Web-Interface: Profil -> Passwort ändern
+# Change default admin password
+# -> In web interface: Profile -> Change Password
 
-# Konfigurationsdatei sichern (aber beschreibbar für Webserver lassen)
+# Secure config file (but keep writable for webserver)
 chmod 664 config.php
-chown www-data:www-data config.php  # oder entsprechender Webserver-User
+chown www-data:www-data config.php  # or appropriate webserver user
 
-# Zusätzliche Sicherheit: Zugriff auf Konfiguration außerhalb von public/ verhindern
-# (Wird automatisch durch .htaccess/Webserver-Konfiguration geregelt)
+# Additional security: prevent access to config outside public/
+# (Automatically handled by .htaccess/webserver configuration)
 ```
 
-### **2. Produktionsumgebung:**
+### **2. Production environment:**
 
 ```bash
-# Debug-Modus deaktivieren
-# In config.php oder index.php:
+# Disable debug mode
+# In config.php or index.php:
 ini_set('display_errors', '0');
 
-# HTTPS erzwingen (in Webserver-Konfiguration)
-# Apache: Redirect 301 / https://ihr-domain.com/
+# Force HTTPS (in webserver configuration)
+# Apache: Redirect 301 / https://your-domain.com/
 # Nginx: return 301 https://$server_name$request_uri;
 
-# Firewall konfigurieren
+# Configure firewall
 sudo ufw enable
 sudo ufw allow 80/tcp
 sudo ufw allow 443/tcp
 sudo ufw allow 22/tcp
 ```
 
-### **3. Regelmäßige Wartung:**
+### **3. Regular maintenance:**
 
 ```bash
-# Updates prüfen
+# Check for updates
 composer update --no-dev
 
-# Logs rotieren (z.B. mit logrotate)
+# Rotate logs (e.g., with logrotate)
 sudo logrotate -f /etc/logrotate.d/secstore
 
-# Backup-Strategie implementieren
+# Implement backup strategy
 mysqldump -u root -p secstore > backup_$(date +%Y%m%d).sql
 ```
 
 ---
 
-## 🛠️ Entwicklungsumgebung
+## 🛠️ Development Environment
 
-### **Code-Qualität Tools:**
+### **Code Quality Tools:**
 
 ```bash
-# Git Pre-Commit Hook aktivieren (verhindert sensitive Datei-Commits)
+# Activate Git pre-commit hook (prevents sensitive file commits)
 cp preCommitHook.sh .git/hooks/pre-commit
 chmod +x .git/hooks/pre-commit
 
-# Hook testen
+# Test hook
 echo "test" > config-test.php && git add config-test.php
-git commit -m "Security test"  # Sollte blockiert werden
-rm config-test.php  # Test-Datei entfernen
+git commit -m "Security test"  # Should be blocked
+rm config-test.php  # Remove test file
 
-**🔒 Sicherheitshinweis:** Das Pre-Commit Hook blockiert automatisch Commits von:
-- `config*.php` (außer Templates)
-- `.env*` Dateien (außer Examples)  
-- `*.key`, `*.credentials`, `*copy*`, `*backup*` Dateien
+**🔒 Security Notice:** The pre-commit hook automatically blocks commits of:
+- `config*.php` (except templates)
+- `.env*` files (except examples)  
+- `*.key`, `*.credentials`, `*copy*`, `*backup*` files
 
-**💡 Erlaubte Template-Dateien:** `config.php_TEMPLATE`, `config.php.example`, `.env.example`
+**💡 Allowed Template Files:** `config.php_TEMPLATE`, `config.php.example`, `.env.example`
 
-# PHP-Syntax prüfen
+# Check PHP syntax
 vendor/bin/phpcs app/
 
-# Code automatisch formatieren
+# Auto-format code
 vendor/bin/php-cs-fixer fix
 
-# Entwicklungsserver mit Debugging
+# Development server with debugging
 php -S localhost:8000 -t public -d xdebug.mode=debug
 ```
 
-### **Nützliche Entwickler-Commands:**
+### **Useful Developer Commands:**
 
 ```bash
-# Abhängigkeiten mit Dev-Packages
+# Dependencies with dev packages
 composer install
 
-# Autoloader aktualisieren
+# Update autoloader
 composer dump-autoload
 
-# Neuen geheimen Schlüssel generieren
+# Generate new secret key
 php generate_key.php
 
-# Database-Schema prüfen
+# Check database schema
 mysql -u secstore_user -p secstore -e "SHOW TABLES;"
 ```
 
@@ -538,11 +574,11 @@ mysql -u secstore_user -p secstore -e "SHOW TABLES;"
 
 ## 🔧 Troubleshooting
 
-### **Häufige Probleme und Lösungen:**
+### **Common Problems and Solutions:**
 
 #### **Problem: "Cache directory is not writable"**
 ```bash
-# Lösung:
+# Solution:
 mkdir -p cache
 chmod 755 cache
 chown www-data:www-data cache
@@ -550,61 +586,61 @@ chown www-data:www-data cache
 
 #### **Problem: "Database connection failed"**
 ```bash
-# Verbindung testen:
+# Test connection:
 mysql -u secstore_user -p secstore
 
-# Lösung: config.php Datenbankeinstellungen überprüfen
+# Solution: Check config.php database settings
 ```
 
 #### **Problem: "Config file not found"**
 ```bash
-# Lösung:
+# Solution:
 cp config.example.php config.php
-# Dann config.php entsprechend anpassen
+# Then adjust config.php accordingly
 ```
 
-#### **Problem: E-Mail-Versand funktioniert nicht**
+#### **Problem: Email sending doesn't work**
 ```bash
-# SMTP-Einstellungen testen:
-telnet smtp.ihrmailserver.com 587
+# Test SMTP settings:
+telnet smtp.yourmailserver.com 587
 
-# Lösung: Mail-Konfiguration in config.php überprüfen
+# Solution: Check mail configuration in config.php
 ```
 
 #### **Problem: 500 Internal Server Error**
 ```bash
-# Error-Log prüfen:
+# Check error log:
 tail -f /var/log/apache2/error.log
-# oder
+# or
 tail -f public/error.log
 
-# PHP-Fehler aktivieren für Debugging:
+# Enable PHP errors for debugging:
 ini_set('display_errors', '1');
 ```
 
-#### **Problem: PHP-Module fehlen**
+#### **Problem: Missing PHP modules**
 ```bash
-# Fehlende Module installieren:
-sudo apt install php8.3-MODULNAME
-# oder
-sudo dnf install php-MODULNAME
+# Install missing modules:
+sudo apt install php8.3-MODULENAME
+# or
+sudo dnf install php-MODULENAME
 
-# PHP neu starten:
+# Restart PHP:
 sudo systemctl restart php8.3-fpm
 ```
 
-### **Log-Dateien Überprüfen:**
+### **Check Log Files:**
 
 ```bash
-# SecStore-Logs (im Admin-Panel)
-# System-Logs
+# SecStore logs (in admin panel)
+# System logs
 tail -f /var/log/syslog
 
-# Apache-Logs
+# Apache logs
 tail -f /var/log/apache2/access.log
 tail -f /var/log/apache2/error.log
 
-# Nginx-Logs
+# Nginx logs
 tail -f /var/log/nginx/access.log
 tail -f /var/log/nginx/error.log
 ```
@@ -613,36 +649,36 @@ tail -f /var/log/nginx/error.log
 
 ## 📞 Support
 
-### **Dokumentation:**
-- 📖 [README.md](../README.md) - Projekt-Übersicht
-- 📝 [CHANGELOG.md](CHANGELOG.md) - Versionshistorie und Updates
-- 🔒 [SECURITY.md](SECURITY.md) - Sicherheitsrichtlinien (falls vorhanden)
+### **Documentation:**
+- 📖 [README.md](../README.md) - Project overview
+- 📝 [CHANGELOG.md](CHANGELOG.md) - Version history and updates
+- 🔒 [SECURITY.md](SECURITY.md) - Security policies (if available)
 
-### **Community & Hilfe:**
+### **Community & Help:**
 - 🐛 **Bug Reports:** [GitHub Issues](https://github.com/madcoda9000/SecStore/issues)
 - 💡 **Feature Requests:** [GitHub Discussions](https://github.com/madcoda9000/SecStore/discussions)
 
-### **Nützliche Links:**
-- 🔗 [Flight PHP Dokumentation](https://docs.flightphp.com/)
+### **Useful Links:**
+- 🔗 [Flight PHP Documentation](https://docs.flightphp.com/)
 - 🔗 [Latte Template Engine](https://latte.nette.org/en/)
-- 🔗 [Composer Dokumentation](https://getcomposer.org/doc/)
+- 🔗 [Composer Documentation](https://getcomposer.org/doc/)
 
 ---
 
-## 🎉 Erfolgreich installiert!
+## 🎉 Successfully Installed!
 
-Herzlichen Glückwunsch! SecStore ist jetzt einsatzbereit. 
+Congratulations! SecStore is now ready to use. 
 
-### **Nächste Schritte:**
+### **Next Steps:**
 
-1. 🔐 **Admin-Passwort ändern** (sofort!)
-2. 📧 **E-Mail-Einstellungen konfigurieren**
-3. 👥 **Erste Benutzer anlegen**
-4. 🛡️ **2FA für Admin-Accounts aktivieren**
-5. 📊 **System-Monitoring einrichten**
+1. 🔐 **Change admin password** (immediately!)
+2. 📧 **Configure email settings**
+3. 👥 **Create first users**
+4. 🛡️ **Enable 2FA for admin accounts**
+5. 📊 **Set up system monitoring**
 
 ---
 
-> **💡 Tipp:** Bookmarken Sie diese Anleitung für zukünftige Updates und Wartungsarbeiten!
+> **💡 Tip:** Bookmark this guide for future updates and maintenance tasks!
 
-**SecStore Team** ❤️ *Danke, dass Sie SecStore verwenden!*
+**SecStore Team** ❤️ *Thank you for using SecStore!*

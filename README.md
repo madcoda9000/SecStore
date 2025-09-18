@@ -1,41 +1,41 @@
 <div align="center">
 
 # 🔐 SecStore
-### *Moderne, sichere Benutzerverwaltung für das Web*
+### *Modern, secure user management for the web*
 
 [![PHP Version](https://img.shields.io/badge/PHP-%3E=8.3-777BB4?style=for-the-badge&logo=php&logoColor=white)](https://php.net)
 [![License](https://img.shields.io/badge/License-MIT-success?style=for-the-badge)](LICENSE)
 [![Last Commit](https://img.shields.io/github/last-commit/madcoda9000/SecStore?style=for-the-badge&color=blue)](https://github.com/madcoda9000/SecStore/commits/main)
 [![Maintained](https://img.shields.io/maintenance/yes/2025?style=for-the-badge&color=green)](https://github.com/madcoda9000/SecStore)
 
-**Eine vollständige Authentifizierungs- und Benutzerverwaltungsplattform mit modernen Sicherheitsfeatures und Enterprise-Ready-Funktionen.**
+**A complete authentication and user management platform with modern security features and enterprise-ready functionality.**
 
-[📚 Dokumentation](Documentation/INSTALL.md) • [🚀 Live Demo](#) • [🐛 Bug Reports](https://github.com/madcoda9000/SecStore/issues) • [💬 Diskussionen](https://github.com/madcoda9000/SecStore/discussions)
+[📚 Documentation](Documentation/INSTALL.md) • [🚀 Live Demo](#) • [🐛 Bug Reports](https://github.com/madcoda9000/SecStore/issues) • [💬 Discussions](https://github.com/madcoda9000/SecStore/discussions)
 
 </div>
 
 ---
 
-## ✨ Warum SecStore?
+## ✨ Why SecStore?
 
 <table>
 <tr>
 <td width="50%">
 
-### 🛡️ **Sicherheit zuerst**
-- **Zero-Trust-Architektur** mit Session Fingerprinting
-- **2FA-Unterstützung** (TOTP) mit QR-Code-Setup
-- **Advanced Rate Limiting** mit intelligenten Scopes
-- **Real-time Security Dashboard** für Bedrohungsüberwachung
+### 🛡️ **Security first**
+- **Zero-Trust architecture** with session fingerprinting
+- **2FA support** (TOTP) with QR code setup
+- **Advanced rate limiting** with intelligent scopes
+- **Real-time security dashboard** for threat monitoring
 
 </td>
 <td width="50%">
 
 ### ⚡ **Developer Experience**
-- **Ein-Klick-Installation** mit automatischem Setup-Script
-- **PSR-12 konform** mit Code-Qualitäts-Tools
-- **Modern PHP 8.3+** mit Type Declarations
-- **Latte Templates** für saubere, sichere Views
+- **One-click installation** with automatic setup script
+- **PSR-12 compliant** with code quality tools
+- **Modern PHP 8.3+** with type declarations
+- **Latte templates** for clean, secure views
 
 </td>
 </tr>
@@ -43,17 +43,17 @@
 <td>
 
 ### 🌐 **Enterprise-Ready**
-- **LDAP-Integration** für Corporate Environments
-- **Granulare Rollenverwaltung** (RBAC)
-- **Umfassendes Audit-Logging** aller Aktionen
-- **Multi-Language Support** (DE/EN)
+- **LDAP integration** for corporate environments
+- **Granular role management** (RBAC)
+- **Comprehensive audit logging** of all actions
+- **Multi-language support** (DE/EN)
 
 </td>
 <td>
 
-### 🎨 **Moderne UI/UX**
-- **Bootstrap 5** Design
-- **Dark/Light Mode** mit Benutzerpräferenzen\
+### 🎨 **Modern UI/UX**
+- **Bootstrap 5** design
+- **Dark/Light mode** with user preferences\
 <br>
 <br>
 
@@ -68,89 +68,89 @@
 
 ## 🚀 Quick Start
 
-### **1-Minute Setup (Automatisch)**
+### **1-Minute Setup (Automatic)**
 
 ```bash
-# Repository klonen
+# Clone repository
 git clone https://github.com/madcoda9000/SecStore.git
 cd SecStore
 
-# Automatisches Setup-Script ausführen
+# Run automatic setup script
 chmod +x setup.sh && ./setup.sh
 
-# Konfiguration anpassen
+# Customize configuration
 cp config.php_TEMPLATE config.php
-# -> DB-Zugangsdaten eintragen
+# -> Enter DB credentials
 
-# Development-Server starten
+# Start development server
 php -S localhost:8000 -t public
 ```
 
-**🎉 Fertig! SecStore läuft unter http://localhost:8000**
+**🎉 Done! SecStore is running at http://localhost:8000**
 
-**Standard-Login:** `super.admin` / `Test1000!` *(⚠️ Passwort sofort ändern!)*
+**Default Login:** `super.admin` / `Test1000!` *(⚠️ Change password immediately!)*
 
-### **Manuelle Installation**
+### **Manual Installation**
 
-Für detaillierte Installationsanweisungen und Produktions-Setup siehe **[📖 INSTALL.md](Documentation/INSTALL.md)**
+For detailed installation instructions and production setup see **[📖 INSTALL.md](Documentation/INSTALL.md)**
 
 ---
 
-## 🌟 Feature-Highlights
+## 🌟 Feature Highlights
 
 <details>
-<summary><b>🔐 Authentifizierung & Sicherheit</b></summary>
+<summary><b>🔐 Authentication & Security</b></summary>
 
-- ✅ **Multi-Factor Authentication (MFA/2FA)** mit TOTP-Standard
-- ✅ **LDAP-Integration** für Unternehmensanbindung
-- ✅ **Session Security** mit Fingerprinting und Auto-Regeneration
-- ✅ **Brute-Force-Schutz** mit intelligenten Sperrmechanismen
-- ✅ **Password Security** mit BCRYPT-Hashing (60 Zeichen)
-- ✅ **CSRF-Protection** für alle Formulare
-- ✅ **Content Security Policy (CSP)** gegen XSS-Angriffe
+- ✅ **Multi-Factor Authentication (MFA/2FA)** with TOTP standard
+- ✅ **LDAP integration** for enterprise connectivity
+- ✅ **Session security** with fingerprinting and auto-regeneration
+- ✅ **Brute-force protection** with intelligent blocking mechanisms
+- ✅ **Password security** with BCRYPT hashing (60 characters)
+- ✅ **CSRF protection** for all forms
+- ✅ **Content Security Policy (CSP)** against XSS attacks
 
 </details>
 
 <details>
-<summary><b>⚡ Rate Limiting & DOS-Schutz</b></summary>
+<summary><b>⚡ Rate Limiting & DOS Protection</b></summary>
 
-- ✅ **Granulares Rate Limiting** mit Scope-basierten Limits
-- ✅ **Real-time Statistics** und Violation Tracking  
-- ✅ **Intelligent Throttling** nach Sensitivität der Aktionen
-- ✅ **Admin-Whitelist** Funktionen
-- ✅ **Automatic Cleanup** und Block-Management
+- ✅ **Granular rate limiting** with scope-based limits
+- ✅ **Real-time statistics** and violation tracking  
+- ✅ **Intelligent throttling** based on action sensitivity
+- ✅ **Admin whitelist** functions
+- ✅ **Automatic cleanup** and block management
 
 </details>
 
 <details>
-<summary><b>👥 Benutzerverwaltung</b></summary>
+<summary><b>👥 User Management</b></summary>
 
-- ✅ **Rollenbasierte Zugriffskontrolle (RBAC)**
-- ✅ **Flexible Benutzerverwaltung** mit Admin-Interface
-- ✅ **Self-Service Profile** Management
-- ✅ **Password Reset** via E-Mail (optional)
-- ✅ **Registration System** (aktivierbar/deaktivierbar)
-- ✅ **2FA-Enforcement** pro Benutzer durch Admins
+- ✅ **Role-based access control (RBAC)**
+- ✅ **Flexible user management** with admin interface
+- ✅ **Self-service profile** management
+- ✅ **Password reset** via email (optional)
+- ✅ **Registration system** (can be enabled/disabled)
+- ✅ **2FA enforcement** per user by admins
 
 </details>
 
 <details>
 <summary><b>📊 Monitoring & Logging</b></summary>
 
-- ✅ **Security Dashboard** mit Real-time Übersicht
-- ✅ **Comprehensive Logging** (Audit, Security, System, Mail, DB)
-- ✅ **Log-Kategorien** mit granularer Konfiguration
-- ✅ **Violation Tracking** und Threat Intelligence
-- ✅ **Performance Metrics** und System Health
+- ✅ **Security dashboard** with real-time overview
+- ✅ **Comprehensive logging** (Audit, Security, System, Mail, DB)
+- ✅ **Log categories** with granular configuration
+- ✅ **Violation tracking** and threat intelligence
+- ✅ **Performance metrics** and system health
 
 </details>
 
 <details>
 <summary><b>🎨 User Experience</b></summary>
 
-- ✅ **Dark/Light Theme** mit automatischer Erkennung
-- ✅ **Multi-Language** (Deutsch/Englisch)
-- ✅ **Intuitive Admin-Interface**
+- ✅ **Dark/Light theme** with automatic detection
+- ✅ **Multi-language** (German/English)
+- ✅ **Intuitive admin interface**
 
 </details>
 
@@ -161,6 +161,7 @@ Für detaillierte Installationsanweisungen und Produktions-Setup siehe **[📖 I
 <div align="center">
 
 ### 🔑 Login & Authentication
+
 <img src="Documentation/Screenshots/Login.png" width="400" alt="Modern Login Interface">
 
 ### 👤 User Dashboard & Profile  
@@ -169,11 +170,11 @@ Für detaillierte Installationsanweisungen und Produktions-Setup siehe **[📖 I
 </div>
 
 <details>
-<summary><b>🖼️ Mehr Screenshots anzeigen</b></summary>
+<summary><b>🖼️ Show more screenshots</b></summary>
 
 <div align="center">
 
-| Admin-Bereich | Security Dashboard |
+| Admin Area | Security Dashboard |
 |:---:|:---:|
 | <img src="Documentation/Screenshots/Users.png" width="350" alt="User Management"> | <img src="Documentation/Screenshots/secDashboard.png" width="350" alt="Security Dashboard"> |
 
@@ -191,7 +192,7 @@ Für detaillierte Installationsanweisungen und Produktions-Setup siehe **[📖 I
 
 ---
 
-## 🏗️ Technologie-Stack
+## 🏗️ Technology Stack
 
 <table>
 <tr>
@@ -216,11 +217,11 @@ Für detaillierte Installationsanweisungen und Produktions-Setup siehe **[📖 I
 </tr>
 </table>
 
-### 🔧 **Systemanforderungen**
+### 🔧 **System Requirements**
 
-| Komponente | Minimum | Empfohlen |
-|------------|---------|-----------|
-| **PHP** | 8.3+ | 8.3+ (neueste) |
+| Component | Minimum | Recommended |
+|-----------|---------|-------------|
+| **PHP** | 8.3+ | 8.3+ (latest) |
 | **MySQL/MariaDB** | 8.0+ / 10.4+ | 8.0+ / 10.6+ |
 | **Webserver** | Apache 2.4 / Nginx 1.18 | Apache 2.4+ / Nginx 1.20+ |
 | **RAM** | 512 MB | 1 GB+ |
@@ -228,7 +229,7 @@ Für detaillierte Installationsanweisungen und Produktions-Setup siehe **[📖 I
 
 ---
 
-## 📂 Projekt-Architektur
+## 📂 Project Architecture
 
 ```
 SecStore/
@@ -256,15 +257,15 @@ SecStore/
 
 ---
 
-## 🛠️ Entwicklung
+## 🛠️ Development
 
 ### **Development Setup**
 
 ```bash
-# Dependencies mit Dev-Tools installieren
+# Install dependencies with dev tools
 composer install
 
-# Code-Qualität prüfen
+# Check code quality
 vendor/bin/phpcs                # PSR-12 Compliance Check
 vendor/bin/php-cs-fixer fix     # Auto-Format Code
 
@@ -272,33 +273,33 @@ vendor/bin/php-cs-fixer fix     # Auto-Format Code
 php -S localhost:8000 -t public
 ```
 
-### **Beitragen**
+### **Contributing**
 
-Wir freuen uns über Beiträge! 🎉
+We welcome contributions! 🎉
 
-1. **Fork** das Repository
-2. **Branch** für neues Feature erstellen (`feature/amazing-feature`)
-3. **Commit** Änderungen (`git commit -m 'Add amazing feature'`)
-4. **Push** zum Branch (`git push origin feature/amazing-feature`)
-5. **Pull Request** öffnen
+1. **Fork** the repository
+2. **Create branch** for new feature (`feature/amazing-feature`)
+3. **Commit** changes (`git commit -m 'Add amazing feature'`)
+4. **Push** to branch (`git push origin feature/amazing-feature`)
+5. **Open Pull Request**
 
 **Coding Standards:**
-- ✅ PSR-12 konformer PHP-Code
-- ✅ Aussagekräftige Commit-Messages  
-- ✅ Tests für neue Features
-- ✅ Dokumentation aktualisieren
+- ✅ PSR-12 compliant PHP code
+- ✅ Meaningful commit messages  
+- ✅ Tests for new features
+- ✅ Update documentation
 
 ---
 
-## 📖 Dokumentation
+## 📖 Documentation
 
-| Dokument | Beschreibung |
-|----------|--------------|
-| 📖 **[INSTALL.md](Documentation/INSTALL.md)** | Vollständige Installations- und Setup-Anleitung |
-| 📝 **[CHANGELOG.md](Documentation/CHANGELOG.md)** | Versionshistorie und Release-Notes |
-| 🔒 **[SECURITY.md](Documentation/SECURITY.md)** | Sicherheitsrichtlinien und Vulnerability-Reporting |
-| 🏗️ **[API.md](#)** | API-Dokumentation (geplant) |
-| 🐳 **[DOCKER.md](#)** | Docker-Setup (geplant) |
+| Document | Description |
+|----------|-------------|
+| 📖 **[INSTALL.md](Documentation/INSTALL.md)** | Complete installation and setup guide |
+| 📝 **[CHANGELOG.md](Documentation/CHANGELOG.md)** | Version history and release notes |
+| 🔒 **[SECURITY.md](Documentation/SECURITY.md)** | Security policies and vulnerability reporting |
+| 🏗️ **[API.md](#)** | API documentation (planned) |
+| 🐳 **[DOCKER.md](#)** | Docker setup (planned) |
 
 ---
 
@@ -306,7 +307,7 @@ Wir freuen uns über Beiträge! 🎉
 
 <div align="center">
 
-### 💬 **Hol dir Hilfe**
+### 💬 **Get Help**
 
 [![GitHub Issues](https://img.shields.io/badge/GitHub-Issues-red?style=for-the-badge&logo=github)](https://github.com/madcoda9000/SecStore/issues)
 [![GitHub Discussions](https://img.shields.io/badge/GitHub-Discussions-blue?style=for-the-badge&logo=github)](https://github.com/madcoda9000/SecStore/discussions)
@@ -314,24 +315,24 @@ Wir freuen uns über Beiträge! 🎉
 
 </div>
 
-### **❓ Häufige Fragen**
+### **❓ Frequently Asked Questions**
 
 <details>
-<summary><b>Kann SecStore in der Produktion eingesetzt werden?</b></summary>
+<summary><b>Can SecStore be used in production?</b></summary>
 
-Ja! SecStore wurde für Produktionsumgebungen entwickelt und implementiert moderne Sicherheitsstandards. Siehe [SECURITY.md](Documentation/SECURITY.md) für Details.
+Yes! SecStore was built for production environments and implements modern security standards. See [SECURITY.md](Documentation/SECURITY.md) for details.
 </details>
 
 <details>
-<summary><b>Unterstützt SecStore Single Sign-On (SSO)?</b></summary>
+<summary><b>Does SecStore support Single Sign-On (SSO)?</b></summary>
 
-Über die LDAP-Integration können Sie SecStore an bestehende SSO-Lösungen anbinden. Native SAML/OAuth2-Unterstützung ist geplant.
+Through LDAP integration, you can connect SecStore to existing SSO solutions. Native SAML/OAuth2 support is planned.
 </details>
 
 <details>
-<summary><b>Wie kann ich zum Projekt beitragen?</b></summary>
+<summary><b>How can I contribute to the project?</b></summary>
 
-Wir freuen uns über Issues, Pull Requests, Dokumentation und Feature-Vorschläge! Siehe unsere Contributing-Guidelines oben.
+We welcome issues, pull requests, documentation, and feature suggestions! See our contributing guidelines above.
 </details>
 
 ---
@@ -352,18 +353,18 @@ Wir freuen uns über Issues, Pull Requests, Dokumentation und Feature-Vorschläg
 
 ---
 
-## ⭐ Gib uns einen Star!
+## ⭐ Give us a Star!
 
-Wenn dir SecStore gefällt, gib uns einen ⭐ auf GitHub! Das motiviert uns, weiter an dem Projekt zu arbeiten.
+If you like SecStore, give us a ⭐ on GitHub! This motivates us to continue working on the project.
 
 <div align="center">
 
-### 🙏 **Danke für dein Interesse an SecStore!**
+### 🙏 **Thank you for your interest in SecStore!**
 
-*Gebaut mit ❤️ für die Open-Source-Community*
+*Built with ❤️ for the open-source community*
 
 ---
 
-**[⬆️ Nach oben](#-secstore)**
+**[⬆️ Back to top](#-secstore)**
 
 </div>
