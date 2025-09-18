@@ -1,0 +1,11 @@
+{extends '../_mainLayout.latte'}
+{block content}
+<div class="container py-4">
+    <div class="alert alert-danger">
+        <h4>Error in Security Dashboard</h4>
+        <p><strong>Error:</strong> {$error}</p>
+        <p>Please check the error logs for more details.</p>
+        <a href="/admin/settings" class="btn btn-primary">Back to Admin</a>
+    </div>
+</div>
+{/block}

@@ -1,0 +1,199 @@
+{* Finale Version: app/views/admin/security_dashboard.latte *}
+{extends '../_mainLayout.latte'}
+
+{block content}
+<div class="container py-4" style="flex:1">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1><i class="bi bi-shield-check text-success"></i> Security Dashboard</h1>
+        <div>
+            <span class="badge bg-{if $metrics['security_score'] >= 80}success{elseif $metrics['security_score'] >= 60}warning{else}danger{/if} fs-6">
+                Security Score: {$metrics['security_score']}%
+            </span>
+        </div>
+    </div>
+
+    {* Alerts Section *}
+    {if count($alerts) > 0}
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border-warning">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-exclamation-triangle"></i> Security Alerts
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {foreach $alerts as $alert}
+                    <div class="alert alert-{if $alert['level'] === 'HIGH'}danger{else}warning{/if} mb-2" role="alert">
+                        <strong>{$alert['type']|upper}:</strong> {$alert['message']}
+                        <br><small class="text-muted"><strong>Recommendation:</strong> {$alert['recommendation']}</small>
+                    </div>
+                    {/foreach}
+                </div>
+            </div>
+        </div>
+    </div>
+    {/if}
+
+    {* Summary Cards *}
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card border-primary">
+                <div class="card-body text-center">
+                    <h5 class="card-title text-primary">Login Success Rate</h5>
+                    <h2 class="text-{if $metrics['login_success_rate'] >= 95}success{else}warning{/if}">
+                        {$metrics['login_success_rate']}%
+                    </h2>
+                    <small class="text-muted">Last 24 hours</small>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="card border-info">
+                <div class="card-body text-center">
+                    <h5 class="card-title text-info">Total Logins</h5>
+                    <h2 class="text-info">{$metrics['total_login_attempts']}</h2>
+                    <small class="text-muted">
+                        <span class="text-success">{$summary['successful_logins']} success</span> / 
+                        <span class="text-danger">{$summary['failed_logins']} failed</span>
+                    </small>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="card border-warning">
+                <div class="card-body text-center">
+                    <h5 class="card-title text-warning">Password Resets</h5>
+                    <h2 class="text-{if $summary['password_resets'] > 10}warning{else}success{/if}">
+                        {$summary['password_resets']}
+                    </h2>
+                    <small class="text-muted">Last 24 hours</small>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="card border-success">
+                <div class="card-body text-center">
+                    <h5 class="card-title text-success">New Users</h5>
+                    <h2 class="text-success">{$summary['new_registrations']}</h2>
+                    <small class="text-muted">Last 24 hours</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {* Detailed Metrics *}
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-graph-up"></i> Security Events
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <table class="table table-sm">
+                        <tbody>
+                            <tr>
+                                <td><i class="bi bi-check-circle text-success"></i> Successful Logins</td>
+                                <td class="text-end"><strong>{$summary['successful_logins']}</strong></td>
+                            </tr>
+                            <tr>
+                                <td><i class="bi bi-x-circle text-danger"></i> Failed Logins</td>
+                                <td class="text-end"><strong>{$summary['failed_logins']}</strong></td>
+                            </tr>
+                            <tr>
+                                <td><i class="bi bi-key"></i> Password Resets</td>
+                                <td class="text-end"><strong>{$summary['password_resets']}</strong></td>
+                            </tr>
+                            <tr>
+                                <td><i class="bi bi-person-plus"></i> New Registrations</td>
+                                <td class="text-end"><strong>{$summary['new_registrations']}</strong></td>
+                            </tr>
+                            <tr class="{if $summary['csrf_violations'] > 0}table-warning{/if}">
+                                <td><i class="bi bi-shield-x text-warning"></i> CSRF Violations</td>
+                                <td class="text-end"><strong>{$summary['csrf_violations']}</strong></td>
+                            </tr>
+                            <tr class="{if $summary['rate_limit_hits'] > 0}table-warning{/if}">
+                                <td><i class="bi bi-speedometer2 text-info"></i> Rate Limit Hits</td>
+                                <td class="text-end"><strong>{$summary['rate_limit_hits']}</strong></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-exclamation-triangle text-warning"></i> Suspicious Activity
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {if $summary['suspicious_activity']['suspicious_ips'] > 0}
+                        <div class="alert alert-warning">
+                            <strong>{$summary['suspicious_activity']['suspicious_ips']} suspicious IP(s) detected</strong>
+                            <br>
+                            <small>IPs with >10 failed login attempts:</small>
+                            <ul class="mb-0 mt-1">
+                                {foreach $summary['suspicious_activity']['ips'] as $ip}
+                                <li><code>{$ip}</code></li>
+                                {/foreach}
+                            </ul>
+                        </div>
+                    {else}
+                        <div class="alert alert-success">
+                            <i class="bi bi-check-circle"></i> No suspicious activity detected
+                        </div>
+                    {/if}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {* Quick Actions *}
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-tools"></i> Quick Actions
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="btn-group" role="group">
+                        <a href="/admin/logsAudit" class="btn btn-outline-primary">
+                            <i class="bi bi-journal-text"></i> View Audit Logs
+                        </a>
+                        <a href="/admin/users" class="btn btn-outline-secondary">
+                            <i class="bi bi-people"></i> Manage Users
+                        </a>
+                        <a href="/admin/settings" class="btn btn-outline-info">
+                            <i class="bi bi-gear"></i> Security Settings
+                        </a>
+                        <button class="btn btn-outline-success" id="refreshMetricsBtn">
+                            <i class="bi bi-arrow-clockwise"></i> Refresh Data
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{* CSP-KONFORME LÖSUNG: Data-Attribute für JavaScript-Konfiguration *}
+<div id="security-dashboard-config" 
+     data-refresh-url="/admin/security/metrics"
+     data-refresh-interval="300000"
+     style="display:none;">
+</div>
+
+{* EXTERNE SCRIPTS (CSP-konform) *}
+<script src="/js/admin/security-dashboard-min.js"></script>  {* NEU: Ersetzt inline scripts *}
+
+{/block}

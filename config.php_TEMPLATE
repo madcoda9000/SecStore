@@ -1,0 +1,128 @@
+<?php
+
+/**
+ * database credentials
+ */
+$db = [
+    'host' => 'YOUR_DB_SERVER_NAME',
+    'name' => 'SecStore_dev',
+    'user' => 'YOUR_DB_USERNAME',
+    'pass' => 'YOUR_DB_PASSWORD',
+];
+
+/**
+ * Logging settings
+ */
+$logging = [
+  'enableSqlLogging' => false,
+  'enableRequestLogging' => false,
+  'enableAuditLogging' => true,
+  'enableMailLogging' => true,
+  'enableSystemLogging' => true,
+];
+
+/**
+ * Application settings
+ * NOTE: Adjust address and port here
+ */
+$application = [
+  'appUrl' => 'http://localhost:8000',
+  'sessionTimeout' => 600,
+  'allowPublicRegister' => false,
+  'allowPublicPasswordReset' => false,
+];
+
+// Rate Limiting Konfiguration
+$rateLimiting = [
+  'enabled' => true,
+
+  // Custom Limits (überschreibt Defaults)
+  'limits' => [
+    // Authentifizierung - sehr restriktiv
+    'login' => ['requests' => 15, 'window' => 300], // Login Versuche
+    'register' => ['requests' => 5, 'window' => 300], // Registrierungen pro Stunde
+    'forgot-password' => ['requests' => 5, 'window' => 3600], // Password-Resets pro Stunde
+    'reset-password' => ['requests' => 5, 'window' => 3600], // Reset-Versuche pro Stunde
+    '2fa' => ['requests' => 25, 'window' => 300], // 2FA Versuche in 5 Minuten
+
+    // Admin Bereiche - restriktiv
+    'admin' => ['requests' => 200, 'window' => 300], // Admin-Actions
+
+    // Globales Limit als Fallback
+    'global' => ['requests' => 1500, 'window' => 300] // Requests pro Stunde
+  ],
+  // Erweiterte Einstellungen
+  'settings' => [
+    'cleanup_interval' => 300, // Session cleanup Intervall
+    'max_violations_per_hour' => 25, // Max Violations bevor schärfere Maßnahmen
+    'block_repeat_offenders' => true, // Repeat Offenders härter bestrafen
+    'log_violations' => true, // Violations loggen
+    'auto_refresh_on_limit' => true, // Automatischer Refresh nach Ablauf
+  ]
+];
+
+/**
+* LDAP settings
+**/
+$ldapSettings = [
+  'ldapHost' => 'YOUR_LDAP_HOST',
+  'ldapPort' => 'YOUR_LDAP_PORT',
+  'domainPrefix' => 'YOUR_DOMAIN_PREFIX z.b.: DOMAINNAME\\',
+  '' => '',
+];
+
+/**
+ * CORS: define allowd Hosts
+ * NOTE: change this according to your setup
+ */
+$allowedHosts = [
+    'capacitor://localhost',
+    'ionic://localhost',
+    'http://localhost',
+    'http://localhost:4200',
+    'http://localhost:8080',
+    'http://localhost:8000',
+];
+
+/**
+ * Brute force settings
+ */
+$bruteForceSettings = [
+  'enableBruteForce' => true,
+  'maxAttempts' => 5,
+  'lockTime' => 1000,
+];
+
+/**
+ * Mail configuration
+ */
+$mail = [
+  'host' => 'YOUR_SMTP_SERVER',
+  'username' => 'YOUR_SMTP_USERNAME',
+  'password' => 'YOUR_SMTP_PASSWORD',
+  'encryption' => 'tls',
+  'port' => 587,
+  'fromEmail' => 'YOUR_SENDER_ADDRESS',
+  'fromName' => 'YOUR_FROM_NAME',
+  'enableWelcomeMail' => false,
+];
+
+/**
+* security
+*/
+$security = [
+  'key' => 'ENTER_YOUR_SECRET_KEY_HERE',
+];
+
+// Alle Konfigurationen in einem Array zusammenfassen
+return [
+    'db' => $db,
+    'allowedHosts' => $allowedHosts,
+    'bruteForceSettings' => $bruteForceSettings,
+    'mail' => $mail,
+    'application' => $application,
+    'logging' => $logging,
+    'security' => $security,
+    'ldapSettings' => $ldapSettings,
+    'rateLimiting' => $rateLimiting
+];

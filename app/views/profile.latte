@@ -1,0 +1,224 @@
+{extends '_mainLayout.latte'}
+
+{block content}
+
+    <!-- The 2fa Modal -->
+    <div class="modal fade" id="2faModal" tabindex="-1" aria-labelledby="copySuccessModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="copySuccessModalLabel">{trans('profile.2famodal.title')}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Schließen"></button>
+            </div>
+            <div class="modal-body">
+                <p>{trans('profile.2famodal.msg1')}</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" id="setEnable2faBtn">{trans('profile.2famodal.msg2')}</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{trans('profile.2famodal.msg3')}</button>
+            </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- The 2fa enable / disable modal -->
+    <div class="modal fade" id="2faModale" tabindex="-1" aria-labelledby="copySuccessModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="copySuccessModalLabel">{trans('profile.2famodal.title')}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Schließen"></button>
+            </div>
+            <div class="modal-body">
+                <p id="2faModaleText"></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">OK</button>
+            </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container py-4" style="flex:1">  
+        <h1 class="mb-5"><span class="bi bi-person-fill">&nbsp;{trans('profile.heading')}</h1>        
+        {ifset $success}
+            <div class="alert alert-success d-flex align-items-center" role="alert">
+                <svg class="bi flex-shrink-0 me-2" role="img" aria-label="Success:"><use xlink:href="#check-circle-fill"/></svg>
+                <div>
+                    {$success}
+                </div>
+            </div>
+        {/ifset}
+
+        {ifset $error}
+            <div class="alert alert-danger d-flex align-items-center" role="alert">
+                <svg class="bi flex-shrink-0 me-2" role="img" aria-label="Danger:"><use xlink:href="#exclamation-triangle-fill"/></svg>
+                <div>
+                    {$error}
+                </div>
+            </div>
+        {/ifset}
+
+        {ifset $message}
+            <div class="alert alert-primary d-flex align-items-center" role="alert">
+                <svg class="bi flex-shrink-0 me-2" role="img" aria-label="Info:"><use xlink:href="#info-fill"/></svg>
+                <div>
+                    {$message}
+                </div>
+            </div>
+        {/ifset}
+        <div class="accordion">
+            <div class="accordion" id="accordionExample">
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed {if $user->ldapEnabled === 1} bg-warning text-dark fw-bold{/if}"
+                            {if $user->ldapEnabled === 1}disabled title="Deaktiviert wegen LDAP-Authentifizierung"{/if}
+                            type="button" 
+                            data-bs-toggle="collapse" 
+                            data-bs-target="#collapseOne" 
+                            aria-expanded="true" 
+                            aria-controls="collapseOne">                        
+                        <i class="bi-key-fill" style="margin-right:15px;"></i>
+                        
+                        {if $user->ldapEnabled === 1}
+                            Password change not possible because LDAP authenticated!
+                        {else}
+                            Change your password..
+                        {/if}
+                    </button>
+                    </h2>
+                    <div id="collapseOne" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
+                    <div class="accordion-body">
+                        <form id="pwResetForm" method="post" action="/profileChangePassword">
+                            <div class="mb-3">
+                                <input type="password" name="old_password" id="old_password" placeholder="Old Password" class="form-control">
+                            </div>
+                            <div class="input-group mb-3">
+                                <input type="password" name="new_password" id="new_password" placeholder="New Password" class="form-control">
+                                <button type="button" id="togglePassword" class="btn btn-outline-secondary" title="toggle password visibilty..">
+                                    <i id="eyeicon" class="bi-eye text-success"></i>                                    
+                                </button>
+                                <button type="button" id="generatePassword" class="btn btn-outline-secondary" title="generate secure password..">
+                                    <i class="bi-arrow-clockwise text-info"></i>
+                                </button>
+                            </div>
+                            <input type="hidden" name="csrf_token" value="{$_SESSION['csrf_token']}">
+                            <button class="btn btn-primary w-100" type="submit">Change Password..</button>
+                        </form>
+                    </div>
+                    </div>
+                </div>
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                            <i class="bi-envelope-fill" style="margin-right:15px;"></i>Change your email address..
+                        </button>
+                    </h2>
+                    <div id="collapseTwo" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
+                    <div class="accordion-body">
+                        <form id="changeEmailAddress" method="post" action="/profileChangeEmail">
+                            <div class="alert alert-info d-flex align-items-center" role="alert">
+                                <svg class="bi flex-shrink-0 me-2" role="img" aria-label="Info:"><use xlink:href="#info-fill"/></svg>
+                                <div>
+                                    NOTE: on successful change, you'll be logged out automatically!
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <input style="border:none !important;" type="text" class="form-control" readonly value="Current email: {$user['email'] ?? ''}">
+                            </div>
+                            <div class="mb-3">
+                                <input type="text" placeholder="new email address.." name="new_email" id="new_email" class="form-control">
+                            </div>
+                            <input type="hidden" name="csrf_token" value="{$_SESSION['csrf_token']}">
+                            <button class="btn btn-primary w-100" type="submit">Change email address..</button>
+                        </form>
+                    </div>
+                    </div>
+                </div>
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                        <i class="bi-shield-fill-exclamation" style="margin-right:10px;margin-bottom:-2px;"></i>2FA Authentication
+                    </button>
+                    </h2>
+                    <div id="collapseThree" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
+                    <div class="accordion-body">
+                        <form id="mfaSwitchForm" method="post" action="{$user['mfaEnabled'] === 1 ? '/disable-2fa' : '/enable-2fa'}">
+                            <input type="hidden" name="csrf_token" value="{$_SESSION['csrf_token']}">
+                            {if $user['mfaEnabled'] === 1 && $user['mfaEnforced'] === 0}
+                                <div class="alert alert-success d-flex align-items-center" role="alert">
+                                    <svg class="bi flex-shrink-0 me-2" role="img" aria-label="Success:"><use xlink:href="#info-fill"/></svg>
+                                    <div>
+                                        {trans('profile.2famodal.msg4')}
+                                    </div>       
+                                </div>                         
+                            {/if}
+                            {if $user['mfaEnabled'] === 1 && $user['mfaEnforced'] === 1}
+                                <div class="alert alert-warning d-flex align-items-center" role="alert">
+                                    <svg class="bi flex-shrink-0 me-2" role="img" aria-label="Warning:"><use xlink:href="#info-fill"/></svg>
+                                    <div>
+                                        {trans('profile.2famodal.msg10')}
+                                    </div>
+                                </div>                          
+                            {/if}
+                            {if $user['mfaEnabled'] === 0 && $user['mfaEnforced'] === 0 && !$user['mfaSecret']}
+                                <div class="alert alert-danger d-flex align-items-center" role="alert">
+                                    <svg class="bi flex-shrink-0 me-2" role="img" aria-label="Danger:"><use xlink:href="#info-fill"/></svg>
+                                    <div>
+                                        {trans('profile.2famodal.msg5')}
+                                    </div>  
+                                </div> 
+                                <form id="enable2fa">
+                                    <input type="hidden" name="csrf_token" value="{$_SESSION['csrf_token']}">
+                                    <button id="enable2fabutton" type="button" class="btn btn-primary w-100">{trans('profile.2famodal.msg9')}!</button>
+                                </form>
+                            {/if}
+                            {if $user['mfaSecret']!==''}
+                                <h2>{trans('profile.2famodal.msg7')} ({$user['mfaEnabled'] === 1 ? '2fa is enabled' : '2fa is disabled'})</h2>
+                                <div class="form-check form-switch mb-3">
+                                    <input class="form-check-input" onchange="switch2fa({$user['mfaEnabled']});" type="checkbox" role="switch" id="mfaSwitch" {if $user['mfaEnabled'] === 1}checked{/if} {if $user['mfaEnforced'] === 1}disabled{/if}>
+                                    <label class="form-check-label" for="mfaSwitch">{$user['mfaEnabled'] === 1 ? 'Disable 2FA' : 'Enable 2FA'}</label>
+                                </div>
+                                <div class="alert alert-info d-flex align-items-center" role="alert">
+                                    <svg class="bi flex-shrink-0 me-2" role="img" aria-label="Info:"><use xlink:href="#info-fill"/></svg>
+                                    <div>
+                                        {trans('profile.2famodal.msg6')}
+                                    </div>
+                                </div>  
+                                <div class="qr-container">
+                                    <div style="width:215px;">
+                                        <img n:attr="src => $qrCodeUrl">
+                                    </div>
+                                    <div style="padding-top:15px;">
+                                        <span><b>{trans('profile.2famodal.msg8')}:</b></span><br><br>
+                                        <span>{$user['mfaSecret']}</span>
+                                    </div>
+                                </div>  
+                            {/if}                             
+                        </form>                            
+                        {if $user['mfaEnforced'] === 0 && $user['mfaEnabled']===1 && !$user['mfaSecret']}
+                            <br>
+                            <hr>
+                            <div class="alert alert-danger d-flex align-items-center" role="alert">
+                                <svg class="bi flex-shrink-0 me-2" role="img" aria-label="Danger:"><use xlink:href="#info-fill"/></svg>
+                                <div>
+                                    {trans('profile.2famodal.msg11')}
+                                </div>
+                            </div>   
+                            <form id="reset2fa" method="post" action="/disableAndReset2FA">
+                                <div class="mb-3">
+                                    <input type="hidden" name="csrf_token" value="{$_SESSION['csrf_token']}">
+                                </div>
+                                <button class="btn btn-primary w-100" type="submit">{trans('profile.2famodal.msd12')}</button>
+                            </form>
+                        {/if}
+                    </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<script src="/js/profile.latte-min.js"></script>
+{/block}

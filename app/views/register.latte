@@ -1,0 +1,109 @@
+{* register.latte - CSP-konform OHNE inline scripts *}
+{extends '_authLayout.latte'}
+
+{block content}
+<div class="container">
+        <div class="card p-4 shadow-sm login-card shadow-lg" style="width: 100%; max-width: 500px;">
+            <h3 class="text-center text-primary"><span class="bi bi-person-fill-add"></span>&nbsp;{trans('register.title')}</h3>
+            <form method="POST" action="/register" id="registerForm" class="mt-3">
+                <div class="mb-3">
+                <input class="form-control" type="text" name="username" id="username" placeholder="{trans('register.username')}" autocomplete="username">
+                </div>
+                <div class="mb-3">
+                <input class="form-control" type="email" name="email" id="email" placeholder="{trans('register.email')}" autocomplete="email">
+                </div>
+                <div class="mb-3">
+                <input class="form-control" type="text" name="firstname" id="firstname" placeholder="{trans('register.firstname')}" autocomplete="given-name">
+                </div>
+                <div class="mb-3">
+                <input class="form-control" type="text" name="lastname" id="lastname" placeholder="{trans('register.lastname')}" autocomplete="family-name">
+                </div>
+                <div class="input-group mb-3">
+                    <input class="form-control" type="password" name="password" id="password" placeholder="{trans('register.password')}" autocomplete="new-password">
+                    <button class="btn btn-outline-secondary" type="button" id="togglePassword">
+                        <i id="togglePasswordIcon" class="bi-eye text-success"></i>
+                    </button>
+                    <button class="btn btn-outline-secondary" type="button" id="generatePassword">
+                        <i id="generatePasswordIcon" class="bi-arrow-clockwise text-info"></i>
+                    </button>
+                </div>
+                <input type="hidden" name="csrf_token" value="{$_SESSION['csrf_token']}">
+                <button type="submit" class="btn btn-primary w-100" {if $smtpInvalid}disabled{/if} id="submitButton">
+                    <span id="loader" style="display:none;" class="btnloader"></span> 
+                    {trans('register.submit')}
+                </button>
+            </form>
+            
+            <div id="error-message" style="color: #fff; display: none;"></div>
+            
+            {ifset $error}
+            <div class="alert alert-danger mt-3" role="alert">
+                <div class="d-flex gap-4">
+                    <span><i class="bi bi-exclamation-circle-fill text-danger"></i></span>
+                    <div class="d-flex flex-column gap-2">
+                    <h6 class="mb-0 text-danger">Error!</h6>
+                    <p class="mb-0">{$error}</p>
+                    </div>
+                </div>
+            </div>
+            {/ifset}
+            
+            {ifset $message}
+                <div class="alert alert-primary mt-3" role="alert">
+                <div class="d-flex gap-4">
+                    <span><i class="bi bi-exclamation-circle-fill text-primary"></i></span>
+                    <div class="d-flex flex-column gap-2">
+                    <h6 class="mb-0 text-primary">Info!</h6>
+                    <p class="mb-0">{$message}</p>
+                    </div>
+                </div>
+                </div>
+            {/ifset}
+            
+            <div class="p-3" style="display:flex; flex-direction:column; justify-content:center; align-items:center; gap:5;">
+            <a href="/login">{trans('register.loginLink')}</a>
+            <form method="get" action="" class="mt-3">
+                    <div class="dropdown">
+                        <button class="btn btn-outline-none dropdown-toggle d-flex align-items-center gap-2" type="button" id="langMenu" data-bs-toggle="dropdown" aria-expanded="false">
+                            <img src="/img/flags/{$lang}.svg" alt="{$lang}" width="20" height="14">
+                            <span class="d-none d-md-inline">
+                                {if $lang === 'de'}{trans('language.german')}{elseif $lang === 'en'}{trans('language.english')}{/if}
+                            </span>
+                        </button>
+                        <ul class="dropdown-menu" aria-labelledby="langMenu">
+                            <li>
+                                <a class="dropdown-item d-flex align-items-center gap-2" href="?lang=de">
+                                    <img src="/img/flags/de.svg" alt="Deutsch" width="20" height="14">
+                                    {trans('language.german')}
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item d-flex align-items-center gap-2" href="?lang=en">
+                                    <img src="/img/flags/en.svg" alt="English" width="20" height="14">
+                                    {trans('language.english')}
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div> 
+
+{* CSP-KONFORME LÖSUNG: Data-Attribute statt inline Script *}
+<div id="register-messages" 
+     data-val1="{trans('register.msg.val1')}"
+     data-val2="{trans('register.msg.val2')}"
+     data-val3="{trans('register.msg.val3')}"
+     data-val4="{trans('register.msg.val4')}"
+     data-val5="{trans('register.msg.val5')}"
+     data-val6="{trans('register.msg.val6')}"
+     style="display:none;">
+</div>
+
+{* EXTERNE SCRIPTS (CSP-konform) *}
+<script src="/js/register.latte-min.js"></script>
+<script src="/js/utils/register-init-min.js"></script>  {* NEU: Ersetzt inline script *}
+
+{/block}

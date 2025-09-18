@@ -1,0 +1,265 @@
+{extends '../_mainLayout.latte'}
+
+{block content}
+
+<div class="container py-4" style="flex:1" 
+     data-messages-save-success="{trans('rate_limit.save_success')}"
+     data-messages-save-error="{trans('rate_limit.save_error')}"
+     data-messages-reset-confirm="{trans('rate_limit.reset_confirm')}"
+     data-messages-test-started="{trans('rate_limit.test_started')}"
+     data-messages-load-error="{trans('rate_limit.load_error')}">
+
+    <!-- CSRF Token als verstecktes Element -->
+    <input type="hidden" id="csrfToken" value="{$_SESSION['csrf_token']}">
+    
+    <h1 class="mb-5">
+        <span class="bi bi-speedometer2">&nbsp;</span>{trans('rate_limit.settings.title')}
+    </h1>
+
+    <!-- Status Overview -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <span class="bi bi-info-circle"></span> {trans('rate_limit.status.title')}
+                    </h5>
+                    <div class="d-flex align-items-center mb-3">
+                        <span class="me-2">{trans('rate_limit.status.enabled')}:</span>
+                        {if $config['enabled']}
+                            <span class="badge bg-success">
+                                <span class="bi bi-check-circle"></span> {trans('common.enabled')}
+                            </span>
+                        {else}
+                            <span class="badge bg-warning">
+                                <span class="bi bi-exclamation-triangle"></span> {trans('common.disabled')}
+                            </span>
+                        {/if}
+                    </div>
+                    
+                    <!-- Quick Stats -->
+                    <div class="row text-center">
+                        <div class="col-md-3">
+                            <div class="border rounded p-2">
+                                <small class="text-muted">{trans('rate_limit.stats.active_limits')}</small>
+                                <div class="h5 mb-0">{count($status)}</div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="border rounded p-2">
+                                <small class="text-muted">{trans('rate_limit.stats.total_requests')}</small>
+                                <div class="h5 mb-0" id="total-requests">0</div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="border rounded p-2">
+                                <small class="text-muted">{trans('rate_limit.stats.violations_today')}</small>
+                                <div class="h5 mb-0 text-warning" id="violations-today">0</div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="border rounded p-2">
+                                <small class="text-muted">{trans('rate_limit.stats.blocked_ips')}</small>
+                                <div class="h5 mb-0 text-danger" id="blocked-ips">0</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Form -->
+    <form id="rateLimitForm">
+        <div class="row">
+            <!-- Global Settings -->
+            <div class="col-md-4">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h6 class="mb-0">
+                            <span class="bi bi-gear"></span> {trans('rate_limit.global_settings')}
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="enableRateLimit" 
+                                       name="enabled" {if $config['enabled']}checked{/if}>
+                                <label class="form-check-label" for="enableRateLimit">
+                                    {trans('rate_limit.enable_rate_limiting')}
+                                </label>
+                            </div>
+                            <div class="form-text">{trans('rate_limit.enable_help')}</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="logViolations" 
+                                       name="settings[log_violations]" {if $config['settings']['log_violations'] ?? true}checked{/if}>
+                                <label class="form-check-label" for="logViolations">
+                                    {trans('rate_limit.log_violations')}
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="maxViolations" class="form-label">{trans('rate_limit.max_violations_per_hour')}</label>
+                            <input type="number" class="form-control" id="maxViolations" 
+                                   name="settings[max_violations_per_hour]" 
+                                   value="{$config['settings']['max_violations_per_hour'] ?? 10}" 
+                                   min="1" max="100">
+                            <div class="form-text">{trans('rate_limit.max_violations_help')}</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="cleanupInterval" class="form-label">{trans('rate_limit.cleanup_interval')}</label>
+                            <div class="input-group">
+                                <input type="number" class="form-control" id="cleanupInterval" 
+                                       name="settings[cleanup_interval]" 
+                                       value="{$config['settings']['cleanup_interval'] ?? 60}" 
+                                       min="60" max="86400">
+                                <span class="input-group-text">{trans('common.seconds')}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Rate Limits Configuration -->
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h6 class="mb-0">
+                            <span class="bi bi-sliders"></span> {trans('rate_limit.limits_configuration')}
+                        </h6>
+                        <button type="button" class="btn btn-sm btn-outline-secondary" id="resetToDefaults">
+                            <span class="bi bi-arrow-clockwise"></span> {trans('rate_limit.reset_to_defaults')}
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>{trans('rate_limit.limit_type')}</th>
+                                        <th>{trans('rate_limit.description')}</th>
+                                        <th class="text-center">{trans('rate_limit.requests')}</th>
+                                        <th class="text-center">{trans('rate_limit.window_seconds')}</th>
+                                        <th class="text-center">{trans('rate_limit.current_usage')}</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {foreach $available_limits as $limitType => $description}
+                                    <tr>
+                                        <td>
+                                            <strong>{$limitType}</strong>
+                                        </td>
+                                        <td>
+                                            <small class="text-muted">{$description}</small>
+                                        </td>
+                                        <td class="text-center">
+                                            <input type="number" class="form-control form-control-sm text-center" 
+                                                   name="limits[{$limitType}][requests]" 
+                                                   value="{$config['limits'][$limitType]['requests'] ?? 0}" 
+                                                   min="1" max="10000" style="width: 80px;">
+                                        </td>
+                                        <td class="text-center">
+                                            <input type="number" class="form-control form-control-sm text-center" 
+                                                   name="limits[{$limitType}][window]" 
+                                                   value="{$config['limits'][$limitType]['window'] ?? 3600}" 
+                                                   min="60" max="86400" style="width: 90px;">
+                                        </td>
+                                        <td class="text-center">
+                                            {if isset($status[$limitType])}
+                                                <span class="badge bg-{if $status[$limitType]['current_requests'] > $status[$limitType]['max_requests'] * 0.8}warning{else}success{/if}">
+                                                    {$status[$limitType]['current_requests']}/{$status[$limitType]['max_requests']}
+                                                </span>
+                                            {else}
+                                                <span class="text-muted">-</span>
+                                            {/if}
+                                        </td>
+                                    </tr>
+                                    {/foreach}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <button type="submit" class="btn btn-primary">
+                            <span class="bi bi-check-lg"></span> {trans('common.save_changes')}
+                        </button>
+                        <button type="button" class="btn btn-outline-secondary ms-2" id="testLimits">
+                            <span class="bi bi-play"></span> {trans('rate_limit.test_limits')}
+                        </button>
+                    </div>
+                    <div>
+                        <a href="/admin/rate-limits/violations" class="btn btn-outline-warning">
+                            <span class="bi bi-exclamation-triangle"></span> {trans('rate_limit.view_violations')}
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <!-- Live Status Panel (collapsible) -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="mb-0">
+                        <button class="btn btn-link text-decoration-none p-0" type="button" 
+                                data-bs-toggle="collapse" data-bs-target="#liveStatus">
+                            <span class="bi bi-activity"></span> {trans('rate_limit.live_status')}
+                            <span class="bi bi-chevron-down"></span>
+                        </button>
+                    </h6>
+                </div>
+                <div class="collapse" id="liveStatus">
+                    <div class="card-body">
+                        <div id="liveStatusContent">
+                            <div class="text-center">
+                                <div class="spinner-border spinner-border-sm" role="status">
+                                    <span class="visually-hidden">{trans('common.loading')}</span>
+                                </div>
+                                <p class="mt-2">{trans('rate_limit.loading_status')}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Success/Error Messages -->
+<div class="toast-container position-fixed bottom-0 end-0 p-3">
+    <div id="successToast" class="toast" role="alert">
+        <div class="toast-header">
+            <span class="bi bi-check-circle text-success me-2"></span>
+            <strong class="me-auto">{trans('common.success')}</strong>
+            <button type="button" class="btn-close" data-bs-dismiss="toast"></button>
+        </div>
+        <div class="toast-body" id="successMessage"></div>
+    </div>
+    
+    <div id="errorToast" class="toast" role="alert">
+        <div class="toast-header">
+            <span class="bi bi-exclamation-circle text-danger me-2"></span>
+            <strong class="me-auto">{trans('common.error')}</strong>
+            <button type="button" class="btn-close" data-bs-dismiss="toast"></button>
+        </div>
+        <div class="toast-body" id="errorMessage"></div>
+    </div>
+</div>
+
+<script n:syntax="off" src="/js/admin/rateLimitSettings.js"></script>
+{/block}

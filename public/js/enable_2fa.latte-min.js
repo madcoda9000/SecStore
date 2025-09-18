@@ -1,0 +1,1 @@
+document.addEventListener("DOMContentLoaded",(function(){const e=document.getElementById("cpclpd"),t=document.getElementById("mfasec"),n=new bootstrap.Modal(document.getElementById("copySuccessModal"));e&&t&&e.addEventListener("click",(function(){navigator.clipboard.writeText(t.innerText).then((()=>n.show())).catch((()=>alert(messages.error1)))}))}));

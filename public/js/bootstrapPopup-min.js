@@ -1,0 +1,1 @@
+document.addEventListener("DOMContentLoaded",(function(){[].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]')).map((function(t){return new bootstrap.Tooltip(t)}))}));

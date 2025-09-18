@@ -1,0 +1,351 @@
+{extends '../_mainLayout.latte'}
+
+{block content}
+
+    <!-- Bootstrap Modal für Delete Confirmation -->
+    <div class="modal fade flyout" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="confirmDeleteLabel">{trans('users.modal.title.1')}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>{trans('users.modal.msg.1')}</p>
+                    <input type="hidden" id="deleteUserId">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{trans('users.modal.btn.cancel')}</button>
+                    <button type="button" class="btn btn-danger" id="confirmDeleteBtn" data-action="confirm-delete">{trans('users.modal.btn.delete')}</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+   <!-- Main Content -->
+    <div class="container py-4" style="flex:1">
+    <h1 class="mb-5"><span class="bi bi-person-square">&nbsp;</span>{trans('users.title')}</h1>
+
+    {ifset $success}
+        <div class="alert alert-success alert-dismissible fade show d-flex align-items-center" role="alert">
+            <svg class="bi flex-shrink-0 me-2" role="img" aria-label="Success:"><use xlink:href="#check-circle-fill"/></svg>
+            <div>{$success}</div>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    {/ifset}
+
+    {ifset $error}
+        <div class="alert alert-danger alert-dismissible fade show d-flex align-items-center" role="alert">
+            <svg class="bi flex-shrink-0 me-2" role="img" aria-label="Danger:"><use xlink:href="#exclamation-triangle-fill"/></svg>
+            <div>{$error}</div>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    {/ifset}
+
+    {ifset $message}
+        <div class="alert alert-info alert-dismissible fade show d-flex align-items-center" role="alert">
+            <svg class="bi flex-shrink-0 me-2" role="img" aria-label="Info:"><use xlink:href="#info-fill"/></svg>
+            <div>{$message}</div>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    {/ifset}
+
+    <!-- Control Bar -->
+    <div class="d-flex justify-content-between align-items-left mb-3">
+        <!-- Page Size Dropdown -->
+        <form method="get" class="usrPageSize">
+            <label for="pageSize" class="me-2 desktop-pager-label">{trans('pager.pageSize')}:</label>
+            <select name="pageSize" id="pageSize" class="d-inline form-select form-select-sm w-auto" data-action="change-page-size">
+                <option value="10" {if $pageSize == 10}selected{/if}>10</option>
+                <option value="25" {if $pageSize == 25}selected{/if}>25</option>
+                <option value="50" {if $pageSize == 50}selected{/if}>50</option>
+            </select>
+            <input type="hidden" name="page" value="{$page}">
+            <input type="hidden" name="search" value="{$search}">
+        </form>
+
+        <!-- Search + Actions -->
+        <form id="tblHeadBar" method="get" class="d-flex align-items-center gap-2">
+            <div class="input-group"> 
+                <input type="text" name="search" id="searchInput" value="{$search}" placeholder="{trans('users.search')}" class="form-control form-control-sm w-auto">
+                <button type="submit" class="btn btn-primary btn-sm"><i class="bi-search"></i></button>
+                <button type="button" class="btn btn-success btn-sm" data-action="create-user">
+                    <i class="bi-person-add"></i>
+                </button>
+            </div>
+            <input type="hidden" name="page" value="{$page}">
+            <input type="hidden" name="pageSize" value="{$pageSize}">
+            <input id="csrf_token" type="hidden" name="csrf_token" value="{$_SESSION['csrf_token']}">
+        </form>
+    </div>
+
+    <!-- Loading Indicator -->
+    <div id="loadingIndicator" style="display: none; text-align: center;">
+        <div class="spinner-border" role="status">
+            <span class="visually-hidden">{trans('users.loading')}</span>
+        </div>
+    </div>
+
+    <!-- Desktop Table -->
+    <div class="table-responsive desktop-table">
+        <table class="table table-striped table-hover align-middle">
+            <thead>
+                <tr>
+                    <th>{trans('users.type')}</th>
+                    <th>Ac</th>
+                    <th>2FA</th>
+                    <th>Enf</th>
+                    <th>{trans('users.username')}</th>
+                    <th>Email</th>                    
+                    <th>{trans('users.actions')}</th>
+                </tr>
+            </thead>
+            <tbody id="userTableBody">
+                {foreach $users as $use}
+                    <tr>
+                        <td>
+                            {if $use->ldapEnabled === 1}
+                                <i class="bi-hdd-network-fill text-teal" data-bs-toggle="tooltip" title="{trans('users.popup.ldapuser')}"></i>
+                            {else}  
+                                <i class="bi-database-fill text-indigo" data-bs-toggle="tooltip" title="{trans('users.popup.dbuser')}"></i>
+                            {/if}
+                        </td>
+                        <td style="min-width:40px !important;text-align:center;">
+                            {if $use->username === 'super.admin'}
+                                <i id="accountStatus{$use->id}" class="bi-check-circle-fill text-secondary" data-bs-toggle="tooltip" title="{trans('users.popup.noDisableUser')}"></i>
+                            {elseif $use->status === 1}
+                                <i id="accountStatus{$use->id}" class="bi-check-circle-fill text-success user-action-btn" 
+                                   data-action="toggle-account-status" 
+                                   data-user-id="{$use->id}" 
+                                   data-operation="disable"
+                                   style="cursor:pointer;" 
+                                   data-bs-toggle="tooltip" 
+                                   title="{trans('users.popup.disableUser')}"></i>
+                            {else}
+                                <i id="accountStatus{$use->id}" class="bi-x-circle-fill text-danger user-action-btn" 
+                                   data-action="toggle-account-status" 
+                                   data-user-id="{$use->id}" 
+                                   data-operation="enable"
+                                   style="cursor:pointer;" 
+                                   data-bs-toggle="tooltip" 
+                                   title="{trans('users.popup.activateUser')}"></i>
+                            {/if}
+                        </td>
+                        <td style="min-width:40px !important;text-align:center;">
+                            {if $use->mfaSecret !== '' && $use->mfaEnabled === 1}
+                                <i id="mfaEnabled{$use->id}" class="bi-check-circle-fill text-success user-action-btn" 
+                                   data-action="toggle-mfa" 
+                                   data-user-id="{$use->id}" 
+                                   data-operation="disable"
+                                   data-bs-toggle="tooltip" 
+                                   title="{trans('users.popup.disable2fa')}" 
+                                   style="cursor:pointer;"></i>
+                            {elseif $use->mfaSecret !== '' && $use->mfaEnabled === 0}
+                                <i id="mfaEnabled{$use->id}" class="bi-x-circle-fill text-danger user-action-btn" 
+                                   data-action="toggle-mfa" 
+                                   data-user-id="{$use->id}" 
+                                   data-operation="enable"
+                                   data-bs-toggle="tooltip" 
+                                   title="{trans('users.popup.enable2fa')}" 
+                                   style="cursor:pointer;"></i>
+                            {elseif $use->mfaSecret === ''}
+                                <i id="mfaEnabled{$use->id}" class="bi-x-circle-fill text-secondary" data-bs-toggle="tooltip" title="{trans('users.popup.no2fa')}"></i>
+                            {/if}
+                        </td>
+                        <td style="min-width:40px !important;text-align:center;">
+                            {if $use->username === 'super.admin'}
+                                <i class="bi-check-circle-fill text-secondary" data-bs-toggle="tooltip" title="{trans('users.popup.no2faforadmin')}"></i>
+                            {elseif $use->mfaSecret !== ''}
+                                <i class="bi-check-circle-fill text-secondary" data-bs-toggle="tooltip" title="{trans('users.popup.2faconfigured')}"></i>
+                            {elseif $use->mfaEnforced === 1}
+                                <i id="enforceStatus{$use->id}" class="bi-check-circle-fill text-warning user-action-btn" 
+                                   data-action="toggle-mfa-enforcement" 
+                                   data-user-id="{$use->id}" 
+                                   data-operation="disable"
+                                   style="cursor:pointer;" 
+                                   data-bs-toggle="tooltip" 
+                                   title="{trans('users.popup.2faenforce')}"></i>
+                            {else}
+                                <i id="enforceStatus{$use->id}" class="bi-x-circle-fill text-danger user-action-btn" 
+                                   data-action="toggle-mfa-enforcement" 
+                                   data-user-id="{$use->id}" 
+                                   data-operation="enable"
+                                   style="cursor:pointer;" 
+                                   data-bs-toggle="tooltip" 
+                                   title="{trans('users.popup.2faunenforce')}"></i>
+                            {/if}
+                        </td>
+                        <td>
+                            <strong>{$use->username}</strong><br>
+                            <!-- <span class="text-muted">{$use->firstname} {$use->lastname}</span><br> -->
+                            <span class="badge bg-info">{$use->roles}</span>
+                        </td>
+                        <td>{$use->email}</td>
+                        <td class="actions-column">
+                            {if $use->username === 'super.admin'}
+                                <button class="btn btn-sm btn-secondary" disabled>
+                                    <i class="bi-trash-fill"></i> {trans('users.btn.delete')}
+                                </button>
+                            {else}
+                                <button class="btn btn-sm btn-danger user-action-btn" 
+                                        data-action="delete-user" 
+                                        data-user-id="{$use->id}"
+                                        data-username="{$use->username}">
+                                    <i class="bi-trash-fill"></i> {trans('users.btn.delete')}
+                                </button>
+                            {/if}
+                            <a href="/admin/showEditUser/{$use->id}" class="btn btn-sm btn-warning">
+                                <i class="bi-pencil-fill"></i> {trans('users.btn.edit')}
+                            </a>
+                        </td>
+                    </tr>
+                {/foreach}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Mobile Cards View -->
+    <div class="d-block d-md-none">
+        {foreach $users as $use}
+            <div class="card mb-3">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <div>
+                        <strong>{$use->username}</strong>
+                        <span class="badge bg-info ms-2">{$use->roles}</span>
+                    </div>
+                    <div>
+                        {if $use->ldapEnabled === 1}
+                            <i class="bi-hdd-network-fill text-teal" data-bs-toggle="tooltip" title="{trans('users.popup.ldapuser')}"></i>
+                        {else}  
+                            <i class="bi-database-fill text-indigo" data-bs-toggle="tooltip" title="{trans('users.popup.dbuser')}"></i>
+                        {/if}
+                    </div>
+                </div>
+                <div class="card-body">
+                    <p class="card-text">
+                        <strong>Email:</strong> {$use->email}<br>
+                        <strong>Name:</strong> {$use->firstname} {$use->lastname}<br>
+                        <strong>Account: </strong>
+                            {if $use->username === 'super.admin'}
+                                <i id="maccountStatus{$use->id}" class="bi-check-circle-fill text-secondary" data-bs-toggle="tooltip" title="{trans('users.popup.noDisableUser')}"></i>
+                            {elseif $use->status === 1}
+                                <i id="maccountStatus{$use->id}" class="bi-check-circle-fill text-success user-action-btn" 
+                                   data-action="toggle-account-status" 
+                                   data-user-id="{$use->id}" 
+                                   data-operation="disable"
+                                   style="cursor:pointer;" 
+                                   data-bs-toggle="tooltip" 
+                                   title="{trans('users.popup.disableUser')}"></i>
+                            {else}
+                                <i id="maccountStatus{$use->id}" class="bi-x-circle-fill text-danger user-action-btn" 
+                                   data-action="toggle-account-status" 
+                                   data-user-id="{$use->id}" 
+                                   data-operation="enable"
+                                   style="cursor:pointer;" 
+                                   data-bs-toggle="tooltip" 
+                                   title="{trans('users.popup.activateUser')}"></i>
+                            {/if}<br>
+                        <strong>2FA: </strong>
+                            {if $use->mfaSecret !== '' && $use->mfaEnabled === 1}
+                                <i id="mmfaEnabled{$use->id}" class="bi-check-circle-fill text-success user-action-btn" 
+                                   data-action="toggle-mfa" 
+                                   data-user-id="{$use->id}" 
+                                   data-operation="disable"
+                                   data-bs-toggle="tooltip" 
+                                   title="{trans('users.popup.disable2fa')}" 
+                                   style="cursor:pointer;"></i>
+                            {elseif $use->mfaSecret !== '' && $use->mfaEnabled === 0}
+                                <i id="mmfaEnabled{$use->id}" class="bi-x-circle-fill text-danger user-action-btn" 
+                                   data-action="toggle-mfa" 
+                                   data-user-id="{$use->id}" 
+                                   data-operation="enable"
+                                   data-bs-toggle="tooltip" 
+                                   title="{trans('users.popup.enable2fa')}" 
+                                   style="cursor:pointer;"></i>
+                            {elseif $use->mfaSecret === ''}
+                                <i id="mmfaEnabled{$use->id}" class="bi-x-circle-fill text-secondary" data-bs-toggle="tooltip" title="{trans('users.popup.no2fa')}"></i>
+                            {/if}<br>
+                        <strong>2FA-Enf: </strong>
+                            {if $use->username === 'super.admin'}
+                                <i class="bi-check-circle-fill text-secondary" data-bs-toggle="tooltip" title="{trans('users.popup.no2faforadmin')}"></i>
+                            {elseif $use->mfaSecret !== ''}
+                                <i class="bi-check-circle-fill text-secondary" data-bs-toggle="tooltip" title="{trans('users.popup.2faconfigured')}"></i>
+                            {elseif $use->mfaEnforced === 1}
+                                <i id="menforceStatus{$use->id}" class="bi-check-circle-fill text-warning user-action-btn" 
+                                   data-action="toggle-mfa-enforcement" 
+                                   data-user-id="{$use->id}" 
+                                   data-operation="disable"
+                                   style="cursor:pointer;" 
+                                   data-bs-toggle="tooltip" 
+                                   title="{trans('users.popup.2faenforce')}"></i>
+                            {else}
+                                <i id="menforceStatus{$use->id}" class="bi-x-circle-fill text-danger user-action-btn" 
+                                   data-action="toggle-mfa-enforcement" 
+                                   data-user-id="{$use->id}" 
+                                   data-operation="enable"
+                                   style="cursor:pointer;" 
+                                   data-bs-toggle="tooltip" 
+                                   title="{trans('users.popup.2faunenforce')}"></i>
+                            {/if}<br>
+                    </p>
+                    
+                    <!-- Mobile Actions -->
+                    <div class="d-flex gap-2">
+                        {if $use->username === 'super.admin'}
+                            <button class="btn btn-sm btn-secondary" disabled>
+                                <i class="bi-trash-fill"></i> {trans('users.btn.delete')}
+                            </button>
+                        {else}
+                            <button class="btn btn-sm btn-danger user-action-btn" 
+                                    data-action="delete-user" 
+                                    data-user-id="{$use->id}"
+                                    data-username="{$use->username}">
+                                <i class="bi-trash-fill"></i> {trans('users.btn.delete')}
+                            </button>
+                        {/if}
+                        <a href="/admin/showEditUser/{$use->id}" class="btn btn-sm btn-warning">
+                            <i class="bi-pencil-fill"></i> {trans('users.btn.edit')}
+                        </a>
+                    </div>
+                </div>
+            </div>
+        {/foreach}
+    </div>
+
+    <!-- Pagination -->
+    <div class="d-flex justify-content-between align-items-center mt-3">
+        <div>{trans('pager.page')} {$page} {trans('pager.of')} {ceil($totalUsers / $pageSize)}</div>
+        <div>
+            {if $page > 1}
+                <a href="?page={$page - 1}&pageSize={$pageSize}&search={$search}" class="btn btn-outline-secondary btn-sm">
+                    {trans('pager.prev')}
+                </a>
+            {/if}
+            {if $page * $pageSize < $totalUsers}
+                <a href="?page={$page + 1}&pageSize={$pageSize}&search={$search}" class="btn btn-outline-secondary btn-sm">
+                    {trans('pager.next')}
+                </a>
+            {/if}
+        </div>
+    </div>
+</div>
+
+{* CSP-KONFORME LÖSUNG: Data-Attribute für Messages *}
+<div id="users-messages" 
+     data-confirm-delete="{trans('users.modal.title.1')}"
+     data-delete-success="{trans('users.delete.success')}"
+     data-toggle-success="{trans('users.toggle.success')}"
+     data-toggle-error="{trans('users.toggle.error')}"
+     data-account-activated="{trans('users.account.activated')}"
+     data-account-deactivated="{trans('users.account.deactivated')}"
+     data-2fa-enabled="{trans('users.2fa.enabled')}"
+     data-2fa-disabled="{trans('users.2fa.disabled')}"
+     data-2fa-enforced="{trans('users.2fa.enforced')}"
+     data-2fa-unenforced="{trans('users.2fa.unenforced')}"
+     style="display:none;">
+</div>
+
+{* EXTERNE SCRIPTS (CSP-konform) *}
+<script src="/js/admin/users.latte.js"></script>
+
+{/block}

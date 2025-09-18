@@ -1,0 +1,251 @@
+body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+.container {
+  width: 75%;
+}
+.footer {
+  width: 100%;
+  text-align: left;
+  padding: 10px 0;
+}
+.footer .container {
+  width: 75%;
+  margin: auto;
+}
+.doubbleDivContainer {
+  display: flex;
+  justify-content: space-between; /* Verteilt die Elemente */
+  align-items: center; /* Zentriert vertikal */
+  width: 100%;
+}
+.qr-container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 15px;
+}
+.actions-column {
+  white-space: nowrap; /* Verhindert Zeilenumbrüche in der Aktionen-Spalte */
+  width: 1%; /* Hält die Spalte so klein wie möglich */
+}
+.nav-link {
+  color: var(--bs-light);
+}
+
+.text-indigo {
+  color: var(--bs-indigo);
+}
+
+.text-cyan {
+  color: var(--bs-cyan);
+}
+
+.text-teal {
+  color: var(--bs-teal);
+}
+
+/* style for mobile offcanvas menu */
+.offcanvas {
+  max-width:70% !important;
+}
+.offcanvas-body ul {
+  border:none !important;
+}
+
+.offcanvas-body .nav-link.active {
+  color: var(--bs-primary) !important;
+}
+[data-bs-theme="dark"] .offcanvas-body .nav-link {
+  color: #ddd !important;
+}
+[data-bs-theme="dark"] .offcanvas-body .nav-link.active {
+  color: var(--bs-primary) !important;
+}
+
+/* Darkmode Fix für Navbar & Footer */
+[data-bs-theme="dark"] .navbar {
+  background-color: var(--bs-dark) !important;
+}
+[data-bs-theme="dark"] .footer {
+  background-color: var(--bs-dark) !important;
+  color: #ddd;
+}
+
+/* darkomde fix für toasts */
+[data-bs-theme="dark"] .toast-header.bg-warning {
+  background-color: var(--bs-warning-border-subtle) !important;
+}
+[data-bs-theme="dark"] .toast-header.bg-info {
+  background-color: var(--bs-info-border-subtle) !important;
+}
+[data-bs-theme="dark"] .toast-header.bg-success {
+  background-color: var(--bs-success-border-subtle) !important;
+}
+[data-bs-theme="dark"] .toast-header.bg-danger {
+  background-color: var(--bs-danger-border-subtle) !important;
+}
+
+/* alert icons */
+svg.bi {
+  width: 16px;
+  height: 16px;
+}
+
+/**
+* Session Timeout Styles
+*/
+.sessionTimeout {
+  position: fixed;
+  z-index: 1;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: #d8d8d8;
+  background-color: rgba(0, 0, 0, 0.7);
+}
+
+.sessionTimeout-modal {
+  background-color: #ffffff;
+  margin: 10% auto;
+  padding: 0.2rem;
+  width: 50%;
+}
+
+[data-bs-theme="dark"] .sessionTimeout-modal {
+  background-color: #333;
+  margin: 10% auto;
+  padding: 0.2rem;
+  width: 50%;
+}
+
+.sessionTimeout-title {
+  background-color: var(--bs-primary);
+  font-weight: bold;
+  padding: 0.4em 1em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: #ffffff;
+}
+
+.sessionTimeout-content {
+  font-size: 22px;
+  text-align: center;
+  margin: 1em 0 2em 0;
+  color: #333;
+}
+
+[data-bs-theme="dark"] .sessionTimeout-content {
+  color: #ffffff;
+}
+
+.sessionTimeout-buttons {
+  text-align: right;
+  margin-bottom: 15px;
+  margin-right: 15px;
+}
+
+.sessionTimeout-btn {
+  font-size: 16px;
+  border: none;
+  padding: 0.5em 0.75em;
+  margin: 0 0.25em;
+  background-color: #6c757d;
+  color: #ffffff;
+  cursor: pointer;
+}
+
+.sessionTimeout-btn:hover {
+  background-color: #5a6268;
+}
+
+.sessionTimeout-btn--primary {
+  background-color: #007bff;
+}
+
+.sessionTimeout-btn--primary:hover {
+  background-color: #0069d9;
+}
+
+.sessionTimeout--hidden {
+  display: none;
+}
+
+/* Medienabfrage für mobile Ansicht */
+@media (max-width: 767px) {
+  .footer .container {
+    width: 95%;
+  }
+  .container {
+    width: 95%;
+  }
+  .desktop-table {
+    display: none;
+  }
+  .desktop-pager-label {
+    display: none;
+  }
+  .desktop-pager-summary {
+    display: none;
+  }
+  .qr-container {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+  .doubbleDivContainer .divLeft {
+    display: none;
+  }
+  .usrPageSize {
+    display:none !important;
+  }
+}
+
+/* aändern des modalen dialogs und toast messages in ein bottom flyout in der mobilen ansicht */
+@media (max-width: 767.98px) {
+  .modal.fade.flyout .modal-content {
+    margin: 0 auto !important;
+    bottom: 0 !important;
+    position: absolute !important;
+    width: 100% !important;
+    transform: translateY(100%);
+    transition: transform 0.3s ease-out;
+    border-radius: 0 !important;
+    border-top-left-radius: 10px !important;
+    border-top-right-radius: 10px !important;
+  }
+
+  .modal.fade.flyout.show .modal-content {
+    transform: translateY(0) !important;
+  }
+  .modal-dialog {
+    margin: 0 auto !important;
+    bottom: 0 !important;
+    position: absolute !important;
+    width: 100% !important;
+    height: auto !important;
+    z-index: 1055; /* Sicherstellen, dass es über anderen Elementen liegt */
+  }
+  .toast.flyout {
+    position: fixed !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    margin: 0 !important;
+    border-radius: 0 !important;
+    border-top-left-radius: 10px !important;
+    border-top-right-radius: 10px !important;
+    transform: translateY(100%);
+    transition: transform 0.3s ease-out;
+    z-index: 1055; /* Sicherstellen, dass es über anderen Elementen liegt */
+  }
+
+  .toast.flyout.show {
+    transform: translateY(0) !important;
+  }
+}

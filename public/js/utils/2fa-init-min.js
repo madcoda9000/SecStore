@@ -1,0 +1,1 @@
+document.addEventListener("DOMContentLoaded",(function(){const e=document.getElementById("2fa-messages");e&&(window.messages={error1:e.getAttribute("data-error1")}),window.location.search.includes("debug=1")}));

@@ -1,0 +1,101 @@
+{extends '../_mainLayout.latte'}
+
+{block content}
+
+
+<div class="container py-4" style="flex:1">
+<h1 class="mb-5"><span class="bi bi-person-fill-add">&nbsp;{trans('user.new.title')}..</h1>
+    <form id="userForm" class="needs-validation" novalidate>
+        <input type="hidden" name="csrf_token" value="{$_SESSION['csrf_token']}">
+
+        <div class="mb-3">
+            <label for="firstname" class="form-label">{trans('user.firstname')}</label>
+            <input type="text" class="form-control" id="firstname" name="firstname" required>
+            <div class="invalid-feedback">{trans('user.firstname.error')}</div>
+        </div>
+        
+        <div class="mb-3">
+            <label for="lastname" class="form-label">{trans('user.lastname')}</label>
+            <input type="text" class="form-control" id="lastname" name="lastname" required>
+            <div class="invalid-feedback">{trans('user.lastname.error')}</div>
+        </div>
+        
+        <div class="mb-3">
+            <label for="email" class="form-label">{trans('user.email')}</label>
+            <input type="email" class="form-control" id="email" name="email" required>
+            <div class="invalid-feedback">{trans('user.email.error')}.</div>
+        </div>
+        
+        <div class="mb-3">
+            <label for="username" class="form-label">{trans('user.username')}</label>
+            <input type="text" class="form-control" id="username" name="username" required>
+            <div class="invalid-feedback">{trans('user.username.error')}</div>
+        </div>
+        <div class="alert alert-info d-flex align-items-center" role="alert">
+            <svg class="bi flex-shrink-0 me-2" role="img" aria-label="Info:"><use xlink:href="#info-fill"/></svg>
+            <div>
+                {trans('user.password.hint')}
+            </div>
+        </div>
+        <label for="password" class="form-label">{trans('user.password')}</label>
+        <div class="input-group mb-3">            
+            <input type="password" class="form-control" id="password" name="password" required>   
+            <button class="btn btn-outline-secondary" type="button" id="togglePassword">
+                <i id="togglePasswordIcon" class="bi-eye text-success"></i>
+            </button>
+            <button class="btn btn-outline-secondary" type="button" id="generatePassword">
+                <i id="generatePasswordIcon" class="bi-arrow-clockwise text-info"></i>
+            </button>         
+        </div>
+        <div class="invalid-feedback">{trans('user.password.error')}</div>
+
+        <div class="input-group mb-3">
+            <input class="form-check-input" type="checkbox" name="ldapEnabled" id="ldapEnabled">
+            <label for="ldapEnabled" class="form-check-label" style="margin-left:15px;">
+                {trans('user.ldap')}
+            </label>
+        </div> 
+        
+        <div class="mb-3">
+            <label for="status" class="form-label">{trans('user.status')}</label>
+            <select class="form-select" id="status" name="status">
+                <option value="1" selected>{trans('user.status.enabled')}</option>
+                <option value="0">{trans('user.status.disabled')}</option>
+            </select>
+        </div>
+        
+        <div class="mb-3">
+        <label class="form-label">{trans('user.role')}</label>
+        <div class="invalid-feedback d-block text-info" id="roleError" style="display: none;">{trans('user.role.hint')}</div>
+        <div id="rolesContainer" class="d-flex flex-wrap gap-2">
+            {foreach $roles as $role}
+                <span class="role-badge badge bg-secondary p-2" data-value="{$role['roleName']}" style="cursor:pointer;">
+                    {$role['roleName']}
+                </span>
+            {/foreach}
+        </div>
+        <input type="hidden" id="rolesInput" name="roles">        
+    </div>
+    <div class="d-flex justify-content-end gap-3">
+        <button type="button" class="btn btn-secondary mr-3" id="backBtn" data-action="back">{trans('user.cancel')}</button>
+        <button type="submit" class="btn btn-primary" style="width:200px;" id="submitBtn">
+            <span id="btnText">{trans('user.submit')}</span>
+            <span id="spinner" class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+        </button>
+    </div>    
+        
+    </form>
+</div>
+{* CSP-KONFORME LÖSUNG: Data-Attribute für Messages *}
+<div id="createuser-messages" 
+     data-error1="{trans('user.role.error1')}"
+     data-error2="{trans('user.role.error2')}"
+     data-error3="{trans('user.role.error3')}"
+     data-error4="{trans('user.role.error4')}"
+     style="display:none;">
+</div>
+
+{* EXTERNE SCRIPTS (CSP-konform) *}
+<script n:syntax="off" src="/js/admin/createUser.latte-min.js"></script>
+<script src="/js/utils/createuser-init-min.js"></script>  {* NEU: Ersetzt inline script *}
+{/block}

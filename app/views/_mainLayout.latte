@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+    <head>        
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>{$title ? $title.' - '}</title>
+        <!-- <link rel="stylesheet" href="/bootstrap-5.3.3-dist/css/bootstrap.min.css" /> -->
+        <link href="/css/fastbootstrap.min.css" rel="stylesheet">
+        <link rel="stylesheet" href="/bootstrap-icons-1.11.3/font/bootstrap-icons.min.css" /> 
+        <link rel="stylesheet" href="/css/_mainLayout.latte.css" />
+        <script src="/js/startDarkmode-min.js"></script>
+    </head>
+    <body> 
+        <!-- toast container -->
+        <div id="toastContainer" class="toast-container position-fixed bottom-0 end-0 p-3"></div>
+
+        {include '_topbar.latte', user => $user}
+        
+        {block content}{/block}    
+
+        <!-- Footer -->
+        <footer class="footer bg-dark text-light">
+            <div class="container py-3">
+                <div class="doubbleDivContainer">
+                    <div class="divLeft text-secondary" >
+                        <p>{trans('footer.copyright')}</p>
+                    </div>
+                    <div class="divRight text-secondary" style="color:var(--bs-secondary-text);">
+                        {trans('footer.sessionTimeout')}&nbsp;<span id="remainingSessionTime" class="text-warning">00:00:00</span>
+                    </div>
+                </div>                 
+            </div>
+        </footer>
+            
+        <!-- Bootstrap JS  -->
+        <script src="/bootstrap-5.3.3-dist/js/bootstrap.bundle.min.js" defer></script>
+
+        <!-- bootstrap toasts -->
+        <script n:syntax="off" src="/js/bootstrapToasts-min.js"></script>
+
+        <!-- bootstrap popups -->
+        <script src="/js/bootstrapPopup-min.js"></script>
+
+        <!-- darkmode script -->
+        <script src="/js/darkmode-min.js"></script>
+
+        <!-- session timeout script -->
+        <script type="module" src="/js/sessionTimeout-min.js"></script>
+
+        <!-- configure and run sessiontimeout notification -->
+        <div id="session-data" data-session-timeout="{$sessionTimeout}"></div>
+        <script src="/js/_mainlayout.latte-min.js"></script>
+        
+    </body>
+</html>

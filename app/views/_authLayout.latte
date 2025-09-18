@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+    <head>        
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>{$title ? $title.' - '}</title>
+        <!-- <link rel="stylesheet" href="/bootstrap-5.3.3-dist/css/bootstrap.min.css" /> -->
+        <link href="/css/fastbootstrap.min.css" rel="stylesheet">
+        <link rel="stylesheet" href="/bootstrap-icons-1.11.3/font/bootstrap-icons.min.css" />  
+        <link rel="stylesheet" href="/css/_authLayout.latte-min.css" />
+        <script src="/js/startDarkmode-min.js"></script>        
+    </head>
+    <body>
+        <noscript>
+            <div id="no-script" class="container">
+                <style type="text/css">
+                    .darkmode-toggle { display:none !important; }
+                    .block_container { display:none !important; }
+                </style>
+                <div class="card">
+                    <img src="/img/noscript_banner_hard_edges.png" class="card-img-top" />
+                    <div class="card-body">
+                        <h4>Oh Noes! I need JavaScript to run this app.</h4>
+                        <p class="card-text">
+                        This Web application relies on Javascript to function, please enable it in your browser settings and reload the page.
+                        99% of websites use JavaScript, so you should be able to enable it without any issues.
+
+                        If you don't know how to enable JavaScript, you can use the link below....
+                        </p>
+                        <div>
+                            <a class="btn btn-primary" href="https://www.enable-javascript.com/">Learn More</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </noscript>
+        <div class="block_container">
+            {block content}{/block}    
+        </div> 
+        <!-- Darkmode Toggle -->
+        <button id="darkmodeToggle" class="darkmode-toggle">
+            <i id="darkmodeIcon" class="bi bi-moon-fill text-white"></i>
+        </button>
+        
+        <!-- Bootstrap JS  -->
+        <script src="/bootstrap-5.3.3-dist/js/bootstrap.bundle.min.js" defer></script>
+
+        <!-- darkmode script -->
+        <script src="/js/darkmode-min.js"></script>>
+    </body>
+</html>

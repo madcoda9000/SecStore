@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="{$lang}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{$title}</title>
+    <link rel="stylesheet" href="/css/fastbootstrap.css">
+    <style>
+        body {
+            background: #fff
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        .rate-limit-container {
+            max-width: 600px;
+            margin: 100px auto;
+            padding: 40px;
+            text-align: center;
+            background: var(--bs-danger);
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+        }
+        
+        .rate-limit-icon {
+            font-size: 4rem;
+            color: #fff
+            margin-bottom: 20px;
+        }
+        
+        .rate-limit-title {
+            font-size: 2rem;
+            color: #fff;
+            margin-bottom: 15px;
+        }
+        
+        .rate-limit-message {
+            color: #fff;
+            margin-bottom: 25px;
+            line-height: 1.6;
+        }
+        
+        .retry-info {
+            background: var(--warning-bg);
+            border: 1px solid var(--warning-border);
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            color:#fff
+        }
+        
+        .countdown-timer {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #fff;
+            margin: 10px 0;
+        }
+        
+        .limit-details {
+            background: var(--info-bg);
+            border-radius: 8px;
+            padding: 15px;
+            margin: 20px 0;
+            font-size: 0.9rem;
+            color: #fff;
+        }
+        
+        @media (max-width: 768px) {
+            .rate-limit-container {
+                margin: 20px;
+                padding: 20px;
+            }
+            
+            .rate-limit-title {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="rate-limit-container">
+        <div class="rate-limit-icon">⏱️</div>
+        
+        <h1 class="rate-limit-title">
+            {$title}
+        </h1>
+        
+        <p class="rate-limit-message">
+            {$rateLimitmsg2}
+        </p>
+        
+        <div class="retry-info">
+            <p><strong>{$rateLimitmsg3}</strong></p>
+            <div class="countdown-timer" id="countdown">
+                {$retry_after} {trans('seconds')}
+            </div>
+            <p>{$rateLimitmsg4}</p>
+        </div>
+    </div>
+
+    <script>
+        // Countdown Timer
+        let timeLeft = {$retry_after};
+        const countdownElement = document.getElementById('countdown');
+        
+        function updateCountdown() {
+            if (timeLeft <= 0) {
+                countdownElement.innerHTML = '{trans("refreshing")}...';
+                // Seite automatisch neu laden
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1000);
+                return;
+            }
+            
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
+            
+            if (minutes > 0) {
+                countdownElement.innerHTML = minutes + 'm ' + seconds + 's';
+            } else {
+                countdownElement.innerHTML = seconds + 's';
+            }
+            
+            timeLeft--;
+        }
+        
+        // Initial Update
+        updateCountdown();
+        
+        // Update every second
+        const timer = setInterval(updateCountdown, 1000);
+        
+        // Clear timer when leaving page
+        window.addEventListener('beforeunload', () => {
+            clearInterval(timer);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,113 @@
+{extends '../_mainLayout.latte'}
+
+{block content}
+
+<div class="container py-4" style="flex:1">
+<h1 class="mb-5"><span class="bi bi-person-lines-fill">&nbsp;{trans('roles.title')}</h1>
+    <div class="d-flex justify-content-between mb-3">
+        <div>
+            <label for="pageSize" class="me-2">{trans('pager.pageSize')}:</label>
+            <select id="pageSize" class="form-select d-inline w-auto">
+                <option value="10">10</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+            </select>
+        </div>
+        <div>
+            <div class="input-group">
+                <input type="text" id="search" class="form-control" placeholder="{trans('roles.search')}">
+                <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addRoleModal"><i class="bi-person-add"></i>&nbsp;{trans('roles.new')}</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- lade indicator -->
+    <div id="loadingSpinner" style="display: none; text-align: center;">
+        <div class="spinner-border" role="status">
+            <span class="visually-hidden">{trans('roles.loading')}</span>
+        </div>
+    </div>
+
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>{trans('roles.name')}</th>
+                <th>{trans('roles.actions')}</th>
+            </tr>
+        </thead>
+        <tbody id="rolesTableBody">
+        </tbody>
+    </table>
+
+    <div class="d-flex justify-content-between">
+        <span id="paginationInfo">Seite 1 von X</span>
+        <nav>
+            <ul class="pagination" id="pagination"></ul>
+        </nav>
+    </div>
+
+    
+</div>
+
+{* Modal für neue Rolle *}
+<div class="modal fade flyout" id="addRoleModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">{trans('roles.modal.new.title')}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <input type="text" id="newRoleName" class="form-control" placeholder="{trans('roles.modal.new.name')}">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{trans('roles.modal.new.btn.cancel')}</button>
+                {* ❌ VORHER: <button type="button" class="btn btn-primary" onclick="addRole()">{trans('roles.modal.new.btn.create')}</button> *}
+                {* ✅ NACHHER: CSP-konforme Lösung *}
+                <button type="button" class="btn btn-primary" id="addRoleBtn">{trans('roles.modal.new.btn.create')}</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{* Modal für Bestätigung *}
+<div class="modal fade flyout" id="confirmDeleteModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">{trans('roles.modal.delete.title')}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p id="deleteMessage"></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{trans('roles.modal.new.btn.cancel')}</button>
+                <button type="button" class="btn btn-danger" id="deleteConfirmBtn">{trans('roles.modal.delete.btn.delete')}</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{* CSP-KONFORME LÖSUNG: Data-Attribute für Messages *}
+<div id="roles-messages" 
+     data-msg1="{trans('roles.modal.delete.btn.delete')}"
+     data-msg2="{trans('roles.error1')}"
+     data-msg3="{trans('roles.error2')}"
+     data-msg4="{trans('pager.page')}"
+     data-msg5="{trans('pager.of')}"
+     data-msg6="{trans('roles.role')}"
+     data-msg7="{trans('roles.success')}"
+     data-msg8="{trans('roles.error1')}"
+     data-msg9="{trans('roles.qs.1')}"
+     data-msg10="{trans('roles.qs.2')}"
+     data-msg11="{trans('roles.success2')}"
+     style="display:none;">
+</div>
+
+{* EXTERNE SCRIPTS (CSP-konform) *}
+<script n:syntax="off" src="/js/admin/roles.latte-min.js"></script>
+<script src="/js/utils/roles-init-min.js"></script>
+
+{/block}

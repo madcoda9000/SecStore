@@ -1,0 +1,347 @@
+{extends '../_mainLayout.latte'}
+
+{block content}
+
+<div class="container py-4" style="flex:1">
+    <h1 class="mb-5">
+        <span class="bi bi-exclamation-triangle text-warning">&nbsp;</span>{trans('rate_limit.violations.title')}
+    </h1>
+
+    <!-- Statistics Overview -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <div class="h2 text-primary mb-2">{$stats['total_violations']}</div>
+                    <div class="text-muted">{trans('rate_limit.violations.total')}</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <div class="h2 text-warning mb-2">{$stats['violations_last_hour']}</div>
+                    <div class="text-muted">{trans('rate_limit.violations.last_hour')}</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <div class="h2 text-danger mb-2">{$stats['violations_last_24h']}</div>
+                    <div class="text-muted">{trans('rate_limit.violations.last_24h')}</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <div class="h2 text-info mb-2">{count($stats['unique_identifiers'])}</div>
+                    <div class="text-muted">{trans('rate_limit.violations.unique_ips')}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filters and Controls -->
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-body">
+                    <div class="row align-items-end">
+                        <div class="col-md-3">
+                            <label for="typeFilter" class="form-label">{trans('rate_limit.filter_by_type')}</label>
+                            <select class="form-select" id="typeFilter">
+                                <option value="">{trans('common.all')}</option>
+                                {foreach $stats['by_type'] as $type => $count}
+                                <option value="{$type}">{$type} ({$count})</option>
+                                {/foreach}
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label for="timeFilter" class="form-label">{trans('rate_limit.filter_by_time')}</label>
+                            <select class="form-select" id="timeFilter">
+                                <option value="all">{trans('rate_limit.time.all')}</option>
+                                <option value="1h">{trans('rate_limit.time.last_hour')}</option>
+                                <option value="24h" selected>{trans('rate_limit.time.last_24h')}</option>
+                                <option value="7d">{trans('rate_limit.time.last_7d')}</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label for="searchFilter" class="form-label">{trans('rate_limit.search_identifier')}</label>
+                            <input type="text" class="form-control" id="searchFilter" placeholder="{trans('rate_limit.search_placeholder')}">
+                        </div>
+                        <div class="col-md-3">
+                            <button type="button" class="btn btn-primary w-100" id="applyFilters">
+                                <span class="bi bi-funnel"></span> {trans('common.apply_filters')}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>{trans('rate_limit.auto_refresh')}</span>
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="autoRefresh" checked>
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <button type="button" class="btn btn-outline-secondary btn-sm" id="refreshData">
+                            <span class="bi bi-arrow-clockwise"></span> {trans('common.refresh')}
+                        </button>
+                        <button type="button" class="btn btn-outline-danger btn-sm" id="clearViolations">
+                            <span class="bi bi-trash"></span> {trans('rate_limit.clear_violations')}
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Top Violators -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="mb-0">
+                        <span class="bi bi-trophy"></span> {trans('rate_limit.top_violators')}
+                    </h6>
+                </div>
+                <div class="card-body">
+                    {if count($stats['unique_identifiers']) > 0}
+                        <div class="table-responsive">
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>{trans('rate_limit.identifier')}</th>
+                                        <th class="text-center">{trans('rate_limit.violations_count')}</th>
+                                        <th class="text-center">{trans('common.actions')}</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {foreach $stats['unique_identifiers'] as $identifier => $count}
+                                    {if $iterator->counter <= 10}
+                                    <tr>
+                                        <td>
+                                            <code class="small">{$identifier|truncate:20}</code>
+                                        </td>
+                                        <td class="text-center">
+                                            <span class="badge bg-{if $count >= 10}danger{elseif $count >= 5}warning{else}secondary{/if}">
+                                                {$count}
+                                            </span>
+                                        </td>
+                                        <td class="text-center">
+                                            <button type="button" class="btn btn-sm btn-outline-primary reset-limit-btn" 
+                                                    data-identifier="{$identifier}">
+                                                <span class="bi bi-arrow-clockwise"></span>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    {/if}
+                                    {/foreach}
+                                </tbody>
+                            </table>
+                        </div>
+                    {else}
+                        <div class="text-center text-muted py-3">
+                            <span class="bi bi-info-circle"></span>
+                            <p class="mb-0">{trans('rate_limit.no_violators')}</p>
+                        </div>
+                    {/if}
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="mb-0">
+                        <span class="bi bi-bar-chart"></span> {trans('rate_limit.violations_by_type')}
+                    </h6>
+                </div>
+                <div class="card-body">
+                    {if count($stats['by_type']) > 0}
+                        <div class="table-responsive">
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>{trans('rate_limit.violation_type')}</th>
+                                        <th class="text-center">{trans('common.count')}</th>
+                                        <th>{trans('rate_limit.percentage')}</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {foreach $stats['by_type'] as $type => $count}
+                                    <tr>
+                                        <td>
+                                            <span class="badge bg-secondary">{$type}</span>
+                                        </td>
+                                        <td class="text-center">{$count}</td>
+                                        <td>
+                                            {var $percentage = round(($count / $stats['total_violations']) * 100, 1)}
+                                            <div class="progress" style="height: 8px;">
+                                                <div class="progress-bar" role="progressbar" 
+                                                     style="width: {$percentage}%" 
+                                                     aria-valuenow="{$percentage}" aria-valuemin="0" aria-valuemax="100">
+                                                </div>
+                                            </div>
+                                            <small class="text-muted">{$percentage}%</small>
+                                        </td>
+                                    </tr>
+                                    {/foreach}
+                                </tbody>
+                            </table>
+                        </div>
+                    {else}
+                        <div class="text-center text-muted py-3">
+                            <span class="bi bi-info-circle"></span>
+                            <p class="mb-0">{trans('rate_limit.no_violations_by_type')}</p>
+                        </div>
+                    {/if}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Violations Log -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h6 class="mb-0">
+                        <span class="bi bi-list-ul"></span> {trans('rate_limit.violations_log')}
+                    </h6>
+                    <div class="d-flex align-items-center">
+                        <small class="text-muted me-3">{trans('rate_limit.showing')} {count($violations)} {trans('rate_limit.violations')}</small>
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="liveUpdate" checked>
+                            <label class="form-check-label" for="liveUpdate">
+                                <small>{trans('rate_limit.live_update')}</small>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body p-0">
+                    {if count($violations) > 0}
+                        <div class="table-responsive">
+                            <table class="table table-sm table-hover mb-0" id="violationsTable">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>{trans('common.time')}</th>
+                                        <th>{trans('rate_limit.identifier')}</th>
+                                        <th>{trans('rate_limit.violation_type')}</th>
+                                        <th class="text-center">{trans('common.actions')}</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="violationsTableBody">
+                                    {foreach $violations as $violation}
+                                    <tr data-identifier="{$violation['identifier']}" data-type="{$violation['type']}">
+                                        <td>
+                                            <small class="text-muted">
+                                                {$violation['timestamp']}
+                                                <br><span class="text-success">{$violation['time']|date:'H:i:s'}</span>
+                                            </small>
+                                        </td>
+                                        <td>
+                                            <code class="small">{$violation['identifier']|truncate:30}</code>
+                                            <br><small class="text-muted">{$violation['identifier']|substr:0,8}...</small>
+
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-{$violation['type'] === 'login' ? 'danger' : ($violation['type'] === 'admin' ? 'warning' : 'secondary')}">
+
+                                                {$violation['type']}
+                                            </span>
+                                        </td>
+                                        <td class="text-center">
+                                            <div class="btn-group btn-group-sm" role="group">
+                                                <button type="button" class="btn btn-outline-primary reset-limit-btn" 
+                                                        data-identifier="{$violation['identifier']}" 
+                                                        data-type="{$violation['type']}"
+                                                        title="{trans('rate_limit.reset_limit')}">
+                                                    <span class="bi bi-arrow-clockwise"></span>
+                                                </button>
+                                                <button type="button" class="btn btn-outline-info view-details-btn" 
+                                                        data-identifier="{$violation['identifier']}"
+                                                        title="{trans('rate_limit.view_details')}">
+                                                    <span class="bi bi-info-circle"></span>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {/foreach}
+                                </tbody>
+                            </table>
+                        </div>
+                    {else}
+                        <div class="text-center text-muted py-5">
+                            <span class="bi bi-shield-check display-1"></span>
+                            <h5 class="mt-3">{trans('rate_limit.no_violations')}</h5>
+                            <p class="mb-0">{trans('rate_limit.no_violations_description')}</p>
+                        </div>
+                    {/if}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Details Modal -->
+<div class="modal fade" id="detailsModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <span class="bi bi-info-circle"></span> {trans('rate_limit.violation_details')}
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="detailsModalBody">
+                <!-- Content wird via JavaScript geladen -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    {trans('common.close')}
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Toast Messages -->
+<div class="toast-container position-fixed bottom-0 end-0 p-3">
+    <div id="successToast" class="toast" role="alert">
+        <div class="toast-header">
+            <span class="bi bi-check-circle text-success me-2"></span>
+            <strong class="me-auto">{trans('common.success')}</strong>
+            <button type="button" class="btn-close" data-bs-dismiss="toast"></button>
+        </div>
+        <div class="toast-body" id="successMessage"></div>
+    </div>
+    
+    <div id="errorToast" class="toast" role="alert">
+        <div class="toast-header">
+            <span class="bi bi-exclamation-circle text-danger me-2"></span>
+            <strong class="me-auto">{trans('common.error')}</strong>
+            <button type="button" class="btn-close" data-bs-dismiss="toast"></button>
+        </div>
+        <div class="toast-body" id="errorMessage"></div>
+    </div>
+</div>
+
+<script>
+    const messages = {
+        resetSuccess: {trans('rate_limit.reset_success')},
+        resetError: {trans('rate_limit.reset_error')},
+        clearConfirm: {trans('rate_limit.clear_confirm')},
+        clearSuccess: {trans('rate_limit.clear_success')},
+        clearError: {trans('rate_limit.clear_error')},
+        loadError: {trans('rate_limit.load_error')},
+        noData: {trans('rate_limit.no_data')}
+    };
+</script>
+<script n:syntax="off" src="/js/admin/rateLimitViolations.js"></script>
+{/block}

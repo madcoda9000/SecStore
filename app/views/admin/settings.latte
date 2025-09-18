@@ -1,0 +1,254 @@
+{extends '../_mainLayout.latte'}
+
+{block content}
+
+   <!-- Main Content -->
+    <div class="container py-4" style="flex:1">
+        <h1 class="mb-5"><span class="bi bi-gear-fill">&nbsp;{trans('settings.title')}</h1>
+        {ifset $success}
+            <div class="alert alert-success">
+                <i data-lucide="check-circle"></i> {$success}
+            </div>
+        {/ifset}
+
+        {ifset $error}
+            <div class="alert alert-error">
+                <i data-lucide="x-circle"></i> {$error}
+            </div>
+        {/ifset}
+
+        {ifset $message}
+            <div class="alert alert-info">
+                <i data-lucide="info"></i> {$message}
+            </div>
+        {/ifset}
+
+        {if !$configWritable}
+            <div class="alert alert-warning" role="alert">
+                {trans('settings.error4')}
+            </div>
+        {/if}
+
+        <div class="accordion" id="accordionExample">
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
+                    <i class="bi-envelope-fill" style="margin-right:10px;"></i>{trans('settings.title.mail')}...
+                </button>
+                </h2>
+                <div id="collapseOne" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
+                <div class="accordion-body">
+                    <form id="mailForm" method="post" action="/admin/updateMailSettings" style="padding:10px;">
+                        <div class="mb-3">
+                            <label for="host">{trans('settings.mail.host')}:</label>
+                            <input class="form-control" type="text" name="host" id="host" value="{$mail['host']}" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="username">Benutz{trans('settings.mail.username')}ername:</label>
+                            <input type="text" class="form-control" id="username" name="username" value="{$mail['username']}" autocomplete="on" required>
+                        </div>
+
+                        <label for="mailpw">{trans('settings.mail.password')}:</label>
+                        <div class="input-group mb-3">                                
+                            <input type="password" id="mailpw" name="password" value="{$mail['password']}" class="form-control" required>
+                            <button type="button" id="togglePassword" class="btn btn-outline-secondary" title="toggle password visibilty..">
+                                <i id="eyeIcon" class="bi-eye text-success"></i>
+                            </button>
+                        </div>
+
+                        <div class="mb-3">
+
+                        <label for="encryption">{trans('settings.mail.encryption')}:</label>
+                        <select class="form-select" aria-label="smtp encryption" id="encryption" name="encryption">
+                            <option value="tls" n:attr="selected: $mail['encryption'] === 'tls'">TLS</option>
+                            <option value="ssl" n:attr="selected: $mail['encryption'] === 'ssl'">SSL</option>
+                        </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="port">{trans('settings.mail.port')}:</label>
+                            <input class="form-control" type="number" name="port" id="port" value="{$mail['port']}" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="fromEmail">{trans('settings.mail.from')}:</label>
+                            <input class="form-control" type="email" name="fromEmail" id="fromEmail" value="{$mail['fromEmail']}" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="fromName">{trans('settings.mail.fromName')}:</label>
+                            <input class="form-control" type="text" name="fromName" id="fromName" value="{$mail['fromName']}" required>
+                        </div>
+
+                        <div class="form-check mb-3">                                
+                            <input class="form-check-input" type="checkbox" name="enableWelcomeMail" id="enableWelcomeMail" n:attr="checked: $mail['enableWelcomeMail']">
+                            <label for="enableWelcomeMail" class="form-check-label">
+                            {trans('settings.mail.welcome')}
+                            </label>
+                        </div>
+                        <input type="hidden" name="csrf_token" value="{$_SESSION['csrf_token']}">
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">{trans('settings.mail.submit')}</button>
+                    </form>
+                </div>
+            </div>
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                    <i class="bi-box2-fill" style="margin-right:10px;"></i>{trans('settings.title.app')}
+                </button>
+                </h2>
+                <div id="collapseTwo" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
+                    <div class="accordion-body">
+                        <form id="applicationForm" method="post" action="/admin/updateApplicationSettings" style="padding:10px;">
+                            <div class="mb-3">
+                                <label for="appUrl" appUrl>{trans('settings.app.url')}:</label>
+                                <input class="form-control" type="text" name="appUrl" id="appUrl" value="{$application['appUrl']}" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="sessionTimeout">{trans('settings.app.sessionTimeout')}:</label>
+                                <input class="form-control" type="number" name="sessionTimeout" id="sessionTimeout" value="{$application['sessionTimeout']}" required>
+                            </div>
+                            <div class="form-check mb-3">                                
+                                <input class="form-check-input" type="checkbox" name="allowPublicRegister" id="allowPublicRegister" n:attr="checked: $application['allowPublicRegister']">
+                                <label for="allowPublicRegister" class="form-check-label">
+                                {trans('settings.app.allowPublicRegister')}
+                                </label>
+                            </div>
+                            <div class="form-check mb-3">                                
+                                <input class="form-check-input" type="checkbox" name="allowPublicPasswordReset" id="allowPublicPasswordReset" n:attr="checked: $application['allowPublicPasswordReset']">
+                                <label for="allowPublicPasswordReset" class="form-check-label">
+                                {trans('settings.app.allowPublicPasswordReset')}
+                                </label>
+                            </div>
+                            <input type="hidden" name="csrf_token" value="{$_SESSION['csrf_token']}">
+                            <button class="btn btn-primary w-100" type="submit">{trans('settings.app.submit')}</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                    <i class="bi-shield-fill-exclamation" style="margin-right:10px;"></i>{trans('settings.title.brute')}
+                </button>
+                </h2>
+                <div id="collapseThree" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
+                <div class="accordion-body">
+                    <form id="bruteForceForm" method="post" action="/admin/updateBruteforceSettings" style="padding:10px;">
+                        <div class="form-check mb-3">                                
+                            <input class="form-check-input" type="checkbox" name="enableBruteForce" id="enableBruteForce" n:attr="checked: $bruteForceSettings['enableBruteForce']">
+                            <label for="enableBruteForce" class="form-check-label">
+                                {trans('settings.brute.enable')}
+                            </label>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="lockTime">{trans('settings.brute.lockoutTime')}:</label>
+                            <input class="form-control" type="number" name="lockTime" id="lockTime" value="{$bruteForceSettings['lockTime']}" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="maxAttempts">{trans('settings.brute.maxAttempts')}:</label>
+                            <input class="from-control" type="number" name="maxAttempts" id="maxAttempts" value="{$bruteForceSettings['maxAttempts']}" required>
+                        </div>
+
+                        <input type="hidden" name="csrf_token" value="{$_SESSION['csrf_token']}">
+                        <button class="btn btn-primary w-100 ,t-2" type="submit">{trans('settings.brute.submit')}</button>
+                    </form>
+                </div>
+                </div>
+            </div>
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapsefour" aria-expanded="false" aria-controls="collapsefour">
+                    <i class="bi-postcard-fill" style="margin-right:10px;"></i>{trans('settings.title.log')}
+                </button>
+                </h2>
+                <div id="collapsefour" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
+                <div class="accordion-body">
+                    <form id="loggingForm" method="post" action="/admin/updateLogSettings" style="padding:10px;">
+                        <div class="form-check mb-3">                                
+                            <input class="form-check-input" type="checkbox" name="enableSystemLogging" id="enableSystemLogging" n:attr="checked: $logging['enableSystemLogging']">
+                            <label for="enableSystemLogging" class="form-check-label">
+                                {trans('settings.log.enableSystem')}
+                            </label>
+                        </div>
+                        <div class="form-check mb-3">                                
+                            <input class="form-check-input" type="checkbox" name="enableMailLogging" id="enableMailLogging" n:attr="checked: $logging['enableMailLogging']">
+                            <label for="enableMailLogging" class="form-check-label">
+                                {trans('settings.log.enableMail')}
+                            </label>
+                        </div>
+                        <div class="form-check mb-3">                                
+                            <input class="form-check-input" type="checkbox" name="enableAuditLogging" id="enableAuditLogging" n:attr="checked: $logging['enableAuditLogging']">
+                            <label for="enableAuditLogging" class="form-check-label">
+                                {trans('settings.log.enableAccess')}
+                            </label>
+                        </div>
+                        <div class="alert alert-warning d-flex align-items-center" role="alert">
+                            <svg class="bi flex-shrink-0 me-2" role="img" aria-label="Warning:"><use xlink:href="#exclamation-triangle-fill"/></svg>
+                            <div>
+                                {trans('settings.log.note1')}
+                            </div>
+                        </div>
+                        <div class="form-check mb-3">                                
+                            <input class="form-check-input" type="checkbox" name="enableRequestLogging" id="enableRequestLogging" n:attr="checked: $logging['enableRequestLogging']">
+                            <label for="enableRequestLogging" class="form-check-label">
+                                {trans('settings.log.enableRequest')}
+                            </label>
+                        </div>
+                        <div class="alert alert-warning d-flex align-items-center" role="alert">
+                            <svg class="bi flex-shrink-0 me-2" role="img" aria-label="Warning:"><use xlink:href="#exclamation-triangle-fill"/></svg>
+                            <div>
+                                {trans('settings.log.note2')}
+                            </div>
+                        </div>
+                        <div class="form-check mb-3">    
+                            <input class="form-check-input" type="checkbox" name="enableSqlLogging" id="enableSqlLogging" n:attr="checked: $logging['enableSqlLogging']">                            
+                            <label for="enableSqlLogging" class="form-check-label">
+                                {trans('settings.log.enableDatabase')}
+                            </label>
+                        </div>
+                        <input type="hidden" name="csrf_token" value="{$_SESSION['csrf_token']}">
+                        <button class="btn btn-primary w-100 ,t-2" type="submit">{trans('settings.log.submit')}</button>
+                    </form>
+                </div>
+                </div>
+            </div>
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapsefive" aria-expanded="false" aria-controls="collapsefive">
+                    <i class="bi-hdd-network-fill" style="margin-right:10px;"></i>{trans('settings.title.ldap')}
+                </button>
+                </h2>
+                <div id="collapsefive" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
+                <div class="accordion-body">
+                    <form id="ldapForm" method="post" action="/admin/updateLdapSettings" style="padding:10px;">
+               
+                        <div class="mb-3">
+                            <label for="ldapPort">{trans('settings.ldap.port')}:</label>
+                            <input class="form-control" type="number" name="ldapPort" id="ldapPort" value="{$ldap['ldapPort']}" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="ldapHost">{trans('settings.ldap.host')}:</label>
+                            <input class="from-control" type="text" name="ldapHost" id="ldapHost" value="{$ldap['ldapHost']}" required>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="domainPrefix">{trans('settings.ldap.prefix')}:</label>
+                            <input class="from-control" type="text" name="domainPrefix" id="domainPrefix" value="{$ldap['domainPrefix']}" required>
+                        </div>
+
+                        <input type="hidden" name="csrf_token" value="{$_SESSION['csrf_token']}">
+                        <button class="btn btn-primary w-100 ,t-2" type="submit">{trans('settings.ldap.submit')}</button>
+                    </form>
+                </div>
+                </div>
+            </div>
+        </div>    
+    </div>
+<script src="/js/admin/settings.latte-min.js"></script>
+{/block}

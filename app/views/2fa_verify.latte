@@ -1,0 +1,66 @@
+{extends '_authLayout.latte'}
+
+{block content}
+    <style>
+    .otp-container {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin: 15px 0;
+    }
+    </style>
+    <div class="container">
+        <div class="card p-4 shadow-sm login-card" style="width: 100%; max-width: 400px;">
+            <h3 class="text-center text-primary"><span class="bi bi-file-lock2-fill text-primary"></span>&nbsp;{trans('2faverify.title')}</h3>
+            <h6 class="text-center text-body-secondary">{trans('2faverify.subtitle')}</h6>
+            <form id="otp-form" method="POST" action="/2fa-verify" class="mt-3">
+                <div class="otp-container">
+                    <input type="text" maxlength="1" class="otp-input form-control" name="otp1" required autofocus>
+                    <input type="text" maxlength="1" class="otp-input form-control" name="otp2" required>
+                    <input type="text" maxlength="1" class="otp-input form-control" name="otp3" required>
+                    <input type="text" maxlength="1" class="otp-input form-control" name="otp4" required>
+                    <input type="text" maxlength="1" class="otp-input form-control" name="otp5" required>
+                    <input type="text" maxlength="1" class="otp-input form-control" name="otp6" required>
+                </div>
+                <input type="hidden" name="otp" id="otp-hidden">
+                <input type="hidden" name="csrf_token" value="{$_SESSION['csrf_token']}">
+                <button type="submit" class="btn btn-primary w-100 mt-8" id="otp-submit" disabled>{trans('2faverify.submit')}</button>
+            </form>
+
+            {ifset $error}
+                <p class="text-danger text-center mt-3">{$error}</p>
+            {/ifset}
+
+        <div class="p-3" style="display:flex; flex-direction:column; justify-content:center; align-items:center; gap:5;">
+            <p><a href="/logout">{trans('2faverify.loginLink')}</a></p>
+            <form method="get" action="" class="mt-3">
+                    <div class="dropdown">
+                        <button class="btn btn-outline-none dropdown-toggle d-flex align-items-center gap-2" type="button" id="langMenu" data-bs-toggle="dropdown" aria-expanded="false">
+                            <img src="/img/flags/{$lang}.svg" alt="{$lang}" width="20" height="14">
+                            <span class="d-none d-md-inline">
+                                {if $lang === 'de'}{trans('language.german')}{elseif $lang === 'en'}{trans('language.english')}{/if}
+                            </span>
+                        </button>
+                        <ul class="dropdown-menu" aria-labelledby="langMenu">
+                            <li>
+                                <a class="dropdown-item d-flex align-items-center gap-2" href="?lang=de">
+                                    <img src="/img/flags/de.svg" alt="Deutsch" width="20" height="14">
+                                    {trans('language.german')}
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item d-flex align-items-center gap-2" href="?lang=en">
+                                    <img src="/img/flags/en.svg" alt="English" width="20" height="14">
+                                    {trans('language.english')}
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </form>
+        </div>
+    </div>
+    
+
+    <script src="/js/2fa_verify.latte-min.js"></script>
+</div>
+{/block}

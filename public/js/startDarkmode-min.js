@@ -1,0 +1,1 @@
+"enabled"===localStorage.getItem("darkmode")&&document.documentElement.setAttribute("data-bs-theme","dark");
