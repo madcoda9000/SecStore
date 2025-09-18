@@ -1,5 +1,3 @@
-# Pre-commit Hook erstellen/aktualisieren
-cat << 'EOF' > .git/hooks/pre-commit
 #!/bin/bash
 echo "🔍 Prüfe auf sensitive Dateien..."
 
@@ -50,6 +48,3 @@ fi
 
 echo "✅ Keine sensitiven Dateien gefunden."
 echo "📋 Erlaubte Template-Dateien: ${ALLOWED_TEMPLATES[*]}"
-EOF
-
-chmod +x .git/hooks/pre-commit
