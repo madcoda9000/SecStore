@@ -501,12 +501,12 @@ echo "test" > config-test.php && git add config-test.php
 git commit -m "Security test"  # Sollte blockiert werden
 rm config-test.php  # Test-Datei entfernen
 
-> **🔒 Sicherheitshinweis:** Das Pre-Commit Hook blockiert automatisch Commits von:
-> - `config*.php` (außer Templates)
-> - `.env*` Dateien (außer Examples)  
-> - `*.key`, `*.credentials`, `*copy*`, `*backup*` Dateien
-> 
-> **💡 Erlaubte Template-Dateien:** `config.php_TEMPLATE`, `config.php.example`, `.env.example`
+**🔒 Sicherheitshinweis:** Das Pre-Commit Hook blockiert automatisch Commits von:
+- `config*.php` (außer Templates)
+- `.env*` Dateien (außer Examples)  
+- `*.key`, `*.credentials`, `*copy*`, `*backup*` Dateien
+
+**💡 Erlaubte Template-Dateien:** `config.php_TEMPLATE`, `config.php.example`, `.env.example`
 
 # PHP-Syntax prüfen
 vendor/bin/phpcs app/
