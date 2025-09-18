@@ -1,4 +1,4 @@
-##### Windows
+#### Windows
 # Windows thumbnail cache files
 Thumbs.db
 Thumbs.db:encryptable
@@ -473,8 +473,12 @@ composer.lock
 *.sass.map
 *.scss.map
 
-# config
+# Sensitive Konfigurationsdateien (Templates sind OK)
 config.php
+config_*.php
+!config.php_TEMPLATE
+!config.php.template
+!config.example.php
 
 # latte cache
 cache/*.php
