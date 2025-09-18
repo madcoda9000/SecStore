@@ -492,6 +492,22 @@ mysqldump -u root -p secstore > backup_$(date +%Y%m%d).sql
 ### **Code-Qualität Tools:**
 
 ```bash
+# Git Pre-Commit Hook aktivieren (verhindert sensitive Datei-Commits)
+cp preCommitHook.sh .git/hooks/pre-commit
+chmod +x .git/hooks/pre-commit
+
+# Hook testen
+echo "test" > config-test.php && git add config-test.php
+git commit -m "Security test"  # Sollte blockiert werden
+rm config-test.php  # Test-Datei entfernen
+
+> **🔒 Sicherheitshinweis:** Das Pre-Commit Hook blockiert automatisch Commits von:
+> - `config*.php` (außer Templates)
+> - `.env*` Dateien (außer Examples)  
+> - `*.key`, `*.credentials`, `*copy*`, `*backup*` Dateien
+> 
+> **💡 Erlaubte Template-Dateien:** `config.php_TEMPLATE`, `config.php.example`, `.env.example`
+
 # PHP-Syntax prüfen
 vendor/bin/phpcs app/
 
