@@ -26,6 +26,14 @@ class CsrfMiddleware
     public function before(array $params): void
     {
         if (Flight::request()->method == 'POST') {
+
+            // DEBUG LOGGING - Temporär hinzufügen
+            LogUtil::logAction(LogType::SECURITY, 'CsrfMiddleware', 'before', 
+                'Session Status: ' . session_status() . 
+                ', Session ID: ' . session_id() .
+                ', Request URI: ' . ($_SERVER['REQUEST_URI'] ?? 'unknown') .
+                ', User Agent: ' . ($_SERVER['HTTP_USER_AGENT'] ?? 'unknown'));
+
             // 1. SICHERHEITSPRÜFUNG: Session existiert
             if (session_status() !== PHP_SESSION_ACTIVE) {
                 LogUtil::logAction(LogType::SECURITY, 'CsrfMiddleware', 'before', 'No active session for CSRF validation', '');

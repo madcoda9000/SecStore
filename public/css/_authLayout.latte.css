@@ -45,6 +45,31 @@ body {
     padding: 1.5rem;
     border: none;
     box-shadow: none !important;
-    background-color: var(--bs-body-bg);
+    background: rgba(0,0,0,0);
+    box-shadow: none;
+  }
+  .login-card h3 {
+    color: #fff !important;
+  }
+  .login-card .bi {
+    color: #fff !important;
+  }
+  .login-card a {
+    color: #fff !important;
+  }
+  .login-card .btn-outline-secondary {
+    
+  }
+  .login-card button:disabled,
+  button[disabled]{
+    border: 1px solid #999999;
+    background-color: #cccccc;
+    color: #666666;
+  }
+  [data-bs-theme="dark"] .login-card .dropdown-item {
+    color: #fff !important;
+  }
+  .login-card .dropdown-item {
+    color: #141313 !important;
   }
 }

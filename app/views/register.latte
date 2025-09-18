@@ -27,7 +27,15 @@
                         <i id="generatePasswordIcon" class="bi-arrow-clockwise text-info"></i>
                     </button>
                 </div>
-                <input type="hidden" name="csrf_token" value="{$_SESSION['csrf_token']}">
+                {if isset($csrf_token)}
+                    <input type="hidden" name="csrf_token" value="{$csrf_token}">
+                {elseif isset($_SESSION['csrf_token'])}
+                    <input type="hidden" name="csrf_token" value="{$_SESSION['csrf_token']}">
+                {else}
+                    <!-- Notfall-Token generieren -->
+                    {php SessionUtil::refreshCsrfToken(); }
+                    <input type="hidden" name="csrf_token" value="{$_SESSION['csrf_token']}">
+                {/if}
                 <button type="submit" class="btn btn-primary w-100" {if $smtpInvalid}disabled{/if} id="submitButton">
                     <span id="loader" style="display:none;" class="btnloader"></span> 
                     {trans('register.submit')}

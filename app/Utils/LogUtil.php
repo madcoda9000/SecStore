@@ -64,6 +64,9 @@ class LogUtil
         } elseif (self::$config['logging']['enableRequestLogging'] === true && $type == LogType::REQUEST) {
             $context = "$file/$method";
             self::log($type, $context, $message);
+        } elseif (self::$config['logging']['enableSecurityLogging'] === true && $type == LogType::SECURITY) {
+            $context = "$file/$method";
+            self::log($type, $context, $message);
         } elseif ($type == LogType::ERROR) {
             $context = "$file/$method";
             self::log($type, $context, $message);

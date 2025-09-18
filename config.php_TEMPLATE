@@ -19,6 +19,7 @@ $logging = [
   'enableAuditLogging' => true,
   'enableMailLogging' => true,
   'enableSystemLogging' => true,
+  'enableSecurityLogging' => true,
 ];
 
 /**

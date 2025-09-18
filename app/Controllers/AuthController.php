@@ -30,13 +30,30 @@ use InvalidArgumentException;
  * - 1.0 (2025-02-24): Erstellt.
  */
 class AuthController
-{    
+{
 
     /**
      * Renders the registration form.
      */
     public function showRegister()
     {
+        // Explizit sicherstellen, dass Session aktiv ist
+        if (session_status() !== PHP_SESSION_ACTIVE) {
+            session_start();
+        }
+
+        // CSRF Token explizit generieren
+        $csrfToken = SessionUtil::getCsrfToken();
+
+        // Debug-Info loggen
+        LogUtil::logAction(
+            LogType::SECURITY,
+            'AuthController',
+            'showRegister',
+            'Session ID: ' . session_id() .
+                ', CSRF Token generated: ' . (!empty($csrfToken) ? 'YES' : 'NO')
+        );
+
         $connOkay = MailUtil::checkConnection();
         if (!$connOkay) {
             Flight::latte()->render('register.latte', [
@@ -77,15 +94,15 @@ class AuthController
             $password = password_hash($validated['password'], PASSWORD_DEFAULT);
             $email = $validated['email'];
             $firstname = $validated['firstName'];
-            $lastname = $validated['lastName'];     
+            $lastname = $validated['lastName'];
         } catch (InvalidArgumentException $e) {
-            LogUtil::logAction(LogType::AUDIT, 'AuthController', 'register', $e->getMessage()  , $user);
-                Flight::latte()->render('register.latte', [
-                    'title' => TranslationUtil::t('register.title'),
-                    'error' => $e->getMessage(),
-                    'lang' => Flight::get('lang'),
-                ]);
-                return;
+            LogUtil::logAction(LogType::AUDIT, 'AuthController', 'register', $e->getMessage(), $user);
+            Flight::latte()->render('register.latte', [
+                'title' => TranslationUtil::t('register.title'),
+                'error' => $e->getMessage(),
+                'lang' => Flight::get('lang'),
+            ]);
+            return;
         }
 
         $userCheck = User::checkIfUserExists($user, $email);
@@ -129,6 +146,24 @@ class AuthController
      */
     public function showLogin()
     {
+
+        // Explizit sicherstellen, dass Session aktiv ist
+        if (session_status() !== PHP_SESSION_ACTIVE) {
+            session_start();
+        }
+
+        // CSRF Token explizit generieren
+        $csrfToken = SessionUtil::getCsrfToken();
+
+        // Debug-Info loggen
+        LogUtil::logAction(
+            LogType::SECURITY,
+            'AuthController',
+            'showLogin',
+            'Session ID: ' . session_id() .
+                ', CSRF Token generated: ' . (!empty($csrfToken) ? 'YES' : 'NO')
+        );
+
         // prüfen ob benutzer bereits angemeldet ist aber 2fa noch fehlt
         if (SessionUtil::get('2fa_user_id') !== null) {
             Flight::latte()->render('2fa_verify.latte', [
@@ -161,7 +196,8 @@ class AuthController
      *
      * @param string $messageKey The key for the error message to be displayed.
      */
-    private function renderLoginError($messageKey, $config) {
+    private function renderLoginError($messageKey, $config)
+    {
         Flight::latte()->render('login.latte', [
             'title' => TranslationUtil::t('login.title'),
             'error' => TranslationUtil::t($messageKey),
@@ -225,7 +261,7 @@ class AuthController
             $password = $validated['password'];
             // ... rest der Login-Logik
         } catch (InvalidArgumentException $e) {
-            LogUtil::logAction(LogType::AUDIT, 'AuthController', 'login', $e->getMessage() , "UNKNOWN_USER");
+            LogUtil::logAction(LogType::AUDIT, 'AuthController', 'login', $e->getMessage(), "UNKNOWN_USER");
             Flight::latte()->render('login.latte', [
                 'title' => TranslationUtil::t('login.title'),
                 'error' => $e->getMessage(),
@@ -440,7 +476,7 @@ class AuthController
      *     enable-2fa page and 2FA is getting enabled for the user.
      */
     public function show2faVerify($comesFrom2faEnable)
-    {
+    {        
         $userId = $_SESSION['2fa_user_id'] ?? null;
         if (!$userId) {
             Flight::redirect('/login');
@@ -489,13 +525,13 @@ class AuthController
             $validated = InputValidator::validateOtp($_POST['otp']);
             $otp = $validated['otp'];
         } catch (InvalidArgumentException $e) {
-            LogUtil::logAction(LogType::AUDIT, 'AuthController', 'verify2FA', $e->getMessage() , $user->username);
-                Flight::latte()->render('2fa_verify.latte', [
-                    'title' => TranslationUtil::t('2faverify.title'),
-                    'lang' => Flight::get('lang'),
-                    'error' => $e->getMessage(),
-                ]);
-                return;
+            LogUtil::logAction(LogType::AUDIT, 'AuthController', 'verify2FA', $e->getMessage(), $user->username);
+            Flight::latte()->render('2fa_verify.latte', [
+                'title' => TranslationUtil::t('2faverify.title'),
+                'lang' => Flight::get('lang'),
+                'error' => $e->getMessage(),
+            ]);
+            return;
         }
 
         $tfa = new TwoFactorAuth(new EndroidQrCodeProvider());
@@ -521,6 +557,23 @@ class AuthController
      */
     public function showForgotPassword()
     {
+        // Explizit sicherstellen, dass Session aktiv ist
+        if (session_status() !== PHP_SESSION_ACTIVE) {
+            session_start();
+        }
+
+        // CSRF Token explizit generieren
+        $csrfToken = SessionUtil::getCsrfToken();
+
+        // Debug-Info loggen
+        LogUtil::logAction(
+            LogType::SECURITY,
+            'AuthController',
+            'showFogotPassword',
+            'Session ID: ' . session_id() .
+                ', CSRF Token generated: ' . (!empty($csrfToken) ? 'YES' : 'NO')
+        );
+
         $connOkay = MailUtil::checkConnection();
 
         if (!$connOkay) {
@@ -556,13 +609,13 @@ class AuthController
             $validated = InputValidator::validateEmail($_POST['email']);
             $email = $validated['email'];
         } catch (InvalidArgumentException $e) {
-            LogUtil::logAction(LogType::AUDIT, 'AuthController', 'forgotPassword', $e->getMessage() , "UNKNOWN_USER");
-                Flight::latte()->render('forgot_password.latte', [
-                    'title' => TranslationUtil::t('login.title'),
-                    'lang' => Flight::get('lang'),
-                    'error' => $e->getMessage(),
-                ]);
-                return;
+            LogUtil::logAction(LogType::AUDIT, 'AuthController', 'forgotPassword', $e->getMessage(), "UNKNOWN_USER");
+            Flight::latte()->render('forgot_password.latte', [
+                'title' => TranslationUtil::t('login.title'),
+                'lang' => Flight::get('lang'),
+                'error' => $e->getMessage(),
+            ]);
+            return;
         }
 
         $user = User::findUserByEmail($email);
@@ -620,6 +673,23 @@ class AuthController
 
     public function showResetPassword($token)
     {
+        // Explizit sicherstellen, dass Session aktiv ist
+        if (session_status() !== PHP_SESSION_ACTIVE) {
+            session_start();
+        }
+
+        // CSRF Token explizit generieren
+        $csrfToken = SessionUtil::getCsrfToken();
+
+        // Debug-Info loggen
+        LogUtil::logAction(
+            LogType::SECURITY,
+            'AuthController',
+            'showResetPassword',
+            'Session ID: ' . session_id() .
+                ', CSRF Token generated: ' . (!empty($csrfToken) ? 'YES' : 'NO')
+        );
+
         Flight::latte()->render('reset_password.latte', [
             'title' => TranslationUtil::t('reset.title'),
             'lang' => Flight::get('lang'),
@@ -653,16 +723,16 @@ class AuthController
         try {
             $validated = InputValidator::validateResetPassword($_POST['token'], $_POST['new_password']);
             $token = $validated['token'];
-            $new_password = password_hash($validated['newPassword'], PASSWORD_DEFAULT);            
+            $new_password = password_hash($validated['newPassword'], PASSWORD_DEFAULT);
         } catch (InvalidArgumentException $e) {
-            LogUtil::logAction(LogType::AUDIT, 'AuthController', 'resetPassword', $e->getMessage() , "UNKNOWN_USER");
-                Flight::latte()->render('reset_password.latte', [
-                    'title' => TranslationUtil::t('login.title'),
-                    'lang' => Flight::get('lang'),
-                    'error' => $e->getMessage(),
-                    'token' => $token
-                ]);
-                return;
+            LogUtil::logAction(LogType::AUDIT, 'AuthController', 'resetPassword', $e->getMessage(), "UNKNOWN_USER");
+            Flight::latte()->render('reset_password.latte', [
+                'title' => TranslationUtil::t('login.title'),
+                'lang' => Flight::get('lang'),
+                'error' => $e->getMessage(),
+                'token' => $token
+            ]);
+            return;
         }
 
         $user = User::findUserByResetToken($token);

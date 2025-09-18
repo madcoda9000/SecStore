@@ -401,7 +401,7 @@ foreach ($fetchLogRoutes as $route => $method) {
 // ==========================================
 
 // Session Extension
-securePostRoute('/extend-session', function() {
+secureRoute('POST /extend-session', function() {
     session_regenerate_id(true);
     $_SESSION['last_activity'] = time();
     echo json_encode(["success" => true]);

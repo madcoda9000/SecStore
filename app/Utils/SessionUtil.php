@@ -350,8 +350,22 @@ class SessionUtil
      */
     public static function getCsrfToken(): string
     {
+        // Session sicherstellen
+        if (session_status() !== PHP_SESSION_ACTIVE) {
+            if (session_status() === PHP_SESSION_NONE) {
+                session_start();
+            }
+        }
+
+        // Token generieren falls nicht vorhanden
         if (!isset($_SESSION['csrf_token']) || empty($_SESSION['csrf_token'])) {
             self::refreshCsrfToken();
+            LogUtil::logAction(
+                LogType::SECURITY,
+                'SessionUtil',
+                'getCsrfToken',
+                'Generated new CSRF token'
+            );
         }
 
         return $_SESSION['csrf_token'] ?? '';
