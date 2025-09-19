@@ -135,24 +135,26 @@ class SetupController
                 !isset($_SESSION['csrf_token']) || !isset($formData['csrf_token']) ||
                 !hash_equals($_SESSION['csrf_token'], $formData['csrf_token'])
             ) {
-                throw new Exception('Ungültiger CSRF Token.');
+                throw new Exception(TranslationUtil::t('csrf.error.invalid'));
             }
 
             // CSRF Token validieren
-            if (!isset($_SESSION['csrf_token']) || !isset($formData['csrf_token']) || 
-                !hash_equals($_SESSION['csrf_token'], $formData['csrf_token'])) {
-                
+            if (
+                !isset($_SESSION['csrf_token']) || !isset($formData['csrf_token']) ||
+                !hash_equals($_SESSION['csrf_token'], $formData['csrf_token'])
+            ) {
+
                 $errorMsg = 'CSRF Token Validierung fehlgeschlagen.';
                 if (!isset($_SESSION['csrf_token'])) {
-                    $errorMsg .= ' Session Token fehlt.';
+                    $errorMsg .= ' ' . TranslationUtil::t('csrf.error.missing');
                 }
                 if (!isset($formData['csrf_token'])) {
-                    $errorMsg .= ' Form Token fehlt.';
+                    $errorMsg .= ' ' . TranslationUtil::t('csrf.error.missingFormToken');
                 }
                 if (isset($_SESSION['csrf_token']) && isset($formData['csrf_token'])) {
-                    $errorMsg .= ' Tokens stimmen nicht überein.';
+                    $errorMsg .= ' ' . TranslationUtil::t('csrf.error.missmatch');
                 }
-                
+
                 throw new Exception($errorMsg);
             }
 
@@ -183,13 +185,13 @@ class SetupController
 
             // Erfolgsmeldung anzeigen
             return $this->renderSetupStep('database_success', [
-                'title' => 'Setup - Datenbank erfolgreich',
+                'title' => TranslationUtil::t('setup.succ.msg1'),
                 'step' => 3,
-                'success' => 'Datenbanksetup wurde erfolgreich abgeschlossen!'
+                'success' => TranslationUtil::t('setup.succ.msg2')
             ]);
         } catch (Exception $e) {
             return $this->renderSetupStep('database_config', [
-                'title' => 'Setup - Datenbank konfigurieren',
+                'title' => 'Setup - ' . TranslationUtil::t('setup.database.title'),
                 'step' => 3,
                 'error' => $e->getMessage(),
                 'form_data' => $formData ?? []
@@ -212,7 +214,7 @@ class SetupController
         } catch (PDOException $e) {
             return ['success' => false, 'error' => $e->getMessage()];
         } catch (Exception $e) {
-            return ['success' => false, 'error' => 'Unbekannter Fehler: ' . $e->getMessage()];
+            return ['success' => false, 'error' => TranslationUtil::t('setup.error.global'). $e->getMessage()];
         }
     }
 
@@ -231,7 +233,7 @@ class SetupController
         // Konfiguration lesen
         $configContent = file_get_contents($this->configFile);
         if ($configContent === false) {
-            throw new Exception('Konfigurationsdatei konnte nicht gelesen werden.');
+            throw new Exception(TranslationUtil::t('setup.config.err.notReadable'));
         }
 
         // Aktuelles $db-Array suchen und ersetzen (wie in AdminController)
@@ -275,20 +277,24 @@ class SetupController
     private function handleMailConfig($config)
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            // CSRF Token validieren für alle POST-Anfragen
-            if (!isset($_SESSION['csrf_token']) || !isset($_POST['csrf_token']) || 
-                !hash_equals($_SESSION['csrf_token'], $_POST['csrf_token'])) {
-                return $this->renderSetupStep('mail_config', [
-                    'title' => 'Setup - E-Mail konfigurieren',
-                    'step' => 4,
-                    'error' => 'Ungültiger CSRF Token.'
-                ]);
-            }
+            // CSRF Token validieren
+            if (
+                !isset($_SESSION['csrf_token']) || !isset($formData['csrf_token']) ||
+                !hash_equals($_SESSION['csrf_token'], $formData['csrf_token'])
+            ) {
 
-            if (isset($_POST['setup_step']) && $_POST['setup_step'] === 'mail') {
-                return $this->processMailConfig($_POST);
-            } elseif (isset($_POST['skip_mail'])) {
-                return $this->completeSetup();
+                $errorMsg = 'CSRF Token Validierung fehlgeschlagen.';
+                if (!isset($_SESSION['csrf_token'])) {
+                    $errorMsg .= ' ' . TranslationUtil::t('csrf.error.missing');
+                }
+                if (!isset($formData['csrf_token'])) {
+                    $errorMsg .= ' ' . TranslationUtil::t('csrf.error.missingFormToken');
+                }
+                if (isset($_SESSION['csrf_token']) && isset($formData['csrf_token'])) {
+                    $errorMsg .= ' ' . TranslationUtil::t('csrf.error.missmatch');
+                }
+
+                throw new Exception($errorMsg);
             }
         }
 
@@ -305,30 +311,31 @@ class SetupController
     {
         try {
             // CSRF Token validieren
-            if (!isset($_SESSION['csrf_token']) || !isset($formData['csrf_token']) || 
-                !hash_equals($_SESSION['csrf_token'], $formData['csrf_token'])) {
-                
+            if (
+                !isset($_SESSION['csrf_token']) || !isset($formData['csrf_token']) ||
+                !hash_equals($_SESSION['csrf_token'], $formData['csrf_token'])
+            ) {
+
                 $errorMsg = 'CSRF Token Validierung fehlgeschlagen.';
                 if (!isset($_SESSION['csrf_token'])) {
-                    $errorMsg .= ' Session Token fehlt.';
+                    $errorMsg .= ' ' . TranslationUtil::t('csrf.error.missing');
                 }
                 if (!isset($formData['csrf_token'])) {
-                    $errorMsg .= ' Form Token fehlt.';
+                    $errorMsg .= ' ' . TranslationUtil::t('csrf.error.missingFormToken');
                 }
                 if (isset($_SESSION['csrf_token']) && isset($formData['csrf_token'])) {
-                    $errorMsg .= ' Tokens stimmen nicht überein.';
+                    $errorMsg .= ' ' . TranslationUtil::t('csrf.error.missmatch');
                 }
-                
+
                 throw new Exception($errorMsg);
             }
-
             // SMTP-Verbindung testen
             $testResult = $this->testMailConnection($formData);
             if (!$testResult['success']) {
                 return $this->renderSetupStep('mail_config', [
-                    'title' => 'Setup - E-Mail konfigurieren',
+                    'title' => TranslationUtil::t('setup.title.mailConfig'),
                     'step' => 4,
-                    'error' => 'SMTP-Verbindung fehlgeschlagen: ' . ($testResult['error'] ?? 'Unbekannter Fehler'),
+                    'error' => TranslationUtil::t('setup.error.smtptest') . ($testResult['error'] ?? 'Unbekannter Fehler'),
                     'form_data' => $formData
                 ]);
             }
@@ -339,7 +346,7 @@ class SetupController
             return $this->completeSetup();
         } catch (Exception $e) {
             return $this->renderSetupStep('mail_config', [
-                'title' => 'Setup - E-Mail konfigurieren',
+                'title' => TranslationUtil::t('setup.title.mailConfig'),
                 'step' => 4,
                 'error' => $e->getMessage(),
                 'form_data' => $formData ?? []
@@ -357,7 +364,7 @@ class SetupController
             $requiredFields = ['mail_host', 'mail_username', 'mail_password', 'mail_port'];
             foreach ($requiredFields as $field) {
                 if (empty($formData[$field])) {
-                    return ['success' => false, 'error' => "Feld {$field} ist erforderlich."];
+                    return ['success' => false, 'error' => "Feld {$field} " . TranslationUtil::t('setup.error.missingField')];
                 }
             }
 
@@ -375,7 +382,7 @@ class SetupController
             // Original-Konfiguration sichern
             $configContent = file_get_contents($this->configFile);
             if ($configContent === false) {
-                return ['success' => false, 'error' => 'Konfigurationsdatei konnte nicht gelesen werden.'];
+                return ['success' => false, 'error' => TranslationUtil::t('setup.config.err.notReadable')];
             }
 
             // Temporäre Konfiguration schreiben
@@ -390,7 +397,7 @@ class SetupController
             $testConfigContent = preg_replace($pattern, $replacement, $configContent);
 
             if ($testConfigContent === null) {
-                return ['success' => false, 'error' => 'Fehler beim Erstellen der Test-Konfiguration.'];
+                return ['success' => false, 'error' => TranslationUtil::t('setup.config.err.notWritable')];
             }
 
             file_put_contents($this->configFile, $testConfigContent);
@@ -430,7 +437,7 @@ class SetupController
         // Konfiguration lesen
         $configContent = file_get_contents($this->configFile);
         if ($configContent === false) {
-            throw new Exception('Konfigurationsdatei konnte nicht gelesen werden.');
+            throw new Exception(TranslationUtil::t('setup.config.err.notReadable'));
         }
 
         // Aktuelles $mail-Array suchen und ersetzen (wie in AdminController)
@@ -445,7 +452,7 @@ class SetupController
         $newConfigContent = preg_replace($pattern, $replacement, $configContent);
 
         if ($newConfigContent === null) {
-            throw new Exception('Fehler beim Ersetzen der Konfiguration.');
+            throw new Exception(TranslationUtil::t('setup.config.err.notReplaceable'));
         }
 
         file_put_contents($this->configFile, $newConfigContent);
@@ -457,11 +464,11 @@ class SetupController
     private function completeSetup()
     {
         return $this->renderSetupStep('complete', [
-            'title' => 'Setup - Abgeschlossen',
-            'success' => 'Setup wurde erfolgreich abgeschlossen!',
-            'login_username' => 'super.admin',
-            'login_password' => 'Test1000!',
-            'login_email' => 'super.admin@test.local'
+            'title' => TranslationUtil::t('setup.finish.msg1'),
+            'success' => TranslationUtil::t('setup.finish.msg2'),
+            'login_username' => TranslationUtil::t('setup.finish.msg3'),
+            'login_password' => TranslationUtil::t('setup.finish.msg4'),
+            'login_email' => TranslationUtil::t('setup.finish.msg5')
         ]);
     }
 
@@ -486,7 +493,7 @@ class SetupController
         // CSRF Token für Formulare generieren
         // Session sollte bereits von index.php gestartet sein
         if (session_status() !== PHP_SESSION_ACTIVE) {
-            throw new Exception('Session wurde nicht korrekt initialisiert.');
+            throw new Exception(TranslationUtil::t('setup.controller.err.invalidSessionInitialization'));
         }
 
         if (!isset($_SESSION['csrf_token'])) {
