@@ -6,6 +6,7 @@ use App\Controllers\AdminController;
 use App\Controllers\ProfileController;
 use App\Controllers\RateLimitController;
 use App\Controllers\LogController;
+use App\Controllers\SetupController;
 use App\Middleware\AdminCheckMiddleware;
 use App\Middleware\AuthCheckMiddleware;
 use App\Middleware\RateLimiter;
@@ -13,6 +14,30 @@ use App\Middleware\CsrfMiddleware;
 use App\Utils\LogUtil;
 use App\Utils\LogType;
 use App\Utils\SecurityMetrics;
+
+// Globale Variable aus index.php verfügbar machen
+global $needsSetup;
+
+// ==========================================
+// SETUP ROUTES (nur wenn Setup benötigt wird)
+// ==========================================
+if ($needsSetup) {
+    Flight::route('GET /setup', function() {
+        (new SetupController)->runSetup();
+    });
+
+    Flight::route('POST /setup', function() {
+        (new SetupController)->runSetup();
+    });
+    
+    // Alle anderen Routen zum Setup umleiten
+    Flight::route('*', function() {
+        Flight::redirect('/setup');
+    });
+    
+    // Hier stoppen - keine weiteren Routen laden wenn Setup benötigt wird
+    return;
+}
 
 $csrfMiddleware = new CsrfMiddleware();
 

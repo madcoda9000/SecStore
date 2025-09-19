@@ -1,0 +1,235 @@
+{* setup.latte - Setup-Prozess mit authLayout *}
+{extends '_authLayout.latte'}
+
+{block content}
+<div class="container">
+    <div class="card p-4 shadow-sm login-card shadow-lg" style="width: 100%; max-width: 600px;">
+        
+        {* Header mit Schritt-Anzeige *}
+        <div class="text-center mb-4">
+            <h3 class="text-primary">
+                <span class="bi bi-gear-fill"></span>&nbsp;{trans('setup.title')}
+            </h3>
+            {if $step !== null}
+                <div class="progress mb-3" style="height: 8px;">
+                    <div class="progress-bar" role="progressbar" style="width: {$step * 25}%" aria-valuenow="{$step * 25}" aria-valuemin="0" aria-valuemax="100"></div>
+                </div>
+                <small class="text-muted">{trans('setup.step')} {$step} {trans('setup.of')} 4</small>
+            {/if}
+        </div>
+
+        {* Fehlermeldungen *}
+        {if $error !== null && $error !== ''}
+            <div class="alert alert-danger">
+                <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                {$error}
+            </div>
+        {/if}
+
+        {* Erfolgsmeldungen *}
+        {if $success !== null && $success !== ''}
+            <div class="alert alert-success">
+                <i class="bi bi-check-circle-fill me-2"></i>
+                {$success}
+            </div>
+        {/if}
+
+        {* Setup-Schritte *}
+        {if $setup_step === 'config_missing'}
+            <div class="text-center">
+                <i class="bi bi-file-earmark-x text-danger" style="font-size: 4rem;"></i>
+                <h4 class="mt-3">{trans('setup.config.missing.title')}</h4>
+                <p class="text-muted">
+                    {trans('setup.config.missing.desc')}
+                </p>
+                <ol class="list-unstyled text-start">
+                    <li><code>cp config.php_TEMPLATE config.php</code></li>
+                    <li><code>chmod 664 config.php</code></li>
+                    <li><code>chown www-data:www-data config.php</code></li>
+                </ol>
+                <a href="/setup" class="btn btn-primary mt-3">
+                    <i class="bi bi-arrow-clockwise"></i> {trans('setup.btn.check_again')}
+                </a>
+            </div>
+
+        {elseif $setup_step === 'config_not_writable'}
+            <div class="text-center">
+                <i class="bi bi-shield-lock text-warning" style="font-size: 4rem;"></i>
+                <h4 class="mt-3">{trans('setup.config.writable.title')}</h4>
+                <p class="text-muted">
+                    {trans('setup.config.writable.desc')}
+                </p>
+                <div class="text-start">
+                    <code>chmod 664 config.php</code><br>
+                    <code>chown www-data:www-data config.php</code>
+                </div>
+                <a href="/setup" class="btn btn-primary mt-3">
+                    <i class="bi bi-arrow-clockwise"></i> {trans('setup.btn.check_again')}
+                </a>
+            </div>
+
+        {elseif $setup_step === 'database_config'}
+            <h4><i class="bi bi-database-fill"></i> {trans('setup.database.title')}</h4>
+            <form method="POST" action="/setup">
+                <input type="hidden" name="setup_step" value="database">
+                <input type="hidden" name="csrf_token" value="{$_SESSION['csrf_token']}">
+                
+                <div class="mb-3">
+                    <label for="db_host" class="form-label">{trans('setup.database.host')}</label>
+                    <input type="text" class="form-control" id="db_host" name="db_host" 
+                           value="{($form_data['db_host'] ?? 'localhost')|escape}" required>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="db_name" class="form-label">{trans('setup.database.name')}</label>
+                    <input type="text" class="form-control" id="db_name" name="db_name" 
+                           value="{($form_data['db_name'] ?? 'secstore')|escape}" required>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="db_user" class="form-label">{trans('setup.database.user')}</label>
+                    <input type="text" class="form-control" id="db_user" name="db_user" 
+                           value="{($form_data['db_user'] ?? '')|escape}" required>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="db_pass" class="form-label">{trans('setup.database.pass')}</label>
+                    <input type="password" class="form-control" id="db_pass" name="db_pass" 
+                           value="{($form_data['db_pass'] ?? '')|escape}" required>
+                </div>
+                
+                <button type="submit" class="btn btn-primary w-100">
+                    <i class="bi bi-database-check"></i> {trans('setup.database.submit')}
+                </button>
+            </form>
+
+        {elseif $setup_step === 'database_success'}
+            <div class="text-center">
+                <i class="bi bi-database-check text-success" style="font-size: 4rem;"></i>
+                <h4 class="mt-3 text-success">{trans('setup.database.success.title')}</h4>
+                <p class="text-muted">
+                    {trans('setup.database.success.desc')}
+                </p>
+                <div class="alert alert-info text-start mt-4">
+                    <strong>{trans('login.credentials')}:</strong><br>
+                    <strong>{trans('login.username')}:</strong> super.admin<br>
+                    <strong>{trans('login.password')}:</strong> Test1000!<br>
+                    <strong>{trans('login.email')}:</strong> super.admin@test.local
+                </div>
+                <a href="/setup" class="btn btn-primary mt-3">
+                    <i class="bi bi-arrow-right"></i> {trans('setup.btn.continue')}
+                </a>
+            </div>
+
+        {elseif $setup_step === 'mail_config'}
+            <h4><i class="bi bi-envelope-fill"></i> {trans('setup.mail.title')}</h4>
+            <p class="text-muted mb-4">{trans('setup.mail.desc')}</p>
+            
+            <form method="POST" action="/setup">
+                <input type="hidden" name="setup_step" value="mail">
+                <input type="hidden" name="csrf_token" value="{$_SESSION['csrf_token']}">
+                
+                <div class="mb-3">
+                    <label for="mail_host" class="form-label">{trans('setup.mail.host')}</label>
+                    <input type="text" class="form-control" id="mail_host" name="mail_host" 
+                           value="{($form_data['mail_host'] ?? '')|escape}" placeholder="smtp.gmail.com">
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="mail_port" class="form-label">{trans('setup.mail.port')}</label>
+                        <input type="number" class="form-control" id="mail_port" name="mail_port" 
+                               value="{($form_data['mail_port'] ?? '587')|escape}">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="mail_encryption" class="form-label">{trans('setup.mail.encryption')}</label>
+                        <select class="form-select" id="mail_encryption" name="mail_encryption">
+                            <option value="tls" {if ($form_data['mail_encryption'] ?? 'tls') === 'tls'}selected{/if}>TLS</option>
+                            <option value="ssl" {if ($form_data['mail_encryption'] ?? '') === 'ssl'}selected{/if}>SSL</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="mail_username" class="form-label">{trans('setup.mail.username')}</label>
+                    <input type="text" class="form-control" id="mail_username" name="mail_username" 
+                           value="{($form_data['mail_username'] ?? '')|escape}">
+                </div>
+                
+                <div class="mb-3">
+                    <label for="mail_password" class="form-label">{trans('setup.mail.password')}</label>
+                    <input type="password" class="form-control" id="mail_password" name="mail_password" 
+                           value="{($form_data['mail_password'] ?? '')|escape}">
+                </div>
+                
+                <div class="mb-3">
+                    <label for="mail_from_email" class="form-label">{trans('setup.mail.from_email')}</label>
+                    <input type="email" class="form-control" id="mail_from_email" name="mail_from_email" 
+                           value="{($form_data['mail_from_email'] ?? '')|escape}">
+                </div>
+                
+                <div class="mb-3">
+                    <label for="mail_from_name" class="form-label">{trans('setup.mail.from_name')}</label>
+                    <input type="text" class="form-control" id="mail_from_name" name="mail_from_name" 
+                           value="{($form_data['mail_from_name'] ?? 'SecStore System')|escape}">
+                </div>
+                
+                <div class="mb-3 form-check">
+                    <input type="checkbox" class="form-check-input" id="mail_enable_welcome" name="mail_enable_welcome" 
+                           {if ($form_data['mail_enable_welcome'] ?? false)}checked{/if}>
+                    <label class="form-check-label" for="mail_enable_welcome">
+                        {trans('setup.mail.enable_welcome')}
+                    </label>
+                </div>
+                
+                <div class="d-grid gap-2">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-envelope-check"></i> {trans('setup.mail.submit')}
+                    </button>
+                </div>
+            </form>
+            
+            <form method="POST" action="/setup" class="mt-2">
+                <input type="hidden" name="csrf_token" value="{$_SESSION['csrf_token']}">
+                <button type="submit" name="skip_mail" value="1" class="btn btn-secondary w-100">
+                    <i class="bi bi-skip-forward"></i> {trans('setup.mail.skip')}
+                </button>
+            </form>
+            </form>
+
+        {elseif $setup_step === 'complete'}
+            <div class="text-center">
+                <i class="bi bi-check-circle-fill text-success" style="font-size: 4rem;"></i>
+                <h4 class="mt-3 text-success">{trans('setup.complete.title')}</h4>
+                <p class="text-muted">
+                    {trans('setup.complete.desc')}
+                </p>
+                
+                <div class="alert alert-warning text-start mt-4">
+                    <h6><i class="bi bi-exclamation-triangle-fill"></i> {trans('setup.complete.warning')}</h6>
+                    <p class="mb-2">{trans('setup.complete.warning.desc')}</p>
+                    <hr>
+                    <strong>{trans('login.username')}:</strong> {$login_username}<br>
+                    <strong>{trans('login.password')}:</strong> {$login_password}<br>
+                    <strong>{trans('login.email')}:</strong> {$login_email}
+                </div>
+                
+                <div class="mt-4">
+                    <a href="/login" class="btn btn-success btn-lg">
+                        <i class="bi bi-box-arrow-in-right"></i> {trans('setup.complete.login')}
+                    </a>
+                </div>
+            </div>
+
+        {elseif $setup_step === 'error'}
+            <div class="text-center">
+                <i class="bi bi-exclamation-triangle text-danger" style="font-size: 4rem;"></i>
+                <h4 class="mt-3">{trans('setup.error.title')}</h4>
+                <a href="/setup" class="btn btn-primary mt-3">
+                    <i class="bi bi-arrow-clockwise"></i> {trans('setup.btn.try_again')}
+                </a>
+            </div>
+        {/if}
+    </div>
+</div>
+{/block}
