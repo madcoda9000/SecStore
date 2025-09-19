@@ -55,7 +55,7 @@ $app->set('lang', TranslationUtil::getLang());
 $app->register('latte', LatteEngine::class, [], function (LatteEngine $latte) use ($app) {
     // make translation available in latte templates
     $latte->addFunction('trans', fn($s) => $app->get('trans')($s));
-    
+
     // Setze den Cache-Ordner für Latte
     $cacheDir = '../cache/';
 
@@ -69,29 +69,6 @@ $app->register('latte', LatteEngine::class, [], function (LatteEngine $latte) us
     $latte->setLoader(new \Latte\Loaders\FileLoader($app->get('flight.views.path')));
 });
 
-/*
- * Load the config file
- */
-$config = [];
-try {
-    if (!file_exists('../config.php')) {
-        throw new Exception('Config file not found. Please create a config.php file.');
-    }
-    $config = include __DIR__ . '/../config.php';
-} catch (Exception $e) {
-    //Flight::halt(500, $e->getMessage());
-    $app->latte()->render("errors/error.latte", [
-        'code' => 500,
-        'message' => $e->getMessage()
-    ]);
-    Flight::halt();
-}
-
-/**
- * enable cors
- */
-$CorsUtil = new CorsUtil($config['allowedHosts']);
-$app->before('start', [$CorsUtil, 'setupCors']);
 
 /**
  * SETUP-PRÜFUNG 
@@ -129,6 +106,34 @@ if (!$needsSetup) {
     }
 }
 
+/*
+ * Load the config file
+ */
+if (!$needsSetup) {
+    $config = [];
+    try {
+        if (!file_exists('../config.php')) {
+            throw new Exception('Config file not found. Please create a config.php file.');
+        }
+        $config = include __DIR__ . '/../config.php';
+    } catch (Exception $e) {
+        //Flight::halt(500, $e->getMessage());
+        $app->latte()->render("errors/error.latte", [
+            'code' => 500,
+            'message' => $e->getMessage()
+        ]);
+        Flight::halt();
+    }
+}
+
+/**
+ * enable cors
+ */
+if (!$needsSetup) {
+    $CorsUtil = new CorsUtil($config['allowedHosts']);
+    $app->before('start', [$CorsUtil, 'setupCors']);
+}
+
 /**
  * Session-Initialisierung (auch für Setup)
  */
@@ -139,7 +144,7 @@ if ($needsSetup) {
             // Basic session settings für Setup
             ini_set('session.use_only_cookies', 1);
             ini_set('session.cookie_httponly', 1);
-            
+
             session_set_cookie_params([
                 'lifetime' => 3600, // 1 Stunde für Setup
                 'path' => '/',
@@ -148,7 +153,7 @@ if ($needsSetup) {
                 'httponly' => true,
                 'samesite' => 'Strict'
             ]);
-            
+
             session_start();
         }
     });
@@ -157,7 +162,7 @@ if ($needsSetup) {
     $app->before('start', function () use ($app) {
         // Session initialisieren - alle Komplexität ist jetzt in SessionUtil
         SessionUtil::initialize();
-        
+
         // Falls Session ungültig/abgelaufen ist, wird automatisch destroyed
         // und wir können entsprechend reagieren
         if (session_status() !== PHP_SESSION_ACTIVE) {
@@ -194,7 +199,7 @@ $app->map('error', function (Throwable $ex) use ($app) {
 
     http_response_code($code);
     LogUtil::logAction(LogType::ERROR, 'index', 'map->error', 'ERROR ' . $code . ': ' . $ex->getMessage());
-    
+
     $app->latte()->render('errors/error.latte', [
         'code' => $code,
         'message' => $ex->getMessage()
