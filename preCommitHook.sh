@@ -12,13 +12,20 @@ ALLOWED_TEMPLATES=(
     "config.example.php"
     ".env.example"
     ".env.template"
+    "*.php.backup"          # ← Backup-Dateien erlauben
+    "*.backup"              # ← Allgemeine Backup-Dateien
 )
 
-# Funktion: Prüfen ob Datei in erlaubten Templates ist
+# Funktion: Prüfen ob Datei in erlaubten Templates ist (mit Wildcard-Support)
 is_allowed_template() {
     local file="$1"
     for template in "${ALLOWED_TEMPLATES[@]}"; do
+        # Exakte Übereinstimmung
         if [[ "$file" == "$template" ]]; then
+            return 0  # Erlaubt
+        fi
+        # Wildcard-Übereinstimmung (für *.backup etc.)
+        if [[ "$file" == $template ]]; then
             return 0  # Erlaubt
         fi
     done
@@ -41,7 +48,7 @@ done
 if [ ! -z "$SENSITIVE_FILES" ]; then
     echo "❌ WARNUNG: Sensitive Dateien erkannt!"
     echo -e "Blockierte Dateien:\n$SENSITIVE_FILES"
-    echo "💡 Tipp: Template-Dateien wie 'config.php_TEMPLATE' sind erlaubt."
+    echo "💡 Tipp: Template-Dateien wie 'config.php_TEMPLATE' und '*.backup' sind erlaubt."
     echo "Commit wurde abgebrochen. Bitte .gitignore prüfen."
     exit 1
 fi
