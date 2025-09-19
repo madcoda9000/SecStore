@@ -130,9 +130,30 @@ if (!$needsSetup) {
 }
 
 /**
- * Start the session (nur wenn Setup abgeschlossen)
+ * Session-Initialisierung (auch für Setup)
  */
-if (!$needsSetup) {
+if ($needsSetup) {
+    // Minimale Session für Setup (ohne SessionUtil complexity)
+    $app->before('start', function () {
+        if (session_status() !== PHP_SESSION_ACTIVE) {
+            // Basic session settings für Setup
+            ini_set('session.use_only_cookies', 1);
+            ini_set('session.cookie_httponly', 1);
+            
+            session_set_cookie_params([
+                'lifetime' => 3600, // 1 Stunde für Setup
+                'path' => '/',
+                'domain' => '',
+                'secure' => (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off'),
+                'httponly' => true,
+                'samesite' => 'Strict'
+            ]);
+            
+            session_start();
+        }
+    });
+} else {
+    // Normale Session für Anwendung
     $app->before('start', function () use ($app) {
         // Session initialisieren - alle Komplexität ist jetzt in SessionUtil
         SessionUtil::initialize();
