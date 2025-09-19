@@ -21,6 +21,9 @@ ini_set('log_errors', '1');
 ini_set('error_log', __DIR__ . '/error.log');
 error_reporting(E_ALL ^ E_DEPRECATED);
 
+// define config var
+$config = [];
+
 /*
  * include composer libraries
  */
@@ -81,6 +84,17 @@ $needsSetup = false;
 // Prüfen ob config.php existiert und beschreibbar ist
 if (!file_exists('../config.php') || !is_writable('../config.php')) {
     $needsSetup = true;
+} else {
+    try {
+        $config = include __DIR__ . '/../config.php';
+    } catch (Exception $e) {
+        //Flight::halt(500, $e->getMessage());
+        $app->latte()->render("errors/error.latte", [
+            'code' => 500,
+            'message' => $e->getMessage()
+        ]);
+        Flight::halt();
+    }
 }
 
 // Prüfen ob Datenbankonfiguration noch Default-Werte hat
@@ -106,25 +120,6 @@ if (!$needsSetup) {
     }
 }
 
-/*
- * Load the config file
- */
-if (!$needsSetup) {
-    $config = [];
-    try {
-        if (!file_exists('../config.php')) {
-            throw new Exception('Config file not found. Please create a config.php file.');
-        }
-        $config = include __DIR__ . '/../config.php';
-    } catch (Exception $e) {
-        //Flight::halt(500, $e->getMessage());
-        $app->latte()->render("errors/error.latte", [
-            'code' => 500,
-            'message' => $e->getMessage()
-        ]);
-        Flight::halt();
-    }
-}
 
 /**
  * enable cors
