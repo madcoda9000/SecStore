@@ -367,13 +367,9 @@ class AuthController
             // SCHRITT 1: User-Daten in Session setzen (BEVOR Session regeneriert wird)
             SessionUtil::set('user', $user);
 
-            // SCHRITT 2: Session regenerieren für Security (Session Fixation Prevention)
-            if (session_regenerate_id(true)) {
-                SessionUtil::set('last_regenerated', time());
-                LogUtil::logAction(LogType::SECURITY, 'AuthController', 'login', 'Session regenerated after successful login', $user->username);
-            } else {
-                LogUtil::logAction(LogType::ERROR, 'AuthController', 'login', 'Failed to regenerate session ID', $user->username);
-            }
+            // SCHRITT 2: Session für Login vorbereiten (verhindert doppelte Regeneration)
+            SessionUtil::prepareForLogin();
+            LogUtil::logAction(LogType::SECURITY, 'AuthController', 'login', 'Session prepared for login: ' . $user->username, $user->username);
 
             // SCHRITT 3: Neue Session-ID in Datenbank speichern (NACH Regeneration)
             User::setActiveSessionId($user->id);
@@ -476,7 +472,7 @@ class AuthController
      *     enable-2fa page and 2FA is getting enabled for the user.
      */
     public function show2faVerify($comesFrom2faEnable)
-    {        
+    {
         $userId = $_SESSION['2fa_user_id'] ?? null;
         if (!$userId) {
             Flight::redirect('/login');

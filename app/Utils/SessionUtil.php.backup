@@ -43,15 +43,6 @@ class SessionUtil
     }
 
     /**
-     * Check if the application is running in production mode
-     */
-    private static function isProduction(): bool
-    {
-        self::loadConfig();
-        return (self::$config['environment'] ?? 'production') === 'production';
-    }
-
-    /**
      * Initialize and start session with security settings
      */
     public static function initialize(): void
@@ -141,27 +132,23 @@ class SessionUtil
 
     /**
      * Handle session security validation and maintenance
-     * VERBESSERT: Verhindert doppelte Regeneration
      */
     private static function handleSessionSecurity(): void
     {
         // Check if session is expired
         if (self::isSessionExpired()) {
-            LogUtil::logAction(LogType::SECURITY, 'SessionUtil', 'handleSessionSecurity', 'Session expired - destroying');
             self::destroy();
             return;
         }
 
         // Validate security fingerprint
         if (!self::validateSecurityFingerprint()) {
-            LogUtil::logAction(LogType::SECURITY, 'SessionUtil', 'handleSessionSecurity', 'Fingerprint validation failed - destroying session');
             self::destroy();
             return;
         }
 
-        // Regenerate session ID periodically (ABER NUR WENN NÖTIG)
+        // Regenerate session ID periodically
         if (self::shouldRegenerateId()) {
-            LogUtil::logAction(LogType::SECURITY, 'SessionUtil', 'handleSessionSecurity', 'Periodic regeneration needed');
             self::regenerateId();
         }
 
@@ -191,7 +178,8 @@ class SessionUtil
 
     /**
      * Generate security fingerprint for session validation
-     * PRODUCTION-VERSION ohne Debug-Logging
+     * WICHTIG: Session-ID wird NICHT in den Fingerprint einbezogen, 
+     * da sich diese bei Regeneration ändert!
      */
     private static function generateSecurityFingerprint(): string
     {
@@ -199,56 +187,37 @@ class SessionUtil
         $acceptLanguage = $_SERVER['HTTP_ACCEPT_LANGUAGE'] ?? '';
         $remoteAddr = $_SERVER['REMOTE_ADDR'] ?? '';
 
-        // ENTWICKLUNGSUMGEBUNG: Nur in Development-Modus
-        if (!self::isProduction()) {
-            // Development: IP-basiert für DevTools-Kompatibilität
-            return hash('sha256', $remoteAddr . '_dev_mode');
-        }
-
-        // PRODUCTION: Moderate Browser-Familie-Erkennung
-        $isChromeFamily = strpos($userAgent, 'Chrome') !== false ||
-            strpos($userAgent, 'Chromium') !== false ||
-            strpos($userAgent, 'Edg/') !== false;
-
-        if ($isChromeFamily) {
-            // Chrome-Familie: Basis ohne Mobile/Desktop-Unterscheidung
-            // Aber immer noch IP + Language für zusätzliche Sicherheit
-            $browserCore = 'chrome_family';
-            if (strpos($userAgent, 'Edg/') !== false) {
-                $browserCore = 'edge_chromium';
-            }
-
-            // WICHTIG: RemoteAddr bleibt für Security
-            return hash('sha256', $remoteAddr . $acceptLanguage . $browserCore);
-        }
-
-        // Andere Browser: Vollständiger Fingerprint
+        // Session-ID NICHT einbeziehen - das war das Problem!
+        // Session-ID ändert sich bei Regeneration, aber Fingerprint soll gleich bleiben
         return hash('sha256', $userAgent . $acceptLanguage . $remoteAddr);
     }
 
     /**
-     * Validate security fingerprint - PRODUCTION VERSION
+     * Validate security fingerprint
      */
     private static function validateSecurityFingerprint(): bool
     {
         if (!isset($_SESSION['security_fingerprint'])) {
-            // Nur bei Development loggen
-            if (!self::isProduction()) {
-                LogUtil::logAction(LogType::SECURITY, 'SessionUtil', 'validateSecurityFingerprint', 'No stored fingerprint found');
-            }
             return false;
         }
 
         $currentFingerprint = self::generateSecurityFingerprint();
         $storedFingerprint = $_SESSION['security_fingerprint'];
-        $isValid = hash_equals($storedFingerprint, $currentFingerprint);
 
-        // Nur Failures loggen in Production
-        if (!$isValid) {
-            LogUtil::logAction(LogType::SECURITY, 'SessionUtil', 'validateSecurityFingerprint', 'Fingerprint validation failed');
-        }
+        // TEMPORÄRER DEBUG LOG
+    if (!hash_equals($storedFingerprint, $currentFingerprint)) {
+        LogUtil::logAction(
+            LogType::SECURITY, 
+            'SessionUtil', 
+            'validateSecurityFingerprint',
+            'Fingerprint mismatch - Current UA: ' . ($_SERVER['HTTP_USER_AGENT'] ?? 'unknown') . 
+            ' | Stored: ' . substr($storedFingerprint, 0, 16) . 
+            ' | Current: ' . substr($currentFingerprint, 0, 16)
+        );
+    }
 
-        return $isValid;
+
+        return hash_equals($_SESSION['security_fingerprint'], $currentFingerprint);
     }
 
     /**
@@ -459,42 +428,5 @@ class SessionUtil
             'is_expired' => self::isSessionExpired(),
             'fingerprint_valid' => self::validateSecurityFingerprint()
         ];
-    }
-
-    /**
-     * Session für Login vorbereiten (verhindert doppelte Regeneration)
-     */
-    public static function prepareForLogin(): void
-    {
-        // Prüfen ob kürzlich regeneriert wurde (innerhalb der letzten 60 Sekunden)
-        $lastRegenerated = $_SESSION['last_regenerated'] ?? 0;
-        $timeSinceRegeneration = time() - $lastRegenerated;
-
-        if ($timeSinceRegeneration < 60) {
-            // Kürzlich regeneriert - nur Fingerprint und Activity updaten
-            $_SESSION['security_fingerprint'] = self::generateSecurityFingerprint();
-            $_SESSION['last_activity'] = time();
-
-            LogUtil::logAction(
-                LogType::SECURITY,
-                'SessionUtil',
-                'prepareForLogin',
-                'Session already recently regenerated - skipping regeneration - ID: ' . session_id()
-            );
-        } else {
-            // Session-Regeneration nur wenn nötig
-            if (session_regenerate_id(true)) {
-                $_SESSION['last_regenerated'] = time();
-                $_SESSION['security_fingerprint'] = self::generateSecurityFingerprint();
-                $_SESSION['last_activity'] = time();
-
-                LogUtil::logAction(
-                    LogType::SECURITY,
-                    'SessionUtil',
-                    'prepareForLogin',
-                    'Session prepared for login - ID: ' . session_id()
-                );
-            }
-        }
     }
 }

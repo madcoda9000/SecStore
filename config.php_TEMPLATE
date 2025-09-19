@@ -31,6 +31,7 @@ $application = [
   'sessionTimeout' => 600,
   'allowPublicRegister' => false,
   'allowPublicPasswordReset' => false,
+  'environment' => 'production', // oder 'development'
 ];
 
 // Rate Limiting Konfiguration

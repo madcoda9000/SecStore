@@ -27,15 +27,7 @@
             <div class="mb-3">
                 <input class="form-control" type="password" name="password" id="password" placeholder="{trans('login.password')}" autocomplete="current-password">
             </div>
-            {if isset($csrf_token)}
-                <input type="hidden" name="csrf_token" value="{$csrf_token}">
-            {elseif isset($_SESSION['csrf_token'])}
-                <input type="hidden" name="csrf_token" value="{$_SESSION['csrf_token']}">
-            {else}
-                <!-- Notfall-Token generieren -->
-                {php SessionUtil::refreshCsrfToken(); }
-                <input type="hidden" name="csrf_token" value="{$_SESSION['csrf_token']}">
-            {/if}
+            <input type="hidden" name="csrf_token" value="{$_SESSION['csrf_token']}">
             <button type="submit" class="btn btn-primary w-100" id="loginBtn">
                 <span id="loginSpinner" class="spinner-border spinner-border-sm d-none me-2" role="status" aria-hidden="true"></span>
                 <span id="loginText">{trans('login.submit')}</span>
