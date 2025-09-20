@@ -428,6 +428,7 @@ Wenn Sie LDAP für diesen Benutzer aktivieren, generieren Sie einfach ein belieb
     'setup.step2.short' => 'Rechte',
     'setup.step3.short' => 'Datenbank',
     'setup.step4.short' => 'E-Mail',
+    'setup.complete.login' => 'Zum Login',
     
     // Setup Completion Info
     'setup.steps.completed' => 'Abgeschlossen',

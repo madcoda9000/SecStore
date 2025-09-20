@@ -22,7 +22,6 @@ global $needsSetup;
 // SETUP ROUTES (nur wenn Setup benötigt wird)
 // ==========================================
 if ($needsSetup) {
-    echo "<idv style='color:#fff'>" . var_dump($_POST). "</idv>";
      Flight::route('GET /setup', function () {
         (new SetupController)->runSetup();
     });

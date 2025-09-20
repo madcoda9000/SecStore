@@ -428,6 +428,7 @@ return [
     'setup.step2.short' => 'Rights',
     'setup.step3.short' => 'Database',
     'setup.step4.short' => 'Email',
+    'setup.complete.login' => 'Go to Login',
     
     // Setup Completion Info
     'setup.steps.completed' => 'Completed',
