@@ -106,7 +106,7 @@ $mail = [
   'port' => 587,
   'fromEmail' => 'YOUR_SENDER_ADDRESS',
   'fromName' => 'YOUR_FROM_NAME',
-  'enableWelcomeMail' => false,
+  'enableWelcomeMail' => true,
 ];
 
 /**
@@ -126,5 +126,5 @@ return [
     'logging' => $logging,
     'security' => $security,
     'ldapSettings' => $ldapSettings,
-    'rateLimiting' => $rateLimiting
+    'rateLimiting' => $rateLimiting,
 ];

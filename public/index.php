@@ -102,8 +102,10 @@ if (!$needsSetup && isset($config['db']['host']) && $config['db']['host'] === 'Y
     $needsSetup = true;
 }
 
-// Prüfen ob SMTP-Konfiguration noch Default-Werte hat
-if (!$needsSetup && isset($config['mail']['host']) && $config['mail']['host'] === 'YOUR_SMTP_SERVER') {
+// Prüfen ob Setup bereits abgeschlossen wurde
+if (!$needsSetup && isset($config['setupCompleted']) && $config['setupCompleted'] === true) {
+    $needsSetup = false; // Setup bereits abgeschlossen, auch wenn Mail-Defaults noch da sind
+} elseif (!$needsSetup && isset($config['mail']['host']) && $config['mail']['host'] === 'YOUR_SMTP_SERVER') {
     $needsSetup = true;
 }
 

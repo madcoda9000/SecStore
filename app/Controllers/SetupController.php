@@ -58,6 +58,7 @@ class SetupController
             }
 
             if ($skipMail === true) {
+                $this->setSkippedMailConfig();
                 return $this->completeSetup();
             } else {
                 // Schritt 4: SMTP-Konfiguration prüfen
@@ -75,6 +76,54 @@ class SetupController
                 'error' => TranslationUtil::t('setup.error.global') . $e->getMessage()
             ]);
         }
+    }
+
+    /**
+     * Setzt das Setup-Flag in der config.php (für überspringen der Mail-Konfiguration)
+     */
+    private function setSkippedMailConfig()
+    {
+        // Standard-Mail-Konfiguration die zeigt, dass Setup übersprungen wurde
+        $skippedConfig = [
+            'host' => 'ANY_MAIL_HOST',        // ← Nicht mehr "YOUR_SMTP_SERVER"!
+            'username' => 'YOUR_SMTP_USERNAME',
+            'password' => 'YOUR_SMTP_PASSWORD',
+            'encryption' => 'tls',
+            'port' => 587,
+            'fromEmail' => 'noreply@localhost',
+            'fromName' => 'SecStore System',
+            'enableWelcomeMail' => true
+        ];
+
+        // Konfiguration lesen
+        $configContent = file_get_contents($this->configFile);
+        if ($configContent === false) {
+            throw new Exception(TranslationUtil::t('setup.config.err.notReadable'));
+        }
+
+        // Mail-Array aktualisieren (gleiche Logik wie updateMailConfig)
+        $pattern = '/(\$mail\s*=\s*\[)(.*?)(\];)/s';
+
+        $newMailArray = var_export($skippedConfig, true);
+        $newMailArray = preg_replace("/^array \(/", "[", $newMailArray);
+        $newMailArray = preg_replace('/\)$/', "]", $newMailArray);
+        $newMailArray = preg_replace('/=> \n\s+/', "=> ", $newMailArray);
+
+        $replacement = '$mail = ' . $newMailArray . ";";
+        $newConfigContent = preg_replace($pattern, $replacement, $configContent);
+
+        if ($newConfigContent === null) {
+            throw new Exception(TranslationUtil::t('setup.config.err.notReplaceable'));
+        }
+
+        file_put_contents($this->configFile, $newConfigContent);
+
+        LogUtil::logAction(
+            LogType::SYSTEM,
+            'SetupController',
+            'setSkippedMailConfig',
+            'Mail configuration set to ANY_MAIL_HOST (setup skipped)'
+        );
     }
 
     /**
