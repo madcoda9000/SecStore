@@ -23,17 +23,14 @@ global $needsSetup;
 // ==========================================
 if ($needsSetup) {
     echo "<idv style='color:#fff'>" . var_dump($_POST). "</idv>";
-    if (isset($_POST['skip_mail']) && $_POST['skip_mail'] === '1') {
-        Flight::route('GET /setup', function () {
-            (new SetupController)->runSetup(true);
-        });
-    }
-    Flight::route('GET /setup', function () {
+     Flight::route('GET /setup', function () {
         (new SetupController)->runSetup();
     });
 
     Flight::route('POST /setup', function () {
-        (new SetupController)->runSetup();
+        // Hier prüfen ob Skip gewünscht ist
+        $skipMail = isset($_POST['skip_mail']) && $_POST['skip_mail'] === '1';
+        (new SetupController)->runSetup($skipMail);
     });
 
     // Alle anderen Routen zum Setup umleiten
