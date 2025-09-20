@@ -27,13 +27,9 @@ class SetupController
     /**
      * Hauptmethode für Setup-Prozess
      */
-    public function runSetup()
+    public function runSetup($skipMail = false)
     {
         try {
-            // Debug: POST-Daten loggen
-            if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-                error_log("Setup POST Data: " . print_r($_POST, true));
-            }
 
             // Schritt 1: Prüfen ob config.php existiert
             if (!$this->checkConfigExists()) {
@@ -61,9 +57,13 @@ class SetupController
                 return $this->handleDatabaseConfig($config);
             }
 
-            // Schritt 4: SMTP-Konfiguration prüfen
-            if ($this->needsMailConfig($config)) {
-                return $this->handleMailConfig($config);
+            if ($skipMail === true) {
+                return $this->completeSetup();
+            } else {
+                // Schritt 4: SMTP-Konfiguration prüfen
+                if ($this->needsMailConfig($config)) {
+                    return $this->handleMailConfig($config);
+                }
             }
 
             // Setup abgeschlossen - weiterleiten zu Login
@@ -214,7 +214,7 @@ class SetupController
         } catch (PDOException $e) {
             return ['success' => false, 'error' => $e->getMessage()];
         } catch (Exception $e) {
-            return ['success' => false, 'error' => TranslationUtil::t('setup.error.global'). $e->getMessage()];
+            return ['success' => false, 'error' => TranslationUtil::t('setup.error.global') . $e->getMessage()];
         }
     }
 
@@ -277,6 +277,7 @@ class SetupController
     private function handleMailConfig($config)
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+
             // CSRF Token validieren
             if (
                 !isset($_SESSION['csrf_token']) || !isset($formData['csrf_token']) ||
@@ -296,6 +297,8 @@ class SetupController
 
                 throw new Exception($errorMsg);
             }
+
+            return $this->processMailConfig($_POST);
         }
 
         return $this->renderSetupStep('mail_config', [
@@ -478,7 +481,7 @@ class SetupController
         $defaultData = [
             'setup_step' => $step,
             'title' => 'Setup',
-            'step' => null,
+            'step' => $this->getStepNumber($step), // <- NEUE METHODE
             'error' => null,
             'success' => null,
             'form_data' => [],
@@ -491,7 +494,6 @@ class SetupController
         $templateData = array_merge($defaultData, $data);
 
         // CSRF Token für Formulare generieren
-        // Session sollte bereits von index.php gestartet sein
         if (session_status() !== PHP_SESSION_ACTIVE) {
             throw new Exception(TranslationUtil::t('setup.controller.err.invalidSessionInitialization'));
         }
@@ -500,9 +502,27 @@ class SetupController
             $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
         }
 
-        // Debug: Token loggen
-        error_log("Setup CSRF Token: " . substr($_SESSION['csrf_token'], 0, 10) . "...");
-
         Flight::latte()->render('setup.latte', $templateData);
+    }
+
+    /**
+     * NEUE METHODE: Ermittelt die Schritt-Nummer basierend auf dem Setup-Step
+     */
+    private function getStepNumber($setupStep)
+    {
+        switch ($setupStep) {
+            case 'config_missing':
+                return 1;
+            case 'config_not_writable':
+                return 2;
+            case 'database_config':
+            case 'database_success':
+                return 3;
+            case 'mail_config':
+            case 'complete':
+                return 4;
+            default:
+                return null;
+        }
     }
 }

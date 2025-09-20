@@ -15,6 +15,54 @@
                     <div class="progress-bar" role="progressbar" style="width: {$step * 25}%" aria-valuenow="{$step * 25}" aria-valuemin="0" aria-valuemax="100"></div>
                 </div>
                 <small class="text-muted">{trans('setup.step')} {$step} {trans('setup.of')} 4</small>
+                
+                {* NEUE ERGÄNZUNG: Kompakte Schritt-Übersicht *}
+                <div class="mt-3 p-2 bg-light rounded">
+                    <div class="row text-center small">
+                        <div class="col-3">
+                            {if $step >= 1}
+                                <i class="bi bi-check-circle-fill text-success"></i>
+                            {else}
+                                <i class="bi bi-circle text-muted"></i>
+                            {/if}
+                            <div class="mt-1 text-muted" style="font-size: 0.75rem;">{trans('setup.step1.short')}</div>
+                        </div>
+                        <div class="col-3">
+                            {if $step >= 2}
+                                <i class="bi bi-check-circle-fill text-success"></i>
+                            {elseif $step === 1}
+                                <i class="bi bi-arrow-right-circle text-primary"></i>
+                            {else}
+                                <i class="bi bi-circle text-muted"></i>
+                            {/if}
+                            <div class="mt-1 text-muted" style="font-size: 0.75rem;">{trans('setup.step2.short')}</div>
+                        </div>
+                        <div class="col-3">
+                            {if $step >= 3}
+                                {if $step === 3}
+                                    <i class="bi bi-arrow-right-circle text-primary"></i>
+                                {else}
+                                    <i class="bi bi-check-circle-fill text-success"></i>
+                                {/if}
+                            {else}
+                                <i class="bi bi-circle text-muted"></i>
+                            {/if}
+                            <div class="mt-1 text-muted" style="font-size: 0.75rem;">{trans('setup.step3.short')}</div>
+                        </div>
+                        <div class="col-3">
+                            {if $step >= 4}
+                                {if $step === 4}
+                                    <i class="bi bi-arrow-right-circle text-primary"></i>
+                                {else}
+                                    <i class="bi bi-check-circle-fill text-success"></i>
+                                {/if}
+                            {else}
+                                <i class="bi bi-circle text-muted"></i>
+                            {/if}
+                            <div class="mt-1 text-muted" style="font-size: 0.75rem;">{trans('setup.step4.short')}</div>
+                        </div>
+                    </div>
+                </div>
             {/if}
         </div>
 
@@ -69,6 +117,14 @@
             </div>
 
         {elseif $setup_step === 'database_config'}
+            {* NEUE ERGÄNZUNG: Info über abgeschlossene Schritte *}
+            <div class="alert alert-info border-0" style="background-color: #e8f4fd;">
+                <small class="text-primary">
+                    <i class="bi bi-info-circle"></i> 
+                    {trans('setup.steps.completed')}: {trans('setup.step1.short')} & {trans('setup.step2.short')}
+                </small>
+            </div>
+            
             <h4><i class="bi bi-database-fill"></i> {trans('setup.database.title')}</h4>
             <form method="POST" action="/setup">
                 <input type="hidden" name="setup_step" value="database">
@@ -99,87 +155,59 @@
                 </div>
                 
                 <button type="submit" class="btn btn-primary w-100">
-                    <i class="bi bi-database-check"></i> {trans('setup.database.submit')}
+                    <i class="bi bi-arrow-right"></i> {trans('setup.database.submit')}
                 </button>
             </form>
 
         {elseif $setup_step === 'database_success'}
             <div class="text-center">
-                <i class="bi bi-database-check text-success" style="font-size: 4rem;"></i>
+                <i class="bi bi-check-circle text-success" style="font-size: 4rem;"></i>
                 <h4 class="mt-3 text-success">{trans('setup.database.success.title')}</h4>
-                <p class="text-muted">
-                    {trans('setup.database.success.desc')}
-                </p>
-                <div class="alert alert-info text-start mt-4">
-                    <strong>{trans('login.credentials')}:</strong><br>
-                    <strong>{trans('login.username')}:</strong> super.admin<br>
-                    <strong>{trans('login.password')}:</strong> Test1000!<br>
-                    <strong>{trans('login.email')}:</strong> super.admin@test.local
-                </div>
+                <p class="text-muted">{trans('setup.database.success.desc')}</p>
                 <a href="/setup" class="btn btn-primary mt-3">
                     <i class="bi bi-arrow-right"></i> {trans('setup.btn.continue')}
                 </a>
             </div>
 
         {elseif $setup_step === 'mail_config'}
+            {* NEUE ERGÄNZUNG: Info über abgeschlossene Schritte *}
+            <div class="alert alert-info border-0" style="background-color: #e8f4fd;">
+                <small class="text-primary">
+                    <i class="bi bi-info-circle"></i> 
+                    {trans('setup.steps.completed')}: {trans('setup.step1.short')}, {trans('setup.step2.short')} & {trans('setup.step3.short')}
+                </small>
+            </div>
+            
             <h4><i class="bi bi-envelope-fill"></i> {trans('setup.mail.title')}</h4>
-            <p class="text-muted mb-4">{trans('setup.mail.desc')}</p>
+            <p class="text-muted">{trans('setup.mail.desc')}</p>
             
             <form method="POST" action="/setup">
                 <input type="hidden" name="setup_step" value="mail">
                 <input type="hidden" name="csrf_token" value="{$_SESSION['csrf_token']}">
                 
-                <div class="mb-3">
-                    <label for="mail_host" class="form-label">{trans('setup.mail.host')}</label>
-                    <input type="text" class="form-control" id="mail_host" name="mail_host" 
-                           value="{($form_data['mail_host'] ?? '')|escape}" placeholder="smtp.gmail.com">
-                </div>
-                
                 <div class="row">
-                    <div class="col-md-6 mb-3">
+                    <div class="col-md-8 mb-3">
+                        <label for="mail_host" class="form-label">{trans('setup.mail.host')}</label>
+                        <input type="text" class="form-control" id="mail_host" name="mail_host" 
+                               value="{($form_data['mail_host'] ?? '')|escape}" required>
+                    </div>
+                    <div class="col-md-4 mb-3">
                         <label for="mail_port" class="form-label">{trans('setup.mail.port')}</label>
                         <input type="number" class="form-control" id="mail_port" name="mail_port" 
-                               value="{($form_data['mail_port'] ?? '587')|escape}">
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label for="mail_encryption" class="form-label">{trans('setup.mail.encryption')}</label>
-                        <select class="form-select" id="mail_encryption" name="mail_encryption">
-                            <option value="tls" {if ($form_data['mail_encryption'] ?? 'tls') === 'tls'}selected{/if}>TLS</option>
-                            <option value="ssl" {if ($form_data['mail_encryption'] ?? '') === 'ssl'}selected{/if}>SSL</option>
-                        </select>
+                               value="{($form_data['mail_port'] ?? '587')|escape}" required>
                     </div>
                 </div>
                 
                 <div class="mb-3">
                     <label for="mail_username" class="form-label">{trans('setup.mail.username')}</label>
                     <input type="text" class="form-control" id="mail_username" name="mail_username" 
-                           value="{($form_data['mail_username'] ?? '')|escape}">
+                           value="{($form_data['mail_username'] ?? '')|escape}" required>
                 </div>
                 
                 <div class="mb-3">
                     <label for="mail_password" class="form-label">{trans('setup.mail.password')}</label>
                     <input type="password" class="form-control" id="mail_password" name="mail_password" 
-                           value="{($form_data['mail_password'] ?? '')|escape}">
-                </div>
-                
-                <div class="mb-3">
-                    <label for="mail_from_email" class="form-label">{trans('setup.mail.from_email')}</label>
-                    <input type="email" class="form-control" id="mail_from_email" name="mail_from_email" 
-                           value="{($form_data['mail_from_email'] ?? '')|escape}">
-                </div>
-                
-                <div class="mb-3">
-                    <label for="mail_from_name" class="form-label">{trans('setup.mail.from_name')}</label>
-                    <input type="text" class="form-control" id="mail_from_name" name="mail_from_name" 
-                           value="{($form_data['mail_from_name'] ?? 'SecStore System')|escape}">
-                </div>
-                
-                <div class="mb-3 form-check">
-                    <input type="checkbox" class="form-check-input" id="mail_enable_welcome" name="mail_enable_welcome" 
-                           {if ($form_data['mail_enable_welcome'] ?? false)}checked{/if}>
-                    <label class="form-check-label" for="mail_enable_welcome">
-                        {trans('setup.mail.enable_welcome')}
-                    </label>
+                           value="{($form_data['mail_password'] ?? '')|escape}" required>
                 </div>
                 
                 <div class="d-grid gap-2">
@@ -188,47 +216,46 @@
                     </button>
                 </div>
             </form>
-            
-            <form method="POST" action="/setup" class="mt-2">
-                <input type="hidden" name="csrf_token" value="{$_SESSION['csrf_token']}">
-                <button type="submit" name="skip_mail" value="1" class="btn btn-secondary w-100">
-                    <i class="bi bi-skip-forward"></i> {trans('setup.mail.skip')}
-                </button>
-            </form>
+            {* Separater Skip-Button außerhalb des Formulars *}
+            <div class="d-grid mt-2">
+                <form method="POST" action="/setup" class="mt-2" id="skipMailForm">
+                 <input type="hidden" name="setup_step" value="mail">
+                    <input type="hidden" name="csrf_token" value="{$_SESSION['csrf_token']}">
+                    <button type="submit" name="skip_mail" value="1" class="btn btn-secondary w-100">
+                        Skip
+                    </button>
+                </form>
+            </div>
 
         {elseif $setup_step === 'complete'}
             <div class="text-center">
-                <i class="bi bi-check-circle-fill text-success" style="font-size: 4rem;"></i>
+                <i class="bi bi-check-circle text-success" style="font-size: 4rem;"></i>
                 <h4 class="mt-3 text-success">{trans('setup.complete.title')}</h4>
-                <p class="text-muted">
-                    {trans('setup.complete.desc')}
-                </p>
+                <p class="text-muted">{trans('setup.complete.desc')}</p>
                 
-                <div class="alert alert-warning text-start mt-4">
-                    <h6><i class="bi bi-exclamation-triangle-fill"></i> {trans('setup.complete.warning')}</h6>
-                    <p class="mb-2">{trans('setup.complete.warning.desc')}</p>
-                    <hr>
+                <div class="alert alert-warning text-start">
+                    <strong>{trans('setup.complete.warning')}</strong><br>
+                    {trans('setup.complete.warning.desc')}<br><br>
                     <strong>{trans('login.username')}:</strong> {$login_username}<br>
-                    <strong>{trans('login.password')}:</strong> {$login_password}<br>
+                    <strong>{trans('login.password')}:</strong> <code>{$login_password}</code><br>
                     <strong>{trans('login.email')}:</strong> {$login_email}
                 </div>
                 
-                <div class="mt-4">
-                    <a href="/login" class="btn btn-success btn-lg">
-                        <i class="bi bi-box-arrow-in-right"></i> {trans('setup.complete.login')}
-                    </a>
-                </div>
+                <a href="/login" class="btn btn-success btn-lg">
+                    <i class="bi bi-box-arrow-in-right"></i> {trans('setup.complete.login')}
+                </a>
             </div>
 
         {elseif $setup_step === 'error'}
             <div class="text-center">
                 <i class="bi bi-exclamation-triangle text-danger" style="font-size: 4rem;"></i>
-                <h4 class="mt-3">{trans('setup.error.title')}</h4>
+                <h4 class="mt-3 text-danger">{trans('setup.error.title')}</h4>
                 <a href="/setup" class="btn btn-primary mt-3">
                     <i class="bi bi-arrow-clockwise"></i> {trans('setup.btn.try_again')}
                 </a>
             </div>
         {/if}
+        
     </div>
 </div>
 {/block}

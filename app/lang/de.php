@@ -424,4 +424,15 @@ Wenn Sie LDAP für diesen Benutzer aktivieren, generieren Sie einfach ein belieb
     'setup.config.err.writeError' => 'Fehler beim Schreiben der Konfigurationsdatei',
     'setup.config.err.notReplaceable' => 'Fehler beim ersetzen der Konfigurationsdatei',
     'setup.controller.err.invalidSessionInitialization' => 'Session wurde nicht korrekt initialisiert.',
+    'setup.step1.short' => 'Config',
+    'setup.step2.short' => 'Rechte',
+    'setup.step3.short' => 'Datenbank',
+    'setup.step4.short' => 'E-Mail',
+    
+    // Setup Completion Info
+    'setup.steps.completed' => 'Abgeschlossen',
+    
+    // Database Success
+    'setup.database.success.title' => 'Datenbank erfolgreich konfiguriert',
+    'setup.database.success.desc' => 'Alle Tabellen wurden erstellt und die Datenbank ist bereit.',
 ];

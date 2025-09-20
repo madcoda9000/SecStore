@@ -424,4 +424,15 @@ return [
     'setup.config.err.notWritable' => 'Configuration file is not writable.',
     'setup.config.err.notReplaceable' => 'Error replacing configuration file.',
     'setup.controller.err.invalidSessionInitialization' => 'Invalid session initialization',
+    'setup.step1.short' => 'Config',
+    'setup.step2.short' => 'Rights',
+    'setup.step3.short' => 'Database',
+    'setup.step4.short' => 'Email',
+    
+    // Setup Completion Info
+    'setup.steps.completed' => 'Completed',
+    
+    // Database Success
+    'setup.database.success.title' => 'Database configured successfully',
+    'setup.database.success.desc' => 'All tables have been created and the database is ready.',
 ];
