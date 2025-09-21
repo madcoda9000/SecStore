@@ -106,23 +106,23 @@ Continue with [🎯 Web-Based Setup](#-web-based-setup-recommended) for the easi
 ### **📸 Setup Process Screenshots**
 
 #### **Step 1: Configuration File Check**
-![Setup Step 1](Documentation/Screenshots/setup-step-1-config.png)
+![Setup Step 1](Screenshots/setup-step-1-config.png)
 *The setup wizard checks if `config.php` exists and has proper permissions*
 
 #### **Step 2: File Permissions**
-![Setup Step 2](Documentation/Screenshots/setup-step-2-permissions.png)
+![Setup Step 2](Screenshots/setup-step-2-permissions.png)
 *Verification that all files have correct write permissions for the web server*
 
 #### **Step 3: Database Configuration**
-![Setup Step 3](Documentation/Screenshots/setup-step-3-database.png)
+![Setup Step 3](Screenshots/setup-step-3-database.png)
 *Interactive database configuration with connection testing*
 
 #### **Step 4: Email Configuration (Optional)**
-![Setup Step 4](Documentation/Screenshots/setup-step-4-email.png)
+![Setup Step 4](Screenshots/setup-step-4-email.png)
 *SMTP configuration for email features - can be skipped and configured later*
 
 #### **Setup Complete**
-![Setup Complete](Documentation/Screenshots/setup-complete.png)
+![Setup Complete](Screenshots/setup-complete.png)
 *Final screen with login credentials and next steps*
 
 ### **🔧 Setup Wizard Features**
