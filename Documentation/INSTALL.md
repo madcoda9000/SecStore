@@ -12,6 +12,7 @@
 
 - [🔧 System Requirements](#-system-requirements)
 - [🚀 Quick Start (Automatic Installation)](#-quick-start-automatic-installation)
+- [🎯 Web-Based Setup (Recommended)](#-web-based-setup-recommended)
 - [⚙️ Manual Installation](#️-manual-installation)
 - [🗄️ Database Setup](#️-database-setup)
 - [📁 Configuration](#-configuration)
@@ -81,11 +82,105 @@ chmod +x secstore_setup.sh
 
 ### **3. After automatic installation:**
 
-Jump to [🗄️ Database Setup](#️-database-setup) and [📁 Configuration](#-configuration).
+Continue with [🎯 Web-Based Setup](#-web-based-setup-recommended) for the easiest configuration experience.
+
+---
+
+## 🎯 Web-Based Setup (Recommended)
+
+**✨ NEW:** SecStore now features an intuitive web-based setup wizard that guides you through the entire configuration process!
+
+### **🚀 Getting Started**
+
+1. **Complete the Quick Start** or Manual Installation above
+2. **Start a web server:**
+   ```bash
+   # For development
+   php -S localhost:8000 -t public
+   
+   # OR configure Apache/Nginx (see Webserver Configuration)
+   ```
+3. **Open your browser** and navigate to your SecStore installation
+4. **Follow the setup wizard** - it will automatically detect missing configuration and guide you through each step
+
+### **📸 Setup Process Screenshots**
+
+#### **Step 1: Configuration File Check**
+![Setup Step 1](Documentation/Screenshots/setup-step-1-config.png)
+*The setup wizard checks if `config.php` exists and has proper permissions*
+
+#### **Step 2: File Permissions**
+![Setup Step 2](Documentation/Screenshots/setup-step-2-permissions.png)
+*Verification that all files have correct write permissions for the web server*
+
+#### **Step 3: Database Configuration**
+![Setup Step 3](Documentation/Screenshots/setup-step-3-database.png)
+*Interactive database configuration with connection testing*
+
+#### **Step 4: Email Configuration (Optional)**
+![Setup Step 4](Documentation/Screenshots/setup-step-4-email.png)
+*SMTP configuration for email features - can be skipped and configured later*
+
+#### **Setup Complete**
+![Setup Complete](Documentation/Screenshots/setup-complete.png)
+*Final screen with login credentials and next steps*
+
+### **🔧 Setup Wizard Features**
+
+| Feature | Description |
+|---------|-------------|
+| **🎯 Visual Progress** | Clear step-by-step indicator showing current progress |
+| **✅ Automatic Validation** | Real-time validation of database connections and SMTP settings |
+| **⚡ Smart Skip Options** | Skip optional steps (like email) and configure them later |
+| **🔄 Error Recovery** | Helpful error messages with specific instructions to fix issues |
+| **🌍 Multi-Language** | Available in German and English |
+| **📱 Responsive Design** | Works perfectly on desktop, tablet, and mobile devices |
+
+### **🛠️ What the Setup Wizard Configures**
+
+1. **📁 Configuration File**: Creates and validates `config.php` from template
+2. **🗄️ Database Connection**: Tests and saves database credentials
+3. **🏗️ Database Schema**: Automatically creates all required tables and indexes
+4. **👤 Admin User**: Creates default administrator account with secure credentials
+5. **📧 Email Settings**: Configures SMTP for email features (optional)
+6. **🔐 Security Settings**: Applies secure defaults for all security features
+
+### **⚙️ Before Starting the Web Setup**
+
+**Required:** Complete one of these preparation steps:
+
+#### **Option A: Copy Configuration Template**
+```bash
+cd /path/to/secstore
+cp config.php_TEMPLATE config.php
+chmod 664 config.php
+chown www-data:www-data config.php  # Ubuntu/Debian
+# OR
+chown apache:apache config.php      # RHEL/CentOS/Fedora
+```
+
+#### **Option B: Let the Setup Guide You**
+If you haven't copied the configuration file, the setup wizard will:
+- Detect the missing `config.php`
+- Show you exactly which commands to run
+- Wait for you to complete the step
+- Continue automatically once the file is ready
+
+### **🎯 Setup Wizard URLs**
+
+| URL Pattern | Purpose |
+|-------------|---------|
+| `http://your-domain.com/` | Main entry point - automatically redirects to setup if needed |
+| `http://your-domain.com/setup` | Direct access to setup wizard |
+| `http://localhost:8000/` | Local development server |
+
+> **💡 Tip:** The setup wizard is automatically activated when SecStore detects missing or incomplete configuration. Once setup is complete, the wizard is automatically disabled for security.
 
 ---
 
 ## ⚙️ Manual Installation
+
+For advanced users who prefer manual configuration or custom environments:
 
 ### **Step 1: Install PHP 8.3+**
 
@@ -201,7 +296,12 @@ composer install
 
 ## 🗄️ Database Setup
 
-### **Step 1: Create Database and User**
+### **📝 For Web-Based Setup Users:**
+> **Skip this section** - the setup wizard handles database creation automatically!
+
+### **⚙️ For Manual Installation:**
+
+#### **Step 1: Create Database and User**
 
 ```sql
 -- Connect to MySQL/MariaDB as root
@@ -219,21 +319,36 @@ FLUSH PRIVILEGES;
 exit;
 ```
 
-### **Step 2: Import Database Schema**
+#### **Step 2: Import Database Schema**
 
 ```bash
-# Import the schema
+# Import the database structure
 mysql -u secstore_user -p secstore < database/schema.sql
+
+# Import default data (admin user and roles)
+mysql -u secstore_user -p secstore < database/default_data.sql
 
 # Verify tables were created
 mysql -u secstore_user -p secstore -e "SHOW TABLES;"
+
+# Verify admin user was created
+mysql -u secstore_user -p secstore -e "SELECT username, email, roles FROM users;"
 ```
+
+> **📝 Note:** The database files are included in the SecStore repository:
+> - `database/schema.sql` - Complete database structure
+> - `database/default_data.sql` - Default admin user and roles
 
 ---
 
 ## 📁 Configuration
 
-### **Step 1: Create Configuration File**
+### **🎯 For Web-Based Setup Users:**
+> **Skip this section** - the setup wizard creates the configuration automatically!
+
+### **⚙️ For Manual Installation:**
+
+#### **Step 1: Create Configuration File**
 
 ```bash
 # Copy template
@@ -246,7 +361,7 @@ chown www-data:www-data config.php  # Ubuntu/Debian
 chown apache:apache config.php      # RHEL/CentOS/Fedora
 ```
 
-### **Step 2: Configure Database Connection**
+#### **Step 2: Configure Database Connection**
 
 Edit `config.php` and update database settings:
 
@@ -282,7 +397,7 @@ $config = [
 ];
 ```
 
-### **Step 3: Generate Encryption Key**
+#### **Step 3: Generate Encryption Key**
 
 ```bash
 # Generate secure encryption key
@@ -291,7 +406,7 @@ php generate_key.php
 # The key is automatically written to config.php
 ```
 
-### **Step 4: Set Directory Permissions**
+#### **Step 4: Set Directory Permissions**
 
 ```bash
 # Cache directory
@@ -439,7 +554,16 @@ sudo systemctl restart nginx
 
 ## ✅ Verify Installation
 
-### **1. First Login:**
+### **🎯 Web-Based Setup:**
+If you used the web-based setup, verification is automatic! The setup wizard:
+- ✅ Tests database connection during configuration
+- ✅ Verifies email settings (if configured)
+- ✅ Creates the default admin account
+- ✅ Provides login credentials on completion
+
+### **⚙️ Manual Installation:**
+
+#### **1. First Login:**
 
 - **URL:** `http://your-domain.com` (or `http://localhost:8000`)
 - **Username:** `super.admin`
@@ -447,7 +571,7 @@ sudo systemctl restart nginx
 
 > **⚠️ Important:** Change the default password immediately after first login!
 
-### **2. Check System Status:**
+#### **2. Check System Status:**
 
 ```bash
 # Check PHP version
@@ -463,7 +587,7 @@ composer --version
 composer show
 ```
 
-### **3. Function Tests:**
+#### **3. Function Tests:**
 
 - ✅ Login with default account
 - ✅ User dashboard accessible
@@ -536,6 +660,7 @@ chmod +x .git/hooks/pre-commit
 echo "test" > config-test.php && git add config-test.php
 git commit -m "Security test"  # Should be blocked
 rm config-test.php  # Remove test file
+```
 
 **🔒 Security Notice:** The pre-commit hook automatically blocks commits of:
 - `config*.php` (except templates)
@@ -544,6 +669,7 @@ rm config-test.php  # Remove test file
 
 **💡 Allowed Template Files:** `config.php_TEMPLATE`, `config.php.example`, `.env.example`
 
+```bash
 # Check PHP syntax
 vendor/bin/phpcs app/
 
@@ -557,128 +683,193 @@ php -S localhost:8000 -t public -d xdebug.mode=debug
 ### **Useful Developer Commands:**
 
 ```bash
-# Dependencies with dev packages
-composer install
+# Clear Latte template cache
+rm -rf cache/*.php
 
-# Update autoloader
+# Regenerate composer autoloader
 composer dump-autoload
 
-# Generate new secret key
-php generate_key.php
+# Export current database schema (for developers)
+php generate_schema.php
 
-# Check database schema
-mysql -u secstore_user -p secstore -e "SHOW TABLES;"
+# Check database connection
+php -r "
+$config = include 'config.php';
+try {
+    $pdo = new PDO('mysql:host='.\$config['db']['host'].';dbname='.\$config['db']['name'], 
+                   \$config['db']['user'], \$config['db']['pass']);
+    echo 'Database connection: OK\n';
+} catch(Exception \$e) {
+    echo 'Database connection failed: ' . \$e->getMessage() . '\n';
+}
+"
 ```
+
+### **🛠️ Schema Management Tools:**
+
+SecStore includes helpful tools for database schema management:
+
+```bash
+# Export current schema from database
+php generate_schema.php
+
+# This creates:
+# - database/schema.sql (table structures)
+# - database/default_data.sql (default admin & roles)
+```
+
+**When to use:**
+- After database structure changes
+- Before major updates
+- For backup purposes
+- When contributing to SecStore development
 
 ---
 
 ## 🔧 Troubleshooting
 
-### **Common Problems and Solutions:**
+### **🎯 Web-Based Setup Issues**
 
-#### **Problem: "Cache directory is not writable"**
+#### **Setup wizard not loading:**
 ```bash
-# Solution:
-mkdir -p cache
-chmod 755 cache
-chown www-data:www-data cache
+# Check file permissions
+ls -la config.php*
+chmod 664 config.php_TEMPLATE config.php
+
+# Check web server logs
+sudo tail -f /var/log/apache2/error.log
+# OR
+sudo tail -f /var/log/nginx/error.log
 ```
 
-#### **Problem: "Database connection failed"**
-```bash
-# Test connection:
-mysql -u secstore_user -p secstore
+#### **Database connection fails in setup:**
+- ✅ Verify database server is running: `sudo systemctl status mysql`
+- ✅ Check database credentials are correct
+- ✅ Ensure database exists: `SHOW DATABASES;`
+- ✅ Verify user permissions: `SHOW GRANTS FOR 'username'@'localhost';`
 
-# Solution: Check config.php database settings
+#### **Email setup fails:**
+- ✅ Test SMTP connection manually: `telnet smtp.server.com 587`
+- ✅ Check firewall allows outbound SMTP: `sudo ufw status`
+- ✅ Verify authentication credentials with email provider
+- ✅ **Remember:** Email setup can be skipped and configured later!
+
+### **⚙️ General Issues**
+
+#### **Permission Errors:**
+```bash
+# Fix file permissions
+find . -type f -exec chmod 644 {} \;
+find . -type d -exec chmod 755 {} \;
+chmod 664 config.php
+chmod 755 cache/
+
+# Fix ownership
+sudo chown -R www-data:www-data .  # Ubuntu/Debian
+sudo chown -R apache:apache .      # RHEL/CentOS
 ```
 
-#### **Problem: "Config file not found"**
+#### **Composer Issues:**
 ```bash
-# Solution:
-cp config.example.php config.php
-# Then adjust config.php accordingly
+# Clear composer cache
+composer clear-cache
+
+# Update composer itself
+composer self-update
+
+# Reinstall dependencies
+rm -rf vendor/ composer.lock
+composer install
 ```
 
-#### **Problem: Email sending doesn't work**
+#### **Database Issues:**
 ```bash
-# Test SMTP settings:
-telnet smtp.yourmailserver.com 587
+# Check MySQL/MariaDB status
+sudo systemctl status mysql
 
-# Solution: Check mail configuration in config.php
+# Restart database service
+sudo systemctl restart mysql
+
+# Check error logs
+sudo tail -f /var/log/mysql/error.log
 ```
 
-#### **Problem: 500 Internal Server Error**
+#### **PHP Issues:**
 ```bash
-# Check error log:
-tail -f /var/log/apache2/error.log
-# or
-tail -f public/error.log
+# Check PHP configuration
+php --ini
+php -m  # List loaded modules
 
-# Enable PHP errors for debugging:
-ini_set('display_errors', '1');
+# Check PHP error logs
+tail -f /var/log/php_errors.log
+
+# Test PHP syntax
+php -l index.php
 ```
 
-#### **Problem: Missing PHP modules**
-```bash
-# Install missing modules:
-sudo apt install php8.3-MODULENAME
-# or
-sudo dnf install php-MODULENAME
+### **🚨 Common Error Messages**
 
-# Restart PHP:
-sudo systemctl restart php8.3-fpm
-```
-
-### **Check Log Files:**
-
-```bash
-# SecStore logs (in admin panel)
-# System logs
-tail -f /var/log/syslog
-
-# Apache logs
-tail -f /var/log/apache2/access.log
-tail -f /var/log/apache2/error.log
-
-# Nginx logs
-tail -f /var/log/nginx/access.log
-tail -f /var/log/nginx/error.log
-```
+| Error | Solution |
+|-------|----------|
+| `config.php not found` | Copy `config.php_TEMPLATE` to `config.php` |
+| `Permission denied` | Fix file permissions with `chmod 664 config.php` |
+| `Database connection failed` | Check database credentials and server status |
+| `SMTP connection failed` | Verify SMTP settings or skip email setup |
+| `Cache directory not writable` | Set permissions: `chmod 755 cache/` |
+| `Class not found` | Run `composer install` to install dependencies |
 
 ---
 
 ## 📞 Support
 
-### **Documentation:**
-- 📖 [README.md](../README.md) - Project overview
-- 📝 [CHANGELOG.md](CHANGELOG.md) - Version history and updates
-- 🔒 [SECURITY.md](SECURITY.md) - Security policies (if available)
+### **📖 Documentation**
+- **[📖 Installation Guide](Documentation/INSTALL.md)** - This document
+- **[📝 Changelog](Documentation/CHANGELOG.md)** - Version history
+- **[🔒 Security](Documentation/SECURITY.md)** - Security policies
 
-### **Community & Help:**
-- 🐛 **Bug Reports:** [GitHub Issues](https://github.com/madcoda9000/SecStore/issues)
-- 💡 **Feature Requests:** [GitHub Discussions](https://github.com/madcoda9000/SecStore/discussions)
+### **💬 Community Support**
+- **[🐛 Bug Reports](https://github.com/madcoda9000/SecStore/issues)** - Report issues
+- **[💡 Feature Requests](https://github.com/madcoda9000/SecStore/discussions)** - Suggest improvements
+- **[❓ Q&A](https://github.com/madcoda9000/SecStore/discussions/categories/q-a)** - Get help from community
 
-### **Useful Links:**
-- 🔗 [Flight PHP Documentation](https://docs.flightphp.com/)
-- 🔗 [Latte Template Engine](https://latte.nette.org/en/)
-- 🔗 [Composer Documentation](https://getcomposer.org/doc/)
+### **🔍 Before Asking for Help**
+
+1. **✅ Check this troubleshooting section**
+2. **✅ Search existing issues:** [GitHub Issues](https://github.com/madcoda9000/SecStore/issues)
+3. **✅ Check the logs:** `tail -f /var/log/apache2/error.log`
+4. **✅ Verify system requirements** are met
+
+### **📝 When Reporting Issues**
+
+Include this information:
+- **Operating System:** (Ubuntu 22.04, etc.)
+- **PHP Version:** `php --version`
+- **Database:** MySQL/MariaDB version
+- **Webserver:** Apache/Nginx version
+- **Error Messages:** Full error text
+- **Steps to Reproduce:** What you did before the error occurred
 
 ---
 
-## 🎉 Successfully Installed!
+## 🎉 Conclusion
 
-Congratulations! SecStore is now ready to use. 
+**Congratulations!** You've successfully installed SecStore. The platform is now ready to provide secure user management for your applications.
 
-### **Next Steps:**
+### **🚀 Next Steps:**
 
-1. 🔐 **Change admin password** (immediately!)
-2. 📧 **Configure email settings**
-3. 👥 **Create first users**
-4. 🛡️ **Enable 2FA for admin accounts**
-5. 📊 **Set up system monitoring**
+1. **🔐 Change the default admin password** (very important!)
+2. **⚙️ Configure additional settings** in the admin panel
+3. **👥 Create user accounts** or enable registration
+4. **📧 Set up email notifications** (if skipped during setup)
+5. **🔒 Review security settings** and enable 2FA
+6. **📊 Explore the admin dashboard** and logging features
 
----
+### **🛡️ Security Reminders:**
 
-> **💡 Tip:** Bookmark this guide for future updates and maintenance tasks!
+- ✅ **Use HTTPS** in production environments
+- ✅ **Regular backups** of database and configuration
+- ✅ **Keep SecStore updated** with latest releases
+- ✅ **Monitor logs** for suspicious activity
+- ✅ **Enable 2FA** for all admin accounts
 
-**SecStore Team** ❤️ *Thank you for using SecStore!*
+**Welcome to SecStore!** 🎊
