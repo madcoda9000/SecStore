@@ -10,7 +10,7 @@
 
 **A complete authentication and user management platform with modern security features and enterprise-ready functionality.**
 
-[📚 Documentation](Documentation/INSTALL.md) • [🚀 Live Demo](#) • [🐛 Bug Reports](https://github.com/madcoda9000/SecStore/issues) • [💬 Discussions](https://github.com/madcoda9000/SecStore/discussions)
+[📚 Documentation](Documentation/INSTALL.md) • [🧑‍💻 Developer Documentation](Documentation/DEVDOC.md) • [🐛 Bug Reports](https://github.com/madcoda9000/SecStore/issues) • [💬 Discussions](https://github.com/madcoda9000/SecStore/discussions)
 
 </div>
 
@@ -93,6 +93,30 @@ php -S localhost:8000 -t public
 ### **Manual Installation**
 
 For detailed installation instructions and production setup see **[📖 INSTALL.md](Documentation/INSTALL.md)**
+
+---
+
+## 🧑‍💻 Extend SecStore
+
+**SecStore is designed as a boilerplate** for building custom web applications with modern security features built-in.
+
+<div align="center">
+
+[![Developer Documentation](https://img.shields.io/badge/📖_Developer_Guide-Read_Now-blue?style=for-the-badge)](Documentation/DEVDOC.md)
+
+**Learn to extend SecStore with custom pages, controllers, and features**  
+*Complete step-by-step guide with practical examples*
+
+</div>
+
+### **What you'll learn:**
+- 🔧 Development environment setup
+- 📄 Creating Latte templates and controllers  
+- 🛣️ Adding routes and navigation
+- 💾 JavaScript integration (CSP-compliant)
+- 🌍 Multilingual support implementation
+
+---
 
 ---
 
