@@ -118,8 +118,6 @@ For detailed installation instructions and production setup see **[📖 INSTALL.
 
 ---
 
----
-
 ## 🌟 Feature Highlights
 
 <details>
