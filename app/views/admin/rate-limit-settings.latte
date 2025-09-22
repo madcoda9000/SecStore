@@ -172,7 +172,7 @@
                                         <td class="text-center">
                                             {if isset($status[$limitType])}
                                                 <span class="badge bg-{if $status[$limitType]['current_requests'] > $status[$limitType]['max_requests'] * 0.8}warning{else}success{/if}">
-                                                    {$status[$limitType]['current_requests']}/{$status[$limitType]['max_requests']}
+                                                    {$status[$limitType]['current_requests']}/{$config['limits'][$limitType]['requests'] ?? 0}
                                                 </span>
                                             {else}
                                                 <span class="text-muted">-</span>
