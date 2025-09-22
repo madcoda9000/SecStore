@@ -325,6 +325,13 @@ return [
     'rate_limit.msg2' => 'You have exceeded the allowed number of requests.',
     'rate_limit.msg3' => 'Please wait a moment before trying again.',
     'rate_limit.msg4' => 'If you believe this is an error, please contact the administrator. The page will automatically refresh when the block is lifted.',
+    'rate_limit.clear_violations' => 'Clear Violations',
+    'rate_limit.clear_confirm' => 'Really delete all violations?',
+    'rate_limit.clear_success' => 'Violations cleared successfully',
+    'rate_limit.clear_error' => 'Error clearing violations',
+    'rate_limit.clear_modal_title' => 'Clear Violations',
+    'rate_limit.clear_modal_description' => 'This action cannot be undone. All current rate limit violations will be permanently deleted.',
+    'rate_limit.clear_modal_confirm_btn' => 'Delete Violations',
 
     // Common
     'common.enabled' => 'Enabled',
@@ -341,6 +348,9 @@ return [
     'common.actions' => 'Actions',
     'common.count' => 'Count',
     'common.close' => 'Close',
+    'common.cancel' => 'Cancel',
+    'common.confirm' => 'Confirm',
+    'common.delete' => 'Delete',
 
     'profile.title' => 'Profile',
     'profile.heading' => 'Manage your profile settings',
@@ -429,10 +439,10 @@ return [
     'setup.step3.short' => 'Database',
     'setup.step4.short' => 'Email',
     'setup.complete.login' => 'Go to Login',
-    
+
     // Setup Completion Info
     'setup.steps.completed' => 'Completed',
-    
+
     // Database Success
     'setup.database.success.title' => 'Database configured successfully',
     'setup.database.success.desc' => 'All tables have been created and the database is ready.',

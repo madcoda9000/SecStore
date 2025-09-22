@@ -7,6 +7,7 @@ use App\Utils\LogType;
 use App\Utils\SessionUtil;
 use App\Models\User;
 use App\Utils\TranslationUtil;
+use Exception;
 use Flight;
 
 class RateLimitController
@@ -99,191 +100,190 @@ class RateLimitController
     }
         */
 
-public function updateSettings()
-{
-    $data = Flight::request()->data;
+    public function updateSettings()
+    {
+        $data = Flight::request()->data;
 
-    try {
-        // Config-Datei einlesen
-        $configFile = "../config.php";
-        $configContent = file_get_contents($configFile);
-        $existingConfig = include $configFile;
+        try {
+            // Config-Datei einlesen
+            $configFile = "../config.php";
+            $configContent = file_get_contents($configFile);
+            $existingConfig = include $configFile;
 
-        // DEBUG: Pattern testen
-        $pattern = '/(\$rateLimiting\s*=\s*\[)(.*?)(\];)/s';
-        
-        if (preg_match($pattern, $configContent, $matches)) {
-            error_log("Pattern FOUND - Match: " . $matches[0]);
-        } else {
-            error_log("Pattern NOT FOUND in config file");
-            // Pattern anpassen für Kommentare
-            $pattern = '/(\/\/\s*Rate\s*Limiting.*?\n\$rateLimiting\s*=\s*\[)(.*?)(\];)/s';
+            // DEBUG: Pattern testen
+            $pattern = '/(\$rateLimiting\s*=\s*\[)(.*?)(\];)/s';
+
             if (preg_match($pattern, $configContent, $matches)) {
-                error_log("Alternative Pattern FOUND");
+                error_log("Pattern FOUND - Match: " . $matches[0]);
             } else {
-                error_log("NO Pattern matches found!");
-            }
-        }
-        
-        if ($configContent === false) {
-            throw new \Exception('Cannot read config file');
-        }
-
-        // Bestehende rateLimiting-Konfiguration als Basis verwenden
-        $newConfig = $existingConfig['rateLimiting'] ?? [];
-
-        // Nur die gesendeten Werte aktualisieren
-        
-        // Enabled Status aktualisieren
-        $newConfig['enabled'] = isset($data->enabled);
-        
-        // Limits aktualisieren (nur die gesendeten)
-        if (isset($data->limits)) {
-            if (!isset($newConfig['limits'])) {
-                $newConfig['limits'] = [];
-            }
-            
-            foreach ($data->limits as $limitType => $limitData) {
-                $newConfig['limits'][$limitType] = [
-                    'requests' => (int)$limitData['requests'],
-                    'window' => (int)$limitData['window']
-                ];
-            }
-        }
-        
-        // Settings aktualisieren (nur die gesendeten)
-        if (isset($data->settings)) {
-            if (!isset($newConfig['settings'])) {
-                $newConfig['settings'] = [];
-            }
-            
-            foreach ($data->settings as $setting => $value) {
-                $newConfig['settings'][$setting] = is_numeric($value) ? (int)$value : (bool)$value;
-            }
-        }
-
-        // Pattern für $rateLimiting Array
-        $pattern = '/(\$rateLimiting\s*=\s*\[)(.*?)(\];)/s';
-
-        // Neues Array als formatierter PHP-Code mit besserer Formatierung
-        $newRateLimitingArray = $this->formatArrayForConfig($newConfig);
-
-        // Neuen Block zusammenbauen
-        $replacement = '$rateLimiting = ' . $newRateLimitingArray . ";";
-
-        // Neuen Config-Code generieren
-        $newConfigContent = preg_replace($pattern, $replacement, $configContent);
-
-        if ($newConfigContent === null) {
-            throw new \Exception('Failed to replace configuration content');
-        }
-
-        // Datei mit neuem Inhalt speichern
-        if (file_put_contents($configFile, $newConfigContent)) {
-            LogUtil::logAction(
-                LogType::AUDIT,
-                'RateLimitController',
-                'updateSettings',
-                'Rate limiting settings updated by admin: ' . $_SESSION['user']['username']
-            );
-
-            Flight::json(['success' => true, 'message' => 'Rate limiting settings updated successfully']);
-        } else {
-            throw new \Exception('Failed to write config file');
-        }
-
-    } catch (\Exception $e) {
-        LogUtil::logAction(
-            LogType::ERROR,
-            'RateLimitController',
-            'updateSettings',
-            'Failed to update rate limiting settings: ' . $e->getMessage()
-        );
-
-        Flight::json(['success' => false, 'message' => 'Failed to update settings: ' . $e->getMessage()]);
-    }
-}
-
-/**
- * Formatiert Array für Config-Datei mit besserer Lesbarkeit
- */
-private function formatArrayForConfig($config)
-{
-    $result = "[\n";
-    
-    foreach ($config as $key => $value) {
-        if ($key === 'enabled') {
-            $result .= "  'enabled' => " . ($value ? 'true' : 'false') . ",\n\n";
-        } elseif ($key === 'limits') {
-            $result .= "  // Custom Limits (überschreibt Defaults)\n";
-            $result .= "  'limits' => [\n";
-            
-            // Gruppierung nach Kategorien
-            $authLimits = ['login', 'register', 'forgot-password', 'reset-password', '2fa'];
-            
-            $result .= "    // Authentifizierung - sehr restriktiv\n";
-            foreach ($authLimits as $limitType) {
-                if (isset($value[$limitType])) {
-                    $limit = $value[$limitType];
-                    $comment = $this->getLimitComment($limitType);
-                    $result .= "    '$limitType' => ['requests' => {$limit['requests']}, 'window' => {$limit['window']}], $comment\n";
+                error_log("Pattern NOT FOUND in config file");
+                // Pattern anpassen für Kommentare
+                $pattern = '/(\/\/\s*Rate\s*Limiting.*?\n\$rateLimiting\s*=\s*\[)(.*?)(\];)/s';
+                if (preg_match($pattern, $configContent, $matches)) {
+                    error_log("Alternative Pattern FOUND");
+                } else {
+                    error_log("NO Pattern matches found!");
                 }
             }
-            
-            $result .= "\n    // Admin Bereiche - restriktiv\n";
-            if (isset($value['admin'])) {
-                $limit = $value['admin'];
-                $result .= "    'admin' => ['requests' => {$limit['requests']}, 'window' => {$limit['window']}], // Admin-Actions\n";
+
+            if ($configContent === false) {
+                throw new \Exception('Cannot read config file');
             }
-            
-            $result .= "\n    // Globales Limit als Fallback\n";
-            if (isset($value['global'])) {
-                $limit = $value['global'];
-                $result .= "    'global' => ['requests' => {$limit['requests']}, 'window' => {$limit['window']}] // Requests pro Stunde\n";
+
+            // Bestehende rateLimiting-Konfiguration als Basis verwenden
+            $newConfig = $existingConfig['rateLimiting'] ?? [];
+
+            // Nur die gesendeten Werte aktualisieren
+
+            // Enabled Status aktualisieren
+            $newConfig['enabled'] = isset($data->enabled);
+
+            // Limits aktualisieren (nur die gesendeten)
+            if (isset($data->limits)) {
+                if (!isset($newConfig['limits'])) {
+                    $newConfig['limits'] = [];
+                }
+
+                foreach ($data->limits as $limitType => $limitData) {
+                    $newConfig['limits'][$limitType] = [
+                        'requests' => (int)$limitData['requests'],
+                        'window' => (int)$limitData['window']
+                    ];
+                }
             }
-            
-            $result .= "  ],\n";
-        } elseif ($key === 'settings') {
-            $result .= "  // Erweiterte Einstellungen\n";
-            $result .= "  'settings' => [\n";
-            
-            foreach ($value as $settingKey => $settingValue) {
-                $comment = $this->getSettingComment($settingKey);
-                $formattedValue = is_bool($settingValue) ? ($settingValue ? 'true' : 'false') : $settingValue;
-                $result .= "    '$settingKey' => $formattedValue, $comment\n";
+
+            // Settings aktualisieren (nur die gesendeten)
+            if (isset($data->settings)) {
+                if (!isset($newConfig['settings'])) {
+                    $newConfig['settings'] = [];
+                }
+
+                foreach ($data->settings as $setting => $value) {
+                    $newConfig['settings'][$setting] = is_numeric($value) ? (int)$value : (bool)$value;
+                }
             }
-            
-            $result .= "  ]\n";
+
+            // Pattern für $rateLimiting Array
+            $pattern = '/(\$rateLimiting\s*=\s*\[)(.*?)(\];)/s';
+
+            // Neues Array als formatierter PHP-Code mit besserer Formatierung
+            $newRateLimitingArray = $this->formatArrayForConfig($newConfig);
+
+            // Neuen Block zusammenbauen
+            $replacement = '$rateLimiting = ' . $newRateLimitingArray . ";";
+
+            // Neuen Config-Code generieren
+            $newConfigContent = preg_replace($pattern, $replacement, $configContent);
+
+            if ($newConfigContent === null) {
+                throw new \Exception('Failed to replace configuration content');
+            }
+
+            // Datei mit neuem Inhalt speichern
+            if (file_put_contents($configFile, $newConfigContent)) {
+                LogUtil::logAction(
+                    LogType::AUDIT,
+                    'RateLimitController',
+                    'updateSettings',
+                    'Rate limiting settings updated by admin: ' . $_SESSION['user']['username']
+                );
+
+                Flight::json(['success' => true, 'message' => 'Rate limiting settings updated successfully']);
+            } else {
+                throw new \Exception('Failed to write config file');
+            }
+        } catch (\Exception $e) {
+            LogUtil::logAction(
+                LogType::ERROR,
+                'RateLimitController',
+                'updateSettings',
+                'Failed to update rate limiting settings: ' . $e->getMessage()
+            );
+
+            Flight::json(['success' => false, 'message' => 'Failed to update settings: ' . $e->getMessage()]);
         }
     }
-    
-    $result .= "]";
-    return $result;
-}
 
-private function getLimitComment($limitType)
-{
-    return match($limitType) {
-        'login' => '// Login Versuche',
-        'register' => '// Registrierungen pro Stunde',
-        'forgot-password' => '// Password-Resets pro Stunde',
-        'reset-password' => '// Reset-Versuche pro Stunde',
-        '2fa' => '// 2FA Versuche in 5 Minuten',
-        default => ''
-    };
-}
+    /**
+     * Formatiert Array für Config-Datei mit besserer Lesbarkeit
+     */
+    private function formatArrayForConfig($config)
+    {
+        $result = "[\n";
 
-private function getSettingComment($setting)
-{
-    return match($setting) {
-        'cleanup_interval' => '// Session cleanup Intervall',
-        'max_violations_per_hour' => '// Max Violations bevor schärfere Maßnahmen',
-        'block_repeat_offenders' => '// Repeat Offenders härter bestrafen',
-        'log_violations' => '// Violations loggen',
-        'auto_refresh_on_limit' => '// Automatischer Refresh nach Ablauf',
-        default => ''
-    };
-}
+        foreach ($config as $key => $value) {
+            if ($key === 'enabled') {
+                $result .= "  'enabled' => " . ($value ? 'true' : 'false') . ",\n\n";
+            } elseif ($key === 'limits') {
+                $result .= "  // Custom Limits (überschreibt Defaults)\n";
+                $result .= "  'limits' => [\n";
+
+                // Gruppierung nach Kategorien
+                $authLimits = ['login', 'register', 'forgot-password', 'reset-password', '2fa'];
+
+                $result .= "    // Authentifizierung - sehr restriktiv\n";
+                foreach ($authLimits as $limitType) {
+                    if (isset($value[$limitType])) {
+                        $limit = $value[$limitType];
+                        $comment = $this->getLimitComment($limitType);
+                        $result .= "    '$limitType' => ['requests' => {$limit['requests']}, 'window' => {$limit['window']}], $comment\n";
+                    }
+                }
+
+                $result .= "\n    // Admin Bereiche - restriktiv\n";
+                if (isset($value['admin'])) {
+                    $limit = $value['admin'];
+                    $result .= "    'admin' => ['requests' => {$limit['requests']}, 'window' => {$limit['window']}], // Admin-Actions\n";
+                }
+
+                $result .= "\n    // Globales Limit als Fallback\n";
+                if (isset($value['global'])) {
+                    $limit = $value['global'];
+                    $result .= "    'global' => ['requests' => {$limit['requests']}, 'window' => {$limit['window']}] // Requests pro Stunde\n";
+                }
+
+                $result .= "  ],\n";
+            } elseif ($key === 'settings') {
+                $result .= "  // Erweiterte Einstellungen\n";
+                $result .= "  'settings' => [\n";
+
+                foreach ($value as $settingKey => $settingValue) {
+                    $comment = $this->getSettingComment($settingKey);
+                    $formattedValue = is_bool($settingValue) ? ($settingValue ? 'true' : 'false') : $settingValue;
+                    $result .= "    '$settingKey' => $formattedValue, $comment\n";
+                }
+
+                $result .= "  ]\n";
+            }
+        }
+
+        $result .= "]";
+        return $result;
+    }
+
+    private function getLimitComment($limitType)
+    {
+        return match ($limitType) {
+            'login' => '// Login Versuche',
+            'register' => '// Registrierungen pro Stunde',
+            'forgot-password' => '// Password-Resets pro Stunde',
+            'reset-password' => '// Reset-Versuche pro Stunde',
+            '2fa' => '// 2FA Versuche in 5 Minuten',
+            default => ''
+        };
+    }
+
+    private function getSettingComment($setting)
+    {
+        return match ($setting) {
+            'cleanup_interval' => '// Session cleanup Intervall',
+            'max_violations_per_hour' => '// Max Violations bevor schärfere Maßnahmen',
+            'block_repeat_offenders' => '// Repeat Offenders härter bestrafen',
+            'log_violations' => '// Violations loggen',
+            'auto_refresh_on_limit' => '// Automatischer Refresh nach Ablauf',
+            default => ''
+        };
+    }
 
     /**
      * Aktuelle Rate Limit Violations anzeigen
@@ -499,5 +499,50 @@ private function getSettingComment($setting)
         arsort($violators);
 
         return array_slice($violators, 0, 10, true);
+    }
+
+    /**
+     * Alle Rate Limit Violations löschen
+     */
+    public function clearViolations()
+    {
+        try {
+            // Session-basierte Rate Limits zurücksetzen
+            if (isset($_SESSION['rate_limits'])) {
+                $clearedCount = count($_SESSION['rate_limits']);
+                unset($_SESSION['rate_limits']);
+
+                LogUtil::logAction(
+                    LogType::AUDIT,
+                    'RateLimitController',
+                    'clearViolations',
+                    "All rate limit violations cleared by admin. Count: {$clearedCount}"
+                );
+
+                Flight::json([
+                    'success' => true,
+                    'message' => 'All violations cleared successfully',
+                    'cleared_count' => $clearedCount
+                ]);
+            } else {
+                Flight::json([
+                    'success' => true,
+                    'message' => 'No violations to clear',
+                    'cleared_count' => 0
+                ]);
+            }
+        } catch (Exception $e) {
+            LogUtil::logAction(
+                LogType::ERROR,
+                'RateLimitController',
+                'clearViolations',
+                'Failed to clear rate limit violations: ' . $e->getMessage()
+            );
+
+            Flight::json([
+                'success' => false,
+                'message' => 'Failed to clear violations: ' . $e->getMessage()
+            ]);
+        }
     }
 }

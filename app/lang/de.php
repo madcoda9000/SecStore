@@ -325,6 +325,13 @@ Wenn Sie LDAP für diesen Benutzer aktivieren, generieren Sie einfach ein belieb
     'rate_limit.msg2' => 'Zu viele Anfragen. Bitte versuchen Sie es später erneut.',
     'rate_limit.msg3' => 'Bitte versuchen Sie es später erneut.',
     'rate_limit.msg4' => 'Wenn Sie glauben, dass dies ein Fehler ist, wenden Sie sich bitte an den Administrator. Nach ablauf der Sperrfrist wird die Sperre automatisch aufgehoben.',
+    'rate_limit.clear_violations' => 'Violations löschen',
+    'rate_limit.clear_confirm' => 'Alle Violations wirklich löschen?',
+    'rate_limit.clear_success' => 'Violations erfolgreich gelöscht',
+    'rate_limit.clear_error' => 'Fehler beim Löschen der Violations',
+    'rate_limit.clear_modal_title' => 'Violations löschen',
+    'rate_limit.clear_modal_description' => 'Diese Aktion kann nicht rückgängig gemacht werden. Alle aktuellen Rate-Limit-Verletzungen werden dauerhaft gelöscht.',
+    'rate_limit.clear_modal_confirm_btn' => 'Violations löschen',
 
     // Common
     'common.enabled' => 'Aktiviert',
@@ -341,6 +348,9 @@ Wenn Sie LDAP für diesen Benutzer aktivieren, generieren Sie einfach ein belieb
     'common.actions' => 'Aktionen',
     'common.count' => 'Anzahl',
     'common.close' => 'Schließen',
+    'common.cancel' => 'Abbrechen',
+    'common.confirm' => 'Bestätigen',
+    'common.delete' => 'Löschen',
 
     'profile.title' => 'Profil',
     'profile.heading' => 'Verwalte deine Profileinstellungen',
@@ -429,10 +439,10 @@ Wenn Sie LDAP für diesen Benutzer aktivieren, generieren Sie einfach ein belieb
     'setup.step3.short' => 'Datenbank',
     'setup.step4.short' => 'E-Mail',
     'setup.complete.login' => 'Zum Login',
-    
+
     // Setup Completion Info
     'setup.steps.completed' => 'Abgeschlossen',
-    
+
     // Database Success
     'setup.database.success.title' => 'Datenbank erfolgreich konfiguriert',
     'setup.database.success.desc' => 'Alle Tabellen wurden erstellt und die Datenbank ist bereit.',

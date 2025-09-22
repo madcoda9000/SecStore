@@ -389,6 +389,10 @@ Flight::route('GET /admin/rate-limits/status', function () {
     (new RateLimitController)->getLiveStatus();
 });
 
+securePostRoute('/admin/rate-limits/clear', function () {
+    (new RateLimitController)->clearViolations();
+}, 'admin', true);
+
 // ==========================================
 // LOG ROUTES (Admin)
 // ==========================================

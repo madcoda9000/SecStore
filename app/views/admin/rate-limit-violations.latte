@@ -3,9 +3,48 @@
 {block content}
 
 <div class="container py-4" style="flex:1">
+
+    <!-- Bootstrap Modal für Clear Violations Confirmation -->
+    <div class="modal fade" id="confirmClearModal" tabindex="-1" aria-labelledby="confirmClearLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="confirmClearLabel">
+                        <span class="bi bi-exclamation-triangle text-warning me-2"></span>
+                        {trans('rate_limit.clear_modal_title')}
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{trans('common.close')}"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="d-flex align-items-start">
+                        <span class="bi bi-shield-exclamation text-warning fs-1 me-3"></span>
+                        <div>
+                            <p class="mb-2"><strong>{trans('rate_limit.clear_confirm')}</strong></p>
+                            <p class="text-muted mb-0">
+                                {trans('rate_limit.clear_modal_description')}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <span class="bi bi-x-circle me-1"></span>
+                        {trans('common.cancel')}
+                    </button>
+                    <button type="button" class="btn btn-danger" id="confirmClearBtn">
+                        <span class="bi bi-trash me-1"></span>
+                        {trans('rate_limit.clear_modal_confirm_btn')}
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <h1 class="mb-5">
         <span class="bi bi-exclamation-triangle text-warning">&nbsp;</span>{trans('rate_limit.violations.title')}
     </h1>
+
+    <input id="csrf_token" type="hidden" name="csrf_token" value="{$_SESSION['csrf_token']}">
 
     <!-- Statistics Overview -->
     <div class="row mb-4">
