@@ -196,7 +196,7 @@ document.addEventListener("DOMContentLoaded", function () {
     showSuccessMessage(messages.testStarted);
 
     // Simulate test requests to various endpoints
-    const testEndpoints = ["/login", "/register", "/admin/settings"];
+    const testEndpoints = ["/login", "/register", "/admin/settings", "/reset-password/dwtfrkjswlgth", "/forgot-password", "/home", "/2fa-verify"];
     const results = [];
 
     for (const endpoint of testEndpoints) {

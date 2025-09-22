@@ -184,6 +184,10 @@ authRoute('POST', '/2fa-verify', function () {
     (new AuthController)->verify2FA();
 }, '2fa');
 
+authRoute('GET', '/2fa-verify', function () {
+    (new AuthController)->verify2FA();
+}, '2fa');
+
 secureRoute('GET /enable-2fa(/@comesFromSettings)', function ($comesFromSettings) use ($csrfMiddleware) {
     $csrfMiddleware->before([]);
     (new ProfileController)->enable2FA($comesFromSettings);
