@@ -124,8 +124,7 @@ class SecurityMetrics {
     
     private static function getCsrfViolations($dateFrom, $dateTo): int {
         return ORM::for_table('logs')
-            ->where('type', 'SECURITY')
-            ->where_like('message', '%CSRF%')
+            ->where_raw("(message LIKE '%CSRF token mismatch%' OR message LIKE '%No CSRF token provided%' OR message LIKE '%No CSRF token in session%')")
             ->where_gte('datum_zeit', $dateFrom . ' 00:00:00')
             ->where_lt('datum_zeit', $dateTo . ' 23:59:59')
             ->count();
@@ -211,8 +210,7 @@ class SecurityMetrics {
     
     private static function getCsrfViolationsTimeRange($from, $to): int {
         return ORM::for_table('logs')
-            ->where('type', 'SECURITY')
-            ->where_like('message', '%CSRF%')
+            ->where_rwa("(message LIKE '%CSRF token mismatch%' OR message LIKE '%No CSRF token provided%' OR message LIKE '%No CSRF token in session%')")
             ->where_gte('datum_zeit', $from)
             ->where_lt('datum_zeit', $to)
             ->count();
