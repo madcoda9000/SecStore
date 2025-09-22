@@ -204,6 +204,9 @@ svg.bi {
   .usrPageSize {
     display:none !important;
   }
+  .offcanvas .nav-link {
+    color:#5a6268 !important;
+  }
 }
 
 /* aändern des modalen dialogs und toast messages in ein bottom flyout in der mobilen ansicht */
