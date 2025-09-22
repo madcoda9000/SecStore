@@ -98,6 +98,12 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   function applyCurrentFilters() {
+    // ⭐ KRITISCHER FIX: Prüfen ob Element existiert
+    if (!violationsTableBody) {
+        console.log('ℹ️ No violations table found - skipping filters');
+        return;
+    }
+
     const rows = violationsTableBody.querySelectorAll("tr");
     let visibleCount = 0;
 
