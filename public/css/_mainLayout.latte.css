@@ -58,6 +58,7 @@ body {
 .offcanvas-body .nav-link.active {
   color: var(--bs-primary) !important;
 }
+
 [data-bs-theme="dark"] .offcanvas-body .nav-link {
   color: #ddd !important;
 }
@@ -176,7 +177,7 @@ svg.bi {
   display: none;
 }
 
-/* Medienabfrage für mobile Ansicht */
+/* mobilen ansicht */
 @media (max-width: 767px) {
   .footer .container {
     width: 95%;
@@ -207,10 +208,7 @@ svg.bi {
   .offcanvas .nav-link {
     color:#5a6268 !important;
   }
-}
 
-/* aändern des modalen dialogs und toast messages in ein bottom flyout in der mobilen ansicht */
-@media (max-width: 767.98px) {
   .modal.fade.flyout .modal-content {
     margin: 0 auto !important;
     bottom: 0 !important;
@@ -250,5 +248,15 @@ svg.bi {
 
   .toast.flyout.show {
     transform: translateY(0) !important;
+  }
+
+  .offcanvas-body .nav-item.dropdown .dropdown-menu {
+    border: none !important;
+    box-shadow: none !important;
+    background-color: transparent !important;
+    position: relative !important;
+    top: 25px !important;
+    left: -40px !important;
+    margin-bottom: 20px !important;
   }
 }

@@ -184,14 +184,6 @@ class SetupController
                 !isset($_SESSION['csrf_token']) || !isset($formData['csrf_token']) ||
                 !hash_equals($_SESSION['csrf_token'], $formData['csrf_token'])
             ) {
-                throw new Exception(TranslationUtil::t('csrf.error.invalid'));
-            }
-
-            // CSRF Token validieren
-            if (
-                !isset($_SESSION['csrf_token']) || !isset($formData['csrf_token']) ||
-                !hash_equals($_SESSION['csrf_token'], $formData['csrf_token'])
-            ) {
 
                 $errorMsg = 'CSRF Token Validierung fehlgeschlagen.';
                 if (!isset($_SESSION['csrf_token'])) {
