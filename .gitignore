@@ -483,3 +483,6 @@ config_*.php
 # latte cache
 cache/*.php
 cache/*.php.lock
+
+# claude
+.claude
