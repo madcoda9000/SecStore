@@ -2,41 +2,42 @@
 namespace App\Utils;
 
 use Exception;
+use InvalidArgumentException;
 
 /**
- * Class Name: EncryptionUtil
- *
- * Hilfsklasse zur implementierung ver / ent Schlüsselung.
- *
- * @package App\Utils
- * @author Sascha Heimann
- * @version 1.0
- * @since 2025-04-24
- *
- * Änderungen:
- * - 1.0 (2025-04-24): Erstellt.
+ * SecureEncryptionUtil
+ * 
+ * Verbesserte Verschlüsselungs- und Entschlüsselungsmethoden mit
+ * sicherer Schlüsselableitung, Authentifizierung und Eingabevalidierung.
+ * 
+ * Anforderungen:
+ * - PHP 7.4+
+ * - OpenSSL Erweiterung
+ * 
+ * Sicherheitsmerkmale:
+ * - PBKDF2 Schlüsselableitung mit 100.000 Iterationen
+ * - AES-256-CBC Verschlüsselung
+ * - HMAC-SHA256 für Datenintegrität und Authentifizierung
+ * - Eingabevalidierung und Längenbeschränkungen
+ * - Verwendung von kryptographisch sicheren Zufallswerten
+ * 
+ * Hinweis: Der Master-Schlüssel muss mindestens 256 Bit (32 Bytes) lang sein.
  */
-class EncryptionUtil
+class SecureEncryptionUtil
 {
-    // Konfigurationsdaten
     private static $config;
-    // AES-256-CBC ist sicherer als AES-128-CBC
-    // und wird von den meisten modernen Systemen unterstützt
     private static string $method = 'aes-256-cbc';
-    // Der geheime Schlüssel sollte sicher und geheim gehalten werden
-    // und nicht im Code hardcodiert sein
-    private static string $secretKey;
-    // Separator für die verschiedenen Teile der verschlüsselten Daten
     private static string $separator = '::';
-
+    
+    // Sicherheitskonfiguration
+    private const PBKDF2_ITERATIONS = 100000;  // Mindestens 100.000 Iterationen
+    private const MAX_INPUT_LENGTH = 65536;    // 64KB Maximum
+    private const SALT_LENGTH = 32;            // 256-bit Salt
+    
     /**
-     * Loads the configuration settings from config.php file.
-     *
-     * This method is designed to be lazy-loaded, meaning it will only load
-     * the configuration the first time it is invoked. Successive calls will
-     * return the pre-loaded configuration to avoid redundant file operations.
+     * Konfiguration laden
      */
-    public static function loadConfig()
+    public static function loadConfig(): void
     {
         if (!self::$config) {
             self::$config = include __DIR__ . '/../../config.php';
@@ -44,73 +45,177 @@ class EncryptionUtil
     }
     
     /**
-     * Generates a cryptographic key by hashing the secret key using the SHA-256 algorithm.
-     *
-     * @return string The generated cryptographic key in binary format.
+     * Sichere Schlüsselableitung mit PBKDF2
+     * 
+     * @param string $salt Zufälliger Salt für die Ableitung
+     * @return string Abgeleiteter Schlüssel
      */
-    private static function getKey(): string
+    private static function deriveKey(string $salt): string
     {
         self::loadConfig();
-        self::$secretKey = self::$config['security']['key'];
-        return hash('sha256', self::$secretKey, true);
+        $masterKey = self::$config['security']['key'];
+        
+        if (strlen($masterKey) < 32) {
+            throw new Exception('Master key must be at least 256 bits (32 bytes)');
+        }
+        
+        return hash_pbkdf2(
+            'sha256', 
+            $masterKey, 
+            $salt, 
+            self::PBKDF2_ITERATIONS, 
+            32, 
+            true
+        );
     }
-
+    
     /**
-     * Encrypts the given plaintext using AES-256-CBC encryption.
-     *
-     * @param string $plainText The plaintext to encrypt.
-     * @return string|false The encrypted text in base64 format, or false on failure.
-     * @throws Exception If encryption fails.
+     * Sichere Verschlüsselung mit AEAD-ähnlichen Eigenschaften
+     * 
+     * @param string $plainText Zu verschlüsselnder Text
+     * @return string Verschlüsselte Daten (Base64)
+     * @throws Exception Bei Verschlüsselungsfehlern
      */
     public static function encrypt(string $plainText): string
     {
-        $key = self::getKey();
-        $ivLength = openssl_cipher_iv_length(self::$method);
-        $iv = openssl_random_pseudo_bytes($ivLength);
-
-        $cipherText = openssl_encrypt($plainText, self::$method, $key, 0, $iv);
+        // Eingabevalidierung
+        if (strlen($plainText) > self::MAX_INPUT_LENGTH) {
+            throw new InvalidArgumentException('Input exceeds maximum length');
+        }
+        
+        if (empty($plainText)) {
+            throw new InvalidArgumentException('Input cannot be empty');
+        }
+        
+        // Zufällige Werte generieren (kryptographisch sicher)
+        $salt = random_bytes(self::SALT_LENGTH);
+        $iv = random_bytes(openssl_cipher_iv_length(self::$method));
+        
+        if ($salt === false || $iv === false) {
+            throw new Exception('Failed to generate cryptographic random bytes');
+        }
+        
+        // Schlüssel ableiten
+        $key = self::deriveKey($salt);
+        
+        // Verschlüsselung durchführen
+        $cipherText = openssl_encrypt($plainText, self::$method, $key, OPENSSL_RAW_DATA, $iv);
+        
         if ($cipherText === false) {
             throw new Exception('Encryption failed');
         }
-
-        // Authentifizierungs-Tag (HMAC)
-        $hmac = hash_hmac('sha256', $cipherText, $key, true);
-
-        // Kombinieren: base64(cipherText) + IV + HMAC
-        $data = base64_encode($cipherText) . self::$separator .
-                base64_encode($iv) . self::$separator .
-                base64_encode($hmac);
-
-        return base64_encode($data); // Alles nochmals codieren für Speicher
+        
+        // HMAC für Authentifizierung (über alle Komponenten)
+        $dataForHmac = $salt . $iv . $cipherText;
+        $hmac = hash_hmac('sha256', $dataForHmac, $key, true);
+        
+        // Komponenten kombinieren: Salt + IV + CipherText + HMAC
+        $combined = base64_encode($salt) . self::$separator .
+                   base64_encode($iv) . self::$separator .
+                   base64_encode($cipherText) . self::$separator .
+                   base64_encode($hmac);
+        
+        // Alles nochmals kodieren für sichere Speicherung
+        return base64_encode($combined);
     }
-
+    
     /**
-     * Decrypts the given encrypted text using AES-256-CBC decryption.
-     *
-     * @param string $encryptedInput The encrypted text in base64 format.
-     * @return string|false The decrypted plaintext, or false on failure.
+     * Sichere Entschlüsselung mit Authentifizierung
+     * 
+     * @param string $encryptedData Verschlüsselte Daten
+     * @return string|false Entschlüsselter Text oder false bei Fehler
      */
-    public static function decrypt(string $encryptedInput): string|false
+    public static function decrypt(string $encryptedData): string|false
     {
-        $decodedData = base64_decode($encryptedInput, true);
-        if ($decodedData === false || !str_contains($decodedData, self::$separator)) {
+        try {
+            // Eingabevalidierung
+            if (empty($encryptedData)) {
+                return false;
+            }
+            
+            // Erste Base64-Dekodierung
+            $combined = base64_decode($encryptedData, true);
+            if ($combined === false) {
+                return false;
+            }
+            
+            // Komponenten trennen
+            $parts = explode(self::$separator, $combined);
+            if (count($parts) !== 4) {
+                return false;
+            }
+            
+            [$saltB64, $ivB64, $cipherB64, $hmacB64] = $parts;
+            
+            // Base64-Dekodierung der Komponenten
+            $salt = base64_decode($saltB64, true);
+            $iv = base64_decode($ivB64, true);
+            $cipherText = base64_decode($cipherB64, true);
+            $receivedHmac = base64_decode($hmacB64, true);
+            
+            if ($salt === false || $iv === false || 
+                $cipherText === false || $receivedHmac === false) {
+                return false;
+            }
+            
+            // Längenvalidierung
+            if (strlen($salt) !== self::SALT_LENGTH || 
+                strlen($iv) !== openssl_cipher_iv_length(self::$method) ||
+                strlen($receivedHmac) !== 32) {
+                return false;
+            }
+            
+            // Schlüssel ableiten
+            $key = self::deriveKey($salt);
+            
+            // HMAC verifizieren (konstante-Zeit Vergleich)
+            $dataForHmac = $salt . $iv . $cipherText;
+            $calculatedHmac = hash_hmac('sha256', $dataForHmac, $key, true);
+            
+            if (!hash_equals($receivedHmac, $calculatedHmac)) {
+                return false; // Daten wurden manipuliert oder beschädigt
+            }
+            
+            // Entschlüsselung
+            $plainText = openssl_decrypt($cipherText, self::$method, $key, OPENSSL_RAW_DATA, $iv);
+            
+            return $plainText;
+            
+        } catch (Exception $e) {
+            // Logging könnte hier hinzugefügt werden
             return false;
         }
-
-        [$cipherBase64, $ivBase64, $hmacBase64] = explode(self::$separator, $decodedData);
-
-        $cipherText = base64_decode($cipherBase64, true);
-        $iv = base64_decode($ivBase64, true);
-        $hmac = base64_decode($hmacBase64, true);
-
-        $key = self::getKey();
-
-        // HMAC prüfen
-        $calculatedHmac = hash_hmac('sha256', $cipherText, $key, true);
-        if (!hash_equals($hmac, $calculatedHmac)) {
-            return false; // Daten wurden manipuliert
+    }
+    
+    /**
+     * Überprüft, ob die Verschlüsselungsumgebung korrekt konfiguriert ist
+     * 
+     * @return bool True wenn korrekt konfiguriert
+     */
+    public static function validateEnvironment(): bool
+    {
+        // OpenSSL verfügbar?
+        if (!extension_loaded('openssl')) {
+            return false;
         }
-
-        return openssl_decrypt($cipherText, self::$method, $key, 0, $iv);
+        
+        // Algorithmus verfügbar?
+        if (!in_array(self::$method, openssl_get_cipher_methods())) {
+            return false;
+        }
+        
+        // Konfiguration laden und prüfen
+        try {
+            self::loadConfig();
+            $masterKey = self::$config['security']['key'] ?? '';
+            
+            if (strlen($masterKey) < 32) {
+                return false; // Schlüssel zu schwach
+            }
+            
+            return true;
+        } catch (Exception $e) {
+            return false;
+        }
     }
 }
