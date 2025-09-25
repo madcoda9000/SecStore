@@ -1385,4 +1385,544 @@ class AdminController
 
         Flight::json(["success" => true, "message" => "Role deleted successfully."]);
     }
+
+    /**
+     * Bulk operations for user management
+     */
+
+    /**
+     * Handles bulk user operations (delete, enable, disable, role assignment)
+     */
+    public static function bulkUserOperations()
+    {
+        if (SessionUtil::get("user")["id"] === null) {
+            Flight::json(["success" => false, "message" => "Unauthorized"]);
+            return;
+        }
+
+        $operation = $_POST['operation'] ?? '';
+        $userIds = $_POST['userIds'] ?? [];
+        $options = $_POST['options'] ?? [];
+
+        if (empty($userIds) || !is_array($userIds)) {
+            Flight::json(["success" => false, "message" => "No users selected"]);
+            return;
+        }
+
+        // Convert to integers and validate
+        $userIds = array_map('intval', $userIds);
+        $userIds = array_filter($userIds, function ($id) {
+            return $id > 0;
+        });
+
+        if (empty($userIds)) {
+            Flight::json(["success" => false, "message" => "Invalid user selection"]);
+            return;
+        }
+
+        $results = [];
+        $success = 0;
+        $failed = 0;
+        $skipped = 0;
+
+        switch ($operation) {
+            case 'delete':
+                $results = self::bulkDeleteUsers($userIds);
+                break;
+
+            case 'enable':
+                $results = self::bulkToggleUsers($userIds, 1);
+                break;
+
+            case 'disable':
+                $results = self::bulkToggleUsers($userIds, 0);
+                break;
+
+            case 'assign_role':
+                $role = $options['role'] ?? '';
+                if (empty($role)) {
+                    Flight::json(["success" => false, "message" => "No role specified"]);
+                    return;
+                }
+                $results = self::bulkAssignRole($userIds, $role);
+                break;
+
+            case 'mfa_enable':
+                $results = self::bulkToggleMfa($userIds, true);
+                break;
+
+            case 'mfa_disable':
+                $results = self::bulkToggleMfa($userIds, false);
+                break;
+
+            case 'mfa_enforce':
+                $results = self::bulkEnforceMfa($userIds, true);
+                break;
+
+            case 'mfa_unenforce':
+                $results = self::bulkEnforceMfa($userIds, false);
+                break;
+
+            default:
+                Flight::json(["success" => false, "message" => "Unknown operation: " . $operation]);
+                return;
+        }
+
+        // Count results
+        foreach ($results as $result) {
+            if ($result['status'] === 'success') $success++;
+            elseif ($result['status'] === 'failed') $failed++;
+            elseif ($result['status'] === 'skipped') $skipped++;
+        }
+
+        // Log bulk operation
+        LogUtil::logAction(
+            LogType::AUDIT,
+            "AdminController",
+            "bulkUserOperations",
+            sprintf(
+                "BULK %s: %d success, %d failed, %d skipped",
+                strtoupper($operation),
+                $success,
+                $failed,
+                $skipped
+            ),
+            SessionUtil::get("user")["username"]
+        );
+
+        Flight::json([
+            "success" => $success > 0,
+            "operation" => $operation,
+            "summary" => [
+                "total" => count($userIds),
+                "success" => $success,
+                "failed" => $failed,
+                "skipped" => $skipped
+            ],
+            "details" => $results,
+            "message" => sprintf(
+                "%s: %d successful, %d failed, %d skipped",
+                ucfirst($operation),
+                $success,
+                $failed,
+                $skipped
+            )
+        ]);
+    }
+
+    /**
+     * Bulk delete users with protection for super.admin
+     */
+    private static function bulkDeleteUsers(array $userIds): array
+    {
+        $results = [];
+        $currentUser = SessionUtil::get("user");
+
+        foreach ($userIds as $userId) {
+            // Get user info first
+            $user = User::findUserById($userId);
+
+            if (!$user) {
+                $results[] = [
+                    'userId' => $userId,
+                    'status' => 'failed',
+                    'reason' => 'User not found'
+                ];
+                continue;
+            }
+
+            // Protection: Can't delete super.admin
+            if ($user['username'] === 'super.admin') {
+                $results[] = [
+                    'userId' => $userId,
+                    'username' => $user['username'],
+                    'status' => 'skipped',
+                    'reason' => 'Cannot delete super.admin account'
+                ];
+                continue;
+            }
+
+            // Protection: Can't delete yourself
+            if ($userId == $currentUser['id']) {
+                $results[] = [
+                    'userId' => $userId,
+                    'username' => $user['username'],
+                    'status' => 'skipped',
+                    'reason' => 'Cannot delete your own account'
+                ];
+                continue;
+            }
+
+            // Attempt deletion
+            $deleteResult = User::deleteUser($userId);
+
+            if ($deleteResult) {
+                $results[] = [
+                    'userId' => $userId,
+                    'username' => $user['username'],
+                    'status' => 'success',
+                    'reason' => 'User deleted successfully'
+                ];
+            } else {
+                $results[] = [
+                    'userId' => $userId,
+                    'username' => $user['username'],
+                    'status' => 'failed',
+                    'reason' => 'Database error during deletion'
+                ];
+            }
+        }
+
+        return $results;
+    }
+
+    /**
+     * Bulk enable/disable users
+     */
+    private static function bulkToggleUsers(array $userIds, int $status): array
+    {
+        $results = [];
+        $statusText = $status ? 'enable' : 'disable';
+
+        foreach ($userIds as $userId) {
+            $user = User::findUserById($userId);
+
+            if (!$user) {
+                $results[] = [
+                    'userId' => $userId,
+                    'status' => 'failed',
+                    'reason' => 'User not found'
+                ];
+                continue;
+            }
+
+            // Protection: Can't disable super.admin
+            if ($user['username'] === 'super.admin' && $status === 0) {
+                $results[] = [
+                    'userId' => $userId,
+                    'username' => $user['username'],
+                    'status' => 'skipped',
+                    'reason' => 'Cannot disable super.admin account'
+                ];
+                continue;
+            }
+
+            // Check if change is needed
+            if ($user['status'] == $status) {
+                $results[] = [
+                    'userId' => $userId,
+                    'username' => $user['username'],
+                    'status' => 'skipped',
+                    'reason' => 'User already ' . ($status ? 'enabled' : 'disabled')
+                ];
+                continue;
+            }
+
+            // Update status
+            $updateResult = User::toggleUserStatus($userId, $status);
+
+            if ($updateResult) {
+                $results[] = [
+                    'userId' => $userId,
+                    'username' => $user['username'],
+                    'status' => 'success',
+                    'reason' => 'User ' . $statusText . 'd successfully'
+                ];
+            } else {
+                $results[] = [
+                    'userId' => $userId,
+                    'username' => $user['username'],
+                    'status' => 'failed',
+                    'reason' => 'Database error during ' . $statusText
+                ];
+            }
+        }
+
+        return $results;
+    }
+
+    /**
+     * Bulk role assignment
+     */
+    private static function bulkAssignRole(array $userIds, string $role): array
+    {
+        $results = [];
+
+        // Validate role exists
+        $roleExists = ORM::for_table("roles")->where("roleName", $role)->find_one();
+        if (!$roleExists) {
+            return array_map(function ($userId) use ($role) {
+                return [
+                    'userId' => $userId,
+                    'status' => 'failed',
+                    'reason' => 'Role "' . $role . '" does not exist'
+                ];
+            }, $userIds);
+        }
+
+        foreach ($userIds as $userId) {
+            $user = User::findUserById($userId);
+
+            if (!$user) {
+                $results[] = [
+                    'userId' => $userId,
+                    'status' => 'failed',
+                    'reason' => 'User not found'
+                ];
+                continue;
+            }
+
+            // Check if user already has this role
+            $currentRoles = explode(',', $user['roles'] ?? '');
+            if (in_array($role, $currentRoles)) {
+                $results[] = [
+                    'userId' => $userId,
+                    'username' => $user['username'],
+                    'status' => 'skipped',
+                    'reason' => 'User already has role "' . $role . '"'
+                ];
+                continue;
+            }
+
+            // Add role (replace for single role, or append for multi-role)
+            $newRoles = $role; // For simplicity, replace all roles with new one
+
+            $updateResult = User::updateUserRoles($userId, $newRoles);
+
+            if ($updateResult) {
+                $results[] = [
+                    'userId' => $userId,
+                    'username' => $user['username'],
+                    'status' => 'success',
+                    'reason' => 'Role "' . $role . '" assigned successfully'
+                ];
+            } else {
+                $results[] = [
+                    'userId' => $userId,
+                    'username' => $user['username'],
+                    'status' => 'failed',
+                    'reason' => 'Database error during role assignment'
+                ];
+            }
+        }
+
+        return $results;
+    }
+
+    /**
+     * Bulk MFA toggle
+     */
+    private static function bulkToggleMfa(array $userIds, bool $enable): array
+    {
+        $results = [];
+        $action = $enable ? 'enable' : 'disable';
+
+        foreach ($userIds as $userId) {
+            $user = User::findUserById($userId);
+
+            if (!$user) {
+                $results[] = [
+                    'userId' => $userId,
+                    'status' => 'failed',
+                    'reason' => 'User not found'
+                ];
+                continue;
+            }
+
+            // Check current MFA status
+            $currentlyEnabled = (bool) $user['mfaEnabled'];
+
+            if ($currentlyEnabled === $enable) {
+                $results[] = [
+                    'userId' => $userId,
+                    'username' => $user['username'],
+                    'status' => 'skipped',
+                    'reason' => 'MFA already ' . ($enable ? 'enabled' : 'disabled') . ' for user'
+                ];
+                continue;
+            }
+
+            // Update MFA status
+            $updateResult = $enable ?
+                User::enableMfaForUser($userId) :
+                User::disableMfaForUser($userId);
+
+            if ($updateResult) {
+                $results[] = [
+                    'userId' => $userId,
+                    'username' => $user['username'],
+                    'status' => 'success',
+                    'reason' => 'MFA ' . $action . 'd successfully'
+                ];
+            } else {
+                $results[] = [
+                    'userId' => $userId,
+                    'username' => $user['username'],
+                    'status' => 'failed',
+                    'reason' => 'Database error during MFA ' . $action
+                ];
+            }
+        }
+
+        return $results;
+    }
+
+    /**
+     * Bulk MFA enforcement
+     */
+    private static function bulkEnforceMfa(array $userIds, bool $enforce): array
+    {
+        $results = [];
+        $action = $enforce ? 'enforce' : 'unenforce';
+
+        foreach ($userIds as $userId) {
+            $user = User::findUserById($userId);
+
+            if (!$user) {
+                $results[] = [
+                    'userId' => $userId,
+                    'status' => 'failed',
+                    'reason' => 'User not found'
+                ];
+                continue;
+            }
+
+            // Protection: Cannot enforce MFA for super.admin
+            if ($user['username'] === 'super.admin') {
+                $results[] = [
+                    'userId' => $userId,
+                    'username' => $user['username'],
+                    'status' => 'skipped',
+                    'reason' => 'Cannot enforce MFA for super.admin'
+                ];
+                continue;
+            }
+
+            // Check current enforcement status
+            $currentlyEnforced = (bool) $user['mfaEnforced'];
+
+            if ($currentlyEnforced === $enforce) {
+                $results[] = [
+                    'userId' => $userId,
+                    'username' => $user['username'],
+                    'status' => 'skipped',
+                    'reason' => 'MFA already ' . ($enforce ? 'enforced' : 'not enforced') . ' for user'
+                ];
+                continue;
+            }
+
+            // Update MFA enforcement
+            $updateResult = $enforce ?
+                User::enforceMfaForUser($userId) :
+                User::unenforceMfaForUser($userId);
+
+            if ($updateResult) {
+                $results[] = [
+                    'userId' => $userId,
+                    'username' => $user['username'],
+                    'status' => 'success',
+                    'reason' => 'MFA ' . $action . 'ment updated successfully'
+                ];
+            } else {
+                $results[] = [
+                    'userId' => $userId,
+                    'username' => $user['username'],
+                    'status' => 'failed',
+                    'reason' => 'Database error during MFA ' . $action . 'ment'
+                ];
+            }
+        }
+
+        return $results;
+    }
+
+    /**
+     * Export users to CSV/Excel format
+     */
+    public static function exportUsers()
+    {
+        if (SessionUtil::get("user")["id"] === null) {
+            Flight::json(["success" => false, "message" => "Unauthorized"]);
+            return;
+        }
+
+        $format = $_GET['format'] ?? 'csv';
+        $selectedIds = $_GET['userIds'] ?? null;
+
+        // Get users (selected or all)
+        if ($selectedIds && !empty($selectedIds)) {
+            $userIds = explode(',', $selectedIds);
+            $userIds = array_map('intval', $userIds);
+            $users = User::getUsersByIds($userIds);
+        } else {
+            $users = User::getAllUsers();
+        }
+
+        if ($format === 'csv') {
+            self::exportUsersCSV($users);
+        } else {
+            Flight::json(["success" => false, "message" => "Unsupported format"]);
+        }
+    }
+
+    /**
+     * Export users as CSV
+     */
+    private static function exportUsersCSV(array $users)
+    {
+        $filename = 'users_export_' . date('Y-m-d_H-i-s') . '.csv';
+
+        header('Content-Type: text/csv');
+        header('Content-Disposition: attachment; filename="' . $filename . '"');
+        header('Cache-Control: no-cache, must-revalidate');
+
+        $output = fopen('php://output', 'w');
+
+        // CSV header
+        fputcsv($output, [
+            'ID',
+            'Username',
+            'Email',
+            'First Name',
+            'Last Name',
+            'Status',
+            'Roles',
+            'MFA Enabled',
+            'MFA Enforced',
+            'LDAP Enabled',
+            'Created',
+            'Last Login'
+        ]);
+
+        // User data
+        foreach ($users as $user) {
+            fputcsv($output, [
+                $user['id'],
+                $user['username'],
+                $user['email'],
+                $user['firstname'],
+                $user['lastname'],
+                $user['status'] ? 'Active' : 'Disabled',
+                $user['roles'],
+                $user['mfaEnabled'] ? 'Yes' : 'No',
+                $user['mfaEnforced'] ? 'Yes' : 'No',
+                $user['ldapEnabled'] ? 'Yes' : 'No',
+                $user['created'] ?? '',
+                $user['lastLogin'] ?? ''
+            ]);
+        }
+
+        fclose($output);
+
+        // Log export
+        LogUtil::logAction(
+            LogType::AUDIT,
+            "AdminController",
+            "exportUsers",
+            "SUCCESS: exported " . count($users) . " users to CSV",
+            SessionUtil::get("user")["username"]
+        );
+
+        exit;
+    }
 }

@@ -177,6 +177,19 @@ svg.bi {
   display: none;
 }
 
+.user-select-checkbox:checked {
+    background-color: #007bff;
+    border-color: #007bff;
+}
+
+tr.selected {
+    background-color: rgba(13, 110, 253, 0.1);
+}
+
+#bulkToolbar {
+    transition: all 0.3s ease;
+}
+
 /* mobilen ansicht */
 @media (max-width: 767px) {
   .footer .container {

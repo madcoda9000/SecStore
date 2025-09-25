@@ -297,6 +297,16 @@ securePostRoute('/admin/updateLdapSettings', function () {
 
 
 // Admin User Management
+// Bulk User Operations
+securePostRoute('/admin/users/bulk', function () {
+    (new AdminController)->bulkUserOperations();
+}, 'admin', true);
+
+// User Export
+secureRoute('GET /admin/users/export', function () {
+    (new AdminController)->exportUsers();
+}, 'admin', true);
+
 secureRoute('GET /admin/users', function () {
     (new AdminController)->fetchUsersPaged();
 }, 'admin', true);
