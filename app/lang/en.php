@@ -133,7 +133,7 @@ return [
     'settings.error1' => 'Access denied: You must be a member of the Admin role.',
     'settings.error2' => 'Configuration file could not be read.',
     'settings.error3' => 'Error replacing configuration.',
-    'settings.error4' => 'ATTENTION: The configuration file is not writable by the web server user! Please change the permissions to 644 or 664.',
+    'settings.error4' => 'ATTENTION: The configuration file is not writable by the web server user! Please change the permissions to 640.',
     'settings.success1' => 'Settings saved successfully!',
     'pager.page' => 'Page',
     'pager.of' => 'from',

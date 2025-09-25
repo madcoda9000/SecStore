@@ -153,7 +153,7 @@ Continue with [🎯 Web-Based Setup](#-web-based-setup-recommended) for the easi
 ```bash
 cd /path/to/secstore
 cp config.php_TEMPLATE config.php
-chmod 664 config.php
+chmod 640 config.php
 chown www-data:www-data config.php  # Ubuntu/Debian
 # OR
 chown apache:apache config.php      # RHEL/CentOS/Fedora
@@ -355,7 +355,7 @@ mysql -u secstore_user -p secstore -e "SELECT username, email, roles FROM users;
 cp config.php_TEMPLATE config.php
 
 # Make writable for web server
-chmod 664 config.php
+chmod 640 config.php
 chown www-data:www-data config.php  # Ubuntu/Debian
 # OR
 chown apache:apache config.php      # RHEL/CentOS/Fedora
@@ -417,7 +417,7 @@ chown www-data:www-data cache  # Ubuntu/Debian
 chown apache:apache cache      # RHEL/CentOS/Fedora
 
 # Config file (readable by web server)
-chmod 664 config.php
+chmod 640 config.php
 ```
 
 ---
@@ -607,7 +607,7 @@ composer show
 # -> In web interface: Profile -> Change Password
 
 # Secure config file (but keep writable for webserver)
-chmod 664 config.php
+chmod 640 config.php
 chown www-data:www-data config.php  # or appropriate webserver user
 
 # Additional security: prevent access to config outside public/
@@ -734,7 +734,7 @@ php generate_schema.php
 ```bash
 # Check file permissions
 ls -la config.php*
-chmod 664 config.php_TEMPLATE config.php
+chmod 640 config.php_TEMPLATE config.php
 
 # Check web server logs
 sudo tail -f /var/log/apache2/error.log
@@ -759,9 +759,9 @@ sudo tail -f /var/log/nginx/error.log
 #### **Permission Errors:**
 ```bash
 # Fix file permissions
-find . -type f -exec chmod 644 {} \;
+find . -type f -exec chmod 640 {} \;
 find . -type d -exec chmod 755 {} \;
-chmod 664 config.php
+chmod 640 config.php
 chmod 755 cache/
 
 # Fix ownership
@@ -812,7 +812,7 @@ php -l index.php
 | Error | Solution |
 |-------|----------|
 | `config.php not found` | Copy `config.php_TEMPLATE` to `config.php` |
-| `Permission denied` | Fix file permissions with `chmod 664 config.php` |
+| `Permission denied` | Fix file permissions with `chmod 640 config.php` |
 | `Database connection failed` | Check database credentials and server status |
 | `SMTP connection failed` | Verify SMTP settings or skip email setup |
 | `Cache directory not writable` | Set permissions: `chmod 755 cache/` |

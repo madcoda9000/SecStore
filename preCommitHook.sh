@@ -12,8 +12,8 @@ ALLOWED_TEMPLATES=(
     "config.example.php"
     ".env.example"
     ".env.template"
-    "*.php.backup"          # ← Backup-Dateien erlauben
-    "*.backup"              # ← Allgemeine Backup-Dateien
+    #"*.php.backup"          # ← Backup-Dateien erlauben
+    #"*.backup"              # ← Allgemeine Backup-Dateien
 )
 
 # Funktion: Prüfen ob Datei in erlaubten Templates ist (mit Wildcard-Support)

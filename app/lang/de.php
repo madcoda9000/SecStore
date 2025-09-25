@@ -133,7 +133,7 @@ return [
     'settings.error1' => 'Zugriff verweigert: Sie müssen Mitglied der Admin Rolle sein.',
     'settings.error2' => 'Konfigurationsdatei konnte nicht gelesen werden.',
     'settings.error3' => 'Fehler beim Ersetzen der Konfiguration.',
-    'settings.error4' => 'ACHTUNG: Die Konfigurationsdatei ist nicht beschreibbar für den Webserver-Benutzer! Bitte ändern Sie die Berechtigungen auf 644 oder 664.',
+    'settings.error4' => 'ACHTUNG: Die Konfigurationsdatei ist nicht beschreibbar für den Webserver-Benutzer! Bitte ändern Sie die Berechtigungen auf 640.',
     'settings.success1' => 'Einstellungen wurden gespeichert!',
     'pager.page' => 'Seite',
     'pager.of' => 'von',
