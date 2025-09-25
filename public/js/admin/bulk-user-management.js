@@ -188,17 +188,28 @@ class BulkUserManager {
   /**
    * Execute bulk actions
    */
+  /**
+   * Execute bulk actions
+   */
   async executeBulkAction(operation) {
+    console.log("⚡ ExecuteBulkAction called with:", operation);
+    console.log("📊 Current selection size:", this.selectedUsers.size);
+    console.log("📋 Selected users:", Array.from(this.selectedUsers));
+
     if (this.selectedUsers.size === 0) {
+      console.warn("❌ No users selected - showing alert");
       this.showAlert("No users selected", "warning");
       return;
     }
 
     if (this.isProcessing) {
+      console.warn("⏸️ Already processing, skipping");
       return;
     }
 
-    console.log("⚡ Executing bulk action:", operation);
+    console.log("✅ Proceeding with bulk action:", operation, "for users:", Array.from(this.selectedUsers));
+
+    // Rest der Methode bleibt gleich...
 
     // Confirmation for dangerous operations
     if (operation === "delete") {
@@ -244,12 +255,16 @@ class BulkUserManager {
   /**
    * Toggle select all functionality
    */
+  /**
+   * Toggle select all functionality
+   */
   toggleSelectAll(checked) {
     console.log("🔄 Toggle select all:", checked);
 
     const userCheckboxes = document.querySelectorAll(".user-select-checkbox");
+    console.log("📋 Found checkboxes:", userCheckboxes.length);
 
-    userCheckboxes.forEach((checkbox) => {
+    userCheckboxes.forEach((checkbox, index) => {
       checkbox.checked = checked;
       const userId = parseInt(checkbox.value);
       const row = checkbox.closest("tr");
@@ -257,11 +272,16 @@ class BulkUserManager {
       if (checked) {
         this.selectedUsers.add(userId);
         row.classList.add("selected");
+        console.log(`✅ [${index}] Selected user:`, userId, checkbox.dataset.username);
       } else {
         this.selectedUsers.delete(userId);
         row.classList.remove("selected");
+        console.log(`❌ [${index}] Deselected user:`, userId);
       }
     });
+
+    console.log("📊 Toggle complete - Total selected:", this.selectedUsers.size);
+    console.log("📋 Selected IDs:", Array.from(this.selectedUsers));
 
     this.updateUI();
   }
@@ -269,9 +289,16 @@ class BulkUserManager {
   /**
    * Update selection based on individual changes
    */
+  /**
+   * Update selection based on individual changes
+   */
   updateSelection() {
+    console.log("🔄 Updating selection...");
+
+    // Clear current selection
     this.selectedUsers.clear();
 
+    // Get all user checkboxes
     const userCheckboxes = document.querySelectorAll(".user-select-checkbox");
 
     userCheckboxes.forEach((checkbox) => {
@@ -281,13 +308,21 @@ class BulkUserManager {
       if (checkbox.checked) {
         this.selectedUsers.add(userId);
         row.classList.add("selected");
+        console.log("✅ Added user to selection:", userId, checkbox.dataset.username);
       } else {
         row.classList.remove("selected");
+        console.log("❌ Removed user from selection:", userId);
       }
     });
 
+    // Debug logging
+    console.log("📊 Selection updated - Total selected:", this.selectedUsers.size);
+    console.log("📋 Selected IDs:", Array.from(this.selectedUsers));
+
     // Update select all checkbox state
     this.updateSelectAllState();
+
+    // Update UI
     this.updateUI();
   }
 
