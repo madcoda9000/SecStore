@@ -14,8 +14,11 @@
             </li>
 
             {if in_array('Admin', explode(',', $user->roles))}
+            <li class="nav-item">
+              <i class="bi bi-gear-fill text-light"></i>&nbsp;<a class="nav-link" href="/admin/settings">{trans('menu.settings')}</a>
+            </li>
             <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle" href="#" id="desktopAdmin" role="button" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi bi-gear-fill text-light"></i>&nbsp;{trans('menu.admin')}</a>
+              <a class="nav-link dropdown-toggle" href="#" id="desktopAdmin" role="button" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi bi-incognito text-light"></i>&nbsp;{trans('menu.admin')}</a>
               <ul class="dropdown-menu" aria-labelledby="desktopAdmin">
                 <li><a class="dropdown-item" href="/admin/users">{trans('menu.admin.users')}</a></li>
                 <li><a class="dropdown-item" href="/admin/showRoles">{trans('menu.admin.roles')}</a></li>
