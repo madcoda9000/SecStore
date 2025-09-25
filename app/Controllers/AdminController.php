@@ -1400,11 +1400,23 @@ class AdminController
             return;
         }
 
-        $operation = $_POST['operation'] ?? '';
-        $userIds = $_POST['userIds'] ?? [];
-        $options = $_POST['options'] ?? [];
+        // NEUER CODE: JSON Request-Body lesen
+        $input = file_get_contents('php://input');
+        $jsonData = json_decode($input, true);
+
+        // Fallback auf $_POST für Form-Requests
+        $operation = $jsonData['operation'] ?? $_POST['operation'] ?? '';
+        $userIds = $jsonData['userIds'] ?? $_POST['userIds'] ?? [];
+        $options = $jsonData['options'] ?? $_POST['options'] ?? [];
 
         if (empty($userIds) || !is_array($userIds)) {
+            LogUtil::logAction(
+                LogType::SYSTEM,
+                "AdminController",
+                "bulkUserOperations",
+                "No users selected - userIds: " . json_encode($userIds),
+                SessionUtil::get("user")["username"]
+            );
             Flight::json(["success" => false, "message" => "No users selected"]);
             return;
         }
@@ -1414,11 +1426,6 @@ class AdminController
         $userIds = array_filter($userIds, function ($id) {
             return $id > 0;
         });
-
-        if (empty($userIds)) {
-            Flight::json(["success" => false, "message" => "Invalid user selection"]);
-            return;
-        }
 
         $results = [];
         $success = 0;
