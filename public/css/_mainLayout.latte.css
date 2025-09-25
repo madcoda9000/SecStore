@@ -250,13 +250,8 @@ svg.bi {
     transform: translateY(0) !important;
   }
 
-  .offcanvas-body .nav-item.dropdown .dropdown-menu {
-    border: none !important;
-    box-shadow: none !important;
-    background-color: transparent !important;
-    position: relative !important;
-    top: 25px !important;
-    left: -40px !important;
-    margin-bottom: 20px !important;
-  }
+  .offcanvas .mobile-submenu { margin-left: 20px; margin-top: 3px; margin-bottom: 6px; }
+  .offcanvas .mobile-submenu .nav-link { padding-left: 0; }
+  .collapse.show + .bi-caret-down-fill { transform: rotate(180deg); }
+
 }

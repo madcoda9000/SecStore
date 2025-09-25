@@ -32,3 +32,32 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   });
 });
+
+// Delegierter Handler: reagiert auf Klicks auf Links im Offcanvas
+(function () {
+  const offEl = document.getElementById('navbarOffcanvas');
+  if (!offEl) return;
+
+  offEl.addEventListener('click', function (e) {
+    const link = e.target.closest('a.nav-link[href]');
+    if (!link) return;
+
+    const href = link.getAttribute('href');
+    // Ignoriere hash-links oder javascript:void(0)
+    if (!href || href.startsWith('#') || href.startsWith('javascript:')) return;
+
+    // Verhindere sofortige Navigation, schließe Offcanvas und navigiere nach dem Schließen
+    e.preventDefault();
+
+    const bsOff = bootstrap.Offcanvas.getInstance(offEl) || new bootstrap.Offcanvas(offEl);
+
+    const onHidden = function () {
+      offEl.removeEventListener('hidden.bs.offcanvas', onHidden);
+      // echte Navigation
+      window.location.href = href;
+    };
+
+    offEl.addEventListener('hidden.bs.offcanvas', onHidden);
+    bsOff.hide();
+  }, false);
+})();
