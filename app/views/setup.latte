@@ -88,11 +88,23 @@
                 <i class="bi bi-file-earmark-x text-danger" style="font-size: 4rem;"></i>
                 <h4 class="mt-3">{trans('setup.config.missing.title')}</h4>
                 <p class="text-muted">
-                    {trans('setup.config.missing.desc')}
+                    {trans('setup.config.missing.desc')}<br>
+                    <div class="mt-3">
+                        <details class="text-muted">
+                            <summary style="cursor: pointer;">🔧 Environment Details</summary>
+                            <small class="mt-2 d-block">
+                                <strong>Detected Environment:</strong><br>
+                                • Web User: <code>{$env_info['web_user']}</code><br>
+                                • Docker: {if $env_info['is_docker']}✅ Yes{else}❌ No{/if}<br>
+                                • Windows: {if $env_info['is_windows']}✅ Yes{else}❌ No{/if}<br>
+                                • Suggested Permissions: <code>{$env_info['suggested_chmod']}</code>
+                            </small>
+                        </details>
+                    </div>
                 </p>
                 <ol class="list-unstyled text-start">
                     <li><code>cp config.php_TEMPLATE config.php</code></li>
-                    <li><code>chmod 664 config.php</code></li>
+                    <li><code>chmod 640 config.php</code></li>
                     <li><code>chown www-data:www-data config.php</code></li>
                 </ol>
                 <a href="/setup" class="btn btn-primary mt-3">
@@ -105,10 +117,22 @@
                 <i class="bi bi-shield-lock text-warning" style="font-size: 4rem;"></i>
                 <h4 class="mt-3">{trans('setup.config.writable.title')}</h4>
                 <p class="text-muted">
-                    {trans('setup.config.writable.desc')}
+                    {trans('setup.config.writable.desc')}<br>
+                    <div class="mt-3">
+                        <details class="text-muted">
+                            <summary style="cursor: pointer;">🔧 Environment Details</summary>
+                            <small class="mt-2 d-block">
+                                <strong>Detected Environment:</strong><br>
+                                • Web User: <code>{$env_info['web_user']}</code><br>
+                                • Docker: {if $env_info['is_docker']}✅ Yes{else}❌ No{/if}<br>
+                                • Windows: {if $env_info['is_windows']}✅ Yes{else}❌ No{/if}<br>
+                                • Suggested Permissions: <code>{$env_info['suggested_chmod']}</code>
+                            </small>
+                        </details>
+                    </div>
                 </p>
                 <div class="text-start">
-                    <code>chmod 664 config.php</code><br>
+                    <code>chmod 640 config.php</code><br>
                     <code>chown www-data:www-data config.php</code>
                 </div>
                 <a href="/setup" class="btn btn-primary mt-3">

@@ -31,12 +31,16 @@ class SetupController
     {
         try {
 
+            // Environment-Detection für alle Setup-Schritte
+            $envInfo = $this->detectEnvironmentAndPermissions();
+
             // Schritt 1: Prüfen ob config.php existiert
             if (!$this->checkConfigExists()) {
                 return $this->renderSetupStep('config_missing', [
                     'title' => TranslationUtil::t('setup.controller.missingConfig'),
                     'step' => 1,
-                    'error' => TranslationUtil::t('setup.controller.missingConfigDesc')
+                    'error' => TranslationUtil::t('setup.controller.missingConfigDesc'),
+                    'env_info' => $envInfo
                 ]);
             }
 
@@ -45,7 +49,8 @@ class SetupController
                 return $this->renderSetupStep('config_not_writable', [
                     'title' => TranslationUtil::t('setup.controller.configNotWritable'),
                     'step' => 2,
-                    'error' => TranslationUtil::t('setup.controller.configNotWritableDesc')
+                    'error' => TranslationUtil::t('setup.controller.configNotWritableDesc'),
+                    'env_info' => $envInfo
                 ]);
             }
 
@@ -70,7 +75,7 @@ class SetupController
             // Setup abgeschlossen - weiterleiten zu Login
             return $this->completeSetup();
         } catch (Exception $e) {
-            LogUtil::logAction(LogType::ERROR, 'SetupController', 'runSetup', $e->getMessage());
+            //LogUtil::logAction(LogType::ERROR, 'SetupController', 'runSetup', $e->getMessage());
             return $this->renderSetupStep('error', [
                 'title' => TranslationUtil::t('setup.error.title'),
                 'error' => TranslationUtil::t('setup.error.global') . $e->getMessage()
@@ -565,5 +570,23 @@ class SetupController
             default:
                 return null;
         }
+    }
+
+    /**
+     * Prüft ob die Anwendung in der Produktionsumgebung läuft
+     */
+    private function detectEnvironmentAndPermissions(): array
+    {
+        $webUser = posix_getpwuid(posix_geteuid())['name'] ?? 'www-data';
+        $isDocker = file_exists('/.dockerenv');
+        $isWindows = strtoupper(substr(PHP_OS, 0, 3)) === 'WIN';
+
+        return [
+            'web_user' => $webUser,
+            'is_docker' => $isDocker,
+            'is_windows' => $isWindows,
+            'suggested_chmod' => $isDocker ? '666' : '640',
+            'suggested_chown' => $isWindows ? 'N/A' : "$webUser:$webUser"
+        ];
     }
 }
