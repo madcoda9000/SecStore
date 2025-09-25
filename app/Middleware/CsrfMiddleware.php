@@ -28,16 +28,20 @@ class CsrfMiddleware
         if (Flight::request()->method == 'POST') {
 
             // DEBUG LOGGING
-            if($params != null && $params['debug'] != null && $params['debug'] === true) {
-                LogUtil::logAction(LogType::SECURITY, 'CsrfMiddleware', 'before', 
-                'Session Status: ' . session_status() . 
-                ', Session ID: ' . session_id() .
-                ', Request URI: ' . ($_SERVER['REQUEST_URI'] ?? 'unknown') .
-                ', User Agent: ' . ($_SERVER['HTTP_USER_AGENT'] ?? 'unknown'));
+            if ($params != null && $params['debug'] === true && !self::isProduction()) {
+                LogUtil::logAction(
+                    LogType::SECURITY,
+                    'CsrfMiddleware',
+                    'before',
+                    'Session Status: ' . session_status() .
+                        ', Session ID: ' . session_id() .
+                        ', Request URI: ' . ($_SERVER['REQUEST_URI'] ?? 'unknown') .
+                        ', User Agent: ' . ($_SERVER['HTTP_USER_AGENT'] ?? 'unknown')
+                );
             } else {
                 LogUtil::logAction(LogType::SECURITY, 'CsrfMiddleware', 'before', 'CSRF validation attempted from: ' . ($_SERVER['REMOTE_ADDR'] ?? 'unknown'));
             }
-            
+
 
             // 1. SICHERHEITSPRÜFUNG: Session existiert
             if (session_status() !== PHP_SESSION_ACTIVE) {
@@ -47,12 +51,12 @@ class CsrfMiddleware
             }
 
             // 2. CSRF TOKEN VALIDIERUNG
-            $token = Flight::request()->data->csrf_token ?? 
-                     $this->getHeaderToken() ?? 
-                     null;
+            $token = Flight::request()->data->csrf_token ??
+                $this->getHeaderToken() ??
+                null;
 
             $sessionToken = SessionUtil::get('csrf_token');
-            
+
             // 3. DETAILLIERTE FEHLERBEHANDLUNG
             if (!$sessionToken) {
                 LogUtil::logAction(LogType::SECURITY, 'CsrfMiddleware', 'before', 'No CSRF token in session', '');
@@ -76,7 +80,7 @@ class CsrfMiddleware
             SessionUtil::refreshCsrfToken();
         }
     }
-    
+
     /**
      * Redirect to login with message
      */
@@ -84,22 +88,31 @@ class CsrfMiddleware
     {
         // Session vollständig zerstören
         SessionUtil::destroy();
-        
+
         // Mit Fehlermeldung zum Login weiterleiten
         Flight::redirect('/login?error=' . urlencode($message));
         exit;
     }
-    
+
     /**
      * Holt CSRF-Token aus HTTP-Headern
      */
     private function getHeaderToken(): ?string
     {
         $headers = getallheaders();
-        
-        return $headers['X-CSRF-Token'] ?? 
-               $headers['X-Csrf-Token'] ?? 
-               $headers['CSRF-Token'] ?? 
-               null;
+
+        return $headers['X-CSRF-Token'] ??
+            $headers['X-Csrf-Token'] ??
+            $headers['CSRF-Token'] ??
+            null;
+    }
+
+    /**
+     * Prüft ob die Anwendung in der Produktionsumgebung läuft
+     */
+    private static function isProduction(): bool
+    {
+        $config = include __DIR__ . '/../../config.php';
+        return ($config['environment'] ?? 'production') === 'production';
     }
 }
