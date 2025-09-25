@@ -573,20 +573,56 @@ class SetupController
     }
 
     /**
-     * Prüft ob die Anwendung in der Produktionsumgebung läuft
+     * Erkennt die Umgebung und schlägt passende Berechtigungen vor
+     *
+     * @return array Assoziatives Array mit Umgebungsinformationen und empfohlenen Berechtigungen
      */
     private function detectEnvironmentAndPermissions(): array
     {
         $webUser = posix_getpwuid(posix_geteuid())['name'] ?? 'www-data';
         $isDocker = file_exists('/.dockerenv');
         $isWindows = strtoupper(substr(PHP_OS, 0, 3)) === 'WIN';
+        $isRoot = posix_geteuid() === 0;
+
+        // Intelligente Berechtigung basierend auf Umgebung
+        if ($isWindows) {
+            $suggestedChmod = '644';  // Windows chmod ist meist nicht relevant
+            $suggestedChown = 'N/A';
+        } elseif ($isDocker) {
+            $suggestedChmod = '666';  // Docker braucht oft weniger restriktive Permissions
+            $suggestedChown = "$webUser:$webUser";
+        } elseif ($isRoot) {
+            $suggestedChmod = '640';  // Produktions-sicher
+            $suggestedChown = "$webUser:$webUser";
+        } else {
+            $suggestedChmod = '664';  // Development-freundlich
+            $suggestedChown = "$webUser:$webUser";
+        }
 
         return [
             'web_user' => $webUser,
             'is_docker' => $isDocker,
             'is_windows' => $isWindows,
-            'suggested_chmod' => $isDocker ? '666' : '640',
-            'suggested_chown' => $isWindows ? 'N/A' : "$webUser:$webUser"
+            'is_root' => $isRoot,
+            'suggested_chmod' => $suggestedChmod,
+            'suggested_chown' => $suggestedChown,
+            'environment_type' => $this->getEnvironmentType($isDocker, $isRoot, $isWindows)
         ];
+    }
+
+    /**
+     * Bestimmt den Umgebungstyp basierend auf den übergebenen Parametern.
+     *
+     * @param bool $isDocker Gibt an, ob die Anwendung in einem Docker-Container läuft.
+     * @param bool $isRoot   Gibt an, ob die Anwendung mit Root-Rechten ausgeführt wird.
+     * @param bool $isWindows Gibt an, ob die Anwendung unter Windows läuft.
+     * @return string        Der ermittelte Umgebungstyp als String.
+     */
+    private function getEnvironmentType(bool $isDocker, bool $isRoot, bool $isWindows): string
+    {
+        if ($isWindows) return 'Windows Development';
+        if ($isDocker) return 'Docker Container';
+        if ($isRoot) return 'Production Server';
+        return 'Development Server';
     }
 }
