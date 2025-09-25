@@ -203,4 +203,58 @@ $app->map('error', function (Throwable $ex) use ($app) {
     ]);
 });
 
+// Add the headers in a filter
+Flight::before('start', function () use ($app) {
+    // Set the X-Frame-Options header to prevent clickjacking
+    $app->response()->header('X-Frame-Options', 'SAMEORIGIN');
+
+    // Set the Content-Security-Policy header to prevent XSS
+    // Note: 'unsafe-inline' should be used temprary only!!! Don't forget to put inline script into seperate js file and then remove this here!
+    // $app->response()->header("Content-Security-Policy", "default-src 'self' 'unsafe-inline'; img-src data: w3.org/svg/2000:img-src 'self'; style-src 'self' 'unsafe-inline'");
+    
+    // Option 1: Report-Only Mode for testing
+    $app->response()->header("Content-Security-Policy", "default-src 'self'; img-src data: w3.org/svg/2000 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'");
+
+    // Option 2: on successful testing, switch to enforcing mode.
+    //$app->response()->header("Content-Security-Policy", "default-src 'self'; img-src data: w3.org/svg/2000 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'");
+
+    // Set the X-XSS-Protection header to prevent XSS
+    $app->response()->header('X-XSS-Protection', '1; mode=block');
+
+    // Set the X-Content-Type-Options header to prevent MIME sniffing
+    $app->response()->header('X-Content-Type-Options', 'nosniff');
+
+    // Set the Referrer-Policy header to control how much referrer information is sent
+    $app->response()->header('Referrer-Policy', 'no-referrer-when-downgrade');
+
+    // OPTIMIERTE HSTS IMPLEMENTATION
+    // Prüfung auf HTTPS mit mehreren Methoden für bessere Kompatibilität
+    $isHttps = (
+        (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ||
+        (!empty($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https') ||
+        (!empty($_SERVER['HTTP_X_FORWARDED_SSL']) && $_SERVER['HTTP_X_FORWARDED_SSL'] === 'on') ||
+        (isset($_SERVER['SERVER_PORT']) && (int) $_SERVER['SERVER_PORT'] === 443)
+    );
+
+    if ($isHttps) {
+        // HSTS Header mit optimalen Einstellungen
+        // max-age=31536000 = 1 Jahr
+        // includeSubDomains = Gilt auch für alle Subdomains
+        // preload = Ermöglicht Aufnahme in Browser-Preload-Listen
+        $app->response()->header('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');
+    } else {
+        // OPTIONAL: Redirect zu HTTPS für bessere Sicherheit
+        // Nur wenn du automatische HTTPS-Redirects möchtest
+        /*
+        $httpsUrl = 'https://' . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+        $app->response()->status(301);
+        $app->response()->header('Location', $httpsUrl);
+        $app->halt();
+        */
+    }
+
+    // Set the Permissions-Policy header to control what features and APIs can be used
+    $app->response()->header('Permissions-Policy', 'geolocation=()');
+});
+
 Flight::start();
