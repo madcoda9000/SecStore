@@ -87,67 +87,69 @@
     </div>
 
     <!-- BULK ACTIONS TOOLBAR - CSP-KONFORM -->
-    <div class="row g-3 align-items-center mb-3" id="bulkToolbar">
-        <div class="col-md-8">
-            <div id="selectionSummary" class="alert alert-info d-none" role="alert">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <i class="bi bi-info-circle"></i>
-                        <span id="selectionSummaryText">0 users selected</span>
-                    </div>
-                    <button type="button" class="btn btn-sm btn-outline-primary" data-action="clear-selection">
-                        <i class="bi bi-x"></i> Clear Selection
-                    </button>
-                </div>
+    <div id="bulkToolbar" 
+     class="mb-3 d-flex justify-content-between align-items-center p-2 border rounded bg-primary-subtle d-none">
+    
+        <!-- Auswahl-Info links -->
+        <div id="selectionSummary" 
+            class="d-none d-flex align-items-center" 
+            role="alert">
+            <i class="bi bi-info-circle me-2 fs-sm"></i>
+            <span id="selectionSummaryText" class="fs-sm">0 users selected</span>
+            <button type="button"  
+                    class="btn btn-sm btn-link ms-1" 
+                    data-action="clear-selection">
+                (Clear Selection)
+            </button>
+        </div>
+
+        <!-- Dropdown rechts -->
+        <div id="bulkActionsContainer" class="d-none">
+            <div class="dropdown">
+                <button class="btn btn-primary dropdown-toggle" type="button" 
+                        id="bulkActionsDropdown" data-bs-toggle="dropdown">
+                    <i class="bi bi-lightning"></i> 
+                    <span id="bulkActionText bg-light">Bulk Actions</span>
+                    <span class="badge bg-light text-dark ms-3" id="selectionCount">0</span>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end">
+                    <!-- User Status -->
+                    <li><h6 class="dropdown-header">User Status</h6></li>
+                    <li><a class="dropdown-item" href="#" data-bulk-action="enable">
+                        <i class="bi bi-check-circle text-success"></i> Enable Selected
+                    </a></li>
+                    <li><a class="dropdown-item" href="#" data-bulk-action="disable">
+                        <i class="bi bi-x-circle text-danger"></i> Disable Selected
+                    </a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    
+                    <!-- MFA Operations -->
+                    <li><h6 class="dropdown-header">2FA Management</h6></li>
+                    <li><a class="dropdown-item" href="#" data-bulk-action="mfa_enforce">
+                        <i class="bi bi-shield-fill-exclamation text-warning"></i> Enforce 2FA
+                    </a></li>
+                    <li><a class="dropdown-item" href="#" data-bulk-action="mfa_unenforce">
+                        <i class="bi bi-shield text-muted"></i> Remove 2FA Enforcement
+                    </a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    
+                    <!-- Export -->
+                    <li><h6 class="dropdown-header">Export</h6></li>
+                    <li><a class="dropdown-item" href="#" data-export="csv-selected">
+                        <i class="bi bi-filetype-csv text-primary"></i> Export Selected as CSV
+                    </a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    
+                    <!-- Dangerous Actions -->
+                    <li><h6 class="dropdown-header text-danger">Danger Zone</h6></li>
+                    <li><a class="dropdown-item text-danger" href="#" data-bulk-action="delete">
+                        <i class="bi bi-trash"></i> Delete Selected
+                    </a></li>
+                </ul>
             </div>
         </div>
-        <div class="col-md-4">
-            <div id="bulkActionsContainer" class="d-none">
-                <div class="dropdown w-100">
-                    <button class="btn btn-warning dropdown-toggle w-100" type="button" 
-                            id="bulkActionsDropdown" data-bs-toggle="dropdown">
-                        <i class="bi bi-lightning"></i> 
-                        <span id="bulkActionText">Bulk Actions</span>
-                        <span class="badge bg-light text-dark ms-1" id="selectionCount">0</span>
-                    </button>
-                    <ul class="dropdown-menu w-100">
-                        <!-- User Status -->
-                        <li><h6 class="dropdown-header">User Status</h6></li>
-                        <li><a class="dropdown-item" href="#" data-bulk-action="enable">
-                            <i class="bi bi-check-circle text-success"></i> Enable Selected
-                        </a></li>
-                        <li><a class="dropdown-item" href="#" data-bulk-action="disable">
-                            <i class="bi bi-x-circle text-danger"></i> Disable Selected
-                        </a></li>
-                        <li><hr class="dropdown-divider"></li>
-                        
-                        <!-- MFA Operations -->
-                        <li><h6 class="dropdown-header">2FA Management</h6></li>
-                        <li><a class="dropdown-item" href="#" data-bulk-action="mfa_enforce">
-                            <i class="bi bi-shield-fill-exclamation text-warning"></i> Enforce 2FA
-                        </a></li>
-                        <li><a class="dropdown-item" href="#" data-bulk-action="mfa_unenforce">
-                            <i class="bi bi-shield text-muted"></i> Remove 2FA Enforcement
-                        </a></li>
-                        <li><hr class="dropdown-divider"></li>
-                        
-                        <!-- Export -->
-                        <li><h6 class="dropdown-header">Export</h6></li>
-                        <li><a class="dropdown-item" href="#" data-export="csv-selected">
-                            <i class="bi bi-filetype-csv text-primary"></i> Export Selected as CSV
-                        </a></li>
-                        <li><hr class="dropdown-divider"></li>
-                        
-                        <!-- Dangerous Actions -->
-                        <li><h6 class="dropdown-header text-danger">Danger Zone</h6></li>
-                        <li><a class="dropdown-item text-danger" href="#" data-bulk-action="delete">
-                            <i class="bi bi-trash"></i> Delete Selected
-                        </a></li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </div>
+    </div>   
+
 
     <!-- Desktop Table -->
     <div class="table-responsive desktop-table">
@@ -159,9 +161,6 @@
                         <div class="form-check">
                             <input class="form-check-input" type="checkbox" id="selectAllCheckbox" 
                                 data-action="toggle-select-all">
-                            <label class="form-check-label fw-bold" for="selectAllCheckbox" title="Select All">
-                                <i class="bi bi-check-square"></i>
-                            </label>
                         </div>
                     </th>
                     <th>{trans('users.type')}</th>

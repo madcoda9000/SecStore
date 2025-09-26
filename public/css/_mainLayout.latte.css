@@ -190,6 +190,10 @@ tr.selected {
     transition: all 0.3s ease;
 }
 
+#bulkActionsContainer .dropdown-item {
+  background-color: transparent !important;
+}
+
 /* mobilen ansicht */
 @media (max-width: 767px) {
   .footer .container {

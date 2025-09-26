@@ -15,6 +15,7 @@ class BulkUserManager {
     this.elements = {
       selectAllCheckbox: document.getElementById("selectAllCheckbox"),
       bulkActionsContainer: document.getElementById("bulkActionsContainer"),
+      bulkToolbar: document.getElementById("bulkToolbar"),
       selectionSummary: document.getElementById("selectionSummary"),
       selectionSummaryText: document.getElementById("selectionSummaryText"),
       selectionCount: document.getElementById("selectionCount"),
@@ -150,11 +151,12 @@ class BulkUserManager {
     if (action === "toggle-select-all" || action === "update-selection") {
       return; // Let handleChange deal with these
     }
-
+    console.log("🔘 Click event detected - action:", action, "bulkAction:", bulkAction, "exportAction:", exportAction);
     // Bulk actions
     if (bulkAction) {
       event.preventDefault();
       this.executeBulkAction(bulkAction);
+      console.log("⚡ Bulk action triggered:", bulkAction);
       return;
     }
 
@@ -244,7 +246,8 @@ class BulkUserManager {
     if (operation === "delete") {
       const confirmed = await this.confirmDangerousAction(
         "Delete Users",
-        `Are you sure you want to delete ${this.selectedUsers.size} user${this.selectedUsers.size !== 1 ? "s" : ""}?`
+        `Are you sure you want to delete ${this.selectedUsers.size} user${this.selectedUsers.size !== 1 ? "s" : ""}?`,
+        operation
       );
       if (!confirmed) return;
     }
@@ -426,9 +429,11 @@ class BulkUserManager {
     if (hasSelection) {
       this.elements.bulkActionsContainer?.classList.remove("d-none");
       this.elements.selectionSummary?.classList.remove("d-none");
+      this.elements.bulkToolbar?.classList.remove("d-none");
     } else {
       this.elements.bulkActionsContainer?.classList.add("d-none");
       this.elements.selectionSummary?.classList.add("d-none");
+        this.elements.bulkToolbar?.classList.add("d-none");
     }
 
     // Update button text
@@ -436,7 +441,7 @@ class BulkUserManager {
       if (selectedCount === 0) {
         this.elements.bulkActionText.textContent = "Bulk Actions";
       } else {
-        this.elements.bulkActionText.textContent = `${selectedCount} User${selectedCount !== 1 ? "s" : ""} Selected`;
+        this.elements.bulkActionText.textContent = "Bulk Actions"; //`${selectedCount} User${selectedCount !== 1 ? "s" : ""} Selected`;
       }
     }
 
