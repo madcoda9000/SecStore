@@ -1626,7 +1626,7 @@ class AdminController
             }
 
             // Update status
-            $updateResult = User::toggleUserStatus($userId, $status);
+            $updateResult = User::updateUserStatus($userId, $status);
 
             if ($updateResult) {
                 $results[] = [
