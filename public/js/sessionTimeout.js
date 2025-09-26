@@ -1,12 +1,11 @@
-
 /**
  * sessionTimeout
- * 
+ *
  * A JavaScript function that will show a warning dialog when the user's session is about to expire.
  * The dialog will display a countdown timer and two buttons: "Log out now" and "Stay connected".
- * 
+ *
  * @param {Object} [options] - Object with options.
- * 
+ *
  * @prop {boolean} [options.appendTimestamp=false] - Whether to append the current timestamp to the keep alive URL.
  * @prop {string} [options.keepAliveMethod="POST"] - The HTTP method to use for the keep alive request.
  * @prop {string} [options.keepAliveUrl="/keep-alive"] - The URL to send the keep alive request to.
@@ -69,7 +68,7 @@ window.sessionTimeout = function (passedOptions) {
 
   /**
    * Displays the session timeout warning dialog by removing the hidden class
-   * from the container element. This informs the user that their session is 
+   * from the container element. This informs the user that their session is
    * about to expire and provides options to stay connected or log out.
    */
   const warn = () => {
@@ -94,27 +93,124 @@ window.sessionTimeout = function (passedOptions) {
   };
 
   /**
-   * Stays connected by keeping the session alive by sending a request to the
-   * keep alive URL. This function is called when the user chooses to stay
-   * connected manually or when the session timeout dialog's "Stay connected"
-   * button is clicked.
-   *
-   * This function clears the countdown timer and sets the session end time to
-   * the current time plus the time out after period. It also sets a new timer to
-   * log the user out after the time out after period has been reached.
+   * Handles successful keep-alive requests by resetting timers and updating the UI.
+   * This function is called when the server confirms that the session has been extended.
+   * It hides the session timeout dialog, resets the warning and timeout timers,
+   * updates the session end time, and re-enables the "Stay connected" button.
    */
   const stayConnected = () => {
+    // 1. Sofort Dialog ausblenden
     container.classList.add("sessionTimeout--hidden");
 
-    const url = options.appendTimestamp ? `${options.keepAliveUrl}?time=${Date.now()}` : options.keepAliveUrl;
-    const req = new XMLHttpRequest();
-    req.open(options.keepAliveMethod, url);
-    req.send();
+    // 2. Button während Request deaktivieren
+    stayConnectedBtn.disabled = true;
+    stayConnectedBtn.innerText = "Connecting...";
 
+    // 3. Request URL vorbereiten
+    const url = options.appendTimestamp ? `${options.keepAliveUrl}?time=${Date.now()}` : options.keepAliveUrl;
+
+    // 4. XMLHttpRequest mit vollständiger Fehlerbehandlung
+    const req = new XMLHttpRequest();
+
+    // 5. SUCCESS Handler - nur bei erfolgreichem Server-Response
+    req.onload = function () {
+      if (req.status === 200) {
+        try {
+          // Versuche JSON Response zu parsen
+          const response = JSON.parse(req.responseText);
+
+          if (response.success === true) {
+            // ✅ Server bestätigt Session-Verlängerung
+            handleKeepAliveSuccess();
+          } else {
+            // ❌ Server meldet Fehler (z.B. Session abgelaufen)
+            handleKeepAliveFailure("Server rejected session extension");
+          }
+        } catch (parseError) {
+          // ❌ Ungültige JSON Response
+          handleKeepAliveFailure("Invalid server response");
+        }
+      } else {
+        // ❌ HTTP Error Status (401, 403, 500, etc.)
+        handleKeepAliveFailure(`Server error: ${req.status}`);
+      }
+    };
+
+    // 6. NETWORK Error Handler
+    req.onerror = function () {
+      handleKeepAliveFailure("Network error - check connection");
+    };
+
+    // 7. TIMEOUT Handler
+    req.ontimeout = function () {
+      handleKeepAliveFailure("Request timeout - server slow");
+    };
+
+    // 8. Request konfigurieren und senden
+    req.open(options.keepAliveMethod, url);
+    req.timeout = 10000; // 10 Sekunden Timeout
+    req.send();
+  };
+
+  /**
+   * Handler für erfolgreiche Session-Verlängerung
+   */
+  const handleKeepAliveSuccess = () => {
+    // Timer zurücksetzen - NUR bei erfolgreichem Server-Response
     sessionEndTime = Date.now() + options.timeOutAfter;
+
+    // Neue Timer starten
     warnTimer = setTimeout(warn, options.warnAfter);
     clearTimeout(timeOutTimer);
     timeOutTimer = setTimeout(timeOut, options.timeOutAfter);
+
+    // Button wieder aktivieren
+    stayConnectedBtn.disabled = false;
+    stayConnectedBtn.innerText = options.stayConnectedBtnText;
+
+    // Optional: Erfolgs-Feedback
+    showFeedback("Session extended successfully", "success");
+  };
+
+  /**
+   * Handler für fehlgeschlagene Session-Verlängerung
+   */
+  const handleKeepAliveFailure = (errorMessage) => {
+    // Bei Fehlern: SOFORT ausloggen (sicherste Option)
+    window.location = options.logOutUrl;
+
+    // Alternative: Warnung anzeigen und schnell erneut warnen
+    // showFeedback(errorMessage, 'error');
+    // container.classList.remove("sessionTimeout--hidden");
+    // warnTimer = setTimeout(warn, 5000); // Schnell erneut warnen
+  };
+
+  /**
+   * Hilfsfunktion für User-Feedback (optional)
+   */
+  const showFeedback = (message, type) => {
+    // Einfache Feedback-Implementierung
+    const feedback = document.createElement("div");
+    feedback.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        padding: 12px 20px;
+        background: ${type === "success" ? "#28a745" : "#dc3545"};
+        color: white;
+        border-radius: 4px;
+        z-index: 10000;
+        font-size: 14px;
+    `;
+    feedback.textContent = message;
+    document.body.appendChild(feedback);
+
+    // Auto-remove nach 3 Sekunden
+    setTimeout(() => {
+      if (feedback.parentNode) {
+        feedback.parentNode.removeChild(feedback);
+      }
+    }, 3000);
   };
 
   // create html elements
