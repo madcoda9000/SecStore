@@ -24,8 +24,8 @@ class User extends ORM
 {
     protected static $tableName = 'users'; // Der Tabellenname
 
-    
-    
+
+
     /**
      * Erstellt einen neuen Benutzer.
      * @param string $username Der Benutzername
@@ -62,8 +62,8 @@ class User extends ORM
         return $erg;
     }
 
-    
-    
+
+
     /**
      * Finds a user by their ID.
      *
@@ -191,7 +191,7 @@ class User extends ORM
         return $erg;
     }
 
-    
+
     /**
      * Updates the status of a user.
      *
@@ -213,13 +213,13 @@ class User extends ORM
                 $lastQuery = end($queries);
                 LogUtil::logAction(LogType::SQL, 'User.php', 'updateUserStatus', $lastQuery);
             }
-            
+
             return $erg;
         }
         return false;
     }
 
-    
+
     /**
      * Updates a user by ID.
      *
@@ -246,7 +246,7 @@ class User extends ORM
             $user->status = $status;
             $user->roles = $roles;
             $user->ldapEnabled = $ldapEnabled; // LDAP-Flag setzen
-            if ($password!==null) {
+            if ($password !== null) {
                 $user->password = $password;
             }
 
@@ -284,7 +284,7 @@ class User extends ORM
                 $lastQuery = end($queries);
                 LogUtil::logAction(LogType::SQL, 'User.php', 'changeEmailAddress', $lastQuery);
             }
-            
+
             return $erg;
         }
         return false;
@@ -341,13 +341,13 @@ class User extends ORM
                 $lastQuery = end($queries);
                 LogUtil::logAction(LogType::SQL, 'User.php', 'setMfaToken', $lastQuery);
             }
-            
+
             return $erg;
         }
         return false;
     }
 
-    
+
     /**
      * Disables MFA and resets the secret for a user identified by their ID.
      *
@@ -369,7 +369,7 @@ class User extends ORM
                 $lastQuery = end($queries);
                 LogUtil::logAction(LogType::SQL, 'User.php', 'disableAndReset2fa', $lastQuery);
             }
-            
+
             return $erg;
         }
         return false;
@@ -395,7 +395,7 @@ class User extends ORM
                 $lastQuery = end($queries);
                 LogUtil::logAction(LogType::SQL, 'User.php', 'enforceMfa', $lastQuery);
             }
-            
+
             return $erg;
         }
         return false;
@@ -421,7 +421,7 @@ class User extends ORM
                 $lastQuery = end($queries);
                 LogUtil::logAction(LogType::SQL, 'User.php', 'unenforceMfa', $lastQuery);
             }
-            
+
             return $erg;
         }
         return false;
@@ -448,7 +448,7 @@ class User extends ORM
                 $lastQuery = end($queries);
                 LogUtil::logAction(LogType::SQL, 'User.php', 'disableMfaForUser', $lastQuery);
             }
-            
+
             return $erg;
         }
         return false;
@@ -474,7 +474,7 @@ class User extends ORM
                 $lastQuery = end($queries);
                 LogUtil::logAction(LogType::SQL, 'User.php', 'enableMfaForUser', $lastQuery);
             }
-            
+
             return $erg;
         }
         return false;
@@ -504,7 +504,7 @@ class User extends ORM
                 $lastQuery = end($queries);
                 LogUtil::logAction(LogType::SQL, 'User.php', 'enableMfaSetupForUser', $lastQuery);
             }
-            
+
             return $erg;
         }
         return false;
@@ -530,12 +530,12 @@ class User extends ORM
                 $lastQuery = end($queries);
                 LogUtil::logAction(LogType::SQL, 'User.php', 'disableMfaSetupForUser', $lastQuery);
             }
-            
+
             return $erg;
         }
         return false;
     }
-    
+
     /**
      * Sets a new password for a user identified by their ID.
      *
@@ -562,12 +562,12 @@ class User extends ORM
                 $lastQuery = end($queries);
                 LogUtil::logAction(LogType::SQL, 'User.php', 'setNewPassword', $lastQuery);
             }
-            
+
             return $erg;
         }
         return false;
     }
-    
+
     /**
      * Deletes a user by their ID.
      *
@@ -578,7 +578,7 @@ class User extends ORM
     {
         ORM::configure('logging', true);
         $user = self::findUserById($id);
-        if ($user !==false) {
+        if ($user !== false) {
             $erg = $user->delete();
 
             // letzte query loggen
@@ -587,7 +587,7 @@ class User extends ORM
                 $lastQuery = end($queries);
                 LogUtil::logAction(LogType::SQL, 'User.php', 'deleteUser', $lastQuery);
             }
-            
+
             return $erg;
         }
         return false;
@@ -608,7 +608,7 @@ class User extends ORM
         }
         return null;
     }
-    
+
     /**
      * Sets the active session ID for a user by their ID.
      *
@@ -632,7 +632,7 @@ class User extends ORM
                 $lastQuery = end($queries);
                 LogUtil::logAction(LogType::SQL, 'User.php', 'setActiveSessionId', $lastQuery);
             }
-            
+
             return $erg;
         }
         return false;
@@ -670,7 +670,7 @@ class User extends ORM
         $user = self::findUserById($id);
         if ($user !== false) {
             $user->lastKnownIp = $ip;
-            $erg = $user->save();   
+            $erg = $user->save();
             // letzte query loggen
             $queries = ORM::get_query_log();
             if (!empty($queries)) {
@@ -681,7 +681,7 @@ class User extends ORM
         }
         return false;
     }
-    
+
     /**
      * Retrieves all users from the database.
      *
@@ -699,7 +699,7 @@ class User extends ORM
             $lastQuery = end($queries);
             LogUtil::logAction(LogType::SQL, 'User.php', 'getAllUsers', $lastQuery);
         }
-        
+
         return $erg;
     }
 
@@ -740,5 +740,39 @@ class User extends ORM
         } else {
             return null;
         }
+    }
+
+    /**
+     * Retrieves multiple users by their IDs.
+     *
+     * @param array $userIds Array of user IDs to retrieve
+     * @return array An array of user objects
+     */
+    public static function getUsersByIds(array $userIds)
+    {
+        if (empty($userIds)) {
+            return [];
+        }
+
+        ORM::configure('logging', true);
+
+        // Convert IDs to integers for safety
+        $userIds = array_map('intval', $userIds);
+
+        // Build the IN clause with placeholders
+        $placeholders = implode(',', array_fill(0, count($userIds), '?'));
+
+        $users = ORM::for_table(self::$tableName)
+            ->where_raw("id IN ({$placeholders})", $userIds)
+            ->find_array(); // Use find_array() for better CSV compatibility
+
+        // Log the query
+        $queries = ORM::get_query_log();
+        if (!empty($queries)) {
+            $lastQuery = end($queries);
+            LogUtil::logAction(LogType::SQL, 'User.php', 'getUsersByIds', $lastQuery);
+        }
+
+        return $users;
     }
 }
