@@ -449,10 +449,37 @@ foreach ($fetchLogRoutes as $route => $method) {
 
 // Session Extension
 secureRoute('POST /extend-session', function () {
-    session_regenerate_id(true);
-    $_SESSION['last_activity'] = time();
-    echo json_encode(["success" => true]);
-}, 'global', false);
+    try {
+        // Session ID regenerieren für Sicherheit
+        session_regenerate_id(true);
+        
+        // Last activity aktualisieren
+        $_SESSION['last_activity'] = time();
+        
+        // Erfolgreiche Response
+        echo json_encode([
+            "success" => true,
+            "timestamp" => time(),
+            "message" => "Session extended successfully"
+        ]);
+        
+    } catch (Exception $e) {
+        // Fehler-Logging
+        LogUtil::logAction(
+            LogType::ERROR, 
+            'routes.php', 
+            'extend-session', 
+            'Session extension failed: ' . $e->getMessage()
+        );
+        
+        // Fehler-Response
+        http_response_code(500);
+        echo json_encode([
+            "success" => false,
+            "message" => "Session extension failed"
+        ]);
+    }
+}, 'session-extend', false);
 
 // Logout (kein Rate Limiting nötig)
 Flight::route('/logout', array(new ProfileController, 'logout'));

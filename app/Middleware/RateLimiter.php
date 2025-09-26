@@ -32,7 +32,10 @@ class RateLimiter
         'register' => ['requests' => 3, 'window' => 3600], // 3 Registrierungen pro Stunde
         'forgot-password' => ['requests' => 3, 'window' => 3600], // 3 Password-Resets pro Stunde
         'reset-password' => ['requests' => 5, 'window' => 3600], // 5 Versuche pro Stunde
-        '2fa' => ['requests' => 10, 'window' => 300], // 10 2FA Versuche in 5 Minuten        
+        '2fa' => ['requests' => 10, 'window' => 300], // 10 2FA Versuche in 5 Minuten       
+
+        // Session Management - moderat restriktiv
+        'session-extend' => ['requests' => 20, 'window' => 900], // 20 Verlängerungen in 15 Minuten
 
         // Admin Bereiche - restriktiv
         'admin' => ['requests' => 50, 'window' => 3600], // 50 Admin-Actions pro Stunde

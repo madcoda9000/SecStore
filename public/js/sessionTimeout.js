@@ -22,6 +22,11 @@
  * @prop {string} [options.countDownTimerInDialogId="remainingTimeInDialog"] - The id of the element that will display the countdown timer in the dialog.
  * @prop {string} [options.countDownTimerId="remainingTime"] - The id of the element that will display the countdown timer on the page.
  */
+/**
+ * sessionTimeout - Bootstrap Modal Version
+ * 
+ * A JavaScript function that will show a Bootstrap modal when the user's session is about to expire.
+ */
 window.sessionTimeout = function (passedOptions) {
   const defaults = {
     appendTimestamp: false,
@@ -45,14 +50,11 @@ window.sessionTimeout = function (passedOptions) {
 
   let warnTimer, timeOutTimer, countdownTimer;
   let countdownSpan = document.getElementById(options.countDownTimerId);
-
   let sessionEndTime = Date.now() + options.timeOutAfter;
+  let bootstrapModal = null;
 
   /**
-   * Updates the countdown timer displayed on the page.
-   * Calculates the remaining time from the current moment until session end,
-   * formats it as MM:SS, and updates the appropriate DOM elements with the remaining time.
-   * If the countdown reaches zero, it clears the countdown interval.
+   * Updates the countdown timer displayed on the page and in dialog
    */
   const updateCountdown = () => {
     let remainingSeconds = Math.max(0, Math.round((sessionEndTime - Date.now()) / 1000));
@@ -60,213 +62,205 @@ window.sessionTimeout = function (passedOptions) {
     let seconds = remainingSeconds % 60;
     let timeString = `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
 
+    // Update countdown on page (footer)
     if (countdownSpan) countdownSpan.innerText = timeString;
-    if (options.showCountDownTimerInDialog && countdownSpanInDialog) countdownSpanInDialog.innerText = timeString;
+    
+    // Update countdown in dialog
+    if (options.showCountDownTimerInDialog) {
+      const dialogCountdown = document.getElementById(options.countDownTimerInDialogId);
+      if (dialogCountdown) dialogCountdown.innerText = timeString;
+    }
 
-    if (remainingSeconds <= 0) clearInterval(countdownTimer);
+    if (remainingSeconds <= 0) {
+      clearInterval(countdownTimer);
+    }
   };
 
   /**
-   * Displays the session timeout warning dialog by removing the hidden class
-   * from the container element. This informs the user that their session is
-   * about to expire and provides options to stay connected or log out.
+   * Creates Bootstrap Modal HTML structure
+   */
+  const createBootstrapModal = () => {
+    const modalHTML = `
+      <div class="modal fade" id="sessionTimeoutModal" tabindex="-1" aria-labelledby="sessionTimeoutModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+        <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-header bg-warning text-dark">
+              <h5 class="modal-title" id="sessionTimeoutModalLabel">
+                <i class="bi bi-clock-history me-2"></i>${options.titleText}
+              </h5>
+            </div>
+            <div class="modal-body text-center">
+              <div class="mb-3">
+                <i class="bi bi-exclamation-triangle-fill text-warning fs-1 mb-3"></i>
+              </div>
+              <p class="fs-5 mb-3">${options.message}</p>
+              ${options.showCountDownTimerInDialog ? `
+                <div class="alert alert-warning" role="alert">
+                  <i class="bi bi-stopwatch me-2"></i>
+                  Time remaining: <strong><span id="${options.countDownTimerInDialogId}" class="text-danger fs-4">00:00</span></strong>
+                </div>
+              ` : ''}
+              <div class="text-muted">
+                <small>Your session will expire automatically if no action is taken.</small>
+              </div>
+            </div>
+            <div class="modal-footer justify-content-center">
+              <button type="button" class="btn btn-outline-secondary me-3" id="sessionTimeoutLogoutBtn">
+                <i class="bi bi-box-arrow-right me-2"></i>${options.logOutBtnText}
+              </button>
+              <button type="button" class="btn btn-primary" id="sessionTimeoutStayConnectedBtn">
+                <i class="bi bi-arrow-clockwise me-2"></i>${options.stayConnectedBtnText}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+
+    // Remove existing modal if present
+    const existingModal = document.getElementById('sessionTimeoutModal');
+    if (existingModal) {
+      existingModal.remove();
+    }
+
+    // Add new modal to DOM
+    document.body.insertAdjacentHTML('beforeend', modalHTML);
+
+    // Initialize Bootstrap Modal
+    const modalElement = document.getElementById('sessionTimeoutModal');
+    bootstrapModal = new bootstrap.Modal(modalElement, {
+      backdrop: 'static',
+      keyboard: false
+    });
+
+    // Add event listeners to buttons
+    document.getElementById('sessionTimeoutLogoutBtn').addEventListener('click', logOut);
+    document.getElementById('sessionTimeoutStayConnectedBtn').addEventListener('click', stayConnected);
+
+    return modalElement;
+  };
+
+  /**
+   * Shows the session timeout warning dialog
    */
   const warn = () => {
-    container.classList.remove("sessionTimeout--hidden");
+    if (!bootstrapModal) {
+      createBootstrapModal();
+    }
+    bootstrapModal.show();
   };
 
   /**
-   * Redirects the user to the specified timeout URL when their session has expired.
-   * This function is called when the session timeout period has been reached.
+   * Redirects to timeout URL when session has expired
    */
   const timeOut = () => {
     window.location = options.timeOutUrl;
   };
 
   /**
-   * Logs the user out by redirecting them to the specified logout URL.
-   * This function is triggered when the user chooses to log out manually
-   * or when the session timeout dialog's "Log out now" button is clicked.
+   * Logs the user out immediately
    */
   const logOut = () => {
     window.location = options.logOutUrl;
   };
 
   /**
-   * Handles successful keep-alive requests by resetting timers and updating the UI.
-   * This function is called when the server confirms that the session has been extended.
-   * It hides the session timeout dialog, resets the warning and timeout timers,
-   * updates the session end time, and re-enables the "Stay connected" button.
+   * Stays connected by extending the session with improved error handling
    */
   const stayConnected = () => {
-    // 1. Sofort Dialog ausblenden
-    container.classList.add("sessionTimeout--hidden");
+    const stayBtn = document.getElementById('sessionTimeoutStayConnectedBtn');
+    const logoutBtn = document.getElementById('sessionTimeoutLogoutBtn');
+    
+    // Disable buttons and show loading state
+    stayBtn.disabled = true;
+    logoutBtn.disabled = true;
+    stayBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Connecting...';
 
-    // 2. Button während Request deaktivieren
-    stayConnectedBtn.disabled = true;
-    stayConnectedBtn.innerText = "Connecting...";
+    const url = options.appendTimestamp ? 
+        `${options.keepAliveUrl}?time=${Date.now()}` : 
+        options.keepAliveUrl;
 
-    // 3. Request URL vorbereiten
-    const url = options.appendTimestamp ? `${options.keepAliveUrl}?time=${Date.now()}` : options.keepAliveUrl;
-
-    // 4. XMLHttpRequest mit vollständiger Fehlerbehandlung
     const req = new XMLHttpRequest();
 
-    // 5. SUCCESS Handler - nur bei erfolgreichem Server-Response
-    req.onload = function () {
+    // Success handler
+    req.onload = function() {
       if (req.status === 200) {
         try {
-          // Versuche JSON Response zu parsen
           const response = JSON.parse(req.responseText);
-
           if (response.success === true) {
-            // ✅ Server bestätigt Session-Verlängerung
             handleKeepAliveSuccess();
           } else {
-            // ❌ Server meldet Fehler (z.B. Session abgelaufen)
-            handleKeepAliveFailure("Server rejected session extension");
+            handleKeepAliveFailure('Server rejected session extension');
           }
         } catch (parseError) {
-          // ❌ Ungültige JSON Response
-          handleKeepAliveFailure("Invalid server response");
+          handleKeepAliveFailure('Invalid server response');
         }
       } else {
-        // ❌ HTTP Error Status (401, 403, 500, etc.)
         handleKeepAliveFailure(`Server error: ${req.status}`);
       }
     };
 
-    // 6. NETWORK Error Handler
-    req.onerror = function () {
-      handleKeepAliveFailure("Network error - check connection");
-    };
+    // Error handlers
+    req.onerror = () => handleKeepAliveFailure('Network error - check connection');
+    req.ontimeout = () => handleKeepAliveFailure('Request timeout - server slow');
 
-    // 7. TIMEOUT Handler
-    req.ontimeout = function () {
-      handleKeepAliveFailure("Request timeout - server slow");
-    };
-
-    // 8. Request konfigurieren und senden
+    // Configure and send request
+    req.timeout = 10000; // 10 second timeout
     req.open(options.keepAliveMethod, url);
-    req.timeout = 10000; // 10 Sekunden Timeout
     req.send();
   };
 
   /**
-   * Handler für erfolgreiche Session-Verlängerung
+   * Handler for successful session extension
    */
   const handleKeepAliveSuccess = () => {
-    // Timer zurücksetzen - NUR bei erfolgreichem Server-Response
+    // Reset session timer
     sessionEndTime = Date.now() + options.timeOutAfter;
-
-    // Neue Timer starten
+    
+    // Hide modal
+    bootstrapModal.hide();
+    
+    // Reset timers
     warnTimer = setTimeout(warn, options.warnAfter);
     clearTimeout(timeOutTimer);
     timeOutTimer = setTimeout(timeOut, options.timeOutAfter);
-
-    // Button wieder aktivieren
-    stayConnectedBtn.disabled = false;
-    stayConnectedBtn.innerText = options.stayConnectedBtnText;
-
-    // Optional: Erfolgs-Feedback
-    showFeedback("Session extended successfully", "success");
+    
+    // Show success feedback
+    showToast('Session extended successfully', 'success');
   };
 
   /**
-   * Handler für fehlgeschlagene Session-Verlängerung
+   * Handler for failed session extension
    */
   const handleKeepAliveFailure = (errorMessage) => {
-    // Bei Fehlern: SOFORT ausloggen (sicherste Option)
+    // On any failure: immediately logout (safest option)
     window.location = options.logOutUrl;
-
-    // Alternative: Warnung anzeigen und schnell erneut warnen
-    // showFeedback(errorMessage, 'error');
-    // container.classList.remove("sessionTimeout--hidden");
-    // warnTimer = setTimeout(warn, 5000); // Schnell erneut warnen
   };
 
   /**
-   * Hilfsfunktion für User-Feedback (optional)
+   * Shows toast notification (if available)
    */
-  const showFeedback = (message, type) => {
-    // Einfache Feedback-Implementierung
-    const feedback = document.createElement("div");
-    feedback.style.cssText = `
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        padding: 12px 20px;
-        background: ${type === "success" ? "#28a745" : "#dc3545"};
-        color: white;
-        border-radius: 4px;
-        z-index: 10000;
-        font-size: 14px;
-    `;
-    feedback.textContent = message;
-    document.body.appendChild(feedback);
-
-    // Auto-remove nach 3 Sekunden
-    setTimeout(() => {
-      if (feedback.parentNode) {
-        feedback.parentNode.removeChild(feedback);
+  const showToast = (message, type) => {
+    // Check if global showToast function exists (from your bootstrap toasts)
+    if (typeof window.showToast === 'function') {
+      window.showToast(message, type === 'success' ? 'success' : 'danger', 'Session');
+    } else {
+      // Fallback: simple alert or console
+      if (type === 'success') {
+        // Could create a simple notification
+        console.log('Session: ' + message);
       }
-    }, 3000);
+    }
   };
 
-  // create html elements
-  const container = document.createElement("div");
-  const modal = document.createElement("div");
-  const content = document.createElement("div");
-  const title = document.createElement("div");
-  const buttons = document.createElement("div");
-  const logOutBtn = document.createElement("button");
-  const stayConnectedBtn = document.createElement("button");
+  // Initialize: Create modal structure
+  createBootstrapModal();
 
-  // add event listeners
-  logOutBtn.addEventListener("click", logOut);
-  stayConnectedBtn.addEventListener("click", stayConnected);
-
-  // add css classes
-  container.classList.add("sessionTimeout", "sessionTimeout--hidden");
-  modal.classList.add("sessionTimeout-modal");
-  title.classList.add("sessionTimeout-title");
-  content.classList.add("sessionTimeout-content");
-  buttons.classList.add("sessionTimeout-buttons");
-  logOutBtn.classList.add("btn", "btn-secondary");
-  logOutBtn.style.marginRight = "15px";
-  stayConnectedBtn.classList.add("btn", "btn-primary");
-
-  // add content
-  title.innerText = options.titleText;
-  content.innerText = options.message;
-  logOutBtn.innerText = options.logOutBtnText;
-  stayConnectedBtn.innerText = options.stayConnectedBtnText;
-
-  // add countdown timer span
-  let countdownSpanInDialog;
-  if (options.showCountDownTimerInDialog) {
-    countdownSpanInDialog = document.createElement("span");
-    countdownSpanInDialog.id = options.countDownTimerInDialogId;
-    countdownSpanInDialog.style.display = "block";
-    countdownSpanInDialog.style.marginTop = "10px";
-    countdownSpanInDialog.style.fontWeight = "bold";
-    content.appendChild(countdownSpanInDialog);
-  }
-
-  // append created html elements
-  modal.appendChild(title);
-  modal.appendChild(content);
-  modal.appendChild(buttons);
-  buttons.appendChild(logOutBtn);
-  buttons.appendChild(stayConnectedBtn);
-  container.appendChild(modal);
-  document.body.appendChild(container);
-
-  // set timers
+  // Set initial timers
   warnTimer = setTimeout(warn, options.warnAfter);
   timeOutTimer = setTimeout(timeOut, options.timeOutAfter);
 
-  // set countdown timer
+  // Set countdown timer if enabled
   if (options.showCountDownTimer) {
     countdownTimer = setInterval(updateCountdown, 1000);
     updateCountdown();

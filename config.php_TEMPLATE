@@ -46,11 +46,8 @@ $rateLimiting = [
     'forgot-password' => ['requests' => 5, 'window' => 3600], // Password-Resets pro Stunde
     'reset-password' => ['requests' => 5, 'window' => 3600], // Reset-Versuche pro Stunde
     '2fa' => ['requests' => 25, 'window' => 300], // 2FA Versuche in 5 Minuten
-
-    // Admin Bereiche - restriktiv
+    'session-extend' => ['requests' => 20, 'window' => 900], // 20 Verlängerungen in 15 Minuten
     'admin' => ['requests' => 200, 'window' => 300], // Admin-Actions
-
-    // Globales Limit als Fallback
     'global' => ['requests' => 1500, 'window' => 300] // Requests pro Stunde
   ],
   // Erweiterte Einstellungen
