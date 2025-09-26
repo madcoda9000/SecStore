@@ -1820,8 +1820,8 @@ class AdminController
 
             // Update MFA enforcement
             $updateResult = $enforce ?
-                User::enforceMfaForUser($userId) :
-                User::unenforceMfaForUser($userId);
+                User::enforceMfa($userId) :
+                User::unenforceMfa($userId);
 
             if ($updateResult) {
                 $results[] = [

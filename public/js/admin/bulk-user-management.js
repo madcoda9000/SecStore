@@ -107,6 +107,18 @@ class BulkUserManager {
     document.addEventListener("click", this.handleClick.bind(this));
     document.addEventListener("change", this.handleChange.bind(this));
 
+    // Results Modal Event: Progress Modal cleanup when results modal is closed
+    const resultsModal = document.getElementById("bulkResultsModal");
+    if (resultsModal) {
+      resultsModal.addEventListener("hidden.bs.modal", () => {
+        // Ensure progress modal is definitely closed when results modal closes
+        if (this.elements.bulkProgressModal && this.elements.bulkProgressModal._element.classList.contains("show")) {
+          console.log("🧹 Cleaning up progress modal after results closed");
+          this.elements.bulkProgressModal.hide();
+        }
+      });
+    }
+
     console.log("📡 CSP-compliant event listeners setup");
   }
 
@@ -147,16 +159,28 @@ class BulkUserManager {
   }
 
   /**
-   * Central change event handler (CSP-compliant)
+   * Handle regular actions
    */
-  handleChange(event) {
-    const target = event.target;
-    const action = target.dataset.action;
-
-    if (action === "toggle-select-all") {
-      this.toggleSelectAll(target.checked);
-    } else if (action === "update-selection") {
-      this.updateSelection();
+  handleAction(action) {
+    switch (action) {
+      case 'clear-selection':
+        this.clearSelection();
+        break;
+        
+      case 'show-role-modal':
+        this.showRoleAssignmentModal();
+        break;
+        
+      case 'confirm-role-assignment':
+        this.confirmRoleAssignment();
+        break;
+        
+      case 'refresh-user-list':
+        this.refreshUserList();
+        break;
+        
+      default:
+        console.warn('Unknown action:', action);
     }
   }
 
@@ -226,6 +250,9 @@ class BulkUserManager {
   /**
    * Process bulk operation with progress tracking
    */
+  /**
+   * Process bulk operation with progress tracking
+   */
   async processBulkOperation(operation, options = {}) {
     this.showProgressModal(operation);
 
@@ -236,6 +263,7 @@ class BulkUserManager {
       const response = await this.sendBulkRequest(operation, userIds, options);
 
       if (response.success) {
+        // Progress Modal wird in showResults() geschlossen
         this.showResults(response);
         this.clearSelection();
       } else {
@@ -243,12 +271,23 @@ class BulkUserManager {
       }
     } catch (error) {
       console.error("❌ Bulk operation failed:", error);
-      this.showAlert("Operation failed: " + error.message, "danger");
-    } finally {
-      this.isProcessing = false;
+
+      // Bei Fehler: Progress Modal explizit schließen
       if (this.elements.bulkProgressModal) {
         this.elements.bulkProgressModal.hide();
       }
+
+      this.showAlert("Operation failed: " + error.message, "danger");
+    } finally {
+      this.isProcessing = false;
+
+      // Sicherheitscheck: Falls Progress Modal immer noch offen
+      setTimeout(() => {
+        if (this.elements.bulkProgressModal && this.elements.bulkProgressModal._element.classList.contains("show")) {
+          console.warn("⚠️ Force closing stuck progress modal");
+          this.elements.bulkProgressModal.hide();
+        }
+      }, 500);
     }
   }
 
@@ -536,7 +575,17 @@ class BulkUserManager {
   /**
    * Show results modal
    */
+  /**
+   * Show results modal with detailed breakdown
+   */
   showResults(response) {
+    console.log("📊 Showing results:", response);
+
+    // WICHTIG: Progress Modal zuerst schließen
+    if (this.elements.bulkProgressModal) {
+      this.elements.bulkProgressModal.hide();
+    }
+
     // Update summary cards
     if (this.elements.successCount) {
       this.elements.successCount.textContent = response.summary?.success || 0;
@@ -548,10 +597,27 @@ class BulkUserManager {
       this.elements.failedCount.textContent = response.summary?.failed || 0;
     }
 
+    // Update modal title based on results
+    const hasFailures = (response.summary?.failed || 0) > 0;
+    const titleIcon = hasFailures
+      ? '<i class="bi bi-exclamation-triangle text-warning"></i>'
+      : '<i class="bi bi-check-circle text-success"></i>';
+
+    if (this.elements.resultsModalTitle) {
+      this.elements.resultsModalTitle.innerHTML = `${titleIcon} ${
+        response.operation.charAt(0).toUpperCase() + response.operation.slice(1)
+      } Complete`;
+    }
+
+    // Generate detailed results table
+    this.generateResultsTable(response.details || []);
+
     // Show results modal
     if (this.elements.bulkResultsModal) {
       this.elements.bulkResultsModal.show();
     }
+
+    console.log("✅ Results modal displayed, progress modal hidden");
   }
 
   /**
@@ -614,6 +680,66 @@ class BulkUserManager {
    */
   confirmDangerousAction(title, message) {
     return Promise.resolve(confirm(`${title}\n\n${message}`));
+  }
+
+  /**
+   * Generate detailed results table
+   */
+  generateResultsTable(details) {
+    console.log("📋 Generating results table with", details.length, "items");
+
+    if (!details || details.length === 0) {
+      this.elements.resultsTable.innerHTML = '<p class="text-muted">No detailed results available.</p>';
+      return;
+    }
+
+    const table = document.createElement("table");
+    table.className = "table table-sm table-striped";
+
+    table.innerHTML = `
+        <thead>
+            <tr>
+                <th>User</th>
+                <th>Status</th>
+                <th>Details</th>
+            </tr>
+        </thead>
+        <tbody>
+            ${details
+              .map((result) => {
+                const statusBadge = this.getStatusBadge(result.status);
+                return `
+                    <tr>
+                        <td>
+                            <strong>${result.username || "Unknown"}</strong>
+                            <br><small class="text-muted">ID: ${result.userId}</small>
+                        </td>
+                        <td>${statusBadge}</td>
+                        <td><small>${result.reason || "No details"}</small></td>
+                    </tr>
+                `;
+              })
+              .join("")}
+        </tbody>
+    `;
+
+    this.elements.resultsTable.innerHTML = "";
+    this.elements.resultsTable.appendChild(table);
+
+    console.log("✅ Results table generated successfully");
+  }
+
+  /**
+   * Get status badge HTML
+   */
+  getStatusBadge(status) {
+    const badges = {
+      success: '<span class="badge bg-success">Success</span>',
+      failed: '<span class="badge bg-danger">Failed</span>',
+      skipped: '<span class="badge bg-warning">Skipped</span>',
+    };
+
+    return badges[status] || '<span class="badge bg-secondary">Unknown</span>';
   }
 }
 
