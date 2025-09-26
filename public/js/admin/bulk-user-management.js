@@ -8,6 +8,8 @@ class BulkUserManager {
     this.selectedUsers = new Set();
     this.allUsers = new Map();
     this.isProcessing = false;
+    this.currentBulkConfirmResolve = null;
+    this.currentBulkOperation = null;
 
     // DOM Elements
     this.elements = {
@@ -21,6 +23,7 @@ class BulkUserManager {
       // Modals
       bulkProgressModal: null,
       bulkResultsModal: null,
+      confirmModal: null,
 
       // Modal elements
       progressOperation: document.getElementById("progressOperation"),
@@ -31,6 +34,12 @@ class BulkUserManager {
       skippedCount: document.getElementById("skippedCount"),
       failedCount: document.getElementById("failedCount"),
       resultsTable: document.getElementById("resultsTable"),
+      confirmModalTitle: document.getElementById("confirmModalTitle"),
+      confirmModalMessage: document.getElementById("confirmModalMessage"),
+      confirmModalSubtext: document.getElementById("confirmModalSubtext"),
+      confirmModalBtnText: document.getElementById("confirmModalBtnText"),
+      confirmModalIcon: document.getElementById("confirmModalIcon"),
+      confirmDeleteBtn: document.getElementById("confirmDeleteBtn2"),
     };
 
     this.init();
@@ -60,12 +69,16 @@ class BulkUserManager {
   initializeModals() {
     const progressModal = document.getElementById("bulkProgressModal");
     const resultsModal = document.getElementById("bulkResultsModal");
+    const confirmModal = document.getElementById("confirmDeleteModal2");
 
     if (progressModal) {
       this.elements.bulkProgressModal = new bootstrap.Modal(progressModal);
     }
     if (resultsModal) {
       this.elements.bulkResultsModal = new bootstrap.Modal(resultsModal);
+    }
+    if (confirmModal) {
+      this.elements.confirmModal = new bootstrap.Modal(confirmModal);
     }
   }
 
@@ -108,6 +121,18 @@ class BulkUserManager {
         if (this.elements.bulkProgressModal && this.elements.bulkProgressModal._element.classList.contains("show")) {
           console.log("🧹 Cleaning up progress modal after results closed");
           this.elements.bulkProgressModal.hide();
+        }
+      });
+    }
+
+    const confirmModal = document.getElementById("confirmDeleteModal2");
+    if (confirmModal) {
+      confirmModal.addEventListener("hidden.bs.modal", () => {
+        // Wenn Modal geschlossen wird ohne Bestätigung, resolve mit false
+        if (this.currentBulkConfirmResolve) {
+          this.currentBulkConfirmResolve(false);
+          this.currentBulkConfirmResolve = null;
+          this.currentBulkOperation = null;
         }
       });
     }
@@ -156,16 +181,16 @@ class BulkUserManager {
    */
   handleAction(action) {
     switch (action) {
-      case 'clear-selection':
+      case "clear-selection":
         this.clearSelection();
         break;
-        
-      case 'refresh-user-list':
+
+      case "refresh-user-list":
         this.refreshUserList();
         break;
-        
+
       default:
-        console.warn('Unknown action:', action);
+        console.warn("Unknown action:", action);
     }
   }
 
@@ -605,10 +630,125 @@ class BulkUserManager {
   }
 
   /**
+   * Get translations from data attributes based on operation
+   */
+  getBulkConfirmTranslations(operation, messagesDiv) {
+    const count = this.selectedUsers.size;
+    const plural = count !== 1 ? "s" : "";
+
+    const configs = {
+      delete: {
+        title: messagesDiv.dataset.bulkDeleteTitle,
+        message: messagesDiv.dataset.bulkDeleteMessage,
+        subtext: messagesDiv.dataset.bulkDeleteSubtext,
+        btnText: messagesDiv.dataset.bulkDeleteBtn,
+        btnClass: "btn-danger",
+        icon: "bi-trash-fill text-danger",
+      },
+      disable: {
+        title: messagesDiv.dataset.bulkDisableTitle,
+        message: messagesDiv.dataset.bulkDisableMessage,
+        subtext: messagesDiv.dataset.bulkDisableSubtext,
+        btnText: messagesDiv.dataset.bulkDisableBtn,
+        btnClass: "btn-warning",
+        icon: "bi-person-x text-warning",
+      },
+      mfa_enforce: {
+        title: messagesDiv.dataset.bulkMfaEnforceTitle,
+        message: messagesDiv.dataset.bulkMfaEnforceMessage,
+        subtext: messagesDiv.dataset.bulkMfaEnforceSubtext,
+        btnText: messagesDiv.dataset.bulkMfaEnforceBtn,
+        btnClass: "btn-warning",
+        icon: "bi-shield-exclamation text-warning",
+      },
+      mfa_unenforce: {
+        title: messagesDiv.dataset.bulkMfaUnenforceTitle,
+        message: messagesDiv.dataset.bulkMfaUnenforceMessage,
+        subtext: messagesDiv.dataset.bulkMfaUnenforceSubtext,
+        btnText: messagesDiv.dataset.bulkMfaUnenforceBtn,
+        btnClass: "btn-info",
+        icon: "bi-shield-slash text-info",
+      },
+    };
+
+    const config = configs[operation];
+
+    // Fallback to delete if operation not found
+    if (!config) {
+      console.warn("Unknown operation:", operation, "falling back to delete config");
+      return configs["delete"];
+    }
+
+    // Replace placeholders in message
+    if (config.message) {
+      config.message = config.message.replace("{count}", count.toString()).replace("{plural}", plural);
+    }
+
+    return config;
+  }
+
+  /**
+   * Update modal with translated content
+   */
+  updateBulkConfirmModal(config) {
+    // Update title
+    if (this.elements.confirmModalTitle && config.title) {
+      this.elements.confirmModalTitle.textContent = config.title;
+    }
+
+    // Update message
+    if (this.elements.confirmModalMessage && config.message) {
+      this.elements.confirmModalMessage.textContent = config.message;
+    }
+
+    // Update subtext
+    if (this.elements.confirmModalSubtext && config.subtext) {
+      this.elements.confirmModalSubtext.textContent = config.subtext;
+    }
+
+    // Update button
+    if (this.elements.confirmDeleteBtn && config.btnClass) {
+      this.elements.confirmDeleteBtn.className = `btn ${config.btnClass}`;
+    }
+
+    if (this.elements.confirmModalBtnText && config.btnText) {
+      this.elements.confirmModalBtnText.textContent = config.btnText;
+    }
+
+    // Update icon
+    if (this.elements.confirmModalIcon && config.icon) {
+      this.elements.confirmModalIcon.className = `${config.icon} fs-1 me-3`;
+    }
+  }
+
+  /**
    * Confirm dangerous actions
    */
-  confirmDangerousAction(title, message) {
-    return Promise.resolve(confirm(`${title}\n\n${message}`));
+  confirmDangerousAction(title, message, operation) {
+    return new Promise((resolve) => {
+      // Store resolve for later use
+      this.currentBulkConfirmResolve = resolve;
+      this.currentBulkOperation = operation;
+
+      // Get translated texts from data attributes
+      const messagesDiv = document.getElementById("users-messages");
+      if (!messagesDiv) {
+        console.warn("users-messages div not found, falling back to confirm()");
+        resolve(confirm(`${title}\n\n${message}`));
+        return;
+      }
+
+      // Get operation-specific translations
+      const config = this.getBulkConfirmTranslations(operation, messagesDiv);
+
+      // Update modal content
+      this.updateBulkConfirmModal(config);
+
+      // Show existing modal (reuse confirmDeleteModal)
+      if (this.elements.confirmModal) {
+        this.elements.confirmModal.show();
+      }
+    });
   }
 
   /**

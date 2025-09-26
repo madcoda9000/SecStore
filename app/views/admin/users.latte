@@ -438,6 +438,43 @@
     </div>
 </div>
 
+<!-- Bulk Confirmation Modal -->
+<!-- ÄNDERE DAS BESTEHENDE MODAL -->
+<div class="modal fade flyout" id="confirmDeleteModal2" tabindex="-1" data-bs-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="confirmDeleteLabel2">
+                    <i class="bi bi-exclamation-triangle text-warning"></i>
+                    <span id="confirmModalTitle2">{trans('users.bulk.confirm.delete.title')}</span>
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="d-flex align-items-start">
+                    <i class="bi bi-shield-exclamation text-warning fs-1 me-3" id="confirmModalIcon2"></i>
+                    <div>
+                        <p class="mb-2" id="confirmModalMessage2">{trans('users.bulk.confirm.delete.message')}</p>
+                        <div class="alert alert-warning mb-0" id="confirmModalDetails">
+                            <small id="confirmModalSubtext2">{trans('users.bulk.confirm.delete.subtext')}</small>
+                        </div>
+                    </div>
+                </div>
+                <input type="hidden" id="deleteUserId">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="bi bi-x-circle"></i> {trans('users.modal.btn.cancel')}
+                </button>
+                <button type="button" class="btn btn-danger" id="confirmDeleteBtn2" data-action="confirm-delete">
+                    <i class="bi bi-trash"></i> 
+                    <span id="confirmModalBtnText">{trans('users.bulk.confirm.delete.btn')}</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Bulk Results Modal -->
 <div class="modal fade" id="bulkResultsModal" tabindex="-1">
     <div class="modal-dialog modal-lg">
@@ -519,6 +556,22 @@
      data-2fa-disabled="{trans('users.2fa.disabled')}"
      data-2fa-enforced="{trans('users.2fa.enforced')}"
      data-2fa-unenforced="{trans('users.2fa.unenforced')}"
+     data-bulk-delete-title="{trans('users.bulk.confirm.delete.title')}"
+     data-bulk-delete-message="{trans('users.bulk.confirm.delete.message')}"
+     data-bulk-delete-subtext="{trans('users.bulk.confirm.delete.subtext')}"
+     data-bulk-delete-btn="{trans('users.bulk.confirm.delete.btn')}"
+     data-bulk-disable-title="{trans('users.bulk.confirm.disable.title')}"
+     data-bulk-disable-message="{trans('users.bulk.confirm.disable.message')}"
+     data-bulk-disable-subtext="{trans('users.bulk.confirm.disable.subtext')}"
+     data-bulk-disable-btn="{trans('users.bulk.confirm.disable.btn')}"
+     data-bulk-mfa-enforce-title="{trans('users.bulk.confirm.mfa_enforce.title')}"
+     data-bulk-mfa-enforce-message="{trans('users.bulk.confirm.mfa_enforce.message')}"
+     data-bulk-mfa-enforce-subtext="{trans('users.bulk.confirm.mfa_enforce.subtext')}"
+     data-bulk-mfa-enforce-btn="{trans('users.bulk.confirm.mfa_enforce.btn')}"
+     data-bulk-mfa-unenforce-title="{trans('users.bulk.confirm.mfa_unenforce.title')}"
+     data-bulk-mfa-unenforce-message="{trans('users.bulk.confirm.mfa_unenforce.message')}"
+     data-bulk-mfa-unenforce-subtext="{trans('users.bulk.confirm.mfa_unenforce.subtext')}"
+     data-bulk-mfa-unenforce-btn="{trans('users.bulk.confirm.mfa_unenforce.btn')}"
      style="display:none;">
 </div>
 
