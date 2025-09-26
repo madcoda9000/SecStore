@@ -519,7 +519,7 @@
                         <h2 class="accordion-header">
                             <button class="accordion-button collapsed" type="button" 
                                     data-bs-toggle="collapse" data-bs-target="#detailedResults">
-                                <i class="bi bi-list-ul"></i> Detailed Results
+                                <i class="bi bi-list-ul"></i>&nbsp; Detailed Results
                             </button>
                         </h2>
                         <div id="detailedResults" class="accordion-collapse collapse">
@@ -531,9 +531,9 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-secondary d-none" data-bs-dismiss="modal">Close</button>
                 <button type="button" class="btn btn-primary" data-action="refresh-user-list">
-                    <i class="bi bi-arrow-clockwise"></i> Refresh List
+                    <i class="bi bi-arrow-clockwise"></i> <span id="resultsFinishButton">{trans('users.bulk.confirm.modal.finishBtn')}</span>
                 </button>
             </div>
         </div>
@@ -563,6 +563,10 @@
      data-bulk-disable-message="{trans('users.bulk.confirm.disable.message')}"
      data-bulk-disable-subtext="{trans('users.bulk.confirm.disable.subtext')}"
      data-bulk-disable-btn="{trans('users.bulk.confirm.disable.btn')}"
+     data-bulk-enable-title="{trans('users.bulk.confirm.enable.title')}"
+     data-bulk-enable-message="{trans('users.bulk.confirm.enable.message')}"
+     data-bulk-enable-subtext="{trans('users.bulk.confirm.enable.subtext')}"
+     data-bulk-enable-btn="{trans('users.bulk.confirm.enable.btn')}"
      data-bulk-mfa-enforce-title="{trans('users.bulk.confirm.mfa_enforce.title')}"
      data-bulk-mfa-enforce-message="{trans('users.bulk.confirm.mfa_enforce.message')}"
      data-bulk-mfa-enforce-subtext="{trans('users.bulk.confirm.mfa_enforce.subtext')}"
@@ -571,6 +575,7 @@
      data-bulk-mfa-unenforce-message="{trans('users.bulk.confirm.mfa_unenforce.message')}"
      data-bulk-mfa-unenforce-subtext="{trans('users.bulk.confirm.mfa_unenforce.subtext')}"
      data-bulk-mfa-unenforce-btn="{trans('users.bulk.confirm.mfa_unenforce.btn')}"
+     data-bulk-confirm-finishBtn="{trans('users.bulk.confirm.finishBtn')}"
      style="display:none;">
 </div>
 

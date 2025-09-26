@@ -77,8 +77,69 @@ class CsrfMiddleware
             }
 
             // 4. TOKEN ROTATION nach erfolgreicher Validierung
-            SessionUtil::refreshCsrfToken();
+            if ($this->shouldRefreshToken()) {
+                SessionUtil::refreshCsrfToken();
+            }
         }
+    }
+
+    /**
+     * Bestimmt ob CSRF Token nach Validierung erneuert werden soll
+     * Erneuert NICHT bei Admin-Bulk-Operationen um UX-Probleme zu vermeiden
+     */
+    private function shouldRefreshToken(): bool
+    {
+        $uri = $_SERVER['REQUEST_URI'] ?? '';
+
+        // KEINE Token-Rotation bei diesen Routen (UX-kritisch):
+        $noRefreshRoutes = [
+            '/admin/users/bulk',           // Bulk User Operations
+            '/admin/roles/bulk',           // Falls du das später implementierst
+        ];
+
+        foreach ($noRefreshRoutes as $route) {
+            if (strpos($uri, $route) !== false) {
+                LogUtil::logAction(
+                    LogType::SECURITY,
+                    'CsrfMiddleware',
+                    'shouldRefreshToken',
+                    'Skipping token refresh for route: ' . $uri
+                );
+                return false;
+            }
+        }
+
+        // Token-Rotation bei kritischen/einmaligen Operationen:
+        $refreshRoutes = [
+            '/login',                      // Login
+            '/register',                   // Registrierung
+            '/reset-password',             // Passwort-Reset
+            '/forgot-password',          // Passwort vergessen
+            '/profileChangePassword',      // Passwort ändern
+            '/profileChangeEmail',         // Email ändern
+            '/2fa-verify',                        // 2FA
+            '/enable-2fa',                 // 2FA aktivieren
+        ];
+
+        foreach ($refreshRoutes as $route) {
+            if (strpos($uri, $route) !== false) {
+                LogUtil::logAction(
+                    LogType::SECURITY,
+                    'CsrfMiddleware',
+                    'shouldRefreshToken',
+                    'Refreshing token for critical route: ' . $uri
+                );
+                return true;
+            }
+        }
+
+        // Default: Token.Regenration für bessere Sicherheit. Nur in Ausnahmen no regenerieren
+        LogUtil::logAction(
+                    LogType::SECURITY,
+                    'CsrfMiddleware',
+                    'shouldRefreshToken',
+                    'Route do not match any filter. Refreshing token for route: ' . $uri);
+        return true;
     }
 
     /**
