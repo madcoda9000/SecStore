@@ -19,13 +19,10 @@ class BulkUserManager {
       bulkActionText: document.getElementById("bulkActionText"),
 
       // Modals
-      roleAssignmentModal: null,
       bulkProgressModal: null,
       bulkResultsModal: null,
 
       // Modal elements
-      roleSelect: document.getElementById("roleSelect"),
-      selectedUsersCount: document.getElementById("selectedUsersCount"),
       progressOperation: document.getElementById("progressOperation"),
       bulkProgressBar: document.getElementById("bulkProgressBar"),
       progressStatus: document.getElementById("progressStatus"),
@@ -61,13 +58,9 @@ class BulkUserManager {
    * Initialize Bootstrap modals safely
    */
   initializeModals() {
-    const roleModal = document.getElementById("roleAssignmentModal");
     const progressModal = document.getElementById("bulkProgressModal");
     const resultsModal = document.getElementById("bulkResultsModal");
 
-    if (roleModal) {
-      this.elements.roleAssignmentModal = new bootstrap.Modal(roleModal);
-    }
     if (progressModal) {
       this.elements.bulkProgressModal = new bootstrap.Modal(progressModal);
     }
@@ -165,14 +158,6 @@ class BulkUserManager {
     switch (action) {
       case 'clear-selection':
         this.clearSelection();
-        break;
-        
-      case 'show-role-modal':
-        this.showRoleAssignmentModal();
-        break;
-        
-      case 'confirm-role-assignment':
-        this.confirmRoleAssignment();
         break;
         
       case 'refresh-user-list':
@@ -443,59 +428,6 @@ class BulkUserManager {
   }
 
   /**
-   * Show role assignment modal
-   */
-  showRoleAssignmentModal() {
-    if (this.selectedUsers.size === 0) {
-      this.showAlert("No users selected", "warning");
-      return;
-    }
-
-    if (this.elements.roleAssignmentModal) {
-      this.elements.roleAssignmentModal.show();
-    }
-  }
-
-  /**
-   * Confirm role assignment
-   */
-  async confirmRoleAssignment() {
-    const selectedRole = this.elements.roleSelect?.value;
-
-    if (!selectedRole) {
-      this.showAlert("Please select a role", "warning");
-      return;
-    }
-
-    // Hide role modal
-    if (this.elements.roleAssignmentModal) {
-      this.elements.roleAssignmentModal.hide();
-    }
-
-    // Execute role assignment
-    await this.processBulkOperation("assign_role", { role: selectedRole });
-  }
-
-  /**
-   * Load available roles
-   */
-  async loadAvailableRoles() {
-    // Extract roles from existing page or use default set
-    const defaultRoles = ["User", "Admin", "Manager", "Editor"];
-
-    if (this.elements.roleSelect) {
-      this.elements.roleSelect.innerHTML = '<option value="">Choose a role...</option>';
-
-      defaultRoles.forEach((role) => {
-        const option = document.createElement("option");
-        option.value = role;
-        option.textContent = role;
-        this.elements.roleSelect.appendChild(option);
-      });
-    }
-  }
-
-  /**
    * Send bulk request to backend
    */
   async sendBulkRequest(operation, userIds, options = {}) {
@@ -534,9 +466,6 @@ class BulkUserManager {
       delete: "Deleting Users",
       enable: "Enabling Users",
       disable: "Disabling Users",
-      assign_role: "Assigning Roles",
-      mfa_enable: "Enabling 2FA",
-      mfa_disable: "Disabling 2FA",
       mfa_enforce: "Enforcing 2FA",
       mfa_unenforce: "Removing 2FA Enforcement",
     };

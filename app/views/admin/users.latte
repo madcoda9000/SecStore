@@ -123,24 +123,11 @@
                         
                         <!-- MFA Operations -->
                         <li><h6 class="dropdown-header">2FA Management</h6></li>
-                        <li><a class="dropdown-item" href="#" data-bulk-action="mfa_enable">
-                            <i class="bi bi-shield-check text-primary"></i> Enable 2FA
-                        </a></li>
-                        <li><a class="dropdown-item" href="#" data-bulk-action="mfa_disable">
-                            <i class="bi bi-shield-x text-secondary"></i> Disable 2FA
-                        </a></li>
                         <li><a class="dropdown-item" href="#" data-bulk-action="mfa_enforce">
                             <i class="bi bi-shield-fill-exclamation text-warning"></i> Enforce 2FA
                         </a></li>
                         <li><a class="dropdown-item" href="#" data-bulk-action="mfa_unenforce">
                             <i class="bi bi-shield text-muted"></i> Remove 2FA Enforcement
-                        </a></li>
-                        <li><hr class="dropdown-divider"></li>
-                        
-                        <!-- Role Assignment -->
-                        <li><h6 class="dropdown-header">Role Assignment</h6></li>
-                        <li><a class="dropdown-item" href="#" data-action="show-role-modal">
-                            <i class="bi bi-person-badge text-info"></i> Assign Role
                         </a></li>
                         <li><hr class="dropdown-divider"></li>
                         
@@ -422,42 +409,6 @@
                     {trans('pager.next')}
                 </a>
             {/if}
-        </div>
-    </div>
-</div>
-
-<!-- NEUE MODALS AM ENDE HINZUFÜGEN -->
-
-<!-- Role Assignment Modal -->
-<div class="modal fade" id="roleAssignmentModal" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">
-                    <i class="bi bi-person-badge"></i> Assign Role to Selected Users
-                </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <p>Select a role to assign to <strong><span id="selectedUsersCount">0</span></strong> selected users:</p>
-                <div class="mb-3">
-                    <label for="roleSelect" class="form-label">Role</label>
-                    <select class="form-select" id="roleSelect">
-                        <option value="">Choose a role...</option>
-                        <!-- Roles werden via JavaScript geladen -->
-                    </select>
-                </div>
-                <div class="alert alert-warning">
-                    <i class="bi bi-exclamation-triangle"></i>
-                    <strong>Warning:</strong> This will replace existing roles for selected users.
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-primary" data-action="confirm-role-assignment">
-                    <i class="bi bi-check"></i> Assign Role
-                </button>
-            </div>
         </div>
     </div>
 </div>
