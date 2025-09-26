@@ -34,10 +34,10 @@ class BulkUserManager {
       skippedCount: document.getElementById("skippedCount"),
       failedCount: document.getElementById("failedCount"),
       resultsTable: document.getElementById("resultsTable"),
-      confirmModalTitle: document.getElementById("confirmModalTitle"),
-      confirmModalMessage: document.getElementById("confirmModalMessage"),
-      confirmModalSubtext: document.getElementById("confirmModalSubtext"),
-      confirmModalBtnText: document.getElementById("confirmModalBtnText"),
+      confirmModalTitle: document.getElementById("confirmModalTitle2"),
+      confirmModalMessage: document.getElementById("confirmModalMessage2"),
+      confirmModalSubtext: document.getElementById("confirmModalSubtext2"),
+      confirmModalBtnText: document.getElementById("confirmModalBtnText2"),
       confirmModalIcon: document.getElementById("confirmModalIcon"),
       confirmDeleteBtn: document.getElementById("confirmDeleteBtn2"),
     };
@@ -56,9 +56,6 @@ class BulkUserManager {
 
     // Setup CSP-compliant event listeners
     this.setupEventListeners();
-
-    // Load available roles
-    this.loadAvailableRoles();
 
     console.log("✅ BulkUserManager initialized with", this.allUsers.size, "users");
   }
@@ -243,8 +240,6 @@ class BulkUserManager {
 
     console.log("✅ Proceeding with bulk action:", operation, "for users:", Array.from(this.selectedUsers));
 
-    // Rest der Methode bleibt gleich...
-
     // Confirmation for dangerous operations
     if (operation === "delete") {
       const confirmed = await this.confirmDangerousAction(
@@ -252,6 +247,22 @@ class BulkUserManager {
         `Are you sure you want to delete ${this.selectedUsers.size} user${this.selectedUsers.size !== 1 ? "s" : ""}?`
       );
       if (!confirmed) return;
+    }
+    else if (operation === "mfa_enforce") {
+        const confirmed = await this.confirmDangerousAction(
+            'Enforce 2FA',
+            `Enforce 2FA for ${this.selectedUsers.size} user${this.selectedUsers.size !== 1 ? 's' : ''}?`,
+            operation
+        );
+        if (!confirmed) return;
+    } 
+    else if (operation === "mfa_unenforce") {
+        const confirmed = await this.confirmDangerousAction(
+            'Remove 2FA Enforcement',
+            `Remove 2FA enforcement for ${this.selectedUsers.size} user${this.selectedUsers.size !== 1 ? 's' : ''}?`,
+            operation
+        );
+        if (!confirmed) return;
     }
 
     await this.processBulkOperation(operation);
@@ -635,6 +646,12 @@ class BulkUserManager {
   getBulkConfirmTranslations(operation, messagesDiv) {
     const count = this.selectedUsers.size;
     const plural = count !== 1 ? "s" : "";
+
+    console.log('🔍 DEBUG - Available datasets:', messagesDiv.dataset);
+    console.log('🔍 DEBUG - Looking for operation:', operation);
+    console.log('🔍 DEBUG - bulkMfaEnforceTitle:', messagesDiv.dataset.bulkMfaEnforceTitle);
+    console.log('🔍 DEBUG - bulkMfaEnforceMessage:', messagesDiv.dataset.bulkMfaEnforceMessage);
+    
 
     const configs = {
       delete: {
