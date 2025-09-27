@@ -230,6 +230,12 @@ class RateLimitController
                     }
                 }
 
+                $result .= "\n    // Session extend - restriktiv\n";
+                if (isset($value['admin'])) {
+                    $limit = $value['session-extend'];
+                    $result .= "    'session-extend' => ['requests' => {$limit['requests']}, 'window' => {$limit['window']}], // 20 Verlängerungen in 15 Minuten\n";
+                }
+
                 $result .= "\n    // Admin Bereiche - restriktiv\n";
                 if (isset($value['admin'])) {
                     $limit = $value['admin'];
@@ -371,7 +377,7 @@ class RateLimitController
     private function getRateLimitStatus(): array
     {
         $status = [];
-        $limitTypes = ['login', 'register', '2fa', 'forgot-password', 'reset-password', 'admin', 'global'];
+        $limitTypes = ['login', 'register', '2fa', 'forgot-password', 'reset-password', 'session-extend', 'admin', 'global'];
 
         foreach ($limitTypes as $type) {
             $rateLimiter = new \App\Middleware\RateLimiter();
@@ -389,6 +395,7 @@ class RateLimitController
             '2fa' => '2FA Verification',
             'forgot-password' => 'Password Reset',
             'reset-password' => 'Password Reset Execution',
+            'session-extend' => 'Session Extension',
             'admin' => 'Admin Actions',
             'global' => 'Global Fallback'
         ];

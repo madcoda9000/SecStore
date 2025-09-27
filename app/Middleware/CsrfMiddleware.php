@@ -95,6 +95,9 @@ class CsrfMiddleware
         $noRefreshRoutes = [
             '/admin/users/bulk',           // Bulk User Operations
             '/admin/roles/bulk',           // Falls du das später implementierst
+            '/admin/rate-limits/update', // Rate Limit Updates
+            '/admin/rate-limits/reset',  // Rate Limit Resets
+            '/admin/rate-limits/clear', // Rate Limit Clear All
         ];
 
         foreach ($noRefreshRoutes as $route) {
