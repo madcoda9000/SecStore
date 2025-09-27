@@ -9,6 +9,7 @@ use App\Utils\LogUtil;
 use App\Utils\TranslationUtil;
 use App\Utils\SecurityMetrics;
 use App\Utils\InputValidator;
+use App\Utils\LoginAnalytics;
 use ORM;
 use Flight;
 use Exception;
@@ -31,58 +32,85 @@ class AdminController
 {
 
     /**
+     * Analytics Dashboard (separate Seite für detaillierte Analyse)
+     */
+    public function showAnalyticsDashboard()
+    {
+        try {
+            $user = SessionUtil::get('user');
+            
+            // Comprehensive Analytics für dedizierte Analytics-Seite
+            $analytics = [
+                'heatmap' => LoginAnalytics::getLoginHeatmapData(30),
+                'hourly' => LoginAnalytics::getHourlyLoginDistribution(14),
+                'weekly' => LoginAnalytics::getWeeklyTrends(8),
+                'patterns' => LoginAnalytics::detectUnusualLoginPatterns(),
+                'summary' => SecurityMetrics::generateDailySummary()
+            ];
+            
+            Flight::latte()->render('admin/analytics_dashboard.latte', [
+                'title' => 'Login Analytics Dashboard',
+                'user' => $user,
+                'sessionTimeout' => SessionUtil::getRemainingTime(),
+                'analytics' => $analytics
+            ]);
+            
+        } catch (Exception $e) {
+            LogUtil::logAction(LogType::ERROR, 'AdminController', 'showAnalyticsDashboard', 
+                'Analytics dashboard error: ' . $e->getMessage());
+                
+            Flight::latte()->render('errors/error.latte', [
+                'code' => 500,
+                'message' => 'Analytics dashboard temporarily unavailable'
+            ]);
+        }
+    }
+
+    /**
      * Security Dashboard für Admins
      */
     public function showSecurityDashboard()
     {
-        $user = User::findUserById(SessionUtil::get("user")["id"]);
-        /*
-        $securityData = SecurityMetrics::getSecurityDashboardData();
-
-        Flight::latte()->render('admin/security_dashboard.latte', [
-            'title' => 'Security Dashboard',
-            'user' => $user,
-            'sessionTimeout' => SessionUtil::getRemainingTime(),
-            'securityData' => $securityData,
-            'summary' => $securityData['summary'],
-            'alerts' => $securityData['alerts'],
-            'metrics' => $securityData['metrics']
-        ]);
-        */
         try {
-            error_log("DEBUG: Starting Security Dashboard");
-
+            $user = SessionUtil::get('user');
+            
+            // Bestehende Security Daten
             $securityData = SecurityMetrics::getSecurityDashboardData();
-            error_log('Security Data generated successfully');
-
-            // DEBUG: Template-Variablen vorbereiten
+            
+            // NEUE: Login Analytics Daten
+            $loginHeatmap = LoginAnalytics::getLoginHeatmapData(30);
+            $hourlyDistribution = LoginAnalytics::getHourlyLoginDistribution(7);
+            $weeklyTrends = LoginAnalytics::getWeeklyTrends(4);
+            $unusualPatterns = LoginAnalytics::detectUnusualLoginPatterns();
+            
             $templateVars = [
                 'title' => 'Security Dashboard',
-                'user' => SessionUtil::get('user'),
+                'user' => $user,
                 'sessionTimeout' => SessionUtil::getRemainingTime(),
                 'securityData' => $securityData,
                 'summary' => $securityData['summary'],
                 'alerts' => $securityData['alerts'],
-                'metrics' => $securityData['metrics']
+                'metrics' => $securityData['metrics'],
+                
+                // NEUE Analytics Daten
+                'loginHeatmap' => $loginHeatmap,
+                'hourlyDistribution' => $hourlyDistribution,
+                'weeklyTrends' => $weeklyTrends,
+                'unusualPatterns' => $unusualPatterns
             ];
 
-            error_log("DEBUG: Template vars prepared: " . print_r(array_keys($templateVars), true));
-
-            // DEBUG: Template rendern
-            error_log("DEBUG: About to render template");
             Flight::latte()->render('admin/security_dashboard.latte', $templateVars);
-            //Flight::latte()->render('admin/simple_security_dashboard.latte', $templateVars);
-            error_log("DEBUG: Template rendered successfully");
+            
         } catch (Exception $e) {
-            error_log("ERROR in Security Dashboard: " . $e->getMessage());
-            error_log("ERROR Stack Trace: " . $e->getTraceAsString());
-
-            // Fallback: Simple Error Page
-            Flight::latte()->render('admin/simple_error.latte', [
-                'title' => 'Security Dashboard Error',
-                'error' => $e->getMessage(),
+            LogUtil::logAction(LogType::ERROR, 'AdminController', 'showSecurityDashboard', 
+                'Dashboard error: ' . $e->getMessage());
+            
+            Flight::latte()->render('errors/error.latte', [
+                'code' => 500,
+                'message' => 'Security dashboard temporarily unavailable',
                 'user' => SessionUtil::get('user'),
-                'sessionTimeout' => SessionUtil::getRemainingTime()
+                'sessionTimeout' => SessionUtil::getRemainingTime(),
+                'title' => 'Error'
             ]);
         }
     }
