@@ -10,7 +10,6 @@ use App\Utils\TranslationUtil;
 use App\Utils\SecurityMetrics;
 use App\Utils\InputValidator;
 use App\Utils\LoginAnalytics;
-use App\Utils\GeoLocationAnalyzer;
 use ORM;
 use Flight;
 use Exception;

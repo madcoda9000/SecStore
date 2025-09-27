@@ -168,6 +168,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // =============================================
     // SCHRITT 8: Debug-Info
     // =============================================
+    console.log(window.location.search);
     if (window.location.search.includes('debug=1')) {
         console.log('=== SECURITY DASHBOARD DEBUG INFO ===');
         console.log('Config:', config);

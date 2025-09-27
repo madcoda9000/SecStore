@@ -119,51 +119,125 @@
     }
 }
 
-/* ================================================
-   3. HEATMAP-LEGENDE & VERBESSERUNGEN
-   ================================================ */
+/* ==========================================================
+   VERBESSERTE HEATMAP VISUALISIERUNG CSS
+   Fix für: Schwer erkennbare Punkte + bessere Darstellung
+   ========================================================== */
 
-/* Heatmap Legende */
+/* Heatmap Canvas Verbesserungen */
+#loginHeatmapChart {
+    cursor: crosshair;
+    border: 1px solid #000;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Heatmap Container */
+.heatmap-container {
+    position: relative;
+    background: white;
+    border-radius: 12px;
+    padding: 1rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* VERBESSERTE HEATMAP-LEGENDE */
 .heatmap-legend {
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
+    gap: 0.75rem;
+    margin-top: 1rem;
+    padding: 1rem;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    border: 1px solid #e9ecef;
+}
+
+.heatmap-legend h6 {
+    margin-bottom: 0.5rem;
+    color: #495057;
+    font-weight: 600;
+    font-size: 0.9rem;
 }
 
 .legend-item {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: 0.75rem;
     font-size: 0.875rem;
 }
 
 .legend-color {
-    width: 20px;
-    height: 20px;
+    width: 24px;
+    height: 24px;
     border-radius: 50%;
-    border: 1px solid #333;
+    border: 2px solid;
     display: inline-block;
     flex-shrink: 0;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .legend-label {
     color: #495057;
     font-weight: 500;
+    margin: 0;
 }
 
-/* Heatmap Canvas Optimierungen */
-#loginHeatmapChart {
-    cursor: crosshair;
-}
-
-/* Activity Insights Card */
+/* Activity Insights Card Verbesserungen */
 #heatmapInsights .card {
     border: 1px solid #e5e5e5;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    margin-top: 1rem;
 }
 
 #heatmapInsights .card-body {
+    padding: 1.25rem;
+}
+
+#heatmapInsights .card-title {
+    color: #495057;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    font-size: 1rem;
+}
+
+#heatmapInsights p {
+    margin-bottom: 0.5rem;
+    color: #6c757d;
+    font-size: 0.9rem;
+}
+
+#heatmapInsights p:last-child {
+    margin-bottom: 0;
+}
+
+#heatmapInsights strong {
+    color: #495057;
+    font-weight: 600;
+}
+
+/* Chart Container Verbesserungen */
+.chart-container {
+    position: relative;
+    background: white;
+    border-radius: 8px;
     padding: 1rem;
+    margin-bottom: 1rem;
+}
+
+/* No Data Message Styling */
+.alert.alert-info {
+    background-color: #e7f3ff;
+    border-color: #b8daff;
+    color: #004085;
+    border-radius: 8px;
+    border: 1px solid #b8daff;
+}
+
+.alert.alert-info i {
+    margin-right: 0.5rem;
+    font-size: 1.1rem;
 }
 
 /* ================================================

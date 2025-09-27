@@ -86,7 +86,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         // Transform matrix data for Chart.js
-        const chartData = transformHeatmapData(heatmapData.heatmap_matrix);
+        const chartData = transformHeatmapData(heatmapData.heatmap_matrix);        
         
         charts.heatmap = new Chart(ctx, {
             type: 'scatter',
@@ -94,6 +94,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 datasets: [{
                     label: 'Login Activity',
                     data: chartData,
+                    /*
                     backgroundColor: function(context) {
                         const value = context.parsed.v || 0;
                         return getHeatmapColor(value, heatmapData.total_logins);
@@ -101,6 +102,25 @@ document.addEventListener('DOMContentLoaded', function() {
                     pointRadius: function(context) {
                         const value = context.parsed.v || 0;
                         return Math.max(3, Math.min(15, value * 2)); // 3-15px radius
+                    }
+                        */
+                    backgroundColor: function(context) {
+                        const value = context.raw.v || 0;
+                        return getImprovedHeatmapColor(value, heatmapData.total_logins);
+                    },
+                    borderColor: function(context) {
+                        const value = context.raw.v || 0;
+                        return getHeatmapBorderColor(value, heatmapData.total_logins);
+                    },
+                    borderWidth: 2,
+                    pointRadius: function(context) {
+                        const value = context.raw.v || 0;
+                        // VERBESSERT: Mindestgröße 6px, bessere Skalierung
+                        return Math.max(6, Math.min(20, 4 + value * 3));
+                    },
+                    pointHoverRadius: function(context) {
+                        const value = context.raw.v || 0;
+                        return Math.max(8, Math.min(25, 6 + value * 4));
                     }
                 }]
             },
@@ -156,7 +176,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                 return `${day} ${hour}:00`;
                             },
                             label: function(context) {
-                                const logins = context.parsed.v || 0;
+                                const logins = context.raw.v || 0;
                                 return `${logins} login${logins !== 1 ? 's' : ''}`;
                             }
                         }
@@ -405,6 +425,48 @@ document.addEventListener('DOMContentLoaded', function() {
             return `rgba(239, 68, 68, ${0.7 + intensity * 0.3})`; // Red
         }
     }
+
+    /**
+ * VERBESSERTE FARBGEBUNG - Bessere Sichtbarkeit
+ */
+function getImprovedHeatmapColor(value, totalLogins) {
+    if (value === 0) return 'rgba(200, 200, 200, 0.3)'; // Grau für leere Felder
+    
+    // Bessere Intensitätsskalierung
+    const maxExpected = Math.max(1, totalLogins * 0.05); // 5% als Maximum
+    const intensity = Math.min(1, value / maxExpected);
+    
+    // Deutlichere Farben mit besserer Sichtbarkeit
+    if (intensity < 0.2) {
+        return `rgba(59, 130, 246, 0.6)`; // Helles Blau (besser sichtbar)
+    } else if (intensity < 0.5) {
+        return `rgba(34, 197, 94, 0.7)`; // Grün
+    } else if (intensity < 0.8) {
+        return `rgba(251, 191, 36, 0.8)`; // Gelb/Orange
+    } else {
+        return `rgba(239, 68, 68, 0.9)`; // Rot
+    }
+}
+
+/**
+ * BORDER-FARBEN für bessere Abgrenzung
+ */
+function getHeatmapBorderColor(value, totalLogins) {
+    if (value === 0) return 'rgba(150, 150, 150, 0.5)';
+    
+    const maxExpected = Math.max(1, totalLogins * 0.05);
+    const intensity = Math.min(1, value / maxExpected);
+    
+    if (intensity < 0.2) {
+        return `rgba(37, 99, 235, 0.9)`; // Dunkles Blau
+    } else if (intensity < 0.5) {
+        return `rgba(22, 163, 74, 0.9)`; // Dunkles Grün
+    } else if (intensity < 0.8) {
+        return `rgba(245, 158, 11, 0.9)`; // Dunkles Gelb
+    } else {
+        return `rgba(220, 38, 38, 0.9)`; // Dunkles Rot
+    }
+}
     
     function addHeatmapInsights(heatmapData) {
         const container = document.getElementById('heatmapInsights');
@@ -502,6 +564,7 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(response => response.json())
             .then(data => {
                 if (data.success && charts.weekly) {
+                    console.log('Weekly data received:', data.data);
                     charts.weekly.data.datasets[0].data = data.data.map(d => d.successful_logins);
                     charts.weekly.data.datasets[1].data = data.data.map(d => d.failed_logins);
                     charts.weekly.data.datasets[2].data = data.data.map(d => d.success_rate);

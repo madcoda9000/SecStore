@@ -21,7 +21,7 @@ class LoginAnalytics
         // Erfolgreiche Logins holen
         $successfulLogins = ORM::for_table('logs')
             ->where('type', 'AUDIT')
-            ->where_like('context', '%login%')
+            ->where_like('context', 'AuthController/login%')
             ->where_like('message', '%SUCCESS%')
             ->where_gte('datum_zeit', $startDate)
             ->where_lte('datum_zeit', $endDate)
@@ -75,7 +75,7 @@ class LoginAnalytics
         // Erfolgreiche Logins
         $successfulLogins = ORM::for_table('logs')
             ->where('type', 'AUDIT')
-            ->where_like('context', '%login%')
+            ->where_like('context', 'AuthController/login%')
             ->where_like('message', '%SUCCESS%')
             ->where_gte('datum_zeit', $startDate)
             ->select('datum_zeit')
@@ -89,7 +89,7 @@ class LoginAnalytics
         // Failed Logins
         $failedLogins = ORM::for_table('logs')
             ->where('type', 'AUDIT')
-            ->where_like('context', '%login%')
+            ->where_like('context', 'Authcontroller/login%')
             ->where_like('message', '%FAILED%')
             ->where_gte('datum_zeit', $startDate)
             ->select('datum_zeit')
@@ -115,7 +115,7 @@ class LoginAnalytics
             
             $successfulLogins = ORM::for_table('logs')
                 ->where('type', 'AUDIT')
-                ->where_like('context', '%login%')
+                ->where_like('context', 'AuthController/login%')
                 ->where_like('message', '%SUCCESS%')
                 ->where_gte('datum_zeit', $weekStart)
                 ->where_lte('datum_zeit', $weekEnd)
@@ -123,7 +123,7 @@ class LoginAnalytics
                 
             $failedLogins = ORM::for_table('logs')
                 ->where('type', 'AUDIT')
-                ->where_like('context', '%login%')
+                ->where_like('context', 'AuthController/login%')
                 ->where_like('message', '%FAILED%')
                 ->where_gte('datum_zeit', $weekStart)
                 ->where_lte('datum_zeit', $weekEnd)
@@ -244,7 +244,7 @@ class LoginAnalytics
         // 1. Logins zu ungewöhnlichen Zeiten (2-6 AM)
         $nightLogins = ORM::for_table('logs')
             ->where('type', 'AUDIT')
-            ->where_like('context', '%login%')
+            ->where_like('context', 'AuthController/login%')
             ->where_like('message', '%SUCCESS%')
             ->where_gte('datum_zeit', date('Y-m-d H:i:s', strtotime('-7 days')))
             ->find_array();

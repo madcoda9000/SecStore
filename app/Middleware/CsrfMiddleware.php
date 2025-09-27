@@ -98,6 +98,7 @@ class CsrfMiddleware
             '/admin/rate-limits/update', // Rate Limit Updates
             '/admin/rate-limits/reset',  // Rate Limit Resets
             '/admin/rate-limits/clear', // Rate Limit Clear All
+            '/admin/analytics/data', // Analytics Data Fetching
         ];
 
         foreach ($noRefreshRoutes as $route) {
