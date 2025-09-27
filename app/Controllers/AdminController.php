@@ -10,6 +10,7 @@ use App\Utils\TranslationUtil;
 use App\Utils\SecurityMetrics;
 use App\Utils\InputValidator;
 use App\Utils\LoginAnalytics;
+use App\Utils\GeoLocationAnalyzer;
 use ORM;
 use Flight;
 use Exception;
@@ -32,13 +33,68 @@ class AdminController
 {
 
     /**
+     * AJAX Endpoint für Analytics-Daten
+     */
+    public function getAnalyticsData()
+    {
+        header('Content-Type: application/json');
+
+        try {
+            $type = $_GET['type'] ?? 'heatmap';
+            $days = (int)($_GET['days'] ?? 30);
+
+            switch ($type) {
+                case 'heatmap':
+                    $data = LoginAnalytics::getLoginHeatmapData($days);
+                    break;
+
+                case 'hourly':
+                    $data = LoginAnalytics::getHourlyLoginDistribution($days);
+                    break;
+
+                case 'weekly':
+                    $weeks = max(1, min(12, (int)($_GET['weeks'] ?? 4)));
+                    $data = LoginAnalytics::getWeeklyTrends($weeks);
+                    break;
+
+                case 'patterns':
+                    $data = LoginAnalytics::detectUnusualLoginPatterns();
+                    break;
+
+                default:
+                    throw new InvalidArgumentException('Invalid analytics type');
+            }
+
+            Flight::json([
+                'success' => true,
+                'data' => $data,
+                'type' => $type,
+                'generated_at' => date('Y-m-d H:i:s')
+            ]);
+        } catch (Exception $e) {
+            LogUtil::logAction(
+                LogType::ERROR,
+                'AdminController',
+                'getAnalyticsData',
+                'Analytics error: ' . $e->getMessage()
+            );
+
+            Flight::json([
+                'success' => false,
+                'error' => 'Analytics data unavailable',
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
      * Analytics Dashboard (separate Seite für detaillierte Analyse)
      */
     public function showAnalyticsDashboard()
     {
         try {
             $user = SessionUtil::get('user');
-            
+
             // Comprehensive Analytics für dedizierte Analytics-Seite
             $analytics = [
                 'heatmap' => LoginAnalytics::getLoginHeatmapData(30),
@@ -47,18 +103,21 @@ class AdminController
                 'patterns' => LoginAnalytics::detectUnusualLoginPatterns(),
                 'summary' => SecurityMetrics::generateDailySummary()
             ];
-            
+
             Flight::latte()->render('admin/analytics_dashboard.latte', [
                 'title' => 'Login Analytics Dashboard',
                 'user' => $user,
                 'sessionTimeout' => SessionUtil::getRemainingTime(),
                 'analytics' => $analytics
             ]);
-            
         } catch (Exception $e) {
-            LogUtil::logAction(LogType::ERROR, 'AdminController', 'showAnalyticsDashboard', 
-                'Analytics dashboard error: ' . $e->getMessage());
-                
+            LogUtil::logAction(
+                LogType::ERROR,
+                'AdminController',
+                'showAnalyticsDashboard',
+                'Analytics dashboard error: ' . $e->getMessage()
+            );
+
             Flight::latte()->render('errors/error.latte', [
                 'code' => 500,
                 'message' => 'Analytics dashboard temporarily unavailable'
@@ -73,16 +132,20 @@ class AdminController
     {
         try {
             $user = SessionUtil::get('user');
-            
+
             // Bestehende Security Daten
             $securityData = SecurityMetrics::getSecurityDashboardData();
-            
+
             // NEUE: Login Analytics Daten
             $loginHeatmap = LoginAnalytics::getLoginHeatmapData(30);
             $hourlyDistribution = LoginAnalytics::getHourlyLoginDistribution(7);
             $weeklyTrends = LoginAnalytics::getWeeklyTrends(4);
             $unusualPatterns = LoginAnalytics::detectUnusualLoginPatterns();
-            
+
+            // NEUE: Geo-Location Daten
+            $geoData = GeoLocationAnalyzer::getLoginGeoData(30);
+            $topCountries = GeoLocationAnalyzer::getTopLoginCountries(10, 30);
+
             $templateVars = [
                 'title' => 'Security Dashboard',
                 'user' => $user,
@@ -91,26 +154,195 @@ class AdminController
                 'summary' => $securityData['summary'],
                 'alerts' => $securityData['alerts'],
                 'metrics' => $securityData['metrics'],
-                
+
                 // NEUE Analytics Daten
                 'loginHeatmap' => $loginHeatmap,
                 'hourlyDistribution' => $hourlyDistribution,
                 'weeklyTrends' => $weeklyTrends,
-                'unusualPatterns' => $unusualPatterns
+                'unusualPatterns' => $unusualPatterns,
+
+                // NEUE: Geo-Location Daten
+                'geoData' => $geoData,
+                'topCountries' => $topCountries
             ];
 
             Flight::latte()->render('admin/security_dashboard.latte', $templateVars);
-            
         } catch (Exception $e) {
-            LogUtil::logAction(LogType::ERROR, 'AdminController', 'showSecurityDashboard', 
-                'Dashboard error: ' . $e->getMessage());
-            
+            LogUtil::logAction(
+                LogType::ERROR,
+                'AdminController',
+                'showSecurityDashboard',
+                'Dashboard error: ' . $e->getMessage()
+            );
+
+            //'Security dashboard temporarily unavailable',
             Flight::latte()->render('errors/error.latte', [
                 'code' => 500,
-                'message' => 'Security dashboard temporarily unavailable',
+                'message' => $e->getMessage(), 
                 'user' => SessionUtil::get('user'),
                 'sessionTimeout' => SessionUtil::getRemainingTime(),
                 'title' => 'Error'
+            ]);
+        }
+    }
+
+    /**
+     * Detaillierte Geo-Analytics Seite
+     */
+    public function showGeoAnalytics()
+    {
+        try {
+            $user = SessionUtil::get('user');
+            $days = (int)($_GET['days'] ?? 30);
+            $days = max(1, min(365, $days)); // 1-365 Tage
+
+            // Umfassende Geo-Daten
+            $geoData = GeoLocationAnalyzer::getLoginGeoData($days);
+            $topCountries = GeoLocationAnalyzer::getTopLoginCountries(20, $days);
+
+            // User-spezifische Analyse (Top 10 User)
+            $topUsers = [];
+            $recentUsers = ORM::for_table('logs')
+                ->where('type', 'AUDIT')
+                ->where_like('context', '%login%')
+                ->where_like('message', '%SUCCESS%')
+                ->where_gte('datum_zeit', date('Y-m-d H:i:s', strtotime("-{$days} days")))
+                ->group_by('user')
+                ->order_by_desc('datum_zeit')
+                ->limit(10)
+                ->find_array();
+
+            foreach ($recentUsers as $userRecord) {
+                $username = $userRecord['user'];
+                $userProfile = GeoLocationAnalyzer::getUserGeoProfile($username, $days);
+                if (!empty($userProfile['countries'])) {
+                    $topUsers[] = $userProfile;
+                }
+            }
+
+            Flight::latte()->render('admin/geo_analytics.latte', [
+                'title' => 'Geographic Analytics',
+                'user' => $user,
+                'sessionTimeout' => SessionUtil::getRemainingTime(),
+                'geoData' => $geoData,
+                'topCountries' => $topCountries,
+                'topUsers' => $topUsers,
+                'analysisdays' => $days
+            ]);
+        } catch (Exception $e) {
+            LogUtil::logAction(
+                LogType::ERROR,
+                'AdminController',
+                'showGeoAnalytics',
+                'Geo analytics error: ' . $e->getMessage()
+            );
+
+            Flight::latte()->render('errors/error.latte', [
+                'code' => 500,
+                'message' => 'Geographic analytics temporarily unavailable'
+            ]);
+        }
+    }
+
+    /**
+     * AJAX: Geo-Daten für dynamische Updates
+     */
+    public function getGeoData()
+    {
+        header('Content-Type: application/json');
+
+        try {
+            $type = $_GET['type'] ?? 'countries';
+            $days = (int)($_GET['days'] ?? 30);
+            $username = $_GET['user'] ?? null;
+
+            switch ($type) {
+                case 'countries':
+                    $data = GeoLocationAnalyzer::getTopLoginCountries(20, $days);
+                    break;
+
+                case 'full':
+                    $data = GeoLocationAnalyzer::getLoginGeoData($days);
+                    break;
+
+                case 'user':
+                    if (!$username) {
+                        throw new InvalidArgumentException('Username required for user geo data');
+                    }
+                    $data = GeoLocationAnalyzer::getUserGeoProfile($username, $days);
+                    break;
+
+                default:
+                    throw new InvalidArgumentException('Invalid geo data type');
+            }
+
+            Flight::json([
+                'success' => true,
+                'data' => $data,
+                'type' => $type,
+                'days' => $days,
+                'generated_at' => date('Y-m-d H:i:s')
+            ]);
+        } catch (Exception $e) {
+            LogUtil::logAction(
+                LogType::ERROR,
+                'AdminController',
+                'getGeoData',
+                'Geo data error: ' . $e->getMessage()
+            );
+
+            Flight::json([
+                'success' => false,
+                'error' => 'Geo data unavailable',
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * User-spezifische Geo-Analyse
+     */
+    public function showUserGeoProfile()
+    {
+        try {
+            $username = $_GET['user'] ?? null;
+            if (!$username) {
+                throw new InvalidArgumentException('Username required');
+            }
+
+            $days = (int)($_GET['days'] ?? 90);
+            $days = max(1, min(365, $days));
+
+            $userProfile = GeoLocationAnalyzer::getUserGeoProfile($username, $days);
+
+            // Prüfen ob User existiert
+            $userExists = ORM::for_table('users')
+                ->where('username', $username)
+                ->find_one();
+
+            if (!$userExists) {
+                throw new InvalidArgumentException('User not found');
+            }
+
+            Flight::latte()->render('admin/user_geo_profile.latte', [
+                'title' => "Geo Profile: {$username}",
+                'user' => SessionUtil::get('user'),
+                'sessionTimeout' => SessionUtil::getRemainingTime(),
+                'userProfile' => $userProfile,
+                'targetUser' => $userExists->as_array(),
+                'analysisdays' => $days
+            ]);
+        } catch (Exception $e) {
+            LogUtil::logAction(
+                LogType::ERROR,
+                'AdminController',
+                'showUserGeoProfile',
+                'User geo profile error: ' . $e->getMessage()
+            );
+
+            Flight::latte()->render('errors/error.latte', [
+                'code' => 404,
+                'message' => $e->getMessage()
             ]);
         }
     }

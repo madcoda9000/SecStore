@@ -265,6 +265,11 @@ secureRoute('GET /admin/security', function () {
     (new AdminController)->showSecurityDashboard();
 }, 'admin', true);
 
+// Analytics Data Endpoints
+secureRoute('GET /admin/analytics/data', function () {
+    (new AdminController)->getAnalyticsData();
+}, 'admin', true);
+
 secureRoute('GET /admin/security/metrics', function () {
     (new AdminController)->getSecurityMetrics();
 }, 'admin', true);
@@ -375,6 +380,8 @@ secureRoute('POST /admin/roles/delete', function () {
 secureRoute('GET /admin/roles/checkUsers', function () {
     (new AdminController)->listRoles();
 }, 'admin', true);
+
+
 
 // ==========================================
 // Rate Limiting Test Route (Admin)

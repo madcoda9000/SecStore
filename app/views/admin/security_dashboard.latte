@@ -256,6 +256,164 @@
             </div>
         </div>
     </div>   
+
+<!-- Geographic Analytics Section -->
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">
+                    <i class="bi bi-globe text-success"></i> Geographic Analytics
+                </h5>
+                <div class="btn-group btn-group-sm">
+                    <a href="/admin/geo-analytics" class="btn btn-outline-primary">
+                        <i class="bi bi-zoom-in"></i> Detailed View
+                    </a>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <!-- Top Countries List -->
+                    <div class="col-md-8">
+                        <h6 class="mb-3">🌍 Top Login Countries (Last 30 Days)</h6>
+                        <div class="table-responsive">
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Country</th>
+                                        <th>Logins</th>
+                                        <th>Users</th>
+                                        <th>Cities</th>
+                                        <th>Risk</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {foreach $topCountries['countries'] as $country => $data}
+                                    <tr>
+                                        <td>
+                                            <span class="fi fi-{$data['country_code']|lower}"></span>
+                                            {$country}
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-primary">{$data['login_count']}</span>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-info">{$data['users']|count}</span>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-secondary">{$data['cities']|count}</span>
+                                        </td>
+                                        <td>
+                                            {if $country === 'Unknown'}
+                                                <span class="badge bg-danger">High</span>
+                                            {elseif $data['login_count'] > 100}
+                                                <span class="badge bg-warning">Medium</span>
+                                            {else}
+                                                <span class="badge bg-success">Low</span>
+                                            {/if}
+                                        </td>
+                                    </tr>
+                                    {/foreach}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <!-- Geographic Summary -->
+                    <div class="col-md-4">
+                        <h6 class="mb-3">📊 Geographic Summary</h6>
+                        <div class="list-group">
+                            <div class="list-group-item d-flex justify-content-between align-items-center">
+                                Total Countries
+                                <span class="badge bg-primary rounded-pill">{$topCountries['total_countries']}</span>
+                            </div>
+                            <div class="list-group-item d-flex justify-content-between align-items-center">
+                                Suspicious Logins
+                                <span class="badge bg-warning rounded-pill">{$topCountries['suspicious_count']}</span>
+                            </div>
+                            <div class="list-group-item d-flex justify-content-between align-items-center">
+                                VPN/Proxy Detected
+                                <span class="badge bg-danger rounded-pill">{$topCountries['vpn_count']}</span>
+                            </div>
+                            <div class="list-group-item d-flex justify-content-between align-items-center">
+                                Total Logins
+                                <span class="badge bg-success rounded-pill">{$geoData['total_logins']}</span>
+                            </div>
+                        </div>
+                        
+                        <!-- New Countries Alert -->
+                        {if !empty($geoData['new_countries'])}
+                        <div class="alert alert-warning mt-3">
+                            <h6><i class="bi bi-exclamation-triangle"></i> New Countries</h6>
+                            <small>
+                                {foreach $geoData['new_countries'] as $newCountry}
+                                    <span class="badge bg-warning me-1">{$newCountry['country']}</span>
+                                {/foreach}
+                            </small>
+                        </div>
+                        {/if}
+                        
+                        <!-- Suspicious Activity Alerts -->
+                        {if !empty($geoData['suspicious_logins'])}
+                        <div class="alert alert-danger mt-3">
+                            <h6><i class="bi bi-shield-exclamation"></i> Suspicious Activity</h6>
+                            <small>
+                                {$geoData['suspicious_logins']|count} suspicious login{if $geoData['suspicious_logins']|count != 1}s{/if} detected
+                            </small>
+                        </div>
+                        {/if}
+                    </div>
+                </div>
+                
+                <!-- Suspicious Logins Details -->
+                {if !empty($geoData['suspicious_logins'])}
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <h6 class="mb-3">⚠️ Suspicious Geographic Activity</h6>
+                        <div class="table-responsive">
+                            <table class="table table-sm table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>User</th>
+                                        <th>Country</th>
+                                        <th>City</th>
+                                        <th>IP</th>
+                                        <th>Time</th>
+                                        <th>Reasons</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {foreach $geoData['suspicious_logins'] as $suspicious}
+                                    <tr class="table-warning">
+                                        <td><strong>{$suspicious['user']}</strong></td>
+                                        <td>{$suspicious['country']}</td>
+                                        <td>{$suspicious['city']}</td>
+                                        <td><code>{$suspicious['ip']}</code></td>
+                                        <td><small>{$suspicious['timestamp']|date:'M d, H:i'}</small></td>
+                                        <td>
+                                            {foreach $suspicious['reasons'] as $reason}
+                                                <span class="badge bg-warning me-1" title="{$reason}">
+                                                    {if $reason === 'login_from_unusual_country'}🌍
+                                                    {elseif $reason === 'unusual_timezone_activity'}🕐
+                                                    {elseif $reason === 'high_risk_country'}⚠️
+                                                    {elseif $reason === 'vpn_or_proxy_detected'}🛡️
+                                                    {else}❓{/if}
+                                                </span>
+                                            {/foreach}
+                                        </td>
+                                    </tr>
+                                    {/foreach}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                {/if}
+            </div>
+        </div>
+    </div>
+</div>
+
 </div>
 
 
