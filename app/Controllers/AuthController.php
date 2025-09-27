@@ -77,62 +77,111 @@ class AuthController
      * Handles user registration by inserting the new user's data into the database.
      * If successful, renders the registration page with a success message.
      * Otherwise, renders the registration page with an error message.
-     * It expects 'email', 'username', and 'password' fields in the POST request.
+     * It expects 'email', 'username', 'password', 'firstname', 'lastname', 'csrf_token' fields in the POST request.
+     *
+     * @return void
      */
     public function register()
     {
-
+        // Initialize variables for security logging
         $email = "";
         $user = "";
         $firstname = "";
-        $lastname = "";;
+        $lastname = "";
         $password = "";
 
         try {
-            $validated = InputValidator::validateRegistration($_POST['username'], $_POST['password'], $_POST['email'], $_POST['firstname'], $_POST['lastname']);
+            // Use new comprehensive validation system
+            $rules = InputValidator::getRegistrationRules();
+            
+            // Add firstname and lastname rules (specific to this registration form)
+            $rules['firstname'] = [
+                InputValidator::RULE_REQUIRED, 
+                [InputValidator::RULE_MIN_LENGTH => 1],
+                [InputValidator::RULE_MAX_LENGTH => 255]
+            ];
+            $rules['lastname'] = [
+                InputValidator::RULE_REQUIRED,
+                [InputValidator::RULE_MIN_LENGTH => 1], 
+                [InputValidator::RULE_MAX_LENGTH => 255]
+            ];
+            
+            // Validate all inputs using the new system
+            $validated = InputValidator::validateAndSanitize($rules, $_POST);
+
+            // Extract validated data for business logic
             $user = $validated['username'];
-            $password = password_hash($validated['password'], PASSWORD_DEFAULT);
             $email = $validated['email'];
-            $firstname = $validated['firstName'];
-            $lastname = $validated['lastName'];
+            $firstname = $validated['firstname'];
+            $lastname = $validated['lastname'];
+            $password = password_hash($validated['password'], PASSWORD_DEFAULT);
+            
         } catch (InvalidArgumentException $e) {
-            LogUtil::logAction(LogType::AUDIT, 'AuthController', 'register', $e->getMessage(), $user);
+            // Log validation failure with user context for security monitoring
+            LogUtil::logAction(LogType::AUDIT, 'AuthController', 'register', 
+                'Validation failed: ' . $e->getMessage(), $user);
+            
+            // Render registration form with error message
             Flight::latte()->render('register.latte', [
                 'title' => TranslationUtil::t('register.title'),
                 'error' => $e->getMessage(),
+                'sessionTimeout' => SessionUtil::getSessionTimeout(),
                 'lang' => Flight::get('lang'),
+                'smtpInvalid' => MailUtil::checkConnection()
             ]);
             return;
         }
 
+        // Check if user already exists (business logic validation)
         $userCheck = User::checkIfUserExists($user, $email);
 
         if ($userCheck === "false") {
+            // Create new user
             $newUser = User::createUser($user, $email, $firstname, $lastname, 1, $password, 'User');
+            
             if ($newUser !== null) {
-                LogUtil::logAction(LogType::AUDIT, 'AuthController', 'register', 'SUCCESS: registered new user.', $user);
-                MailUtil::sendMail($email, "SecStore: Welcome to SecStore", "welcome", ['name' => $firstname . ' ' . $lastname]);
+                // Success: Log and send welcome email
+                LogUtil::logAction(LogType::AUDIT, 'AuthController', 'register', 
+                    'SUCCESS: registered new user.', $user);
+                
+                MailUtil::sendMail($email, "SecStore: Welcome to SecStore", "welcome", [
+                    'name' => $firstname . ' ' . $lastname
+                ]);
+                
                 Flight::latte()->render('register.latte', [
                     'title' => TranslationUtil::t('register.title'),
                     'message' => TranslationUtil::t('register.msg.success'),
+                    'sessionTimeout' => SessionUtil::getSessionTimeout(),
                     'lang' => Flight::get('lang'),
+                    'smtpInvalid' => MailUtil::checkConnection()
                 ]);
                 return;
+                
             } else {
-                LogUtil::logAction(LogType::AUDIT, 'AuthController', 'register', 'ERROR: could not create new user.', $user);
+                // Database error during user creation
+                LogUtil::logAction(LogType::AUDIT, 'AuthController', 'register', 
+                    'ERROR: could not create new user.', $user);
+                
                 Flight::latte()->render('register.latte', [
                     'title' => TranslationUtil::t('register.title'),
-                    'error' => TranslationUtil::t('register.msg,errorGeneral'),
+                    'error' => TranslationUtil::t('register.msg.errorGeneral'),
+                    'sessionTimeout' => SessionUtil::getSessionTimeout(),
                     'lang' => Flight::get('lang'),
+                    'smtpInvalid' => MailUtil::checkConnection()
                 ]);
                 return;
             }
         } else {
-            LogUtil::logAction(LogType::AUDIT, 'AuthController', 'register', 'FAILED: ', $userCheck);
+            // User already exists (username or email taken)
+            LogUtil::logAction(LogType::AUDIT, 'AuthController', 'register', 
+                'FAILED: ' . $userCheck, $user);
+            
             Flight::latte()->render('register.latte', [
                 'title' => TranslationUtil::t('register.title'),
                 'error' => $userCheck,
+                'sessionTimeout' => SessionUtil::getSessionTimeout(),
                 'lang' => Flight::get('lang'),
+                'smtpInvalid' => MailUtil::checkConnection()
             ]);
             return;
         }
@@ -256,7 +305,9 @@ class AuthController
         $config = include $configFile;
 
         try {
-            $validated = InputValidator::validateLogin($_POST['username'], $_POST['password']);
+            // Use new comprehensive validation system
+            $rules = InputValidator::getLoginRules();
+            $validated = InputValidator::validateAndSanitize($rules, $_POST);
             $username = $validated['username'];
             $password = $validated['password'];
             // ... rest der Login-Logik
@@ -518,7 +569,8 @@ class AuthController
         $otp = "";
 
         try {
-            $validated = InputValidator::validateOtp($_POST['otp']);
+            $rules = InputValidator::get2FAVerificationRules();
+            $validated = InputValidator::validateAndSanitize($rules, $_POST);
             $otp = $validated['otp'];
         } catch (InvalidArgumentException $e) {
             LogUtil::logAction(LogType::AUDIT, 'AuthController', 'verify2FA', $e->getMessage(), $user->username);
@@ -536,6 +588,7 @@ class AuthController
             // SessionUtil::set('isAdmin', in_array('Admin', explode(',', $user->roles)) ? 1 : 0);
             // SessionUtil::set('username', $user->username);
             // SessionUtil::set('email', $user->email);
+            LogUtil::logAction(LogType::AUDIT, 'AuthController', 'verify2FA', 'SUCCESS: 2FA verification successful', $user->username);
             SessionUtil::Set('user', $user);
             unset($_SESSION['2fa_user_id']); // Session aufräumen
             Flight::redirect('/home');
@@ -602,7 +655,14 @@ class AuthController
         $email = "";
 
         try {
-            $validated = InputValidator::validateEmail($_POST['email']);
+            $validated = InputValidator::validateAndSanitize([
+                'email' => [
+                    InputValidator::RULE_REQUIRED, 
+                    InputValidator::RULE_EMAIL,
+                    [InputValidator::RULE_MAX_LENGTH => 255]
+                ]
+            ], $_POST);
+            
             $email = $validated['email'];
         } catch (InvalidArgumentException $e) {
             LogUtil::logAction(LogType::AUDIT, 'AuthController', 'forgotPassword', $e->getMessage(), "UNKNOWN_USER");
@@ -717,7 +777,10 @@ class AuthController
         $new_password = "";
 
         try {
-            $validated = InputValidator::validateResetPassword($_POST['token'], $_POST['new_password']);
+            $rules['new_password'] = [InputValidator::RULE_REQUIRED];
+            $rules['new_password'] = [InputValidator::RULE_PASSWORD_STRONG];
+            $rules['token'] = [InputValidator::RULE_REQUIRED];
+            $validated = InputValidator::validateAndSanitize($rules, $_POST);
             $token = $validated['token'];
             $new_password = password_hash($validated['newPassword'], PASSWORD_DEFAULT);
         } catch (InvalidArgumentException $e) {

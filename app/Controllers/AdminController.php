@@ -8,9 +8,11 @@ use App\Utils\LogType;
 use App\Utils\LogUtil;
 use App\Utils\TranslationUtil;
 use App\Utils\SecurityMetrics;
+use App\Utils\InputValidator;
 use ORM;
 use Flight;
 use Exception;
+use InvalidArgumentException;
 
 /**
  * Class Name: AdminController
@@ -680,29 +682,82 @@ class AdminController
      */
     public function createUser()
     {
-        $email = $_POST["email"];
-        $user = $_POST["username"];
-        $firstname = $_POST["firstname"];
-        $lastname = $_POST["lastname"];
-        $password = password_hash($_POST["password"], PASSWORD_DEFAULT);
-        $status = isset($_POST["status"]) ? $_POST["status"] : 0;
-        $roles = isset($_POST["roles"]) ? $_POST["roles"] : "";
-        $userCheck = User::checkIfUserExists($user, $email);
-        $ldapEnabled = isset($_POST["ldapEnabled"]) ? $_POST["ldapEnabled"] : false;
+        $rules = InputValidator::getAdminUserRules();
 
-        if ($userCheck !== "false") {
-            Flight::json(["success" => false, "message" => TranslationUtil::t("user.new.error1")]);
+        // Add required fields specific to user creation
+        $rules['firstname'] = [
+            InputValidator::RULE_REQUIRED,
+            [InputValidator::RULE_MIN_LENGTH => 1],
+            [InputValidator::RULE_MAX_LENGTH => 255]
+        ];
+        $rules['lastname'] = [
+            InputValidator::RULE_REQUIRED,
+            [InputValidator::RULE_MIN_LENGTH => 1],
+            [InputValidator::RULE_MAX_LENGTH => 255]
+        ];
+        $rules['password'] = [
+            InputValidator::RULE_REQUIRED,
+            InputValidator::RULE_PASSWORD_STRONG
+        ];
+        $rules['email'] = [
+            InputValidator::RULE_REQUIRED,
+            InputValidator::RULE_EMAIL
+        ];
+        $rules['status'] = [
+            InputValidator::RULE_REQUIRED
+        ];
+        $rules['roles'] = [
+            InputValidator::RULE_REQUIRED
+        ];
+        $rules['ldapEnabled'] = [
+            InputValidator::RULE_REQUIRED
+        ];
+
+        try {
+            // Validate all input data
+            $validated = InputValidator::validateAndSanitize($rules, $_POST);
+
+            // Extract validated data
+            $email = $validated["email"];
+            $user = $validated["username"];
+            $firstname = $validated["firstname"];
+            $lastname = $validated["lastname"];
+            $password = password_hash($validated["password"], PASSWORD_DEFAULT);
+            $status = $validated['status'] ?? 0;
+            $roles = $validated['roles'] ?? "";
+            $ldapEnabled = $validated['ldapEnabled'] ?? false;
+
+            // Check if user already exists
+            $userCheck = User::checkIfUserExists($user, $email);
+            if ($userCheck !== "false") {
+                Flight::json(["success" => false, "message" => TranslationUtil::t("user.new.error1")]);
+                return;
+            }
+
+            // Create new user
+            $newUser = User::createUser($user, $email, $firstname, $lastname, $status, $password, $roles, $ldapEnabled == true ? 1 : 0);
+
+            if (!$newUser) {
+                Flight::json(["success" => false, "message" => TranslationUtil::t("user.new.error2")]);
+            }
+
+            LogUtil::logAction(LogType::AUDIT, "AdminController", "createUser", "SUCCESS: created new user.");
+            Flight::json(["success" => true, "message" => TranslationUtil::t("user.new.success")]);
+        } catch (InvalidArgumentException $e) {
+            LogUtil::logAction(
+                LogType::AUDIT,
+                "AdminController",
+                "createUser",
+                "User creation validation failed: " . $e->getMessage(),
+                SessionUtil::get("user")["username"]
+            );
+
+            Flight::json([
+                "success" => false,
+                "message" => $e->getMessage()
+            ]);
             return;
         }
-
-        $newUser = User::createUser($user, $email, $firstname, $lastname, $status, $password, $roles, $ldapEnabled == true ? 1 : 0);
-
-        if (!$newUser) {
-            Flight::json(["success" => false, "message" => TranslationUtil::t("user.new.error2")]);
-        }
-
-        LogUtil::logAction(LogType::AUDIT, "AdminController", "createUser", "SUCCESS: created new user.");
-        Flight::json(["success" => true, "message" => TranslationUtil::t("user.new.success")]);
     }
 
     /**
@@ -757,25 +812,90 @@ class AdminController
             Flight::redirect("/login");
         }
 
-        $userId = $_POST["id"];
-        $email = $_POST["email"];
-        $username = $_POST["username"];
-        $firstname = $_POST["firstname"];
-        $lastname = $_POST["lastname"];
-        $status = isset($_POST["status"]) ? $_POST["status"] : 0;
-        $roles = isset($_POST["roles"]) ? $_POST["roles"] : "";
-        $password = isset($_POST["password"]) ? password_hash($_POST["password"], PASSWORD_DEFAULT) : null;
-        $ldapEnabled = isset($_POST["ldapEnabled"]) ? $_POST["ldapEnabled"] : 0;
+        $rules = InputValidator::getAdminUserRules();
 
-        $erg = User::updateuser($userId, $email, $username, $firstname, $lastname, $status, $roles, $password, $ldapEnabled);
+        // Add required fields specific to user creation
+        $rules['firstname'] = [
+            InputValidator::RULE_REQUIRED,
+            [InputValidator::RULE_MIN_LENGTH => 1],
+            [InputValidator::RULE_MAX_LENGTH => 255]
+        ];
+        $rules['lastname'] = [
+            InputValidator::RULE_REQUIRED,
+            [InputValidator::RULE_MIN_LENGTH => 1],
+            [InputValidator::RULE_MAX_LENGTH => 255]
+        ];
+        $rules['username'] = [
+            InputValidator::RULE_REQUIRED,
+            [InputValidator::RULE_MIN_LENGTH => 1],
+            [InputValidator::RULE_MAX_LENGTH => 255]
+        ];
+        $rules['email'] = [
+            InputValidator::RULE_REQUIRED,
+            InputValidator::RULE_EMAIL
+        ];
+        if (isset($_POST["password"]) && $_POST["password"] !== "") {
+            $rules['password'] = [
+                InputValidator::RULE_REQUIRED,
+                InputValidator::RULE_PASSWORD_STRONG
+            ];
+        }
+        $rules['status'] = [
+            InputValidator::RULE_REQUIRED
+        ];
+        $rules['roles'] = [
+            InputValidator::RULE_REQUIRED
+        ];
+        $rules['ldapEnabled'] = [
+            InputValidator::RULE_REQUIRED
+        ];
+        $rules['id'] = [
+            InputValidator::RULE_REQUIRED
+        ];
 
-        // log action
-        LogUtil::logAction(LogType::AUDIT, "AdminController", "updateUser", "SUCCESS: updated user " . $username . ".");
+        try {
+            // Validate all input data
+            $validated = InputValidator::validateAndSanitize($rules, $_POST);
 
-        if ($erg === true) {
-            Flight::json(["success" => true, "message" => TranslationUtil::t('user.edit.success') . $ldapEnabled . ""]);
-        } else {
-            Flight::json(["success" => false, "message" => TranslationUtil::t("user.edit.error1")]);
+            // Extract validated data
+            $userId = $validated["id"];
+            $email = $validated["email"];
+            $username = $validated["username"];
+            $firstname = $validated["firstname"];
+            $lastname = $validated["lastname"];
+            $status = $validated['status'] ?? 0;
+            $roles = $validated['roles'] ?? "";
+            $password = null;
+            if (isset($validated["password"]) && !empty($validated["password"])) {
+                $password = password_hash($validated["password"], PASSWORD_DEFAULT);
+            }
+            $ldapEnabled = $validated['ldapEnabled'] ?? 0;
+
+            // Update user
+            $erg = User::updateuser($userId, $email, $username, $firstname, $lastname, $status, $roles, $password, $ldapEnabled);
+
+            // log action
+            LogUtil::logAction(LogType::AUDIT, "AdminController", "updateUser", "SUCCESS: updated user " . $username . ".");
+
+            if ($erg === true) {
+                Flight::json(["success" => true, "message" => TranslationUtil::t('user.edit.success') . $ldapEnabled . ""]);
+            } else {
+                Flight::json(["success" => false, "message" => TranslationUtil::t("user.edit.error1")]);
+            }
+        } catch (InvalidArgumentException $e) {
+            LogUtil::logAction(
+                LogType::AUDIT,
+                "AdminController",
+                "updateUser",
+                "User update validation failed: " . $e->getMessage(),
+                SessionUtil::get("user")["username"]
+            );
+
+            Flight::json([
+                "success" => false,
+                "message" => $e->getMessage()
+            ]);
+            return;
         }
     }
 
@@ -1287,45 +1407,61 @@ class AdminController
      */
     public static function addRole()
     {
-        $roleName = trim($_POST["roleName"]);
-        if (!$roleName) {
-            Flight::json(["success" => false, "message" => "Role name is required."]);
-            return;
-        }
-        ORM::configure("logging", true);
-        if (ORM::for_table("roles")->where("roleName", $roleName)->find_one()) {
-            // letzte query loggen
+        try {
+            $validated = InputValidator::validateAndSanitize(
+                InputValidator::getRoleRules(),
+                $_POST
+            );
+
+            $roleName = $validated['roleName'];
+
             ORM::configure("logging", true);
+            if (ORM::for_table("roles")->where("roleName", $roleName)->find_one()) {
+                // letzte query loggen
+                ORM::configure("logging", true);
+                $queries = ORM::get_query_log();
+                if (!empty($queries)) {
+                    $lastQuery = end($queries);
+                    LogUtil::logAction(LogType::SQL, "LogController", "listLogs", $lastQuery);
+                }
+                Flight::json(["success" => false, "message" => TranslationUtil::t("roles.error5")]);
+                return;
+            }
+
+            $role = ORM::for_table("roles")->create();
+            $role->roleName = $roleName;
+            $role->save();
+
+            // letzte query loggen
             $queries = ORM::get_query_log();
             if (!empty($queries)) {
                 $lastQuery = end($queries);
                 LogUtil::logAction(LogType::SQL, "LogController", "listLogs", $lastQuery);
             }
-            Flight::json(["success" => false, "message" => TranslationUtil::t("roles.error5")]);
+
+            // log action
+            LogUtil::logAction(
+                LogType::AUDIT,
+                "AdminController",
+                "addRole",
+                "SUCCESS: added role " . $roleName . ".",
+                SessionUtil::get("user")["username"]
+            );
+
+            Flight::json(["success" => true, "message" => TranslationUtil::t('roles.error6'), "role" => $role->as_array()]);
+        } catch (InvalidArgumentException $e) {
+            Flight::json([
+                "success" => false,
+                "message" => $e->getMessage()
+            ]);
+            return;
+        } catch (Exception $e) {
+            Flight::json([
+                "success" => false,
+                "message" => $e->getMessage()
+            ]);
             return;
         }
-
-        $role = ORM::for_table("roles")->create();
-        $role->roleName = $roleName;
-        $role->save();
-
-        // letzte query loggen
-        $queries = ORM::get_query_log();
-        if (!empty($queries)) {
-            $lastQuery = end($queries);
-            LogUtil::logAction(LogType::SQL, "LogController", "listLogs", $lastQuery);
-        }
-
-        // log action
-        LogUtil::logAction(
-            LogType::AUDIT,
-            "AdminController",
-            "addRole",
-            "SUCCESS: added role " . $roleName . ".",
-            SessionUtil::get("user")["username"]
-        );
-
-        Flight::json(["success" => true, "message" => TranslationUtil::t('roles.error6'), "role" => $role->as_array()]);
     }
 
     /**
@@ -1343,47 +1479,70 @@ class AdminController
      */
     public static function deleteRole()
     {
-        $roleId = (int) $_POST["roleId"];
-        $role = ORM::for_table("roles")->find_one($roleId);
+        try {
+            try {
+                $rules['id'] = [
+                    InputValidator::RULE_REQUIRED,
+                    InputValidator::RULE_NUMERIC
+                ];
 
-        if (!$role) {
-            Flight::json(["success" => false, "message" => "Role not found."]);
+                $validated = InputValidator::validateAndSanitize($rules, $_POST);
+
+                $roleId = (int) $validated['id'];
+                $role = ORM::for_table("roles")->find_one($roleId);
+
+                if (!$role) {
+                    Flight::json(["success" => false, "message" => "Role not found."]);
+                    return;
+                }
+                ORM::configure("logging", true);
+                $usersWithRole = ORM::for_table("users")
+                    ->where("roles", $role->roleName)
+                    ->count();
+                // letzte query loggen
+                ORM::configure("logging", true);
+                $queries = ORM::get_query_log();
+                if (!empty($queries)) {
+                    $lastQuery = end($queries);
+                    LogUtil::logAction(LogType::SQL, "LogController", "listLogs", $lastQuery);
+                }
+                if ($usersWithRole > 0) {
+                    Flight::json(["success" => false, "message" => "Cannot delete role. It is assigned to users."]);
+                    return;
+                }
+
+                $role->delete();
+                // letzte query loggen
+                $queries = ORM::get_query_log();
+                if (!empty($queries)) {
+                    $lastQuery = end($queries);
+                    LogUtil::logAction(LogType::SQL, "LogController", "listLogs", $lastQuery);
+                }
+
+                // log action
+                LogUtil::logAction(
+                    LogType::AUDIT,
+                    "AdminController",
+                    "deleteRole",
+                    "SUCCESS: deleted role " . $role->roleName . ".",
+                    SessionUtil::get("user")["username"]
+                );
+
+                Flight::json(["success" => true, "message" => "Role deleted successfully."]);
+            } catch (InvalidArgumentException $e) {
+                Flight::json([
+                    "success" => false,
+                    "message" => $e->getMessage()
+                ]);
+                return;
+            }
+        } catch (Exception $e) {
+            Flight::json([
+                "success" => false,
+                "message" => $e->getMessage()
+            ]);
             return;
         }
-        ORM::configure("logging", true);
-        $usersWithRole = ORM::for_table("users")
-            ->where("roles", $role->roleName)
-            ->count();
-        // letzte query loggen
-        ORM::configure("logging", true);
-        $queries = ORM::get_query_log();
-        if (!empty($queries)) {
-            $lastQuery = end($queries);
-            LogUtil::logAction(LogType::SQL, "LogController", "listLogs", $lastQuery);
-        }
-        if ($usersWithRole > 0) {
-            Flight::json(["success" => false, "message" => "Cannot delete role. It is assigned to users."]);
-            return;
-        }
-
-        $role->delete();
-        // letzte query loggen
-        $queries = ORM::get_query_log();
-        if (!empty($queries)) {
-            $lastQuery = end($queries);
-            LogUtil::logAction(LogType::SQL, "LogController", "listLogs", $lastQuery);
-        }
-
-        // log action
-        LogUtil::logAction(
-            LogType::AUDIT,
-            "AdminController",
-            "deleteRole",
-            "SUCCESS: deleted role " . $role->roleName . ".",
-            SessionUtil::get("user")["username"]
-        );
-
-        Flight::json(["success" => true, "message" => "Role deleted successfully."]);
     }
 
     /**
@@ -1630,7 +1789,7 @@ class AdminController
 
         return $results;
     }
-    
+
 
     /**
      * Bulk MFA enforcement
