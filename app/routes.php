@@ -274,6 +274,25 @@ secureRoute('GET /admin/security/metrics', function () {
     (new AdminController)->getSecurityMetrics();
 }, 'admin', true);
 
+// Geo-Location Analytics
+secureRoute('GET /admin/geo-analytics', function () {
+    (new AdminController)->showGeoAnalytics();
+}, 'admin', true);
+
+secureRoute('GET /admin/geo/data', function () {
+    (new AdminController)->getGeoData();
+}, 'admin', true);
+
+// User Geo Profile
+secureRoute('GET /admin/user-geo-profile', function () {
+    (new AdminController)->showUserGeoProfile();
+}, 'admin', true);
+
+// Dedicated Analytics Dashboard
+secureRoute('GET /admin/analytics-dashboard', function () {
+    (new AdminController)->showAnalyticsDashboard();
+}, 'admin', true);
+
 // Admin Settings
 secureRoute('GET /admin/settings', function () {
     (new AdminController)->showSettings();
