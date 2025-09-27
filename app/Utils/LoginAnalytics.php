@@ -89,7 +89,7 @@ class LoginAnalytics
         // Failed Logins
         $failedLogins = ORM::for_table('logs')
             ->where('type', 'AUDIT')
-            ->where_like('context', 'Authcontroller/login%')
+            ->where_like('context', 'AuthController/login%')
             ->where_like('message', '%FAILED%')
             ->where_gte('datum_zeit', $startDate)
             ->select('datum_zeit')
@@ -107,40 +107,42 @@ class LoginAnalytics
      * Wöchentliche Trends
      */
     public static function getWeeklyTrends(int $weeks = 4): array {
-        $weeklyData = [];
+    $weeklyData = [];
+    
+    for ($week = $weeks - 1; $week >= 0; $week--) {
+        // KORREKT: Beide Daten vom gleichen Montag ableiten
+        $weekStart = date('Y-m-d 00:00:00', strtotime("Monday -{$week} weeks"));
+        $weekEnd = date('Y-m-d 23:59:59', strtotime("Monday -{$week} weeks +6 days"));
         
-        for ($week = $weeks - 1; $week >= 0; $week--) {
-            $weekStart = date('Y-m-d H:i:s', strtotime("-{$week} weeks Monday"));
-            $weekEnd = date('Y-m-d H:i:s', strtotime("-{$week} weeks Sunday 23:59:59"));
+        // Rest bleibt gleich...
+        $successfulLogins = ORM::for_table('logs')
+            ->where('type', 'AUDIT')
+            ->where_like('context', 'AuthController/login%')
+            ->where_like('message', '%SUCCESS%')
+            ->where_gte('datum_zeit', $weekStart)
+            ->where_lte('datum_zeit', $weekEnd)
+            ->count();
             
-            $successfulLogins = ORM::for_table('logs')
-                ->where('type', 'AUDIT')
-                ->where_like('context', 'AuthController/login%')
-                ->where_like('message', '%SUCCESS%')
-                ->where_gte('datum_zeit', $weekStart)
-                ->where_lte('datum_zeit', $weekEnd)
-                ->count();
-                
-            $failedLogins = ORM::for_table('logs')
-                ->where('type', 'AUDIT')
-                ->where_like('context', 'AuthController/login%')
-                ->where_like('message', '%FAILED%')
-                ->where_gte('datum_zeit', $weekStart)
-                ->where_lte('datum_zeit', $weekEnd)
-                ->count();
-            
-            $weeklyData[] = [
-                'week_start' => date('M d', strtotime($weekStart)),
-                'week_end' => date('M d', strtotime($weekEnd)),
-                'successful_logins' => $successfulLogins,
-                'failed_logins' => $failedLogins,
-                'success_rate' => $successfulLogins + $failedLogins > 0 ? 
-                    round(($successfulLogins / ($successfulLogins + $failedLogins)) * 100, 1) : 100
-            ];
-        }
+        $failedLogins = ORM::for_table('logs')
+            ->where('type', 'AUDIT')
+            ->where_like('context', 'AuthController/login%')
+            ->where_like('message', '%FAILED%')
+            ->where_gte('datum_zeit', $weekStart)
+            ->where_lte('datum_zeit', $weekEnd)
+            ->count();
         
-        return $weeklyData;
+        $weeklyData[] = [
+            'week_start' => date('M d', strtotime($weekStart)),
+            'week_end' => date('M d', strtotime($weekEnd)),
+            'successful_logins' => $successfulLogins,
+            'failed_logins' => $failedLogins,
+            'success_rate' => $successfulLogins + $failedLogins > 0 ? 
+                round(($successfulLogins / ($successfulLogins + $failedLogins)) * 100, 1) : 100
+        ];
     }
+    
+    return $weeklyData;
+}
     
     /**
      * Peak Activity Zeiten finden
