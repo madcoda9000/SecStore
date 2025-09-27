@@ -438,8 +438,7 @@ class InputValidator
     public static function getEmailChangeRules(): array
     {
         return [
-            'newEmail' => [self::RULE_REQUIRED, self::RULE_EMAIL, [self::RULE_MAX_LENGTH => 255]],
-            'currentPassword' => [self::RULE_REQUIRED, [self::RULE_MIN_LENGTH => 1]]
+            'newEmail' => [self::RULE_REQUIRED, self::RULE_EMAIL, [self::RULE_MAX_LENGTH => 255]]
         ];
     }
 
@@ -453,7 +452,6 @@ class InputValidator
         return [
             'currentPassword' => [self::RULE_REQUIRED, [self::RULE_MIN_LENGTH => 1]],
             'newPassword' => [self::RULE_REQUIRED, self::RULE_PASSWORD_STRONG],
-            'newPasswordConfirm' => [self::RULE_REQUIRED]
         ];
     }
 }

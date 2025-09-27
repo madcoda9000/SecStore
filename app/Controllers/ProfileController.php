@@ -10,7 +10,9 @@ use App\Utils\SessionUtil;
 use RobThree\Auth\TwoFactorAuth;
 use RobThree\Auth\Providers\Qr\EndroidQrCodeProvider;
 use App\Utils\TranslationUtil;
+use App\Utils\InputValidator;
 use Exception;
+use InvalidArgumentException;
 
 /**
  * Class Name: DashboardController
@@ -70,52 +72,70 @@ class ProfileController
             return;
         }
 
-        // pq requirements check
-        $oldPW = $_POST['old_password'] ?? null;
-        $newPW = $_POST['new_password'] ?? null;
-        $error = null;
+        try {
+            try {
+                $validated = InputValidator::validateAndSanitize(
+                    InputValidator::getPasswordChangeRules(),
+                    $_POST
+                );
 
-        if (!$oldPW || !$newPW) {
-            $error = 'All fields are required!';
-        } elseif (!password_verify($oldPW, $user->password)) {
-            $error = 'Current password is incorrect!';
-        } elseif (strlen($newPW) < 14 || !preg_match('/[A-Z]/', $newPW) || !preg_match('/\d/', $newPW)) {
-            $error = 'Password must be at least 14 characters long and contain an uppercase letter and a number.';
-        } elseif (password_verify($newPW, $user->password)) {
-            $error = 'New password must be different from the current password!';
-        }
+                $oldPW = $validated['current_password'];
+                $newPW = $validated['new_password'];
+                $error = null;
 
-        if ($error) {
+                if (!$oldPW || !$newPW) {
+                    $error = 'All fields are required!';
+                } elseif (!password_verify($oldPW, $user->password)) {
+                    $error = 'Current password is incorrect!';
+                } elseif (strlen($newPW) < 14 || !preg_match('/[A-Z]/', $newPW) || !preg_match('/\d/', $newPW)) {
+                    $error = 'Password must be at least 14 characters long and contain an uppercase letter and a number.';
+                } elseif (password_verify($newPW, $user->password)) {
+                    $error = 'New password must be different from the current password!';
+                }
+
+                if ($error) {
+                    Flight::latte()->render('profile.latte', [
+                        'title' => 'Profile',
+                        'user' => $user,
+                        'error' => $error,
+                        'sessionTimeout' => SessionUtil::getRemainingTime(),
+                    ]);
+                    return;
+                }
+
+                // Neues Passwort setzen
+                $pwhash = password_hash($newPW, PASSWORD_DEFAULT);
+                if (!User::setNewPassword($user_id, $pwhash)) {
+                    Flight::latte()->render('profile.latte', [
+                        'title' => 'Profile',
+                        'user' => $user,
+                        'error' => 'Failed to update password!',
+                        'sessionTimeout' => SessionUtil::getRemainingTime(),
+                    ]);
+                    return;
+                }
+
+                //log pw change
+                LogUtil::logAction(LogType::AUDIT, 'ProfileController', 'profileChangePassword', 'SUCCESS: Password changed.', $user->username);
+
+                Flight::latte()->render('profile.latte', [
+                    'title' => 'Profile',
+                    'user' => $user,
+                    'success' => 'Password changed successfully!',
+                    'sessionTimeout' => SessionUtil::getRemainingTime(),
+                ]);
+            } catch (InvalidArgumentException $e) {
+                throw new Exception($e->getMessage());
+            }
+        } catch (Exception $e) {
             Flight::latte()->render('profile.latte', [
                 'title' => 'Profile',
-                'user' => $user,
-                'error' => $error,
+                'user' => $user ?? 'anonymous',
+                'error' => $e->getMessage(),
                 'sessionTimeout' => SessionUtil::getRemainingTime(),
             ]);
             return;
         }
-
-        // Neues Passwort setzen
-        $pwhash = password_hash($newPW, PASSWORD_DEFAULT);
-        if (!User::setNewPassword($user_id, $pwhash)) {
-            Flight::latte()->render('profile.latte', [
-                'title' => 'Profile',
-                'user' => $user,
-                'error' => 'Failed to update password!',
-                'sessionTimeout' => SessionUtil::getRemainingTime(),
-            ]);
-            return;
-        }
-
-        //log pw change
-        LogUtil::logAction(LogType::AUDIT, 'ProfileController', 'profileChangePassword', 'SUCCESS: Password changed.', $user->username);
-
-        Flight::latte()->render('profile.latte', [
-            'title' => 'Profile',
-            'user' => $user,
-            'success' => 'Password changed successfully!',
-            'sessionTimeout' => SessionUtil::getRemainingTime(),
-        ]);
     }
 
     /**
@@ -130,46 +150,66 @@ class ProfileController
     {
         $user_id = SessionUtil::get('user')['id'];
         $user = User::findUserById($user_id);
-        $new_mail = $_POST['new_email'] ?? null;
 
-        if ($user === false) {
-            Flight::redirect('/login'); // Falls kein Nutzer gefunden wurde, zum Login weiterleiten
-            return;
-        }
+        try {
+            try {
+                $validated = InputValidator::validateAndSanitize(
+                    InputValidator::getEmailChangeRules(),
+                    $_POST
+                );
 
-        if (!$new_mail) {
+                $new_mail = $validated['new_email'];
+
+                if ($user === false) {
+                    Flight::redirect('/login'); // Falls kein Nutzer gefunden wurde, zum Login weiterleiten
+                    return;
+                }
+
+                if (!$new_mail) {
+                    Flight::latte()->render('profile.latte', [
+                        'title' => 'Profile',
+                        'user' => $user,
+                        'error' => 'The new email address field must be filled!',
+                        'sessionTimeout' => SessionUtil::getRemainingTime(),
+                    ]);
+                    return;
+                }
+
+                if (!filter_var($new_mail, FILTER_VALIDATE_EMAIL)) {
+                    Flight::latte()->render('profile.latte', [
+                        'title' => 'Profile',
+                        'user' => $user,
+                        'error' => 'Please enter a valid email address!',
+                        'sessionTimeout' => SessionUtil::getRemainingTime(),
+                    ]);
+                    return;
+                }
+
+                $erg = User::changeEmailAddress($user->id, $new_mail);
+
+                if ($erg === false) {
+                    Flight::latte()->render('profile.latte', [
+                        'title' => 'Profile',
+                        'user' => $user,
+                        'error' => 'There was an error saving your new email address!',
+                        'sessionTimeout' => SessionUtil::getRemainingTime(),
+                    ]);
+                    return;
+                } else {
+                    LogUtil::logAction(LogType::AUDIT, 'ProfileController', 'changeEmailAddress', 'SUCCESS: changed email adress to ' . $new_mail, $user->username);
+                    Flight::redirect('/logout');
+                }
+            } catch (InvalidArgumentException $e) {
+                throw new Exception($e->getMessage());
+            }
+        } catch (Exception $e) {
             Flight::latte()->render('profile.latte', [
                 'title' => 'Profile',
-                'user' => $user,
-                'error' => 'The new email address field must be filled!',
+                'user' => $user ?? 'anonymous',
+                'error' => $e->getMessage(),
                 'sessionTimeout' => SessionUtil::getRemainingTime(),
             ]);
             return;
-        }
-
-        if (!filter_var($new_mail, FILTER_VALIDATE_EMAIL)) {
-            Flight::latte()->render('profile.latte', [
-                'title' => 'Profile',
-                'user' => $user,
-                'error' => 'Please enter a valid email address!',
-                'sessionTimeout' => SessionUtil::getRemainingTime(),
-            ]);
-            return;
-        }
-
-        $erg = User::changeEmailAddress($user->id, $new_mail);
-
-        if ($erg === false) {
-            Flight::latte()->render('profile.latte', [
-                'title' => 'Profile',
-                'user' => $user,
-                'error' => 'There was an error saving your new email address!',
-                'sessionTimeout' => SessionUtil::getRemainingTime(),
-            ]);
-            return;
-        } else {
-            LogUtil::logAction(LogType::AUDIT, 'ProfileController', 'changeEmailAddress', 'SUCCESS: changed email adress to ' . $new_mail, $user->username);
-            Flight::redirect('/logout');
         }
     }
 
