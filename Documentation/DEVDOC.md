@@ -236,7 +236,7 @@ Let's create an example **"FAQ"** page to demonstrate all concepts.
                     <h5>{trans('faq.sidebar.title')}</h5>
                 </div>
                 <div class="card-body">
-                    <button class="btn btn-primary" id="searchBtn" data-search-url="/api/faq/search">
+                    <button class="btn btn-primary" id="searchBtn" data-search-url="/faq/search">
                         {trans('faq.sidebar.search')}
                     </button>
                 </div>
@@ -247,7 +247,7 @@ Let's create an example **"FAQ"** page to demonstrate all concepts.
 
 {* CSP-compliant data transfer *}
 <div id="faq-config" 
-     data-search-url="/api/faq/search"
+     data-search-url="/faq/search"
      data-total-faqs="{count($faqs)}"
      style="display:none;">
 </div>
@@ -343,7 +343,7 @@ class FaqController
     }
 
     /**
-     * API: FAQ Search
+     * Controller: FAQ Search
      */
     public function searchFaq()
     {
@@ -439,8 +439,8 @@ secureRoute('GET /faq', function () {
     (new FaqController)->showFaq();
 }, 'global', false);
 
-// FAQ search API (protected)
-secureRoute('GET /api/faq/search', function () {
+// FAQ search (protected)
+secureRoute('GET /faq/search', function () {
     (new FaqController)->searchFaq();
 }, 'global', false);
 
@@ -455,7 +455,7 @@ secureRoute('GET /admin/faq', function () {
 | Parameter | Description | Options |
 |-----------|-------------|---------|
 | **HTTP Method** | `GET`, `POST`, `PUT`, `DELETE` | Standard HTTP verbs |
-| **Path** | URL path like `/faq` or `/api/faq/search` | Can contain parameters |
+| **Path** | URL path like `/faq` or `/faq/search` | Can contain parameters |
 | **Callback** | Controller method as closure | Instantiates controller |
 | **Scope** | Rate limiting scope | `'global'`, `'admin'`, `'login'` |
 | **Admin-Only** | Only for admin role | `true` or `false` |
@@ -546,7 +546,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // =============================================
     const configElement = document.getElementById('faq-config');
     let config = {
-        searchUrl: '/api/faq/search',
+        searchUrl: '/faq/search',
         totalFaqs: 0
     };
     
@@ -590,7 +590,7 @@ document.addEventListener('DOMContentLoaded', function() {
         searchBtn.textContent = 'Searching...';
         searchBtn.disabled = true;
         
-        // API call
+        // controller call
         fetch(`${config.searchUrl}?q=${encodeURIComponent(query)}`)
             .then(response => response.json())
             .then(data => {
@@ -868,7 +868,7 @@ php -S localhost:8000 -t public
 curl http://localhost:8000/faq
 
 # Test FAQ search  
-curl "http://localhost:8000/api/faq/search?q=password"
+curl "http://localhost:8000/faq/search?q=password"
 ```
 
 ### **Code Quality Check:**
@@ -892,7 +892,7 @@ With this knowledge, you can extend SecStore with any features:
 
 - 📊 **Dashboard widgets**
 - 🛠️ **Admin tools**  
-- 🔌 **API endpoints**
+- 🔌 **Controller endpoints**
 - 📱 **Mobile app integration**
 - 🎨 **Custom themes**
 

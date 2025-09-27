@@ -319,8 +319,7 @@ We welcome contributions! 🎉
 |----------|-------------|
 | 📖 **[INSTALL.md](Documentation/INSTALL.md)** | Complete installation and setup guide |
 | 📝 **[CHANGELOG.md](Documentation/CHANGELOG.md)** | Version history and release notes |
-| 🔒 **[SECURITY.md](Documentation/SECURITY.md)** | Security policies and vulnerability reporting |
-| 🏗️ **[API.md](#)** | API documentation (planned) |
+| 🔒 **[SECURITY.md](Documentation/SECURITY.md)** | Security policies and vulnerability reporting ||
 | 🐳 **[DOCKER.md](#)** | Docker setup (planned) |
 
 ---

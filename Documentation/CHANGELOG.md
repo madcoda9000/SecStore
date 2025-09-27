@@ -10,7 +10,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased] - Next Version
 ### Planned
 - Docker container support
-- API endpoints for external integration
 - Backup/restore functionality
 - Advanced security analytics
 
