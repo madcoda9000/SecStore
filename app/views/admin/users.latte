@@ -109,41 +109,41 @@
                 <button class="btn btn-primary dropdown-toggle" type="button" 
                         id="bulkActionsDropdown" data-bs-toggle="dropdown">
                     <i class="bi bi-lightning"></i> 
-                    <span id="bulkActionText bg-light">Bulk Actions</span>
+                    <span id="bulkActionText bg-light">{trans('users.bulk.menu.actions')}</span>
                     <span class="badge bg-light text-dark ms-3" id="selectionCount">0</span>
                 </button>
                 <ul class="dropdown-menu dropdown-menu-end">
                     <!-- User Status -->
-                    <li><h6 class="dropdown-header">User Status</h6></li>
+                    <li><h6 class="dropdown-header">{trans('users.bulk.menu.title.status')}</h6></li>
                     <li><a class="dropdown-item" href="#" data-bulk-action="enable">
-                        <i class="bi bi-check-circle text-success"></i> Enable Selected
+                        <i class="bi bi-check-circle text-success"></i> {trans('users.bulk.menu.enable')}
                     </a></li>
                     <li><a class="dropdown-item" href="#" data-bulk-action="disable">
-                        <i class="bi bi-x-circle text-danger"></i> Disable Selected
+                        <i class="bi bi-x-circle text-danger"></i> {trans('users.bulk.menu.disable')}
                     </a></li>
                     <li><hr class="dropdown-divider"></li>
                     
                     <!-- MFA Operations -->
-                    <li><h6 class="dropdown-header">2FA Management</h6></li>
+                    <li><h6 class="dropdown-header">{trans('users.bulk.menu.title.2fa')}</h6></li>
                     <li><a class="dropdown-item" href="#" data-bulk-action="mfa_enforce">
-                        <i class="bi bi-shield-fill-exclamation text-warning"></i> Enforce 2FA
+                        <i class="bi bi-shield-fill-exclamation text-warning"></i> {trans('users.bulk.menu.mfa_enforce')}
                     </a></li>
                     <li><a class="dropdown-item" href="#" data-bulk-action="mfa_unenforce">
-                        <i class="bi bi-shield text-muted"></i> Remove 2FA Enforcement
+                        <i class="bi bi-shield text-muted"></i> {trans('users.bulk.menu.mfa_unenforce')}
                     </a></li>
                     <li><hr class="dropdown-divider"></li>
                     
                     <!-- Export -->
-                    <li><h6 class="dropdown-header">Export</h6></li>
+                    <li><h6 class="dropdown-header">{trans('users.bulk.menu.title.export')}</h6></li>
                     <li><a class="dropdown-item" href="#" data-export="csv-selected">
-                        <i class="bi bi-filetype-csv text-primary"></i> Export Selected as CSV
+                        <i class="bi bi-filetype-csv text-primary"></i> {trans('users.bulk.menu.export')}
                     </a></li>
                     <li><hr class="dropdown-divider"></li>
                     
                     <!-- Dangerous Actions -->
-                    <li><h6 class="dropdown-header text-danger">Danger Zone</h6></li>
+                    <li><h6 class="dropdown-header text-danger">{trans('users.bulk.menu.title.danger')}</h6></li>
                     <li><a class="dropdown-item text-danger" href="#" data-bulk-action="delete">
-                        <i class="bi bi-trash"></i> Delete Selected
+                        <i class="bi bi-trash"></i> {trans('users.bulk.menu.delete')}
                     </a></li>
                 </ul>
             </div>
