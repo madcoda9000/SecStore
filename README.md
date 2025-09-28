@@ -150,7 +150,7 @@ For detailed installation instructions and production setup see **[📖 INSTALL.
 
 - ✅ **Role-based access control (RBAC)**
 - ✅ **Flexible user management** with admin interface
-- ✅ **Bulk actions** (Enforce and Unenforce 2fa, delte, Enable and Disable)
+- ✅ **Bulk actions** (Enforce and Unenforce 2fa, delete, Enable and Disable)
 - ✅ **Self-service profile** management
 - ✅ **Password reset** via email (can be enabled/disbaled)
 - ✅ **Registration system** (can be enabled/disabled)
