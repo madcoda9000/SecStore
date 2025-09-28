@@ -48,7 +48,6 @@ class BulkUserManager {
   }
 
   init() {
-    console.log("🚀 CSP-Compliant BulkUserManager initializing...");
 
     // Initialize Bootstrap modals
     this.initializeModals();
@@ -58,8 +57,6 @@ class BulkUserManager {
 
     // Setup CSP-compliant event listeners
     this.setupEventListeners();
-
-    console.log("✅ BulkUserManager initialized with", this.allUsers.size, "users");
   }
 
   /**
@@ -100,8 +97,6 @@ class BulkUserManager {
         element: row,
       });
     });
-
-    console.log("📊 Collected", this.allUsers.size, "users from table");
   }
 
   /**
@@ -118,7 +113,6 @@ class BulkUserManager {
       resultsModal.addEventListener("hidden.bs.modal", () => {
         // Ensure progress modal is definitely closed when results modal closes
         if (this.elements.bulkProgressModal && this.elements.bulkProgressModal._element.classList.contains("show")) {
-          console.log("🧹 Cleaning up progress modal after results closed");
           this.elements.bulkProgressModal.hide();
         }
       });
@@ -135,8 +129,6 @@ class BulkUserManager {
         }
       });
     }
-
-    console.log("📡 CSP-compliant event listeners setup");
   }
 
   /**
@@ -152,12 +144,10 @@ class BulkUserManager {
     if (action === "toggle-select-all" || action === "update-selection") {
       return; // Let handleChange deal with these
     }
-    console.log("🔘 Click event detected - action:", action, "bulkAction:", bulkAction, "exportAction:", exportAction);
     // Bulk actions
     if (bulkAction) {
       event.preventDefault();
       this.executeBulkAction(bulkAction);
-      console.log("⚡ Bulk action triggered:", bulkAction);
       return;
     }
 
@@ -215,10 +205,8 @@ class BulkUserManager {
 
     // Only handle checkbox-related actions
     if (action === "toggle-select-all") {
-      console.log("🔄 Select all checkbox changed:", target.checked);
       this.toggleSelectAll(target.checked);
     } else if (action === "update-selection") {
-      console.log("🔄 Individual checkbox changed");
       this.updateSelection();
     }
   }
@@ -238,9 +226,6 @@ class BulkUserManager {
    * Execute bulk actions
    */
   async executeBulkAction(operation) {
-    console.log("⚡ ExecuteBulkAction called with:", operation);
-    console.log("📊 Current selection size:", this.selectedUsers.size);
-    console.log("📋 Selected users:", Array.from(this.selectedUsers));
 
     if (this.selectedUsers.size === 0) {
       console.warn("❌ No users selected - showing alert");
@@ -252,8 +237,6 @@ class BulkUserManager {
       console.warn("⏸️ Already processing, skipping");
       return;
     }
-
-    console.log("✅ Proceeding with bulk action:", operation, "for users:", Array.from(this.selectedUsers));
 
     // Confirmation for dangerous operations
     if (operation === "delete") {
@@ -347,10 +330,8 @@ class BulkUserManager {
    * Toggle select all functionality
    */
   toggleSelectAll(checked) {
-    console.log("🔄 Toggle select all:", checked);
 
     const userCheckboxes = document.querySelectorAll(".user-select-checkbox");
-    console.log("📋 Found checkboxes:", userCheckboxes.length);
 
     userCheckboxes.forEach((checkbox, index) => {
       checkbox.checked = checked;
@@ -360,16 +341,11 @@ class BulkUserManager {
       if (checked) {
         this.selectedUsers.add(userId);
         row.classList.add("selected");
-        console.log(`✅ [${index}] Selected user:`, userId, checkbox.dataset.username);
       } else {
         this.selectedUsers.delete(userId);
         row.classList.remove("selected");
-        console.log(`❌ [${index}] Deselected user:`, userId);
       }
     });
-
-    console.log("📊 Toggle complete - Total selected:", this.selectedUsers.size);
-    console.log("📋 Selected IDs:", Array.from(this.selectedUsers));
 
     this.updateUI();
   }
@@ -381,7 +357,6 @@ class BulkUserManager {
    * Update selection based on individual changes
    */
   updateSelection() {
-    console.log("🔄 Updating selection...");
 
     // Clear current selection
     this.selectedUsers.clear();
@@ -396,16 +371,10 @@ class BulkUserManager {
       if (checkbox.checked) {
         this.selectedUsers.add(userId);
         row.classList.add("selected");
-        console.log("✅ Added user to selection:", userId, checkbox.dataset.username);
       } else {
         row.classList.remove("selected");
-        console.log("❌ Removed user from selection:", userId);
       }
     });
-
-    // Debug logging
-    console.log("📊 Selection updated - Total selected:", this.selectedUsers.size);
-    console.log("📋 Selected IDs:", Array.from(this.selectedUsers));
 
     // Update select all checkbox state
     this.updateSelectAllState();
@@ -469,8 +438,6 @@ class BulkUserManager {
         this.elements.bulkActionText.textContent = "Bulk Actions"; //`${selectedCount} User${selectedCount !== 1 ? "s" : ""} Selected`;
       }
     }
-
-    console.log("🎨 UI updated - Selected:", selectedCount);
   }
 
   /**
@@ -574,7 +541,6 @@ class BulkUserManager {
    * Show results modal with detailed breakdown
    */
   showResults(response) {
-    console.log("📊 Showing results:", response);
 
     // WICHTIG: Progress Modal zuerst schließen
     if (this.elements.bulkProgressModal) {
@@ -615,8 +581,6 @@ class BulkUserManager {
     if (this.elements.bulkResultsModal) {
       this.elements.bulkResultsModal.show();
     }
-
-    console.log("✅ Results modal displayed, progress modal hidden");
   }
 
   /**
@@ -680,11 +644,6 @@ class BulkUserManager {
   getBulkConfirmTranslations(operation, messagesDiv) {
     const count = this.selectedUsers.size;
     const plural = count !== 1 ? "s" : "";
-
-    console.log("🔍 DEBUG - Available datasets:", messagesDiv.dataset);
-    console.log("🔍 DEBUG - Looking for operation:", operation);
-    console.log("🔍 DEBUG - bulkMfaEnforceTitle:", messagesDiv.dataset.bulkMfaEnforceTitle);
-    console.log("🔍 DEBUG - bulkMfaEnforceMessage:", messagesDiv.dataset.bulkMfaEnforceMessage);
 
     const configs = {
       delete: {
@@ -813,7 +772,6 @@ class BulkUserManager {
    * Generate detailed results table
    */
   generateResultsTable(details) {
-    console.log("📋 Generating results table with", details.length, "items");
 
     if (!details || details.length === 0) {
       this.elements.resultsTable.innerHTML = '<p class="text-muted">No detailed results available.</p>';
@@ -852,8 +810,6 @@ class BulkUserManager {
 
     this.elements.resultsTable.innerHTML = "";
     this.elements.resultsTable.appendChild(table);
-
-    console.log("✅ Results table generated successfully");
   }
 
   /**
@@ -872,6 +828,5 @@ class BulkUserManager {
 
 // Initialize when DOM is ready (CSP-compliant)
 document.addEventListener("DOMContentLoaded", function () {
-  console.log("🚀 Initializing CSP-compliant Bulk User Manager...");
   window.bulkManager = new BulkUserManager();
 });

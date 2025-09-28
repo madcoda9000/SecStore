@@ -211,8 +211,6 @@ document.addEventListener("DOMContentLoaded", function () {
       }
     }
 
-    console.log("Rate limit test results:", results);
-
     // Refresh live status to show test results
     if (liveStatusCollapse?.classList.contains("show")) {
       loadLiveStatus();

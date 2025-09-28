@@ -244,13 +244,7 @@ window.sessionTimeout = function (passedOptions) {
     // Check if global showToast function exists (from your bootstrap toasts)
     if (typeof window.showToast === 'function') {
       window.showToast(message, type === 'success' ? 'success' : 'danger', 'Session');
-    } else {
-      // Fallback: simple alert or console
-      if (type === 'success') {
-        // Could create a simple notification
-        console.log('Session: ' + message);
-      }
-    }
+    } 
   };
 
   // Initialize: Create modal structure

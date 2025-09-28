@@ -4,7 +4,6 @@
  */
 
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('🔧 Roles initialization started');
     
     // =============================================
     // SCHRITT 1: Messages aus data-Attributen laden
@@ -25,7 +24,6 @@ document.addEventListener('DOMContentLoaded', function() {
             msg10: messagesElement.getAttribute('data-msg10'),
             msg11: messagesElement.getAttribute('data-msg11')
         };
-        console.log('✅ Roles messages loaded:', window.messages);
     } else {
         console.warn('⚠️ Roles messages element not found');
     }
@@ -35,9 +33,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Ersetzt den inline fetchRoles() Aufruf
     // =============================================
     if (typeof fetchRoles === 'function') {
-        console.log('📊 Initializing roles data fetch...');
         fetchRoles();
-        console.log('✅ Roles initialization completed');
     } else {
         console.error('❌ fetchRoles function not found! Ensure roles.latte-min.js is loaded first.');
     }

@@ -6,7 +6,6 @@
  */
 
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('🔥 Login Analytics initialized');
     
     // Configuration from data attributes (CSP-compliant)
     const configElement = document.getElementById('analytics-config');
@@ -27,7 +26,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 weekly: JSON.parse(configElement.getAttribute('data-weekly-data') || '[]'),
                 patterns: JSON.parse(configElement.getAttribute('data-patterns-data') || '[]')
             };
-            console.log('✅ Analytics data loaded from data attributes');
         } catch (e) {
             console.error('❌ Failed to parse analytics data:', e);
             analyticsData = { heatmap: {}, hourly: [], weekly: [], patterns: [] };
@@ -491,7 +489,6 @@ function getHeatmapBorderColor(value, totalLogins) {
      * Refresh all charts with new data
      */
     function refreshAllCharts() {
-        console.log('🔄 Refreshing analytics charts...');
         
         // Show loading state on refresh button
         const refreshBtn = document.getElementById('refreshAnalyticsBtn');
@@ -530,7 +527,6 @@ function getHeatmapBorderColor(value, totalLogins) {
                     const chartData = transformHeatmapData(data.data.heatmap_matrix);
                     charts.heatmap.data.datasets[0].data = chartData;
                     charts.heatmap.update();
-                    console.log('✅ Heatmap updated');
                 }
             })
             .catch(error => {
@@ -549,7 +545,6 @@ function getHeatmapBorderColor(value, totalLogins) {
                     charts.hourly.data.datasets[0].data = data.data.map(d => d.successful_logins);
                     charts.hourly.data.datasets[1].data = data.data.map(d => d.failed_logins);
                     charts.hourly.update();
-                    console.log('✅ Hourly chart updated');
                 }
             })
             .catch(error => {
@@ -564,12 +559,10 @@ function getHeatmapBorderColor(value, totalLogins) {
             .then(response => response.json())
             .then(data => {
                 if (data.success && charts.weekly) {
-                    console.log('Weekly data received:', data.data);
                     charts.weekly.data.datasets[0].data = data.data.map(d => d.successful_logins);
                     charts.weekly.data.datasets[1].data = data.data.map(d => d.failed_logins);
                     charts.weekly.data.datasets[2].data = data.data.map(d => d.success_rate);
                     charts.weekly.update();
-                    console.log('✅ Weekly chart updated');
                 }
             })
             .catch(error => {
@@ -606,6 +599,4 @@ function getHeatmapBorderColor(value, totalLogins) {
         refresh: refreshAllCharts,
         data: analyticsData
     };
-    
-    console.log('🔥 Login Analytics fully initialized and CSP-compliant');
 });

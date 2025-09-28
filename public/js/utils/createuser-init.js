@@ -3,9 +3,7 @@
  * Ersetzt inline Scripts aus admin/createUser.latte für CSP-Konformität
  */
 
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('🔧 CreateUser initialization started');
-    
+document.addEventListener('DOMContentLoaded', function() {    
     // =============================================
     // SCHRITT 1: Messages aus data-Attributen laden
     // =============================================
@@ -18,7 +16,6 @@ document.addEventListener('DOMContentLoaded', function() {
             error3: messagesElement.getAttribute('data-error3'),
             error4: messagesElement.getAttribute('data-error4')
         };
-        console.log('✅ CreateUser messages loaded:', window.messages);
     } else {
         console.warn('⚠️ CreateUser messages element not found');
     }
@@ -31,7 +28,6 @@ document.addEventListener('DOMContentLoaded', function() {
     if (backBtn) {
         backBtn.addEventListener('click', function(e) {
             e.preventDefault();
-            console.log('📱 Back button clicked - navigating back');
             
             // Sicherheitscheck: Nur wenn es eine History gibt
             if (window.history.length > 1) {
@@ -41,10 +37,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 window.location.href = '/admin/users';
             }
         });
-        console.log('✅ Back button event listener attached');
     } else {
         console.warn('⚠️ Back button element not found');
     }
-    
-    console.log('✅ CreateUser initialization completed');
 });

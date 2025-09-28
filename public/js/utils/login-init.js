@@ -5,7 +5,6 @@
  */
 
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('🔧 Login initialization started');
     
     // =============================================
     // SCHRITT 1: Messages aus data-Attributen laden
@@ -18,7 +17,6 @@ document.addEventListener('DOMContentLoaded', function() {
             val2: messagesElement.getAttribute('data-val2'),
             val3: messagesElement.getAttribute('data-val3')
         };
-        console.log('✅ Login messages loaded:', window.messages);
     } else {
         console.warn('⚠️ Login messages element not found');
     }
@@ -32,7 +30,6 @@ document.addEventListener('DOMContentLoaded', function() {
         const sessionTimeout = parseInt(sessionElement.getAttribute('data-timeout'));
         
         if (sessionTimeout && sessionTimeout > 0) {
-            console.log('📊 Session timeout received:', sessionTimeout + 's');
             
             // =============================================
             // SCHRITT 3: Script-Detection für Debug-Modus
@@ -44,7 +41,6 @@ document.addEventListener('DOMContentLoaded', function() {
             );
             
             const debugMode = !hasMinifiedScript;
-            console.log('🔍 Script detection - Debug mode:', debugMode);
             
             // AuthSessionManager für Login-Seite initialisieren
             // Repliziert exakt die ursprüngliche inline Konfiguration
@@ -53,30 +49,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 showWarning: true,      // Warnung anzeigen
                 warningTime: 15,        // 15 Sekunden Warnung
                 debugLog: debugMode     // Debug nur bei non-minified Version
-            });
-            
-            console.log('✅ AuthSessionManager initialized with debug mode:', debugMode);
-            
+            });            
         } else {
             console.warn('⚠️ Invalid session timeout:', sessionTimeout);
         }
     } else {
         console.warn('⚠️ Login session element not found');
     }
-    
-    // =============================================
-    // SCHRITT 4: Debug-Info für Entwicklung
-    // =============================================
-    if (window.location.search.includes('debug=1')) {
-        console.log('=== LOGIN PAGE DEBUG INFO ===');
-        console.log('Messages available:', !!window.messages);
-        console.log('Messages object:', window.messages);
-        console.log('AuthSessionManager available:', !!window.authSessionManager);
-        console.log('AuthSessionManager config:', window.authSessionManager?.options);
-        console.log('login.latte-min.js loaded:', typeof window.messages !== 'undefined');
-        console.log('Current session timeout:', sessionElement?.getAttribute('data-timeout'));
-        console.log('==============================');
-    }
-    
-    console.log('✅ Login initialization completed successfully');
 });

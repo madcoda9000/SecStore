@@ -6,7 +6,6 @@
  */
 
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('📋 Logs initialization started');
     
     // =============================================
     // SCHRITT 1: Messages aus data-Attributen laden
@@ -19,7 +18,6 @@ document.addEventListener('DOMContentLoaded', function() {
             msg5: messagesElement.getAttribute('data-msg5'),
             msg6: messagesElement.getAttribute('data-msg6')
         };
-        console.log('✅ Log messages loaded:', window.messages);
     } else {
         console.warn('⚠️ Log messages element not found');
     }
@@ -34,7 +32,6 @@ document.addEventListener('DOMContentLoaded', function() {
             fetchUrl: configElement.getAttribute('data-fetch-url'),
             autoFetch: configElement.getAttribute('data-auto-fetch') === 'true'
         };
-        console.log('✅ Log config loaded:', window.logConfig);
     } else {
         console.warn('⚠️ Log config element not found');
     }
@@ -46,7 +43,6 @@ document.addEventListener('DOMContentLoaded', function() {
     function performAutoFetch() {
         // Prüfen ob fetchLogs() Funktion verfügbar ist
         if (typeof fetchLogs === 'function') {
-            console.log('🔄 Calling fetchLogs() automatically...');
             
             try {
                 fetchLogs();
@@ -61,7 +57,6 @@ document.addEventListener('DOMContentLoaded', function() {
             // Retry nach kurzer Verzögerung (manchmal laden Scripts asynchron)
             setTimeout(() => {
                 if (typeof fetchLogs === 'function') {
-                    console.log('🔄 Retrying fetchLogs() after delay...');
                     fetchLogs();
                 } else {
                     console.error('❌ fetchLogs() still not available after retry');
@@ -132,7 +127,6 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Refresh-Funktion für alle Log-Templates
     window.refreshLogs = function() {
-        console.log('🔄 Manual refresh triggered');
         if (typeof fetchLogs === 'function') {
             fetchLogs();
         } else {
@@ -146,47 +140,9 @@ document.addEventListener('DOMContentLoaded', function() {
         const searchInput = document.getElementById('search');
         if (searchInput) {
             searchInput.value = '';
-            console.log('🔍 Search reset');
             if (typeof fetchLogs === 'function') {
                 fetchLogs();
             }
         }
     };
-    
-    // =============================================
-    // SCHRITT 7: Debug-Modus für Entwicklung
-    // =============================================
-    if (window.location.search.includes('debug=1')) {
-        console.log('=== LOG PAGE DEBUG INFO ===');
-        console.log('Messages available:', !!window.messages);
-        console.log('Messages object:', window.messages);
-        console.log('Config available:', !!window.logConfig);
-        console.log('Config object:', window.logConfig);
-        console.log('fetchLogs function available:', typeof fetchLogs === 'function');
-        console.log('Current page type:', window.logConfig?.type || 'unknown');
-        console.log('Auto-fetch enabled:', window.logConfig?.autoFetch !== false);
-        console.log('Fetch URL:', window.logConfig?.fetchUrl);
-        
-        // Debug-Tools global verfügbar machen
-        window.logDebug = {
-            refreshLogs: window.refreshLogs,
-            resetSearch: window.resetLogSearch,
-            config: window.logConfig,
-            messages: window.messages,
-            testFetch: () => {
-                if (window.logConfig?.fetchUrl) {
-                    console.log('Testing fetch to:', window.logConfig.fetchUrl);
-                    fetch(window.logConfig.fetchUrl + '?search=&pageSize=10&page=1')
-                        .then(r => r.json())
-                        .then(d => console.log('Test fetch result:', d))
-                        .catch(e => console.error('Test fetch error:', e));
-                }
-            }
-        };
-        
-        console.log('Debug tools available at: window.logDebug');
-        console.log('=========================');
-    }
-    
-    console.log('✅ Logs initialization completed successfully');
 });

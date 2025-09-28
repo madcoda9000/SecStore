@@ -17,8 +17,7 @@ document.addEventListener('DOMContentLoaded', function() {
             error2: messagesElement.getAttribute('data-error2'),
             error3: messagesElement.getAttribute('data-error3'),
             error4: messagesElement.getAttribute('data-error4')
-        };
-        console.log('✅ EditUser messages loaded:', window.messages);
+        };        
     } else {
         console.warn('⚠️ EditUser messages element not found');
     }
@@ -31,7 +30,6 @@ document.addEventListener('DOMContentLoaded', function() {
     if (backBtn) {
         backBtn.addEventListener('click', function(e) {
             e.preventDefault();
-            console.log('📱 Back button clicked - navigating back');
             
             // Sicherheitscheck: Nur wenn es eine History gibt
             if (window.history.length > 1) {
@@ -41,10 +39,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 window.location.href = '/admin/users';
             }
         });
-        console.log('✅ Back button event listener attached');
     } else {
         console.warn('⚠️ Back button element not found');
     }
-    
-    console.log('✅ EditUser initialization completed');
 });

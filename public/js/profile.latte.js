@@ -139,7 +139,6 @@ function switch2fa(mfaEnabled) {
     fetch(fetchAction, { method: "POST" })
       .then((response) => response.json())
       .then((data) => {
-        console.log(data);
         if (data.success === true && fetchAction == "/disable-2fa") {
           document.getElementById("2faModaleText").innerText = "2FA Authentication disabled successfully!";
           modal.show();

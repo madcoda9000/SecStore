@@ -641,7 +641,7 @@ function shareLogEntry(cardId) {
     
     if (navigator.share) {
         navigator.share(shareData).catch(err => {
-            console.log('Share failed:', err);
+            console.error('Share failed:', err);
         });
     } else {
         // Fallback: copy to clipboard
@@ -872,13 +872,11 @@ function debounce(func, wait) {
  */
 function setupNetworkMonitoring() {
   window.addEventListener("online", () => {
-    console.log("📡 Network back online - retrying logs");
     showSuccessMessage("Connection restored. Refreshing logs...");
     setTimeout(fetchLogs, 500);
   });
 
   window.addEventListener("offline", () => {
-    console.log("📡 Network offline detected");
     showError("You appear to be offline. Please check your internet connection.", "network");
   });
 }

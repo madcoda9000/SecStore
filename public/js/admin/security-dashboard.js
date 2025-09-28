@@ -5,7 +5,6 @@
  */
 
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('🛡️ Security Dashboard initialization started');
     
     // =============================================
     // SCHRITT 1: Konfiguration aus data-Attributen laden
@@ -19,7 +18,6 @@ document.addEventListener('DOMContentLoaded', function() {
     if (configElement) {
         config.refreshUrl = configElement.getAttribute('data-refresh-url') || config.refreshUrl;
         config.refreshInterval = parseInt(configElement.getAttribute('data-refresh-interval')) || config.refreshInterval;
-        console.log('✅ Dashboard config loaded:', config);
     }
     
     // =============================================
@@ -27,7 +25,6 @@ document.addEventListener('DOMContentLoaded', function() {
     // Repliziert die ursprüngliche refreshMetrics() Funktion
     // =============================================
     function refreshMetrics() {
-        console.log('🔄 Refreshing security metrics...');
         
         fetch(config.refreshUrl)
             .then(response => {
@@ -37,7 +34,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 return response.json();
             })
             .then(data => {
-                console.log('✅ Metrics refreshed successfully');
                 // Seite neu laden um die neuen Daten anzuzeigen
                 location.reload();
             })
@@ -98,7 +94,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 refreshBtn.disabled = false;
             }, 3000);
         });
-        console.log('✅ Refresh button event listener attached');
     }
     
     // =============================================
@@ -113,11 +108,8 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         autoRefreshTimer = setInterval(() => {
-            console.log('🔄 Auto-refreshing metrics (every ' + (config.refreshInterval / 1000 / 60) + ' minutes)');
             refreshMetrics();
         }, config.refreshInterval);
-        
-        console.log('✅ Auto-refresh timer started (interval: ' + (config.refreshInterval / 1000 / 60) + ' minutes)');
     }
     
     // Auto-refresh starten
@@ -144,11 +136,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 timestamp.className = 'text-muted ms-2 dashboard-timestamp';
                 timestamp.textContent = '(Updated: ' + timeString + ')';
                 h1.appendChild(timestamp);
-                
-                console.log('✅ Timestamp added:', timeString);
             }
         } catch (e) {
-            console.log('⚠️ Error adding timestamp:', e);
+            console.error('⚠️ Error adding timestamp:', e);
         }
     }
     
@@ -161,22 +151,8 @@ document.addEventListener('DOMContentLoaded', function() {
     window.addEventListener('beforeunload', function() {
         if (autoRefreshTimer) {
             clearInterval(autoRefreshTimer);
-            console.log('🧹 Auto-refresh timer cleared');
         }
     });
-    
-    // =============================================
-    // SCHRITT 8: Debug-Info
-    // =============================================
-    console.log(window.location.search);
-    if (window.location.search.includes('debug=1')) {
-        console.log('=== SECURITY DASHBOARD DEBUG INFO ===');
-        console.log('Config:', config);
-        console.log('Refresh button found:', !!refreshBtn);
-        console.log('Auto-refresh active:', !!autoRefreshTimer);
-        console.log('Timestamp added:', !!document.querySelector('.dashboard-timestamp'));
-        console.log('=====================================');
-    }
     
     // Global verfügbar machen für Console-Testing
     window.securityDashboard = {
@@ -185,6 +161,4 @@ document.addEventListener('DOMContentLoaded', function() {
         startAutoRefresh,
         addTimestamp
     };
-    
-    console.log('✅ Security Dashboard initialization completed');
 });
