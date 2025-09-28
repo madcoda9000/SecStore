@@ -110,22 +110,6 @@ class RateLimitController
             $configContent = file_get_contents($configFile);
             $existingConfig = include $configFile;
 
-            // DEBUG: Pattern testen
-            $pattern = '/(\$rateLimiting\s*=\s*\[)(.*?)(\];)/s';
-
-            if (preg_match($pattern, $configContent, $matches)) {
-                error_log("Pattern FOUND - Match: " . $matches[0]);
-            } else {
-                error_log("Pattern NOT FOUND in config file");
-                // Pattern anpassen für Kommentare
-                $pattern = '/(\/\/\s*Rate\s*Limiting.*?\n\$rateLimiting\s*=\s*\[)(.*?)(\];)/s';
-                if (preg_match($pattern, $configContent, $matches)) {
-                    error_log("Alternative Pattern FOUND");
-                } else {
-                    error_log("NO Pattern matches found!");
-                }
-            }
-
             if ($configContent === false) {
                 throw new \Exception('Cannot read config file');
             }

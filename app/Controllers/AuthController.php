@@ -45,15 +45,6 @@ class AuthController
         // CSRF Token explizit generieren
         $csrfToken = SessionUtil::getCsrfToken();
 
-        // Debug-Info loggen
-        LogUtil::logAction(
-            LogType::SECURITY,
-            'AuthController',
-            'showRegister',
-            'Session ID: ' . session_id() .
-                ', CSRF Token generated: ' . (!empty($csrfToken) ? 'YES' : 'NO')
-        );
-
         $connOkay = MailUtil::checkConnection();
         if (!$connOkay) {
             Flight::latte()->render('register.latte', [
@@ -203,15 +194,6 @@ class AuthController
 
         // CSRF Token explizit generieren
         $csrfToken = SessionUtil::getCsrfToken();
-
-        // Debug-Info loggen
-        LogUtil::logAction(
-            LogType::SECURITY,
-            'AuthController',
-            'showLogin',
-            'Session ID: ' . session_id() .
-                ', CSRF Token generated: ' . (!empty($csrfToken) ? 'YES' : 'NO')
-        );
 
         // prüfen ob benutzer bereits angemeldet ist aber 2fa noch fehlt
         if (SessionUtil::get('2fa_user_id') !== null) {
@@ -614,15 +596,6 @@ class AuthController
         // CSRF Token explizit generieren
         $csrfToken = SessionUtil::getCsrfToken();
 
-        // Debug-Info loggen
-        LogUtil::logAction(
-            LogType::SECURITY,
-            'AuthController',
-            'showFogotPassword',
-            'Session ID: ' . session_id() .
-                ', CSRF Token generated: ' . (!empty($csrfToken) ? 'YES' : 'NO')
-        );
-
         $connOkay = MailUtil::checkConnection();
 
         if (!$connOkay) {
@@ -736,15 +709,6 @@ class AuthController
 
         // CSRF Token explizit generieren
         $csrfToken = SessionUtil::getCsrfToken();
-
-        // Debug-Info loggen
-        LogUtil::logAction(
-            LogType::SECURITY,
-            'AuthController',
-            'showResetPassword',
-            'Session ID: ' . session_id() .
-                ', CSRF Token generated: ' . (!empty($csrfToken) ? 'YES' : 'NO')
-        );
 
         Flight::latte()->render('reset_password.latte', [
             'title' => TranslationUtil::t('reset.title'),

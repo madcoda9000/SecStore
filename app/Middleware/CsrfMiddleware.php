@@ -20,6 +20,7 @@ use App\Utils\LogType;
  *
  * Änderungen:
  * - 1.0 (2025-02-24): Erstellt.
+ * - 1.1 (2025-09-28): SECURITY FIX - Session-ID Logging entfernt
  */
 class CsrfMiddleware
 {
@@ -29,17 +30,23 @@ class CsrfMiddleware
 
             // DEBUG LOGGING
             if ($params != null && $params['debug'] === true && !self::isProduction()) {
+                // DEBUG-Modus: Nur unkritische Informationen loggen
                 LogUtil::logAction(
                     LogType::SECURITY,
                     'CsrfMiddleware',
                     'before',
-                    'Session Status: ' . session_status() .
-                        ', Session ID: ' . session_id() .
+                    'Debug CSRF check - Session active: ' . (session_status() === PHP_SESSION_ACTIVE ? 'YES' : 'NO') .
                         ', Request URI: ' . ($_SERVER['REQUEST_URI'] ?? 'unknown') .
-                        ', User Agent: ' . ($_SERVER['HTTP_USER_AGENT'] ?? 'unknown')
+                        ', Remote IP: ' . ($_SERVER['REMOTE_ADDR'] ?? 'unknown')
                 );
             } else {
-                LogUtil::logAction(LogType::SECURITY, 'CsrfMiddleware', 'before', 'CSRF validation attempted from: ' . ($_SERVER['REMOTE_ADDR'] ?? 'unknown'));
+                // Production: Minimales sicheres Logging
+                LogUtil::logAction(
+                    LogType::SECURITY, 
+                    'CsrfMiddleware', 
+                    'before', 
+                    'CSRF validation attempted from: ' . ($_SERVER['REMOTE_ADDR'] ?? 'unknown')
+                );
             }
 
 

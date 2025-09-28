@@ -1367,7 +1367,6 @@ class AdminController
      */
     public function checkUsers()
     {
-        ORM::configure("logging", true);
         $roleName = Flight::request()->query["role"] ?? null;
 
         if (!$roleName) {
@@ -1379,12 +1378,6 @@ class AdminController
         $userCount = ORM::for_table("users")
             ->where_raw("FIND_IN_SET(?, roles)", [$roleName])
             ->count();
-
-        // letzte query loggen
-        $queries = ORM::get_query_log();
-        if (!empty($queries)) {
-            $lastQuery = end($queries);
-        }
 
         Flight::json(["inUse" => $userCount > 0]);
     }

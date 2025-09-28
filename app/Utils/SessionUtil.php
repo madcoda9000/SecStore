@@ -16,7 +16,8 @@ use App\Models\User;
  *
  * Änderungen:
  * - 1.0 (2025-02-24): Erstellt.
- * - 2.0 (2025-09-15): Erweitert um Security-Features und bessere Struktur.
+ * - 1.1 (2025-09-15): Erweitert um Security-Features und bessere Struktur.
+ * - 1.2 (2025-09-28): SECURITY FIX - Session-ID Logging entfernt
  */
 class SessionUtil
 {
@@ -280,7 +281,7 @@ class SessionUtil
                 LogType::SECURITY,
                 'SessionUtil',
                 'regenerateId',
-                'Session ID regenerated: ' . $oldSessionId . ' -> ' . session_id()
+                'Session ID regenerated successfully'
             );
 
             return true;
@@ -451,7 +452,7 @@ class SessionUtil
     public static function getSessionInfo(): array
     {
         return [
-            'session_id' => session_id(),
+            //'session_id' => session_id(),
             'created' => $_SESSION['created'] ?? null,
             'last_activity' => $_SESSION['last_activity'] ?? null,
             'last_regenerated' => $_SESSION['last_regenerated'] ?? null,
@@ -479,7 +480,7 @@ class SessionUtil
                 LogType::SECURITY,
                 'SessionUtil',
                 'prepareForLogin',
-                'Session already recently regenerated - skipping regeneration - ID: ' . session_id()
+                'Session recently regenerated - skipping regeneration'
             );
         } else {
             // Session-Regeneration nur wenn nötig
@@ -492,7 +493,7 @@ class SessionUtil
                     LogType::SECURITY,
                     'SessionUtil',
                     'prepareForLogin',
-                    'Session prepared for login - ID: ' . session_id()
+                    'Session prepared for login successfully'
                 );
             }
         }
