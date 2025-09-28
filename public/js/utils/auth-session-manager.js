@@ -51,6 +51,7 @@ class AuthSessionManager {
         // SCHRITT 9: Warnung planen (falls aktiviert)
         if (this.options.showWarning && warningTime < refreshTime) {
             setTimeout(() => {
+                this.showWarning(this.options.warningTime);
             }, warningTime * 1000);
         } 
         
