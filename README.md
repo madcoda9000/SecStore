@@ -26,7 +26,7 @@
 - **Zero-Trust architecture** with session fingerprinting
 - **2FA support** (TOTP) with QR code setup
 - **Advanced rate limiting** with intelligent scopes
-- **Real-time security dashboard** for threat monitoring
+- **Security dashboard** Login Ananlytics, Security Events, 
 
 </td>
 <td width="50%">
@@ -53,7 +53,8 @@
 
 ### 🎨 **Modern UI/UX**
 - **Bootstrap 5** design
-- **Dark/Light mode** with user preferences\
+- **Dark/Light mode** with user preferences
+- **Mobile first**
 <br>
 <br>
 
@@ -149,8 +150,9 @@ For detailed installation instructions and production setup see **[📖 INSTALL.
 
 - ✅ **Role-based access control (RBAC)**
 - ✅ **Flexible user management** with admin interface
+- ✅ **Bulk actions** (Enforce and Unenforce 2fa, delte, Enable and Disable)
 - ✅ **Self-service profile** management
-- ✅ **Password reset** via email (optional)
+- ✅ **Password reset** via email (can be enabled/disbaled)
 - ✅ **Registration system** (can be enabled/disabled)
 - ✅ **2FA enforcement** per user by admins
 
@@ -159,7 +161,7 @@ For detailed installation instructions and production setup see **[📖 INSTALL.
 <details>
 <summary><b>📊 Monitoring & Logging</b></summary>
 
-- ✅ **Security dashboard** with real-time overview
+- ✅ **Security dashboard** with Login Analytics (Heatmap, Hourly, Weekly, Pattern detection)
 - ✅ **Comprehensive logging** (Audit, Security, System, Mail, DB)
 - ✅ **Log categories** with granular configuration
 - ✅ **Violation tracking** and threat intelligence
@@ -173,6 +175,7 @@ For detailed installation instructions and production setup see **[📖 INSTALL.
 - ✅ **Dark/Light theme** with automatic detection
 - ✅ **Multi-language** (German/English)
 - ✅ **Intuitive admin interface**
+- ✅ **Mobile first** every page is mobile optimized
 
 </details>
 
