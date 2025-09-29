@@ -11,7 +11,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Planned
 - Docker container support
 - Backup/restore functionality
-- Advanced security analytics
+
+---
+
+## [1.3.1] - 2025-09-15
+### ✨ Added
+- **Advanced security analytics** Heatmap, Weekly Trends etc..
+- **Implemented global Input validation**
+
+### 🔄 Changed
+- **various security fixes**
+- **removed debug logging**
+- **optimized sql queries fdor performance**
+- **updated documentation**
 
 ---
 
