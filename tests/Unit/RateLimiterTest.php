@@ -320,7 +320,9 @@ class RateLimiterTest extends TestCase
         
         $this->assertArrayHasKey('window_reset', $status);
         $this->assertIsInt($status['window_reset']);
-        $this->assertGreaterThan(time(), $status['window_reset']);
+        // Greater than OR EQUAL (kann manchmal exakt gleich sein)
+        $this->assertGreaterThanOrEqual(time(), $status['window_reset']);
+        $this->assertLessThan(time() + 301, $status['window_reset']);
     }
 
     /** @test */

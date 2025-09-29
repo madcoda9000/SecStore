@@ -55,9 +55,9 @@
         <ul>
             <li class="success">It validates login credentials</li>
             <li class="success">It rejects empty credentials</li>
-            <li class="defect">It validates password complexity</li>
+            <li class="success">It validates password complexity</li>
             <li class="success">It creates session on successful login</li>
-            <li class="defect">It destroys session on logout</li>
+            <li class="success">It destroys session on logout</li>
             <li class="defect">It regenerates session id on login</li>
             <li class="success">It tracks failed login attempts</li>
             <li class="success">It enforces account lockout after max attempts</li>
@@ -68,12 +68,12 @@
         </ul>
         <h2>Login Flow (Tests\Feature\LoginFlow)</h2>
         <ul>
-            <li class="defect">User can complete full login flow</li>
-            <li class="defect">User with 2fa completes full flow</li>
+            <li class="success">User can complete full login flow</li>
+            <li class="success">User with 2fa completes full flow</li>
             <li class="success">Failed login tracks attempts</li>
             <li class="success">Account locks after max failed attempts</li>
-            <li class="defect">Session expires after timeout</li>
-            <li class="defect">Logout clears all session data</li>
+            <li class="success">Session expires after timeout</li>
+            <li class="success">Logout clears all session data</li>
         </ul>
         <h2>Rate Limiter (Tests\Unit\RateLimiter)</h2>
         <ul>
@@ -90,7 +90,7 @@
             <li class="success">It calculates remaining requests correctly</li>
             <li class="success">It generates consistent identifier for same client</li>
             <li class="success">It handles missing user agent gracefully</li>
-            <li class="defect">It provides window reset timestamp</li>
+            <li class="success">It provides window reset timestamp</li>
             <li class="success">It handles concurrent limit types</li>
         </ul>
         <h2>Session Util (Tests\Unit\SessionUtil)</h2>
@@ -99,7 +99,7 @@
             <li class="success">It returns null for nonexistent key</li>
             <li class="success">It can remove session value</li>
             <li class="success">It can check if key exists</li>
-            <li class="defect">It can destroy session</li>
+            <li class="success">It can destroy session</li>
             <li class="defect">It generates unique csrf tokens</li>
             <li class="defect">It validates csrf tokens correctly</li>
             <li class="success">It stores user in session</li>

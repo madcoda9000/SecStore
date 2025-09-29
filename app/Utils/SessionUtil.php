@@ -373,6 +373,7 @@ class SessionUtil
      */
     public static function destroy(): void
     {
+        $_SESSION = [];
         if (session_status() === PHP_SESSION_ACTIVE) {
             session_unset();
             session_destroy();
