@@ -52,7 +52,7 @@ class MailUtil
         try {
             $mail->SmtpConnect();
             $mail->SmtpClose();
-            return true;   
+            return true;
         } catch (Exception $e) {
             LogUtil::logAction(LogType::MAIL, "MailUtil", "checkConnection", $e->getMessage());
             error_log("Mail connection failed: {$mail->ErrorInfo}");

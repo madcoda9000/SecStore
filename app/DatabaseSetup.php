@@ -111,8 +111,7 @@ try {
     if ($stmt->fetchColumn() == 0) {
         $pdo->exec("INSERT INTO roles (roleName) VALUES ('User')");
     }
-
-    // Verbindung schließen      
+    // Verbindung schließen
     unset($pdo);
 } catch (PDOException $e) {
     die("Fehler beim Initialisieren der Datenbank: " . $e->getMessage());
