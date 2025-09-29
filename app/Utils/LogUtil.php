@@ -18,6 +18,7 @@ use App\Utils\LogType;
  *
  * Änderungen:
  * - 1.0 (2025-02-24): Erstellt.
+ * - 1.1 (2025-09-28): SECURITY FIX - File-Permissions korrigiert (0775 → 0750)
  */
 class LogUtil
 {
@@ -119,7 +120,7 @@ class LogUtil
     {
         $logDir = __DIR__ . '/../logs/'; // Pfad zu /app/logs/
         if (!is_dir($logDir)) {
-            mkdir($logDir, 0775, true); // Erstellt den Ordner, falls nicht vorhanden
+            mkdir($logDir, 0750, true); // Erstellt den Ordner, falls nicht vorhanden
         }
 
         $filePath = $logDir . $filename;

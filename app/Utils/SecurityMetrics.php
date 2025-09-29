@@ -6,8 +6,18 @@ use App\Utils\LogUtil;
 use App\Utils\LogType;
 
 /**
- * Einfache Security Metriken für tägliche Überwachung
- * FINALE KORRIGIERTE VERSION - logs-Tabelle mit korrekten SQL-Queries
+ * Class Name: SecurityMetrics
+ *
+ * PERFORMANCE-OPTIMIERT: LIKE-Queries durch indexierte Spalten ersetzt
+ *
+ * @package App\Utils
+ * @author Sascha Heimann
+ * @version 1.1 - PERFORMANCE FIX
+ * @since 2025-02-24
+ *
+ * Änderungen:
+ * - 1.0 (2025-02-24): Erstellt.
+ * - 1.1 (2025-09-28): PERFORMANCE FIX - LIKE-Queries optimiert, Debug-Code entfernt
  */
 class SecurityMetrics {
     
@@ -86,53 +96,77 @@ class SecurityMetrics {
     }
     
     // Private Methoden für logs-Tabelle - ALLE KORREKT
-    private static function getFailedLogins($dateFrom, $dateTo): int {
+    private static function getFailedLogins($dateFrom, $dateTo): int
+    {
         return ORM::for_table('logs')
             ->where('type', 'AUDIT')
-            ->where_like('context', '%login%')
-            ->where_like('message', '%FAILED%')
+            ->where_in('context', [
+                'AuthController/login',
+                'AuthController/verify2FA',
+                'AuthController/forgotPassword'
+            ])
+            ->where_raw("message LIKE 'FAILED:%' OR message LIKE 'Failed login%' OR message LIKE 'Invalid%'")
             ->where_gte('datum_zeit', $dateFrom . ' 00:00:00')
             ->where_lt('datum_zeit', $dateTo . ' 23:59:59')
             ->count();
     }
     
-    private static function getSuccessfulLogins($dateFrom, $dateTo): int {
+    private static function getSuccessfulLogins($dateFrom, $dateTo): int
+    {
         return ORM::for_table('logs')
             ->where('type', 'AUDIT')
-            ->where_like('context', '%login%')
-            ->where_like('message', '%SUCCESS%')
+            ->where_in('context', [
+                'AuthController/login',
+                'AuthController/verify2FA'
+            ])
+            ->where_raw("message LIKE 'SUCCESS:%'")
             ->where_gte('datum_zeit', $dateFrom . ' 00:00:00')
             ->where_lt('datum_zeit', $dateTo . ' 23:59:59')
             ->count();
     }
     
-    private static function getPasswordResets($dateFrom, $dateTo): int {
+    private static function getPasswordResets($dateFrom, $dateTo): int
+    {
         return ORM::for_table('logs')
             ->where('type', 'AUDIT')
-            ->where_like('context', '%resetPassword%')
+            ->where_in('context', [
+                'AuthController/forgotPassword',
+                'AuthController/resetPassword'
+            ])
             ->where_gte('datum_zeit', $dateFrom . ' 00:00:00')
             ->where_lt('datum_zeit', $dateTo . ' 23:59:59')
             ->count();
     }
     
-    private static function getNewRegistrations($dateFrom, $dateTo): int {
+    private static function getNewRegistrations($dateFrom, $dateTo): int
+    {
         return ORM::for_table('users')
             ->where_gte('created_at', $dateFrom . ' 00:00:00')
             ->where_lt('created_at', $dateTo . ' 23:59:59')
             ->count();
     }
     
-    private static function getCsrfViolations($dateFrom, $dateTo): int {
+    private static function getCsrfViolations($dateFrom, $dateTo): int
+    {
         return ORM::for_table('logs')
-            ->where_raw("(message LIKE '%CSRF token mismatch%' OR message LIKE '%No CSRF token provided%' OR message LIKE '%No CSRF token in session%')")
+            ->where('type', 'SECURITY')
+            ->where_in('context', [
+                'CsrfMiddleware/before'
+            ])
+            ->where_raw("message LIKE '%CSRF token%' OR message LIKE '%token mismatch%'")
             ->where_gte('datum_zeit', $dateFrom . ' 00:00:00')
             ->where_lt('datum_zeit', $dateTo . ' 23:59:59')
             ->count();
     }
     
-    private static function getRateLimitViolations($dateFrom, $dateTo): int {
+    private static function getRateLimitViolations($dateFrom, $dateTo): int
+    {
         return ORM::for_table('logs')
-            ->where_raw("(message LIKE '%rate limit exceeded%' OR message LIKE '%rate limit violation%' OR message LIKE '%rate limit hit%')")
+            ->where('type', 'ERROR')
+            ->where_in('context', [
+                'RateLimiter/limitExceeded',
+                'RateLimiter/repeatedViolations'
+            ])
             ->where_gte('datum_zeit', $dateFrom . ' 00:00:00')
             ->where_lt('datum_zeit', $dateTo . ' 23:59:59')
             ->count();
@@ -144,8 +178,8 @@ class SecurityMetrics {
         $failedLogins = ORM::for_table('logs')
             ->select_many('ip_address', 'datum_zeit')
             ->where('type', 'AUDIT')
-            ->where_like('context', '%login%')
-            ->where_like('message', '%FAILED%')
+            ->where_in('context', ['AuthController/login'])
+            ->where_raw("message LIKE 'FAILED:%'")
             ->where_gte('datum_zeit', $dateFrom . ' 00:00:00')
             ->where_lt('datum_zeit', $dateTo . ' 23:59:59')
             ->find_array();
@@ -171,54 +205,64 @@ class SecurityMetrics {
         ];
     }
     
-    // Helper-Methoden mit flexiblen Zeiträumen - ALLE KORREKT
-    private static function getFailedLoginsTimeRange($from, $to): int {
+    
+    private static function getFailedLoginsTimeRange($from, $to): int
+    {
         return ORM::for_table('logs')
             ->where('type', 'AUDIT')
-            ->where_like('context', '%login%')
-            ->where_like('message', '%FAILED%')
+            ->where_in('context', ['AuthController/login'])
+            ->where_raw("message LIKE 'FAILED:%'")
             ->where_gte('datum_zeit', $from)
             ->where_lt('datum_zeit', $to)
             ->count();
     }
     
-    private static function getSuccessfulLoginsTimeRange($from, $to): int {
+    
+    private static function getSuccessfulLoginsTimeRange($from, $to): int
+    {
         return ORM::for_table('logs')
             ->where('type', 'AUDIT')
-            ->where_like('context', '%login%')
-            ->where_like('message', '%SUCCESS%')
+            ->where_in('context', ['AuthController/login', 'AuthController/verify2FA'])
+            ->where_raw("message LIKE 'SUCCESS:%'")
             ->where_gte('datum_zeit', $from)
             ->where_lt('datum_zeit', $to)
             ->count();
     }
     
-    private static function getPasswordResetsTimeRange($from, $to): int {
+    private static function getPasswordResetsTimeRange($from, $to): int
+    {
         return ORM::for_table('logs')
             ->where('type', 'AUDIT')
-            ->where_like('context', '%resetPassword%')
+            ->where_in('context', ['AuthController/resetPassword'])
             ->where_gte('datum_zeit', $from)
             ->where_lt('datum_zeit', $to)
             ->count();
     }
     
-    private static function getNewRegistrationsTimeRange($from, $to): int {
+    private static function getNewRegistrationsTimeRange($from, $to): int
+    {
         return ORM::for_table('users')
             ->where_gte('created_at', $from)
             ->where_lt('created_at', $to)
             ->count();
     }
     
-    private static function getCsrfViolationsTimeRange($from, $to): int {
+    private static function getCsrfViolationsTimeRange($from, $to): int
+    {
         return ORM::for_table('logs')
-            ->where_rwa("(message LIKE '%CSRF token mismatch%' OR message LIKE '%No CSRF token provided%' OR message LIKE '%No CSRF token in session%')")
+            ->where('type', 'SECURITY')
+            ->where_in('context', ['CsrfMiddleware/before'])
+            ->where_raw("message LIKE '%CSRF token%'")
             ->where_gte('datum_zeit', $from)
             ->where_lt('datum_zeit', $to)
             ->count();
     }
     
-    private static function getRateLimitViolationsTimeRange($from, $to): int {
+    private static function getRateLimitViolationsTimeRange($from, $to): int
+    {
         return ORM::for_table('logs')
-            ->where_like('message', '%rate limit%')
+            ->where('type', 'ERROR')
+            ->where_in('context', ['RateLimiter/limitExceeded'])
             ->where_gte('datum_zeit', $from)
             ->where_lt('datum_zeit', $to)
             ->count();
@@ -268,11 +312,11 @@ class SecurityMetrics {
     
     private static function detectSuspiciousLogins(): array {
         return ORM::for_table('logs')
+            ->select_many('ip_address', 'user', 'datum_zeit')
             ->where('type', 'AUDIT')
-            ->where_like('context', '%login%')
-            ->where_like('message', '%SUCCESS%')
+            ->where_in('context', ['AuthController/login'])
+            ->where_raw("message LIKE 'FAILED:%'")
             ->where_gte('datum_zeit', date('Y-m-d H:i:s', time() - 3600)) // Last hour
-            ->select_many('user', 'ip_address', 'datum_zeit')
             ->find_array();
     }
     
@@ -280,11 +324,11 @@ class SecurityMetrics {
     private static function detectRapidAuthFailures(): array {
         // Einfache Version: Hole alle Failed Logins der letzten 5 Minuten
         $recentFailures = ORM::for_table('logs')
-            ->select_many('ip_address', 'datum_zeit', 'user')
+            ->select('ip_address')
             ->where('type', 'AUDIT')
-            ->where_like('context', '%login%')
-            ->where_like('message', '%FAILED%')
-            ->where_gte('datum_zeit', date('Y-m-d H:i:s', time() - 300))
+            ->where_in('context', ['AuthController/login'])
+            ->where_raw("message LIKE 'FAILED:%'")
+            ->where_gte('datum_zeit', date('Y-m-d H:i:s', time() - 1800)) // Last 30 minutes
             ->find_array();
         
         // Gruppiere in PHP
@@ -396,38 +440,6 @@ class SecurityMetrics {
         $score -= min($summary['csrf_violations'] * 5, 30);
         
         return max($score, 0);
-    }
-    
-    /**
-     * Debug-Methode: Zeigt tatsächliche Log-Einträge für Kalibrierung
-     */
-    public static function debugLogContent(): array {
-        // Die letzten 50 Audit-Logs anzeigen
-        $auditLogs = ORM::for_table('logs')
-            ->where('type', 'AUDIT')
-            ->order_by_desc('datum_zeit')
-            ->limit(50)
-            ->find_array();
-            
-        // Die letzten 20 Security-Logs anzeigen  
-        $securityLogs = ORM::for_table('logs')
-            ->where('type', 'SECURITY')
-            ->order_by_desc('datum_zeit')
-            ->limit(20)
-            ->find_array();
-            
-        // Unique Contexts für Pattern-Erkennung
-        $uniqueContexts = ORM::for_table('logs')
-            ->select('context')
-            ->group_by('context')
-            ->find_array();
-            
-        return [
-            'recent_audit_logs' => $auditLogs,
-            'recent_security_logs' => $securityLogs,
-            'unique_contexts' => array_column($uniqueContexts, 'context'),
-            'total_logs_count' => ORM::for_table('logs')->count()
-        ];
     }
     
     /**
