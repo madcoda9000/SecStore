@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### ✨ Added
 - **Advanced security analytics** Heatmap, Weekly Trends etc..
 - **Implemented global Input validation**
+- **4 step setup Wizard**
 
 ### 🔄 Changed
 - **various security fixes**
