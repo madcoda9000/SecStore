@@ -1,4 +1,30 @@
 {
+    "name": "madcoda9000/secstore",
+    "description": "Production-ready PHP authentication framework with enterprise-grade security features including 2FA, LDAP, rate limiting, and comprehensive audit logging",
+    "type": "project",
+    "license": "MIT",
+    "keywords": [
+        "authentication",
+        "security",
+        "2fa",
+        "ldap",
+        "rate-limiting",
+        "php",
+        "session-management",
+        "rbac"
+    ],
+    "authors": [
+        {
+            "name": "Sascha Heimann",
+            "email": "your-email@example.com",
+            "role": "Developer"
+        }
+    ],
+    "homepage": "https://github.com/madcoda9000/SecStore",
+    "support": {
+        "issues": "https://github.com/madcoda9000/SecStore/issues",
+        "source": "https://github.com/madcoda9000/SecStore"
+    },
     "require": {
         "php": ">=8.3",
         "ext-curl": "*",
@@ -49,6 +75,16 @@
         "test:integration": "phpunit --testsuite Integration --testdox",
         "test:filter": "phpunit --filter",
         "cs:check": "phpcs",
-        "cs:fix": "php-cs-fixer fix"
-    }
+        "cs:fix": "php-cs-fixer fix",
+        "post-install-cmd": [
+            "@php -r \"if (!file_exists('config.php')) { echo 'Run setup.sh or copy config.php_TEMPLATE to config.php\\n'; }\""
+        ]
+    },
+    "config": {
+        "optimize-autoloader": true,
+        "sort-packages": true,
+        "preferred-install": "dist"
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
 }
