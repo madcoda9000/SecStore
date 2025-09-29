@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace App\Utils;
@@ -8,13 +9,11 @@ use Exception;
 /**
  * Class Name: SessionUtil
  *
- * Utility class for encryption and decryption using libsodium. 
+ * Utility class for encryption and decryption using libsodium.
  *
- * @package App\Utils
  * @author Sascha Heimann
  * @version 2.0
  * @since 2025-02-24
- *
  */
 final class SodiumEncryption
 {
@@ -22,7 +21,10 @@ final class SodiumEncryption
     private const KEY_LEN = SODIUM_CRYPTO_AEAD_XCHACHA20POLY1305_IETF_KEYBYTES; // 32
     private const NONCE_LEN = SODIUM_CRYPTO_AEAD_XCHACHA20POLY1305_IETF_NPUBBYTES; // 24
 
-    private function __construct() { /* static usage */ }
+    private function __construct()
+    {
+        /* static usage */
+    }
 
     /**
      * Generate a cryptographically secure random key (binary).
@@ -58,6 +60,7 @@ final class SodiumEncryption
         if (strlen($bin) !== self::KEY_LEN) {
             throw new Exception('Invalid key length.');
         }
+
         return $bin;
     }
 
@@ -74,9 +77,9 @@ final class SodiumEncryption
      */
     public static function deriveKeyFromPassphrase(string $passphrase, ?string $salt = null, array $options = [])
     {
-        $memory = (int)($options['memory_cost'] ?? 1<<16); // 64 MiB
-        $time   = (int)($options['time_cost'] ?? 4);
-        $threads= (int)($options['threads'] ?? 2);
+        $memory = (int) ($options['memory_cost'] ?? 1 << 16); // 64 MiB
+        $time = (int) ($options['time_cost'] ?? 4);
+        $threads = (int) ($options['threads'] ?? 2);
 
         if ($salt === null) {
             $salt = random_bytes(16);
@@ -88,6 +91,7 @@ final class SodiumEncryption
                 SODIUM_CRYPTO_PWHASH_MEMLIMIT_INTERACTIVE,
                 SODIUM_CRYPTO_PWHASH_ALG_ARGON2ID13
             );
+
             return ['key' => $key, 'salt' => $salt];
         } else {
             if (strlen($salt) < 8) {
@@ -101,6 +105,7 @@ final class SodiumEncryption
                 SODIUM_CRYPTO_PWHASH_MEMLIMIT_INTERACTIVE,
                 SODIUM_CRYPTO_PWHASH_ALG_ARGON2ID13
             );
+
             return $key;
         }
     }

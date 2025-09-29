@@ -18,9 +18,6 @@ use App\Utils\LogType;
  * @version 1.0
  * @since 2025-02-24
  *
- * Änderungen:
- * - 1.0 (2025-02-24): Erstellt.
- * - 1.1 (2025-09-28): SECURITY FIX - Session-ID Logging entfernt
  */
 class CsrfMiddleware
 {

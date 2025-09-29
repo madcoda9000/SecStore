@@ -489,3 +489,5 @@ cache/*.php.lock
 
 # php unit cache
 .phpunit.cache
+# php-cs-fixer cache
+.php-cs-fixer.cache
