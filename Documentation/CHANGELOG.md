@@ -14,11 +14,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [1.3.1] - 2025-09-15
+## [1.3.1] - 2025-08-15
 ### ✨ Added
 - **Advanced security analytics** Heatmap, Weekly Trends etc..
 - **Implemented global Input validation**
 - **4 step setup Wizard**
+- **bulk user actions** 2fa Un/enforce, enable/disable, delete
 
 ### 🔄 Changed
 - **various security fixes**
