@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8"/>
+        <title>Test Documentation</title>
+        <style>
+            body {
+                text-rendering: optimizeLegibility;
+                font-family: Source SansSerif Pro, Arial, sans-serif;
+                font-variant-ligatures: common-ligatures;
+                font-kerning: normal;
+                margin-left: 2rem;
+                background-color: #fff;
+                color: #000;
+            }
+
+            body > ul > li {
+                font-size: larger;
+            }
+
+            h2 {
+                font-size: larger;
+                text-decoration-line: underline;
+                text-decoration-thickness: 2px;
+                margin: 0;
+                padding: 0.5rem 0;
+            }
+
+            ul {
+                list-style: none;
+                margin: 0 0 2rem;
+                padding: 0 0 0 1rem;
+                text-indent: -1rem;
+            }
+
+            .success:before {
+                color: #4e9a06;
+                content: '✓';
+                padding-right: 0.5rem;
+            }
+
+            .defect {
+                color: #a40000;
+            }
+
+            .defect:before {
+                color: #a40000;
+                content: '✗';
+                padding-right: 0.5rem;
+            }
+        </style>
+    </head>
+    <body>
+        <h2>Authentication (Tests\Integration\Authentication)</h2>
+        <ul>
+            <li class="success">It validates login credentials</li>
+            <li class="success">It rejects empty credentials</li>
+            <li class="defect">It validates password complexity</li>
+            <li class="success">It creates session on successful login</li>
+            <li class="defect">It destroys session on logout</li>
+            <li class="defect">It regenerates session id on login</li>
+            <li class="success">It tracks failed login attempts</li>
+            <li class="success">It enforces account lockout after max attempts</li>
+            <li class="success">It resets failed attempts on successful login</li>
+            <li class="success">It validates session timeout</li>
+            <li class="success">It handles 2fa flow</li>
+            <li class="success">It completes 2fa verification</li>
+        </ul>
+        <h2>Login Flow (Tests\Feature\LoginFlow)</h2>
+        <ul>
+            <li class="defect">User can complete full login flow</li>
+            <li class="defect">User with 2fa completes full flow</li>
+            <li class="success">Failed login tracks attempts</li>
+            <li class="success">Account locks after max failed attempts</li>
+            <li class="defect">Session expires after timeout</li>
+            <li class="defect">Logout clears all session data</li>
+        </ul>
+        <h2>Rate Limiter (Tests\Unit\RateLimiter)</h2>
+        <ul>
+            <li class="success">It initializes with default limits</li>
+            <li class="success">It accepts custom limits</li>
+            <li class="success">It allows requests within limit</li>
+            <li class="success">It tracks request count correctly</li>
+            <li class="success">It returns correct status information</li>
+            <li class="success">It uses global limit as fallback</li>
+            <li class="success">It has correct default limits</li>
+            <li class="success">It stores requests in session</li>
+            <li class="success">It maintains separate limits for different types</li>
+            <li class="success">It handles zero requests correctly</li>
+            <li class="success">It calculates remaining requests correctly</li>
+            <li class="success">It generates consistent identifier for same client</li>
+            <li class="success">It handles missing user agent gracefully</li>
+            <li class="defect">It provides window reset timestamp</li>
+            <li class="success">It handles concurrent limit types</li>
+        </ul>
+        <h2>Session Util (Tests\Unit\SessionUtil)</h2>
+        <ul>
+            <li class="success">It can set and get session value</li>
+            <li class="success">It returns null for nonexistent key</li>
+            <li class="success">It can remove session value</li>
+            <li class="success">It can check if key exists</li>
+            <li class="defect">It can destroy session</li>
+            <li class="defect">It generates unique csrf tokens</li>
+            <li class="defect">It validates csrf tokens correctly</li>
+            <li class="success">It stores user in session</li>
+            <li class="success">It handles session timeout calculation</li>
+        </ul>
+    </body>
+</html>

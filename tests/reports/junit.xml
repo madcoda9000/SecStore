@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="/Users/de63386/Documents/Source/SecStore/phpunit.xml" tests="42" assertions="105" errors="0" failures="7" skipped="0" time="0.009438">
+    <testsuite name="Unit" tests="24" assertions="65" errors="0" failures="2" skipped="0" time="0.007750">
+      <testsuite name="Tests\Unit\RateLimiterTest" file="/Users/de63386/Documents/Source/SecStore/tests/Unit/RateLimiterTest.php" tests="15" assertions="51" errors="0" failures="1" skipped="0" time="0.004472">
+        <testcase name="it_initializes_with_default_limits" file="/Users/de63386/Documents/Source/SecStore/tests/Unit/RateLimiterTest.php" line="53" class="Tests\Unit\RateLimiterTest" classname="Tests.Unit.RateLimiterTest" assertions="2" time="0.001091"/>
+        <testcase name="it_accepts_custom_limits" file="/Users/de63386/Documents/Source/SecStore/tests/Unit/RateLimiterTest.php" line="63" class="Tests\Unit\RateLimiterTest" classname="Tests.Unit.RateLimiterTest" assertions="2" time="0.000121"/>
+        <testcase name="it_allows_requests_within_limit" file="/Users/de63386/Documents/Source/SecStore/tests/Unit/RateLimiterTest.php" line="78" class="Tests\Unit\RateLimiterTest" classname="Tests.Unit.RateLimiterTest" assertions="5" time="0.000114"/>
+        <testcase name="it_tracks_request_count_correctly" file="/Users/de63386/Documents/Source/SecStore/tests/Unit/RateLimiterTest.php" line="94" class="Tests\Unit\RateLimiterTest" classname="Tests.Unit.RateLimiterTest" assertions="2" time="0.000082"/>
+        <testcase name="it_returns_correct_status_information" file="/Users/de63386/Documents/Source/SecStore/tests/Unit/RateLimiterTest.php" line="114" class="Tests\Unit\RateLimiterTest" classname="Tests.Unit.RateLimiterTest" assertions="11" time="0.000080"/>
+        <testcase name="it_uses_global_limit_as_fallback" file="/Users/de63386/Documents/Source/SecStore/tests/Unit/RateLimiterTest.php" line="147" class="Tests\Unit\RateLimiterTest" classname="Tests.Unit.RateLimiterTest" assertions="1" time="0.000076"/>
+        <testcase name="it_has_correct_default_limits" file="/Users/de63386/Documents/Source/SecStore/tests/Unit/RateLimiterTest.php" line="159" class="Tests\Unit\RateLimiterTest" classname="Tests.Unit.RateLimiterTest" assertions="6" time="0.000078"/>
+        <testcase name="it_stores_requests_in_session" file="/Users/de63386/Documents/Source/SecStore/tests/Unit/RateLimiterTest.php" line="178" class="Tests\Unit\RateLimiterTest" classname="Tests.Unit.RateLimiterTest" assertions="5" time="0.000130"/>
+        <testcase name="it_maintains_separate_limits_for_different_types" file="/Users/de63386/Documents/Source/SecStore/tests/Unit/RateLimiterTest.php" line="206" class="Tests\Unit\RateLimiterTest" classname="Tests.Unit.RateLimiterTest" assertions="3" time="0.000080"/>
+        <testcase name="it_handles_zero_requests_correctly" file="/Users/de63386/Documents/Source/SecStore/tests/Unit/RateLimiterTest.php" line="230" class="Tests\Unit\RateLimiterTest" classname="Tests.Unit.RateLimiterTest" assertions="2" time="0.000075"/>
+        <testcase name="it_calculates_remaining_requests_correctly" file="/Users/de63386/Documents/Source/SecStore/tests/Unit/RateLimiterTest.php" line="245" class="Tests\Unit\RateLimiterTest" classname="Tests.Unit.RateLimiterTest" assertions="4" time="0.000099"/>
+        <testcase name="it_generates_consistent_identifier_for_same_client" file="/Users/de63386/Documents/Source/SecStore/tests/Unit/RateLimiterTest.php" line="280" class="Tests\Unit\RateLimiterTest" classname="Tests.Unit.RateLimiterTest" assertions="1" time="0.000075"/>
+        <testcase name="it_handles_missing_user_agent_gracefully" file="/Users/de63386/Documents/Source/SecStore/tests/Unit/RateLimiterTest.php" line="299" class="Tests\Unit\RateLimiterTest" classname="Tests.Unit.RateLimiterTest" assertions="1" time="0.000084"/>
+        <testcase name="it_provides_window_reset_timestamp" file="/Users/de63386/Documents/Source/SecStore/tests/Unit/RateLimiterTest.php" line="310" class="Tests\Unit\RateLimiterTest" classname="Tests.Unit.RateLimiterTest" assertions="3" time="0.002181">
+          <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Unit\RateLimiterTest::it_provides_window_reset_timestamp
+Failed asserting that 1759125914 is greater than 1759125914.
+
+/Users/de63386/Documents/Source/SecStore/tests/Unit/RateLimiterTest.php:323
+/Users/de63386/Documents/Source/SecStore/vendor/bin/phpunit:122</failure>
+        </testcase>
+        <testcase name="it_handles_concurrent_limit_types" file="/Users/de63386/Documents/Source/SecStore/tests/Unit/RateLimiterTest.php" line="327" class="Tests\Unit\RateLimiterTest" classname="Tests.Unit.RateLimiterTest" assertions="3" time="0.000107"/>
+      </testsuite>
+      <testsuite name="Tests\Unit\SessionUtilTest" file="/Users/de63386/Documents/Source/SecStore/tests/Unit/SessionUtilTest.php" tests="9" assertions="14" errors="0" failures="1" skipped="0" time="0.003278">
+        <testcase name="it_can_set_and_get_session_value" file="/Users/de63386/Documents/Source/SecStore/tests/Unit/SessionUtilTest.php" line="41" class="Tests\Unit\SessionUtilTest" classname="Tests.Unit.SessionUtilTest" assertions="1" time="0.000257"/>
+        <testcase name="it_returns_null_for_nonexistent_key" file="/Users/de63386/Documents/Source/SecStore/tests/Unit/SessionUtilTest.php" line="49" class="Tests\Unit\SessionUtilTest" classname="Tests.Unit.SessionUtilTest" assertions="1" time="0.000105"/>
+        <testcase name="it_can_remove_session_value" file="/Users/de63386/Documents/Source/SecStore/tests/Unit/SessionUtilTest.php" line="55" class="Tests\Unit\SessionUtilTest" classname="Tests.Unit.SessionUtilTest" assertions="1" time="0.000073"/>
+        <testcase name="it_can_check_if_key_exists" file="/Users/de63386/Documents/Source/SecStore/tests/Unit/SessionUtilTest.php" line="64" class="Tests\Unit\SessionUtilTest" classname="Tests.Unit.SessionUtilTest" assertions="2" time="0.000093"/>
+        <testcase name="it_can_destroy_session" file="/Users/de63386/Documents/Source/SecStore/tests/Unit/SessionUtilTest.php" line="73" class="Tests\Unit\SessionUtilTest" classname="Tests.Unit.SessionUtilTest" assertions="1" time="0.000140">
+          <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Unit\SessionUtilTest::it_can_destroy_session
+Failed asserting that an array is empty.
+
+/Users/de63386/Documents/Source/SecStore/tests/Unit/SessionUtilTest.php:78
+/Users/de63386/Documents/Source/SecStore/vendor/bin/phpunit:122</failure>
+        </testcase>
+        <testcase name="it_generates_unique_csrf_tokens" file="/Users/de63386/Documents/Source/SecStore/tests/Unit/SessionUtilTest.php" line="82" class="Tests\Unit\SessionUtilTest" classname="Tests.Unit.SessionUtilTest" assertions="2" time="0.002265"/>
+        <testcase name="it_validates_csrf_tokens_correctly" file="/Users/de63386/Documents/Source/SecStore/tests/Unit/SessionUtilTest.php" line="93" class="Tests\Unit\SessionUtilTest" classname="Tests.Unit.SessionUtilTest" assertions="2" time="0.000160"/>
+        <testcase name="it_stores_user_in_session" file="/Users/de63386/Documents/Source/SecStore/tests/Unit/SessionUtilTest.php" line="102" class="Tests\Unit\SessionUtilTest" classname="Tests.Unit.SessionUtilTest" assertions="2" time="0.000082"/>
+        <testcase name="it_handles_session_timeout_calculation" file="/Users/de63386/Documents/Source/SecStore/tests/Unit/SessionUtilTest.php" line="118" class="Tests\Unit\SessionUtilTest" classname="Tests.Unit.SessionUtilTest" assertions="2" time="0.000103"/>
+      </testsuite>
+    </testsuite>
+    <testsuite name="Integration" tests="12" assertions="21" errors="0" failures="3" skipped="0" time="0.001086">
+      <testsuite name="Tests\Integration\AuthenticationTest" file="/Users/de63386/Documents/Source/SecStore/tests/Integration/AuthenticationTest.php" tests="12" assertions="21" errors="0" failures="3" skipped="0" time="0.001086">
+        <testcase name="it_validates_login_credentials" file="/Users/de63386/Documents/Source/SecStore/tests/Integration/AuthenticationTest.php" line="18" class="Tests\Integration\AuthenticationTest" classname="Tests.Integration.AuthenticationTest" assertions="3" time="0.000176"/>
+        <testcase name="it_rejects_empty_credentials" file="/Users/de63386/Documents/Source/SecStore/tests/Integration/AuthenticationTest.php" line="33" class="Tests\Integration\AuthenticationTest" classname="Tests.Integration.AuthenticationTest" assertions="2" time="0.000068"/>
+        <testcase name="it_validates_password_complexity" file="/Users/de63386/Documents/Source/SecStore/tests/Integration/AuthenticationTest.php" line="43" class="Tests\Integration\AuthenticationTest" classname="Tests.Integration.AuthenticationTest" assertions="2" time="0.000111">
+          <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Integration\AuthenticationTest::it_validates_password_complexity
+password should be considered weak
+Failed asserting that 8 is less than 8.
+
+/Users/de63386/Documents/Source/SecStore/tests/Integration/AuthenticationTest.php:49
+/Users/de63386/Documents/Source/SecStore/vendor/bin/phpunit:122</failure>
+        </testcase>
+        <testcase name="it_creates_session_on_successful_login" file="/Users/de63386/Documents/Source/SecStore/tests/Integration/AuthenticationTest.php" line="60" class="Tests\Integration\AuthenticationTest" classname="Tests.Integration.AuthenticationTest" assertions="3" time="0.000077"/>
+        <testcase name="it_destroys_session_on_logout" file="/Users/de63386/Documents/Source/SecStore/tests/Integration/AuthenticationTest.php" line="87" class="Tests\Integration\AuthenticationTest" classname="Tests.Integration.AuthenticationTest" assertions="1" time="0.000093">
+          <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Integration\AuthenticationTest::it_destroys_session_on_logout
+Failed asserting that an array is empty.
+
+/Users/de63386/Documents/Source/SecStore/tests/Integration/AuthenticationTest.php:97
+/Users/de63386/Documents/Source/SecStore/vendor/bin/phpunit:122</failure>
+        </testcase>
+        <testcase name="it_regenerates_session_id_on_login" file="/Users/de63386/Documents/Source/SecStore/tests/Integration/AuthenticationTest.php" line="101" class="Tests\Integration\AuthenticationTest" classname="Tests.Integration.AuthenticationTest" assertions="1" time="0.000166">
+          <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Integration\AuthenticationTest::it_regenerates_session_id_on_login
+Session ID should change on login
+Failed asserting that '' is not equal to ''.
+
+/Users/de63386/Documents/Source/SecStore/tests/Integration/AuthenticationTest.php:115
+/Users/de63386/Documents/Source/SecStore/vendor/bin/phpunit:122</failure>
+        </testcase>
+        <testcase name="it_tracks_failed_login_attempts" file="/Users/de63386/Documents/Source/SecStore/tests/Integration/AuthenticationTest.php" line="119" class="Tests\Integration\AuthenticationTest" classname="Tests.Integration.AuthenticationTest" assertions="1" time="0.000069"/>
+        <testcase name="it_enforces_account_lockout_after_max_attempts" file="/Users/de63386/Documents/Source/SecStore/tests/Integration/AuthenticationTest.php" line="137" class="Tests\Integration\AuthenticationTest" classname="Tests.Integration.AuthenticationTest" assertions="1" time="0.000067"/>
+        <testcase name="it_resets_failed_attempts_on_successful_login" file="/Users/de63386/Documents/Source/SecStore/tests/Integration/AuthenticationTest.php" line="155" class="Tests\Integration\AuthenticationTest" classname="Tests.Integration.AuthenticationTest" assertions="1" time="0.000069"/>
+        <testcase name="it_validates_session_timeout" file="/Users/de63386/Documents/Source/SecStore/tests/Integration/AuthenticationTest.php" line="168" class="Tests\Integration\AuthenticationTest" classname="Tests.Integration.AuthenticationTest" assertions="1" time="0.000062"/>
+        <testcase name="it_handles_2fa_flow" file="/Users/de63386/Documents/Source/SecStore/tests/Integration/AuthenticationTest.php" line="179" class="Tests\Integration\AuthenticationTest" classname="Tests.Integration.AuthenticationTest" assertions="3" time="0.000066"/>
+        <testcase name="it_completes_2fa_verification" file="/Users/de63386/Documents/Source/SecStore/tests/Integration/AuthenticationTest.php" line="196" class="Tests\Integration\AuthenticationTest" classname="Tests.Integration.AuthenticationTest" assertions="2" time="0.000062"/>
+      </testsuite>
+    </testsuite>
+    <testsuite name="Feature" tests="6" assertions="19" errors="0" failures="2" skipped="0" time="0.000602">
+      <testsuite name="Tests\Feature\LoginFlowTest" file="/Users/de63386/Documents/Source/SecStore/tests/Feature/LoginFlowTest.php" tests="6" assertions="19" errors="0" failures="2" skipped="0" time="0.000602">
+        <testcase name="user_can_complete_full_login_flow" file="/Users/de63386/Documents/Source/SecStore/tests/Feature/LoginFlowTest.php" line="16" class="Tests\Feature\LoginFlowTest" classname="Tests.Feature.LoginFlowTest" assertions="6" time="0.000143"/>
+        <testcase name="user_with_2fa_completes_full_flow" file="/Users/de63386/Documents/Source/SecStore/tests/Feature/LoginFlowTest.php" line="59" class="Tests\Feature\LoginFlowTest" classname="Tests.Feature.LoginFlowTest" assertions="5" time="0.000134"/>
+        <testcase name="failed_login_tracks_attempts" file="/Users/de63386/Documents/Source/SecStore/tests/Feature/LoginFlowTest.php" line="97" class="Tests\Feature\LoginFlowTest" classname="Tests.Feature.LoginFlowTest" assertions="3" time="0.000067"/>
+        <testcase name="account_locks_after_max_failed_attempts" file="/Users/de63386/Documents/Source/SecStore/tests/Feature/LoginFlowTest.php" line="115" class="Tests\Feature\LoginFlowTest" classname="Tests.Feature.LoginFlowTest" assertions="1" time="0.000068"/>
+        <testcase name="session_expires_after_timeout" file="/Users/de63386/Documents/Source/SecStore/tests/Feature/LoginFlowTest.php" line="132" class="Tests\Feature\LoginFlowTest" classname="Tests.Feature.LoginFlowTest" assertions="2" time="0.000097">
+          <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\LoginFlowTest::session_expires_after_timeout
+Failed asserting that an array is empty.
+
+/Users/de63386/Documents/Source/SecStore/tests/Feature/LoginFlowTest.php:150
+/Users/de63386/Documents/Source/SecStore/vendor/bin/phpunit:122</failure>
+        </testcase>
+        <testcase name="logout_clears_all_session_data" file="/Users/de63386/Documents/Source/SecStore/tests/Feature/LoginFlowTest.php" line="154" class="Tests\Feature\LoginFlowTest" classname="Tests.Feature.LoginFlowTest" assertions="2" time="0.000093">
+          <failure type="PHPUnit\Framework\ExpectationFailedException">Tests\Feature\LoginFlowTest::logout_clears_all_session_data
+Failed asserting that an array is empty.
+
+/Users/de63386/Documents/Source/SecStore/tests/Feature/LoginFlowTest.php:168
+/Users/de63386/Documents/Source/SecStore/vendor/bin/phpunit:122</failure>
+        </testcase>
+      </testsuite>
+    </testsuite>
+  </testsuite>
+</testsuites>

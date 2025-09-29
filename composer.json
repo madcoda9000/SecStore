@@ -32,6 +32,23 @@
     },
     "require-dev": {
         "friendsofphp/php-cs-fixer": "^3.74",
-        "squizlabs/php_codesniffer": "*"
+        "squizlabs/php_codesniffer": "*",
+        "phpunit/phpunit": "^11.5",
+        "mockery/mockery": "^1.6",
+        "fakerphp/faker": "^1.23"
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\": "tests/"
+        }
+    },
+    "scripts": {
+        "test": "phpunit --testdox --colors=always",
+        "test:coverage": "phpunit --coverage-html coverage --coverage-text",
+        "test:unit": "phpunit --testsuite Unit --testdox",
+        "test:integration": "phpunit --testsuite Integration --testdox",
+        "test:filter": "phpunit --filter",
+        "cs:check": "phpcs",
+        "cs:fix": "php-cs-fixer fix"
     }
 }
