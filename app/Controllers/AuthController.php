@@ -87,13 +87,13 @@ class AuthController
             
             // Add firstname and lastname rules (specific to this registration form)
             $rules['firstname'] = [
-                InputValidator::RULE_REQUIRED, 
+                InputValidator::RULE_REQUIRED,
                 [InputValidator::RULE_MIN_LENGTH => 1],
                 [InputValidator::RULE_MAX_LENGTH => 255]
             ];
             $rules['lastname'] = [
                 InputValidator::RULE_REQUIRED,
-                [InputValidator::RULE_MIN_LENGTH => 1], 
+                [InputValidator::RULE_MIN_LENGTH => 1],
                 [InputValidator::RULE_MAX_LENGTH => 255]
             ];
             
@@ -106,11 +106,9 @@ class AuthController
             $firstname = $validated['firstname'];
             $lastname = $validated['lastname'];
             $password = password_hash($validated['password'], PASSWORD_DEFAULT);
-            
         } catch (InvalidArgumentException $e) {
             // Log validation failure with user context for security monitoring
-            LogUtil::logAction(LogType::AUDIT, 'AuthController', 'register', 
-                'Validation failed: ' . $e->getMessage(), $user);
+            LogUtil::logAction(LogType::AUDIT, 'AuthController', 'register', 'Validation failed: ' . $e->getMessage(), $user);
             
             // Render registration form with error message
             Flight::latte()->render('register.latte', [
@@ -132,8 +130,7 @@ class AuthController
             
             if ($newUser !== null) {
                 // Success: Log and send welcome email
-                LogUtil::logAction(LogType::AUDIT, 'AuthController', 'register', 
-                    'SUCCESS: registered new user.', $user);
+                LogUtil::logAction(LogType::AUDIT, 'AuthController', 'register', 'SUCCESS: registered new user.', $user);
                 
                 MailUtil::sendMail($email, "SecStore: Welcome to SecStore", "welcome", [
                     'name' => $firstname . ' ' . $lastname
@@ -147,11 +144,9 @@ class AuthController
                     'smtpInvalid' => MailUtil::checkConnection()
                 ]);
                 return;
-                
             } else {
                 // Database error during user creation
-                LogUtil::logAction(LogType::AUDIT, 'AuthController', 'register', 
-                    'ERROR: could not create new user.', $user);
+                LogUtil::logAction(LogType::AUDIT, 'AuthController', 'register', 'ERROR: could not create new user.', $user);
                 
                 Flight::latte()->render('register.latte', [
                     'title' => TranslationUtil::t('register.title'),
@@ -164,8 +159,7 @@ class AuthController
             }
         } else {
             // User already exists (username or email taken)
-            LogUtil::logAction(LogType::AUDIT, 'AuthController', 'register', 
-                'FAILED: ' . $userCheck, $user);
+            LogUtil::logAction(LogType::AUDIT, 'AuthController', 'register', 'FAILED: ' . $userCheck, $user);
             
             Flight::latte()->render('register.latte', [
                 'title' => TranslationUtil::t('register.title'),
@@ -630,7 +624,7 @@ class AuthController
         try {
             $validated = InputValidator::validateAndSanitize([
                 'email' => [
-                    InputValidator::RULE_REQUIRED, 
+                    InputValidator::RULE_REQUIRED,
                     InputValidator::RULE_EMAIL,
                     [InputValidator::RULE_MAX_LENGTH => 255]
                 ]

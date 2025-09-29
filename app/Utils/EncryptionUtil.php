@@ -15,16 +15,16 @@ use Exception;
  * @version 2.0
  * @since 2025-02-24
  *
- * 
+ *
  * Example CLI Usage:
  * ```php
  * use App\Utils\EncryptionUtil;
- * 
+ *
  * // Schlüssel generieren und in config.php speichern
  * $key = App\Utils\EncryptionUtil::generateKey();
  * $encodedKey = App\Utils\EncryptionUtil::encodeKey($key);
  * echo "Save this in config.php as ENCRYPTION_KEY: $encodedKey\n";
- * 
+ *
  * // Verschlüsseln und Entschlüsseln
  * $plaintext = "Hallo Welt";
  * $key = App\Utils\SodiumEncryption::decodeKey($config['encryption_key']);
@@ -38,7 +38,10 @@ use Exception;
  */
 final class EncryptionUtil
 {
-    private function __construct() { /* static only */ }
+    private function __construct()
+    {
+         /* static only */
+    }
 
     /**
      * Erzeugt einen neuen Schlüssel (binär).

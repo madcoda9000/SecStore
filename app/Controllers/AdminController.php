@@ -131,7 +131,7 @@ class AdminController
             //'Security dashboard temporarily unavailable',
             Flight::latte()->render('errors/error.latte', [
                 'code' => 500,
-                'message' => $e->getMessage(), 
+                'message' => $e->getMessage(),
                 'user' => SessionUtil::get('user'),
                 'sessionTimeout' => SessionUtil::getRemainingTime(),
                 'title' => 'Error'
@@ -989,8 +989,7 @@ class AdminController
         );
 
         // Prüfen, ob es eine AJAX-Anfrage ist
-        if (
-            !empty($_SERVER["HTTP_X_REQUESTED_WITH"]) &&
+        if (!empty($_SERVER["HTTP_X_REQUESTED_WITH"]) &&
             strtolower($_SERVER["HTTP_X_REQUESTED_WITH"]) == "xmlhttprequest"
         ) {
             // JSON-Antwort für AJAX
@@ -1309,8 +1308,7 @@ class AdminController
      */
     private static function handleResponse(bool $success, ?string $errorMessage = null)
     {
-        if (
-            !empty($_SERVER["HTTP_X_REQUESTED_WITH"]) &&
+        if (!empty($_SERVER["HTTP_X_REQUESTED_WITH"]) &&
             strtolower($_SERVER["HTTP_X_REQUESTED_WITH"]) === "xmlhttprequest"
         ) {
             Flight::json(["success" => $success]);
@@ -1664,9 +1662,13 @@ class AdminController
 
         // Count results
         foreach ($results as $result) {
-            if ($result['status'] === 'success') $success++;
-            elseif ($result['status'] === 'failed') $failed++;
-            elseif ($result['status'] === 'skipped') $skipped++;
+            if ($result['status'] === 'success') {
+                $success++;
+            } elseif ($result['status'] === 'failed') {
+                $failed++;
+            } elseif ($result['status'] === 'skipped') {
+                $skipped++;
+            }
         }
 
         // Log bulk operation

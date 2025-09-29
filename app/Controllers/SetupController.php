@@ -30,7 +30,6 @@ class SetupController
     public function runSetup($skipMail = false)
     {
         try {
-
             // Environment-Detection für alle Setup-Schritte
             $envInfo = $this->detectEnvironmentAndPermissions();
 
@@ -185,11 +184,9 @@ class SetupController
     {
         try {
             // CSRF Token validieren
-            if (
-                !isset($_SESSION['csrf_token']) || !isset($formData['csrf_token']) ||
+            if (!isset($_SESSION['csrf_token']) || !isset($formData['csrf_token']) ||
                 !hash_equals($_SESSION['csrf_token'], $formData['csrf_token'])
             ) {
-
                 $errorMsg = 'CSRF Token Validierung fehlgeschlagen.';
                 if (!isset($_SESSION['csrf_token'])) {
                     $errorMsg .= ' ' . TranslationUtil::t('csrf.error.missing');
@@ -323,13 +320,10 @@ class SetupController
     private function handleMailConfig($config)
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-
             // CSRF Token validieren
-            if (
-                !isset($_SESSION['csrf_token']) || !isset($formData['csrf_token']) ||
+            if (!isset($_SESSION['csrf_token']) || !isset($formData['csrf_token']) ||
                 !hash_equals($_SESSION['csrf_token'], $formData['csrf_token'])
             ) {
-
                 $errorMsg = 'CSRF Token Validierung fehlgeschlagen.';
                 if (!isset($_SESSION['csrf_token'])) {
                     $errorMsg .= ' ' . TranslationUtil::t('csrf.error.missing');
@@ -360,11 +354,9 @@ class SetupController
     {
         try {
             // CSRF Token validieren
-            if (
-                !isset($_SESSION['csrf_token']) || !isset($formData['csrf_token']) ||
+            if (!isset($_SESSION['csrf_token']) || !isset($formData['csrf_token']) ||
                 !hash_equals($_SESSION['csrf_token'], $formData['csrf_token'])
             ) {
-
                 $errorMsg = 'CSRF Token Validierung fehlgeschlagen.';
                 if (!isset($_SESSION['csrf_token'])) {
                     $errorMsg .= ' ' . TranslationUtil::t('csrf.error.missing');
@@ -620,9 +612,15 @@ class SetupController
      */
     private function getEnvironmentType(bool $isDocker, bool $isRoot, bool $isWindows): string
     {
-        if ($isWindows) return 'Windows Development';
-        if ($isDocker) return 'Docker Container';
-        if ($isRoot) return 'Production Server';
+        if ($isWindows) {
+            return 'Windows Development';
+        }
+        if ($isDocker) {
+            return 'Docker Container';
+        }
+        if ($isRoot) {
+            return 'Production Server';
+        }
         return 'Development Server';
     }
 }

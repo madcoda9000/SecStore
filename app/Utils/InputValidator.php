@@ -6,11 +6,11 @@ use InvalidArgumentException;
 
 /**
  * Central Input Validation and Sanitization Class
- * 
+ *
  * Provides comprehensive validation rules and sanitization methods
  * for all user input across the application.
  */
-class InputValidator 
+class InputValidator
 {
     // Validation rules constants
     public const RULE_REQUIRED = 'required';
@@ -33,7 +33,7 @@ class InputValidator
 
     /**
      * Validate and sanitize input data based on provided rules
-     * 
+     *
      * @param array $rules Validation rules for each field
      * @param array $data Input data to validate
      * @param bool $strict If true, throw exception on validation failure
@@ -66,7 +66,7 @@ class InputValidator
 
     /**
      * Validate a single field with its rules
-     * 
+     *
      * @param string $fieldName Name of the field being validated
      * @param mixed $value Value to validate
      * @param array $rules Array of validation rules
@@ -106,7 +106,7 @@ class InputValidator
 
     /**
      * Apply a specific validation rule
-     * 
+     *
      * @param mixed $value Value to validate
      * @param string $rule Rule name
      * @param mixed $parameters Rule parameters
@@ -208,7 +208,7 @@ class InputValidator
 
     /**
      * Validate strong password requirements
-     * 
+     *
      * @param string $password Password to validate
      * @param string $fieldName Field name for error messages
      * @throws InvalidArgumentException When password is not strong enough
@@ -238,7 +238,7 @@ class InputValidator
 
     /**
      * Validate username format
-     * 
+     *
      * @param string $username Username to validate
      * @param string $fieldName Field name for error messages
      * @throws InvalidArgumentException When username format is invalid
@@ -264,7 +264,7 @@ class InputValidator
 
     /**
      * Validate OTP code format
-     * 
+     *
      * @param string $otp OTP code to validate
      * @param string $fieldName Field name for error messages
      * @throws InvalidArgumentException When OTP format is invalid
@@ -278,7 +278,7 @@ class InputValidator
 
     /**
      * Validate role name format
-     * 
+     *
      * @param string $roleName Role name to validate
      * @param string $fieldName Field name for error messages
      * @throws InvalidArgumentException When role name format is invalid
@@ -300,7 +300,7 @@ class InputValidator
 
     /**
      * Sanitize input value
-     * 
+     *
      * @param mixed $value Value to sanitize
      * @return mixed Sanitized value
      */
@@ -322,7 +322,7 @@ class InputValidator
 
     /**
      * Handle empty values
-     * 
+     *
      * @param mixed $value Value to check
      * @return mixed Sanitized empty value
      */
@@ -337,7 +337,7 @@ class InputValidator
 
     /**
      * Check if a value is considered empty
-     * 
+     *
      * @param mixed $value Value to check
      * @return bool True if value is empty
      */
@@ -350,7 +350,7 @@ class InputValidator
 
     /**
      * Get validation rules for user login
-     * 
+     *
      * @return array Validation rules
      */
     public static function getLoginRules(): array
@@ -363,7 +363,7 @@ class InputValidator
 
     /**
      * Get validation rules for user registration
-     * 
+     *
      * @return array Validation rules
      */
     public static function getRegistrationRules(): array
@@ -377,7 +377,7 @@ class InputValidator
 
     /**
      * Get validation rules for password reset
-     * 
+     *
      * @return array Validation rules
      */
     public static function getPasswordResetRules(): array
@@ -391,7 +391,7 @@ class InputValidator
 
     /**
      * Get validation rules for 2FA verification
-     * 
+     *
      * @return array Validation rules
      */
     public static function get2FAVerificationRules(): array
@@ -403,7 +403,7 @@ class InputValidator
 
     /**
      * Get validation rules for user creation/update by admin
-     * 
+     *
      * @return array Validation rules
      */
     public static function getAdminUserRules(): array
@@ -420,7 +420,7 @@ class InputValidator
 
     /**
      * Get validation rules for role management
-     * 
+     *
      * @return array Validation rules
      */
     public static function getRoleRules(): array
@@ -432,7 +432,7 @@ class InputValidator
 
     /**
      * Get validation rules for email change
-     * 
+     *
      * @return array Validation rules
      */
     public static function getEmailChangeRules(): array
@@ -444,7 +444,7 @@ class InputValidator
 
     /**
      * Get validation rules for password change
-     * 
+     *
      * @return array Validation rules
      */
     public static function getPasswordChangeRules(): array

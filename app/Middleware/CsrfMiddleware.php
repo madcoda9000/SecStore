@@ -27,7 +27,6 @@ class CsrfMiddleware
     public function before(array $params): void
     {
         if (Flight::request()->method == 'POST') {
-
             // DEBUG LOGGING
             if ($params != null && $params['debug'] === true && !self::isProduction()) {
                 // DEBUG-Modus: Nur unkritische Informationen loggen
@@ -42,9 +41,9 @@ class CsrfMiddleware
             } else {
                 // Production: Minimales sicheres Logging
                 LogUtil::logAction(
-                    LogType::SECURITY, 
-                    'CsrfMiddleware', 
-                    'before', 
+                    LogType::SECURITY,
+                    'CsrfMiddleware',
+                    'before',
                     'CSRF validation attempted from: ' . ($_SERVER['REMOTE_ADDR'] ?? 'unknown')
                 );
             }
@@ -146,10 +145,11 @@ class CsrfMiddleware
 
         // Default: Token.Regenration für bessere Sicherheit. Nur in Ausnahmen no regenerieren
         LogUtil::logAction(
-                    LogType::SECURITY,
-                    'CsrfMiddleware',
-                    'shouldRefreshToken',
-                    'Route do not match any filter. Refreshing token for route: ' . $uri);
+            LogType::SECURITY,
+            'CsrfMiddleware',
+            'shouldRefreshToken',
+            'Route do not match any filter. Refreshing token for route: ' . $uri
+        );
         return true;
     }
 

@@ -304,8 +304,7 @@ class ProfileController
      */
     private static function handleResponse(bool $success, ?string $errorMessage = null)
     {
-        if (
-            !empty($_SERVER["HTTP_X_REQUESTED_WITH"]) &&
+        if (!empty($_SERVER["HTTP_X_REQUESTED_WITH"]) &&
             strtolower($_SERVER["HTTP_X_REQUESTED_WITH"]) === "xmlhttprequest"
         ) {
             Flight::json(["success" => $success, "message" => $errorMessage]);
