@@ -486,3 +486,6 @@ cache/*.php.lock
 
 # claude
 .claude
+
+# php unit cache
+.phpunit.cache
