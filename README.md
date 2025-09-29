@@ -1,14 +1,14 @@
 <div align="center">
 
 # 🔐 SecStore
-### *Modern, secure user management for the web*
+### *Secure authentication boilerplate for PHP web applications*
 
 [![PHP Version](https://img.shields.io/badge/PHP-%3E=8.3-777BB4?style=for-the-badge&logo=php&logoColor=white)](https://php.net)
 [![License](https://img.shields.io/badge/License-MIT-success?style=for-the-badge)](LICENSE)
 [![Last Commit](https://img.shields.io/github/last-commit/madcoda9000/SecStore?style=for-the-badge&color=blue)](https://github.com/madcoda9000/SecStore/commits/main)
 [![Maintained](https://img.shields.io/maintenance/yes/2025?style=for-the-badge&color=green)](https://github.com/madcoda9000/SecStore)
 
-**A complete authentication and user management platform with modern security features and enterprise-ready functionality.**
+**Production-ready authentication framework that saves you weeks of development. Features enterprise-grade security: 2FA/TOTP, LDAP integration, intelligent rate limiting, session fingerprinting, brute-force protection, security analytics dashboard, comprehensive audit logging, and granular role-based access control. Start building features, not infrastructure.**
 
 [📚 Documentation](Documentation/INSTALL.md) • [🧑‍💻 Developer Documentation](Documentation/DEVDOC.md) • [🐛 Bug Reports](https://github.com/madcoda9000/SecStore/issues) • [💬 Discussions](https://github.com/madcoda9000/SecStore/discussions)
 
