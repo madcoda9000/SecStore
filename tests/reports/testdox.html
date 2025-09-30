@@ -105,6 +105,48 @@
             <li class="success">It stores user in session</li>
             <li class="success">It handles session timeout calculation</li>
         </ul>
+        <h2>Sodium Encryption (Tests\Unit\SodiumEncryption)</h2>
+        <ul>
+            <li class="success">It generates key with correct length</li>
+            <li class="success">It generates unique keys</li>
+            <li class="success">It generates cryptographically random keys</li>
+            <li class="success">It encodes key to base64url</li>
+            <li class="success">It decodes key from base64url</li>
+            <li class="success">It performs encode decode roundtrip</li>
+            <li class="success">It throws exception for invalid encoded key format</li>
+            <li class="success">It throws exception for invalid decoded key length</li>
+            <li class="success">It encrypts plaintext successfully</li>
+            <li class="success">It decrypts ciphertext successfully</li>
+            <li class="success">It performs encrypt decrypt roundtrip</li>
+            <li class="success">It produces different ciphertexts for same plaintext</li>
+            <li class="success">It throws exception for invalid key length on encrypt</li>
+            <li class="success">It throws exception for invalid key length on decrypt</li>
+            <li class="success">It throws exception for invalid ciphertext encoding</li>
+            <li class="success">It throws exception for too short ciphertext</li>
+            <li class="success">It throws exception for wrong decryption key</li>
+            <li class="success">It throws exception for tampered ciphertext</li>
+            <li class="success">It encrypts and decrypts with associated data</li>
+            <li class="success">It fails decryption with wrong associated data</li>
+            <li class="success">It fails decryption with missing associated data</li>
+            <li class="success">It encrypts without associated data by default</li>
+            <li class="success">It derives key from passphrase without salt</li>
+            <li class="success">It derives key from passphrase with salt</li>
+            <li class="success">It derives same key for same passphrase and salt</li>
+            <li class="success">It derives different keys for different passphrases</li>
+            <li class="success">It derives different keys for different salts</li>
+            <li class="success">It throws exception for too short salt</li>
+            <li class="success">It uses derived key for encryption</li>
+            <li class="success">It handles empty plaintext</li>
+            <li class="success">It handles large plaintext</li>
+            <li class="success">It handles unicode characters</li>
+            <li class="success">It handles binary data</li>
+            <li class="success">It produces url safe ciphertext</li>
+            <li class="success">It includes version in envelope</li>
+            <li class="success">It rejects unsupported version</li>
+            <li class="success">It provides authenticated encryption</li>
+            <li class="success">It uses different nonces for each encryption</li>
+            <li class="success">It maintains confidentiality</li>
+        </ul>
         <h2>Translation Util (Tests\Unit\TranslationUtil)</h2>
         <ul>
             <li class="success">It initializes with default language</li>
