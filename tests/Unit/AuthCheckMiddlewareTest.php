@@ -10,7 +10,7 @@ use PHPUnit\Framework\Attributes\Test;
  * Class Name: AuthCheckMiddlewareTest
  *
  * Unit Tests für AuthCheckMiddleware.
- * 
+ *
  * HINWEIS: Diese Middleware verwendet statische Aufrufe (Flight::redirect, SessionUtil::get)
  * die schwer zu mocken sind. Diese Tests prüfen nur die Logik, nicht die tatsächlichen Redirects.
  *
