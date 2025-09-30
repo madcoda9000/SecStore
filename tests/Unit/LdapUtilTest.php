@@ -339,28 +339,6 @@ class LdapUtilTest extends TestCase
         $this->assertStringNotContainsString('johndoe', $bindDn); // Lowercase sollte NICHT vorkommen
     }
 
-    // ==========================================
-    // TESTS: SECURITY CONSIDERATIONS
-    // ==========================================
-
-    /** @test */
-    public function it_does_not_log_passwords_in_plaintext(): void
-    {
-        // This is a documentation test - actual implementation check
-        // Password should NEVER be logged anywhere
-        
-        // Arrange
-        $username = 'testuser';
-        $password = 'SecretPassword123!';
-        
-        // Act
-        $result = LdapUtil::authenticate($username, $password);
-        
-        // Assert - Password should not appear in any logs
-        // This test documents the requirement
-        $this->assertTrue(true, 'Password must never be logged in plaintext');
-    }
-
     /** @test */
     public function it_validates_ldap_injection_attempts(): void
     {

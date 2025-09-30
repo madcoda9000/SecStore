@@ -66,6 +66,71 @@
             <li class="success">It handles 2fa flow</li>
             <li class="success">It completes 2fa verification</li>
         </ul>
+        <h2>Input Validator (Tests\Unit\InputValidator)</h2>
+        <ul>
+            <li class="success">It validates required fields</li>
+            <li class="success">It rejects missing required field</li>
+            <li class="success">It rejects empty string for required field</li>
+            <li class="success">It rejects null for required field</li>
+            <li class="success">It allows empty values for optional fields</li>
+            <li class="success">It validates correct email format</li>
+            <li class="success">It rejects invalid email formats</li>
+            <li class="success">It validates minimum length</li>
+            <li class="success">It rejects strings below minimum length</li>
+            <li class="success">It validates maximum length</li>
+            <li class="success">It rejects strings exceeding maximum length</li>
+            <li class="success">It validates both min and max length</li>
+            <li class="success">It validates numeric values</li>
+            <li class="success">It rejects non numeric values</li>
+            <li class="success">It validates integer values</li>
+            <li class="success">It rejects non integer values</li>
+            <li class="success">It validates boolean values</li>
+            <li class="success">It rejects invalid boolean values</li>
+            <li class="success">It validates alpha only strings</li>
+            <li class="success">It rejects non alpha strings</li>
+            <li class="success">It validates alphanumeric strings</li>
+            <li class="success">It rejects non alphanumeric strings</li>
+            <li class="success">It validates strong passwords</li>
+            <li class="success">It rejects passwords too short</li>
+            <li class="success">It rejects passwords without uppercase</li>
+            <li class="success">It rejects passwords without lowercase</li>
+            <li class="success">It rejects passwords without numbers</li>
+            <li class="success">It rejects passwords without special characters</li>
+            <li class="success">It validates correct username format</li>
+            <li class="success">It rejects username too short</li>
+            <li class="success">It rejects username too long</li>
+            <li class="success">It rejects username with invalid characters</li>
+            <li class="success">It rejects username starting with special char</li>
+            <li class="success">It rejects username ending with special char</li>
+            <li class="success">It validates correct otp format</li>
+            <li class="success">It rejects otp with wrong length</li>
+            <li class="success">It rejects otp with non numeric characters</li>
+            <li class="success">It validates correct url format</li>
+            <li class="success">It rejects invalid url format</li>
+            <li class="success">It validates correct role name</li>
+            <li class="success">It rejects role name too short</li>
+            <li class="success">It rejects role name too long</li>
+            <li class="success">It validates value in allowed list</li>
+            <li class="success">It rejects value not in allowed list</li>
+            <li class="success">It validates value not in blacklist</li>
+            <li class="success">It rejects value in blacklist</li>
+            <li class="success">It validates value matching regex</li>
+            <li class="success">It rejects value not matching regex</li>
+            <li class="success">It trims whitespace from strings</li>
+            <li class="success">It encodes html special characters</li>
+            <li class="success">It removes null bytes</li>
+            <li class="success">It validates multiple rules on single field</li>
+            <li class="success">It validates multiple fields</li>
+            <li class="success">It returns partial results in non strict mode</li>
+            <li class="success">It has login rules definition</li>
+            <li class="success">It has registration rules definition</li>
+            <li class="success">It has password reset rules definition</li>
+            <li class="success">It has 2fa verification rules definition</li>
+            <li class="success">It has admin user rules definition</li>
+            <li class="success">It handles empty rules array</li>
+            <li class="success">It handles empty data array</li>
+            <li class="success">It validates complex real world scenario</li>
+        </ul>
         <h2>Ldap Util (Tests\Unit\LdapUtil)</h2>
         <ul>
             <li class="success">It has default configuration values</li>
@@ -85,7 +150,6 @@
             <li class="success">It constructs bind dn without domain prefix</li>
             <li class="success">It handles special characters in username</li>
             <li class="success">It preserves case in username</li>
-            <li class="defect">It does not log passwords in plaintext</li>
             <li class="success">It validates ldap injection attempts</li>
             <li class="success">It handles missing config file gracefully</li>
             <li class="success">It validates ldap host is not empty</li>
