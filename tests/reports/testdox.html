@@ -66,6 +66,35 @@
             <li class="success">It handles 2fa flow</li>
             <li class="success">It completes 2fa verification</li>
         </ul>
+        <h2>Ldap Util (Tests\Unit\LdapUtil)</h2>
+        <ul>
+            <li class="success">It has default configuration values</li>
+            <li class="success">It validates ldap port is within valid range</li>
+            <li class="success">It uses standard ldap ports</li>
+            <li class="success">It validates ldap host format</li>
+            <li class="success">It validates timeout is reasonable</li>
+            <li class="success">It validates domain prefix format</li>
+            <li class="success">It rejects empty username</li>
+            <li class="success">It rejects empty password</li>
+            <li class="success">It rejects both empty credentials</li>
+            <li class="success">It rejects whitespace only username</li>
+            <li class="success">It rejects whitespace only password</li>
+            <li class="success">It handles null username safely</li>
+            <li class="success">It handles null password safely</li>
+            <li class="success">It constructs bind dn with domain prefix</li>
+            <li class="success">It constructs bind dn without domain prefix</li>
+            <li class="success">It handles special characters in username</li>
+            <li class="success">It preserves case in username</li>
+            <li class="defect">It does not log passwords in plaintext</li>
+            <li class="success">It validates ldap injection attempts</li>
+            <li class="success">It handles missing config file gracefully</li>
+            <li class="success">It validates ldap host is not empty</li>
+            <li class="success">It uses ldap protocol version 3</li>
+            <li class="success">It has reasonable network timeout</li>
+            <li class="success">It returns boolean from authenticate</li>
+            <li class="success">It returns false for invalid input</li>
+            <li class="defect">It documents integration test requirements</li>
+        </ul>
         <h2>Log Util (Tests\Unit\LogUtil)</h2>
         <ul>
             <li class="success">It loads configuration lazily</li>

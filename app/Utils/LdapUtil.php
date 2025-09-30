@@ -37,9 +37,20 @@ class LdapUtil
     public static function loadConfig()
     {
         $config = include __DIR__ . '/../../config.php'; // Konfigurationsdatei einbinden
-        self::$ldapHost = $config['ldapSettings']['ldapHost'] ?? 'ldaps://ldap.example.com';
-        self::$ldapPort = $config['ldapSettings']['ldapPort'] ?? 636;
-        self::$domainPrefix = $config['ldapSettings']['domainPrefix'] ?? '';
+        
+        // LDAP Host laden (mit Fallback auf Default)
+        $host = $config['ldapSettings']['ldapHost'] ?? 'ldaps://ldap.example.com';
+        self::$ldapHost = !empty($host) ? $host : 'ldaps://ldap.example.com';
+        
+        // LDAP Port laden und validieren
+        $port = $config['ldapSettings']['ldapPort'] ?? 636;
+        $port = (int)$port;
+        // Wenn Port ungültig (0 oder außerhalb Range), nutze Default 636
+        self::$ldapPort = ($port > 0 && $port <= 65535) ? $port : 636;
+        
+        // Domain Prefix laden
+        $domainPrefix = $config['ldapSettings']['domainPrefix'] ?? '';
+        self::$domainPrefix = is_string($domainPrefix) ? $domainPrefix : '';
     }
 
     /**
