@@ -75,6 +75,37 @@
             <li class="success">Session expires after timeout</li>
             <li class="success">Logout clears all session data</li>
         </ul>
+        <h2>Mail Util (Tests\Unit\MailUtil)</h2>
+        <ul>
+            <li class="success">It loads configuration lazily</li>
+            <li class="success">It does not reload configuration if already loaded</li>
+            <li class="success">It loads mail configuration with required keys</li>
+            <li class="success">It validates smtp configuration structure</li>
+            <li class="success">It has valid smtp port numbers</li>
+            <li class="success">It has valid encryption type</li>
+            <li class="success">It has valid email format for from address</li>
+            <li class="success">It validates recipient email format</li>
+            <li class="success">It validates subject is not empty</li>
+            <li class="success">It validates template names</li>
+            <li class="success">It validates template data is array</li>
+            <li class="success">It respects enable welcome mail flag</li>
+            <li class="success">It validates welcome mail logic</li>
+            <li class="success">It sends non welcome emails regardless of flag</li>
+            <li class="success">It handles invalid smtp credentials gracefully</li>
+            <li class="success">It handles missing mail configuration</li>
+            <li class="success">It handles invalid port number</li>
+            <li class="success">It uses reasonable smtp timeout</li>
+            <li class="success">It handles special characters in subject</li>
+            <li class="success">It handles unicode in subject</li>
+            <li class="success">It handles empty from name gracefully</li>
+            <li class="success">It validates smtp host format</li>
+            <li class="success">It handles different encryption methods</li>
+            <li class="success">It constructs valid template path</li>
+            <li class="success">It validates template file extension</li>
+            <li class="success">It has complete mail configuration for sending</li>
+            <li class="success">It validates complete email send parameters</li>
+            <li class="success">It constructs valid log messages</li>
+        </ul>
         <h2>Rate Limiter (Tests\Unit\RateLimiter)</h2>
         <ul>
             <li class="success">It initializes with default limits</li>
