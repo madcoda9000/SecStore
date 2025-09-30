@@ -93,6 +93,32 @@
             <li class="success">It provides window reset timestamp</li>
             <li class="success">It handles concurrent limit types</li>
         </ul>
+        <h2>Security Metrics (Tests\Unit\SecurityMetrics)</h2>
+        <ul>
+            <li class="success">It calculates perfect security score</li>
+            <li class="success">It reduces score for moderate failed logins</li>
+            <li class="success">It reduces score for high failed logins</li>
+            <li class="success">It reduces score for csrf violations</li>
+            <li class="success">It caps csrf violation penalty at 30</li>
+            <li class="success">It reduces score for high severity alerts</li>
+            <li class="success">It reduces score for medium severity alerts</li>
+            <li class="success">It combines multiple penalties</li>
+            <li class="success">It never returns negative security score</li>
+            <li class="success">It detects no alerts for normal activity</li>
+            <li class="success">It detects excessive failed logins alert</li>
+            <li class="success">It detects csrf violations alert</li>
+            <li class="success">It detects suspicious activity alert</li>
+            <li class="success">It detects multiple alerts simultaneously</li>
+            <li class="success">It includes recommendations in alerts</li>
+            <li class="success">It identifies suspicious ips from failed logins</li>
+            <li class="success">It identifies multiple suspicious ips</li>
+            <li class="success">It handles no suspicious activity</li>
+            <li class="success">It returns valid summary structure</li>
+            <li class="success">It returns valid alert structure</li>
+            <li class="success">It handles zero login attempts</li>
+            <li class="success">It handles null suspicious activity</li>
+            <li class="success">It handles boundary value for failed logins</li>
+        </ul>
         <h2>Session Util (Tests\Unit\SessionUtil)</h2>
         <ul>
             <li class="success">It can set and get session value</li>
