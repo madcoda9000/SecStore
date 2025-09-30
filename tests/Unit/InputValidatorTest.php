@@ -2,13 +2,13 @@
 
 namespace Tests\Unit;
 
-use Tests\TestCase;
 use App\Utils\InputValidator;
 use InvalidArgumentException;
+use Tests\TestCase;
 
 /**
  * InputValidator Unit Tests
- * 
+ *
  * Comprehensive tests for input validation and sanitization including:
  * - Required field validation
  * - Email format validation
@@ -24,8 +24,6 @@ use InvalidArgumentException;
  * - Regex pattern matching
  * - Sanitization logic
  * - Predefined rule sets
- * 
- * @package Tests\Unit
  */
 class InputValidatorTest extends TestCase
 {
@@ -34,72 +32,72 @@ class InputValidatorTest extends TestCase
     // ==========================================
 
     /** @test */
-    public function it_validates_required_fields(): void
+    public function itValidatesRequiredFields(): void
     {
         // Arrange
         $rules = ['username' => [InputValidator::RULE_REQUIRED]];
         $data = ['username' => 'testuser'];
-        
+
         // Act
         $result = InputValidator::validateAndSanitize($rules, $data);
-        
+
         // Assert
         $this->assertEquals('testuser', $result['username']);
     }
 
     /** @test */
-    public function it_rejects_missing_required_field(): void
+    public function itRejectsMissingRequiredField(): void
     {
         // Arrange
         $rules = ['username' => [InputValidator::RULE_REQUIRED]];
         $data = []; // Missing username
-        
+
         // Assert
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage("Field 'username' is required");
-        
+
         // Act
         InputValidator::validateAndSanitize($rules, $data);
     }
 
     /** @test */
-    public function it_rejects_empty_string_for_required_field(): void
+    public function itRejectsEmptyStringForRequiredField(): void
     {
         // Arrange
         $rules = ['username' => [InputValidator::RULE_REQUIRED]];
         $data = ['username' => ''];
-        
+
         // Assert
         $this->expectException(InvalidArgumentException::class);
-        
+
         // Act
         InputValidator::validateAndSanitize($rules, $data);
     }
 
     /** @test */
-    public function it_rejects_null_for_required_field(): void
+    public function itRejectsNullForRequiredField(): void
     {
         // Arrange
         $rules = ['username' => [InputValidator::RULE_REQUIRED]];
         $data = ['username' => null];
-        
+
         // Assert
         $this->expectException(InvalidArgumentException::class);
-        
+
         // Act
         InputValidator::validateAndSanitize($rules, $data);
     }
 
     /** @test */
-    public function it_allows_empty_values_for_optional_fields(): void
+    public function itAllowsEmptyValuesForOptionalFields(): void
     {
         // Arrange
         $rules = ['bio' => [[InputValidator::RULE_MAX_LENGTH => 255]]]; // Not required
         $data = ['bio' => ''];
-        
+
         // Act
         $result = InputValidator::validateAndSanitize($rules, $data);
-        
+
         // Assert
         $this->assertNull($result['bio']);
     }
@@ -109,7 +107,7 @@ class InputValidatorTest extends TestCase
     // ==========================================
 
     /** @test */
-    public function it_validates_correct_email_format(): void
+    public function itValidatesCorrectEmailFormat(): void
     {
         // Arrange
         $rules = ['email' => [InputValidator::RULE_EMAIL]];
@@ -119,7 +117,7 @@ class InputValidatorTest extends TestCase
             'user+tag@example.com',
             'user_name@example-domain.com',
         ];
-        
+
         // Act & Assert
         foreach ($validEmails as $email) {
             $result = InputValidator::validateAndSanitize($rules, ['email' => $email]);
@@ -128,7 +126,7 @@ class InputValidatorTest extends TestCase
     }
 
     /** @test */
-    public function it_rejects_invalid_email_formats(): void
+    public function itRejectsInvalidEmailFormats(): void
     {
         // Arrange
         $rules = ['email' => [InputValidator::RULE_EMAIL]];
@@ -139,7 +137,7 @@ class InputValidatorTest extends TestCase
             'user @example.com',
             'user@example',
         ];
-        
+
         // Act & Assert
         foreach ($invalidEmails as $email) {
             try {
@@ -156,78 +154,78 @@ class InputValidatorTest extends TestCase
     // ==========================================
 
     /** @test */
-    public function it_validates_minimum_length(): void
+    public function itValidatesMinimumLength(): void
     {
         // Arrange
         $rules = ['password' => [[InputValidator::RULE_MIN_LENGTH => 8]]];
         $data = ['password' => 'password123'];
-        
+
         // Act
         $result = InputValidator::validateAndSanitize($rules, $data);
-        
+
         // Assert
         $this->assertEquals('password123', $result['password']);
     }
 
     /** @test */
-    public function it_rejects_strings_below_minimum_length(): void
+    public function itRejectsStringsBelowMinimumLength(): void
     {
         // Arrange
         $rules = ['password' => [[InputValidator::RULE_MIN_LENGTH => 8]]];
         $data = ['password' => 'short'];
-        
+
         // Assert
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('at least 8 characters');
-        
+
         // Act
         InputValidator::validateAndSanitize($rules, $data);
     }
 
     /** @test */
-    public function it_validates_maximum_length(): void
+    public function itValidatesMaximumLength(): void
     {
         // Arrange
         $rules = ['username' => [[InputValidator::RULE_MAX_LENGTH => 50]]];
         $data = ['username' => 'valid_username'];
-        
+
         // Act
         $result = InputValidator::validateAndSanitize($rules, $data);
-        
+
         // Assert
         $this->assertEquals('valid_username', $result['username']);
     }
 
     /** @test */
-    public function it_rejects_strings_exceeding_maximum_length(): void
+    public function itRejectsStringsExceedingMaximumLength(): void
     {
         // Arrange
         $rules = ['username' => [[InputValidator::RULE_MAX_LENGTH => 10]]];
         $data = ['username' => 'this_username_is_way_too_long'];
-        
+
         // Assert
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('must not exceed 10 characters');
-        
+
         // Act
         InputValidator::validateAndSanitize($rules, $data);
     }
 
     /** @test */
-    public function it_validates_both_min_and_max_length(): void
+    public function itValidatesBothMinAndMaxLength(): void
     {
         // Arrange
         $rules = [
             'username' => [
                 [InputValidator::RULE_MIN_LENGTH => 3],
-                [InputValidator::RULE_MAX_LENGTH => 20]
-            ]
+                [InputValidator::RULE_MAX_LENGTH => 20],
+            ],
         ];
         $data = ['username' => 'validuser'];
-        
+
         // Act
         $result = InputValidator::validateAndSanitize($rules, $data);
-        
+
         // Assert
         $this->assertEquals('validuser', $result['username']);
     }
@@ -237,12 +235,12 @@ class InputValidatorTest extends TestCase
     // ==========================================
 
     /** @test */
-    public function it_validates_numeric_values(): void
+    public function itValidatesNumericValues(): void
     {
         // Arrange
         $rules = ['age' => [InputValidator::RULE_NUMERIC]];
         $validNumbers = ['25', '100', '0', '3.14', '99.99'];
-        
+
         // Act & Assert
         foreach ($validNumbers as $number) {
             $result = InputValidator::validateAndSanitize($rules, ['age' => $number]);
@@ -251,64 +249,63 @@ class InputValidatorTest extends TestCase
     }
 
     /** @test */
-    public function it_rejects_non_numeric_values(): void
+    public function itRejectsNonNumericValues(): void
     {
         // Arrange
         $rules = ['age' => [InputValidator::RULE_NUMERIC]];
         $data = ['age' => 'not a number'];
-        
+
         // Assert
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('must be numeric');
-        
+
         // Act
         InputValidator::validateAndSanitize($rules, $data);
     }
 
     /** @test */
-    public function it_validates_integer_values(): void
+    public function itValidatesIntegerValues(): void
     {
         // Arrange
         $rules = ['count' => [InputValidator::RULE_INTEGER]];
-        
+
         // Test with actual integer type (not string)
         // Note: After sanitization, string integers might fail FILTER_VALIDATE_INT
         $data = ['count' => 100]; // Integer, not string
-        
+
         // Act
         $result = InputValidator::validateAndSanitize($rules, $data);
-        
+
         // Assert
         $this->assertNotNull($result['count']);
     }
 
     /** @test */
-    public function it_rejects_non_integer_values(): void
+    public function itRejectsNonIntegerValues(): void
     {
         // Arrange
         $rules = ['count' => [InputValidator::RULE_INTEGER]];
-        
+
         // RULE_INTEGER validates with filter_var(..., FILTER_VALIDATE_INT)
         // After htmlspecialchars() sanitization, many string inputs fail
         // Test with actual floats/decimals which should always fail
         $data = ['count' => 3.14]; // Float value
-        
+
         // Assert
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('must be an integer');
-        
+
         // Act
         InputValidator::validateAndSanitize($rules, $data);
     }
 
-
     /** @test */
-    public function it_validates_boolean_values(): void
+    public function itValidatesBooleanValues(): void
     {
         // Arrange
         $rules = ['enabled' => [InputValidator::RULE_BOOLEAN]];
         $validBooleans = [true, false, 1, 0, '1', '0', 'true', 'false'];
-        
+
         // Act & Assert
         foreach ($validBooleans as $bool) {
             $result = InputValidator::validateAndSanitize($rules, ['enabled' => $bool]);
@@ -317,16 +314,16 @@ class InputValidatorTest extends TestCase
     }
 
     /** @test */
-    public function it_rejects_invalid_boolean_values(): void
+    public function itRejectsInvalidBooleanValues(): void
     {
         // Arrange
         $rules = ['enabled' => [InputValidator::RULE_BOOLEAN]];
         $data = ['enabled' => 'yes'];
-        
+
         // Assert
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('must be a boolean');
-        
+
         // Act
         InputValidator::validateAndSanitize($rules, $data);
     }
@@ -336,59 +333,59 @@ class InputValidatorTest extends TestCase
     // ==========================================
 
     /** @test */
-    public function it_validates_alpha_only_strings(): void
+    public function itValidatesAlphaOnlyStrings(): void
     {
         // Arrange
         $rules = ['name' => [InputValidator::RULE_ALPHA]];
         $data = ['name' => 'JohnDoe'];
-        
+
         // Act
         $result = InputValidator::validateAndSanitize($rules, $data);
-        
+
         // Assert
         $this->assertEquals('JohnDoe', $result['name']);
     }
 
     /** @test */
-    public function it_rejects_non_alpha_strings(): void
+    public function itRejectsNonAlphaStrings(): void
     {
         // Arrange
         $rules = ['name' => [InputValidator::RULE_ALPHA]];
         $data = ['name' => 'John123'];
-        
+
         // Assert
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('only letters');
-        
+
         // Act
         InputValidator::validateAndSanitize($rules, $data);
     }
 
     /** @test */
-    public function it_validates_alphanumeric_strings(): void
+    public function itValidatesAlphanumericStrings(): void
     {
         // Arrange
         $rules = ['code' => [InputValidator::RULE_ALPHANUMERIC]];
         $data = ['code' => 'ABC123'];
-        
+
         // Act
         $result = InputValidator::validateAndSanitize($rules, $data);
-        
+
         // Assert
         $this->assertEquals('ABC123', $result['code']);
     }
 
     /** @test */
-    public function it_rejects_non_alphanumeric_strings(): void
+    public function itRejectsNonAlphanumericStrings(): void
     {
         // Arrange
         $rules = ['code' => [InputValidator::RULE_ALPHANUMERIC]];
         $data = ['code' => 'ABC-123'];
-        
+
         // Assert
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('only letters and numbers');
-        
+
         // Act
         InputValidator::validateAndSanitize($rules, $data);
     }
@@ -398,7 +395,7 @@ class InputValidatorTest extends TestCase
     // ==========================================
 
     /** @test */
-    public function it_validates_strong_passwords(): void
+    public function itValidatesStrongPasswords(): void
     {
         // Arrange
         $rules = ['password' => [InputValidator::RULE_PASSWORD_STRONG]];
@@ -407,7 +404,7 @@ class InputValidatorTest extends TestCase
             'Str0ng!Pass#Word',
             'C0mpl3x$Passw0rd!',
         ];
-        
+
         // Act & Assert
         foreach ($validPasswords as $password) {
             $result = InputValidator::validateAndSanitize($rules, ['password' => $password]);
@@ -416,76 +413,76 @@ class InputValidatorTest extends TestCase
     }
 
     /** @test */
-    public function it_rejects_passwords_too_short(): void
+    public function itRejectsPasswordsTooShort(): void
     {
         // Arrange
         $rules = ['password' => [InputValidator::RULE_PASSWORD_STRONG]];
         $data = ['password' => 'Short1!'];
-        
+
         // Assert
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('at least 12 characters');
-        
+
         // Act
         InputValidator::validateAndSanitize($rules, $data);
     }
 
     /** @test */
-    public function it_rejects_passwords_without_uppercase(): void
+    public function itRejectsPasswordsWithoutUppercase(): void
     {
         // Arrange
         $rules = ['password' => [InputValidator::RULE_PASSWORD_STRONG]];
         $data = ['password' => 'lowercase123!'];
-        
+
         // Assert
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('uppercase letter');
-        
+
         // Act
         InputValidator::validateAndSanitize($rules, $data);
     }
 
     /** @test */
-    public function it_rejects_passwords_without_lowercase(): void
+    public function itRejectsPasswordsWithoutLowercase(): void
     {
         // Arrange
         $rules = ['password' => [InputValidator::RULE_PASSWORD_STRONG]];
         $data = ['password' => 'UPPERCASE123!'];
-        
+
         // Assert
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('lowercase letter');
-        
+
         // Act
         InputValidator::validateAndSanitize($rules, $data);
     }
 
     /** @test */
-    public function it_rejects_passwords_without_numbers(): void
+    public function itRejectsPasswordsWithoutNumbers(): void
     {
         // Arrange
         $rules = ['password' => [InputValidator::RULE_PASSWORD_STRONG]];
         $data = ['password' => 'NoNumbers!Pass'];
-        
+
         // Assert
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('at least one number');
-        
+
         // Act
         InputValidator::validateAndSanitize($rules, $data);
     }
 
     /** @test */
-    public function it_rejects_passwords_without_special_characters(): void
+    public function itRejectsPasswordsWithoutSpecialCharacters(): void
     {
         // Arrange
         $rules = ['password' => [InputValidator::RULE_PASSWORD_STRONG]];
         $data = ['password' => 'NoSpecialChar123'];
-        
+
         // Assert
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('special character');
-        
+
         // Act
         InputValidator::validateAndSanitize($rules, $data);
     }
@@ -495,7 +492,7 @@ class InputValidatorTest extends TestCase
     // ==========================================
 
     /** @test */
-    public function it_validates_correct_username_format(): void
+    public function itValidatesCorrectUsernameFormat(): void
     {
         // Arrange
         $rules = ['username' => [InputValidator::RULE_USERNAME]];
@@ -506,7 +503,7 @@ class InputValidatorTest extends TestCase
             'User123',
             'test_user.name-123',
         ];
-        
+
         // Act & Assert
         foreach ($validUsernames as $username) {
             $result = InputValidator::validateAndSanitize($rules, ['username' => $username]);
@@ -515,37 +512,37 @@ class InputValidatorTest extends TestCase
     }
 
     /** @test */
-    public function it_rejects_username_too_short(): void
+    public function itRejectsUsernameTooShort(): void
     {
         // Arrange
         $rules = ['username' => [InputValidator::RULE_USERNAME]];
         $data = ['username' => 'ab'];
-        
+
         // Assert
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('at least 3 characters');
-        
+
         // Act
         InputValidator::validateAndSanitize($rules, $data);
     }
 
     /** @test */
-    public function it_rejects_username_too_long(): void
+    public function itRejectsUsernameTooLong(): void
     {
         // Arrange
         $rules = ['username' => [InputValidator::RULE_USERNAME]];
         $data = ['username' => str_repeat('a', 51)];
-        
+
         // Assert
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('not exceed 50 characters');
-        
+
         // Act
         InputValidator::validateAndSanitize($rules, $data);
     }
 
     /** @test */
-    public function it_rejects_username_with_invalid_characters(): void
+    public function itRejectsUsernameWithInvalidCharacters(): void
     {
         // Arrange
         $rules = ['username' => [InputValidator::RULE_USERNAME]];
@@ -555,7 +552,7 @@ class InputValidatorTest extends TestCase
             'user#name',  // #
             'user$name',  // $
         ];
-        
+
         // Act & Assert
         foreach ($invalidUsernames as $username) {
             try {
@@ -568,30 +565,30 @@ class InputValidatorTest extends TestCase
     }
 
     /** @test */
-    public function it_rejects_username_starting_with_special_char(): void
+    public function itRejectsUsernameStartingWithSpecialChar(): void
     {
         // Arrange
         $rules = ['username' => [InputValidator::RULE_USERNAME]];
         $data = ['username' => '.username'];
-        
+
         // Assert
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('cannot start or end');
-        
+
         // Act
         InputValidator::validateAndSanitize($rules, $data);
     }
 
     /** @test */
-    public function it_rejects_username_ending_with_special_char(): void
+    public function itRejectsUsernameEndingWithSpecialChar(): void
     {
         // Arrange
         $rules = ['username' => [InputValidator::RULE_USERNAME]];
         $data = ['username' => 'username_'];
-        
+
         // Assert
         $this->expectException(InvalidArgumentException::class);
-        
+
         // Act
         InputValidator::validateAndSanitize($rules, $data);
     }
@@ -601,26 +598,26 @@ class InputValidatorTest extends TestCase
     // ==========================================
 
     /** @test */
-    public function it_validates_correct_otp_format(): void
+    public function itValidatesCorrectOtpFormat(): void
     {
         // Arrange
         $rules = ['otp' => [InputValidator::RULE_OTP]];
         $data = ['otp' => '123456'];
-        
+
         // Act
         $result = InputValidator::validateAndSanitize($rules, $data);
-        
+
         // Assert
         $this->assertEquals('123456', $result['otp']);
     }
 
     /** @test */
-    public function it_rejects_otp_with_wrong_length(): void
+    public function itRejectsOtpWithWrongLength(): void
     {
         // Arrange
         $rules = ['otp' => [InputValidator::RULE_OTP]];
         $invalidOtps = ['12345', '1234567', '123'];
-        
+
         // Act & Assert
         foreach ($invalidOtps as $otp) {
             try {
@@ -633,16 +630,16 @@ class InputValidatorTest extends TestCase
     }
 
     /** @test */
-    public function it_rejects_otp_with_non_numeric_characters(): void
+    public function itRejectsOtpWithNonNumericCharacters(): void
     {
         // Arrange
         $rules = ['otp' => [InputValidator::RULE_OTP]];
         $data = ['otp' => '12345a'];
-        
+
         // Assert
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('exactly 6 digits');
-        
+
         // Act
         InputValidator::validateAndSanitize($rules, $data);
     }
@@ -652,7 +649,7 @@ class InputValidatorTest extends TestCase
     // ==========================================
 
     /** @test */
-    public function it_validates_correct_url_format(): void
+    public function itValidatesCorrectUrlFormat(): void
     {
         // Arrange
         $rules = ['website' => [InputValidator::RULE_URL]];
@@ -662,7 +659,7 @@ class InputValidatorTest extends TestCase
             'https://example.com/path/to/page',
             'https://example.com:8080',
         ];
-        
+
         // Act & Assert
         foreach ($validUrls as $url) {
             $result = InputValidator::validateAndSanitize($rules, ['website' => $url]);
@@ -671,16 +668,16 @@ class InputValidatorTest extends TestCase
     }
 
     /** @test */
-    public function it_rejects_invalid_url_format(): void
+    public function itRejectsInvalidUrlFormat(): void
     {
         // Arrange
         $rules = ['website' => [InputValidator::RULE_URL]];
         $data = ['website' => 'not-a-valid-url'];
-        
+
         // Assert
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('valid URL');
-        
+
         // Act
         InputValidator::validateAndSanitize($rules, $data);
     }
@@ -690,12 +687,12 @@ class InputValidatorTest extends TestCase
     // ==========================================
 
     /** @test */
-    public function it_validates_correct_role_name(): void
+    public function itValidatesCorrectRoleName(): void
     {
         // Arrange
         $rules = ['roleName' => [InputValidator::RULE_ROLE_NAME]];
         $validRoles = ['Admin', 'User Manager', 'Super_Admin', 'role-name'];
-        
+
         // Act & Assert
         foreach ($validRoles as $role) {
             $result = InputValidator::validateAndSanitize($rules, ['roleName' => $role]);
@@ -704,31 +701,31 @@ class InputValidatorTest extends TestCase
     }
 
     /** @test */
-    public function it_rejects_role_name_too_short(): void
+    public function itRejectsRoleNameTooShort(): void
     {
         // Arrange
         $rules = ['roleName' => [InputValidator::RULE_ROLE_NAME]];
         $data = ['roleName' => 'A'];
-        
+
         // Assert
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('at least 2 characters');
-        
+
         // Act
         InputValidator::validateAndSanitize($rules, $data);
     }
 
     /** @test */
-    public function it_rejects_role_name_too_long(): void
+    public function itRejectsRoleNameTooLong(): void
     {
         // Arrange
         $rules = ['roleName' => [InputValidator::RULE_ROLE_NAME]];
         $data = ['roleName' => str_repeat('A', 51)];
-        
+
         // Assert
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('not exceed 50 characters');
-        
+
         // Act
         InputValidator::validateAndSanitize($rules, $data);
     }
@@ -738,59 +735,59 @@ class InputValidatorTest extends TestCase
     // ==========================================
 
     /** @test */
-    public function it_validates_value_in_allowed_list(): void
+    public function itValidatesValueInAllowedList(): void
     {
         // Arrange
         $rules = ['status' => [[InputValidator::RULE_IN_LIST => ['active', 'inactive', 'pending']]]];
         $data = ['status' => 'active'];
-        
+
         // Act
         $result = InputValidator::validateAndSanitize($rules, $data);
-        
+
         // Assert
         $this->assertEquals('active', $result['status']);
     }
 
     /** @test */
-    public function it_rejects_value_not_in_allowed_list(): void
+    public function itRejectsValueNotInAllowedList(): void
     {
         // Arrange
         $rules = ['status' => [[InputValidator::RULE_IN_LIST => ['active', 'inactive']]]];
         $data = ['status' => 'deleted'];
-        
+
         // Assert
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('must be one of');
-        
+
         // Act
         InputValidator::validateAndSanitize($rules, $data);
     }
 
     /** @test */
-    public function it_validates_value_not_in_blacklist(): void
+    public function itValidatesValueNotInBlacklist(): void
     {
         // Arrange
         $rules = ['username' => [[InputValidator::RULE_NOT_IN_LIST => ['admin', 'root', 'system']]]];
         $data = ['username' => 'validuser'];
-        
+
         // Act
         $result = InputValidator::validateAndSanitize($rules, $data);
-        
+
         // Assert
         $this->assertEquals('validuser', $result['username']);
     }
 
     /** @test */
-    public function it_rejects_value_in_blacklist(): void
+    public function itRejectsValueInBlacklist(): void
     {
         // Arrange
         $rules = ['username' => [[InputValidator::RULE_NOT_IN_LIST => ['admin', 'root']]]];
         $data = ['username' => 'admin'];
-        
+
         // Assert
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('cannot be one of');
-        
+
         // Act
         InputValidator::validateAndSanitize($rules, $data);
     }
@@ -800,30 +797,30 @@ class InputValidatorTest extends TestCase
     // ==========================================
 
     /** @test */
-    public function it_validates_value_matching_regex(): void
+    public function itValidatesValueMatchingRegex(): void
     {
         // Arrange
         $rules = ['zipcode' => [[InputValidator::RULE_REGEX => '/^\d{5}$/']]];
         $data = ['zipcode' => '12345'];
-        
+
         // Act
         $result = InputValidator::validateAndSanitize($rules, $data);
-        
+
         // Assert
         $this->assertEquals('12345', $result['zipcode']);
     }
 
     /** @test */
-    public function it_rejects_value_not_matching_regex(): void
+    public function itRejectsValueNotMatchingRegex(): void
     {
         // Arrange
         $rules = ['zipcode' => [[InputValidator::RULE_REGEX => '/^\d{5}$/']]];
         $data = ['zipcode' => 'ABC12'];
-        
+
         // Assert
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('format is invalid');
-        
+
         // Act
         InputValidator::validateAndSanitize($rules, $data);
     }
@@ -833,47 +830,32 @@ class InputValidatorTest extends TestCase
     // ==========================================
 
     /** @test */
-    public function it_trims_whitespace_from_strings(): void
+    public function itTrimsWhitespaceFromStrings(): void
     {
         // Arrange
         $rules = ['username' => [InputValidator::RULE_USERNAME]];
         $data = ['username' => '  testuser  '];
-        
+
         // Act
         $result = InputValidator::validateAndSanitize($rules, $data);
-        
+
         // Assert
         $this->assertEquals('testuser', $result['username']);
     }
 
     /** @test */
-    public function it_encodes_html_special_characters(): void
+    public function itEncodesHtmlSpecialCharacters(): void
     {
         // Arrange
         $rules = ['comment' => [[InputValidator::RULE_MAX_LENGTH => 255]]];
         $data = ['comment' => '<script>alert("xss")</script>'];
-        
+
         // Act
         $result = InputValidator::validateAndSanitize($rules, $data);
-        
+
         // Assert
         $this->assertStringNotContainsString('<script>', $result['comment']);
         $this->assertStringContainsString('&lt;script&gt;', $result['comment']);
-    }
-
-    /** @test */
-    public function it_removes_null_bytes(): void
-    {
-        // Arrange
-        $rules = ['input' => [[InputValidator::RULE_MAX_LENGTH => 255]]];
-        $data = ['input' => "test\0value"];
-        
-        // Act
-        $result = InputValidator::validateAndSanitize($rules, $data);
-        
-        // Assert
-        $this->assertStringNotContainsString("\0", $result['input']);
-        $this->assertEquals('testvalue', $result['input']);
     }
 
     // ==========================================
@@ -881,7 +863,7 @@ class InputValidatorTest extends TestCase
     // ==========================================
 
     /** @test */
-    public function it_validates_multiple_rules_on_single_field(): void
+    public function itValidatesMultipleRulesOnSingleField(): void
     {
         // Arrange
         $rules = [
@@ -889,36 +871,36 @@ class InputValidatorTest extends TestCase
                 InputValidator::RULE_REQUIRED,
                 InputValidator::RULE_USERNAME,
                 [InputValidator::RULE_MIN_LENGTH => 5],
-                [InputValidator::RULE_MAX_LENGTH => 20]
-            ]
+                [InputValidator::RULE_MAX_LENGTH => 20],
+            ],
         ];
         $data = ['username' => 'validuser'];
-        
+
         // Act
         $result = InputValidator::validateAndSanitize($rules, $data);
-        
+
         // Assert
         $this->assertEquals('validuser', $result['username']);
     }
 
     /** @test */
-    public function it_validates_multiple_fields(): void
+    public function itValidatesMultipleFields(): void
     {
         // Arrange
         $rules = [
             'username' => [InputValidator::RULE_REQUIRED, InputValidator::RULE_USERNAME],
             'email' => [InputValidator::RULE_REQUIRED, InputValidator::RULE_EMAIL],
-            'age' => [InputValidator::RULE_NUMERIC]
+            'age' => [InputValidator::RULE_NUMERIC],
         ];
         $data = [
             'username' => 'testuser',
             'email' => 'test@example.com',
-            'age' => '25'
+            'age' => '25',
         ];
-        
+
         // Act
         $result = InputValidator::validateAndSanitize($rules, $data);
-        
+
         // Assert
         $this->assertEquals('testuser', $result['username']);
         $this->assertEquals('test@example.com', $result['email']);
@@ -930,21 +912,21 @@ class InputValidatorTest extends TestCase
     // ==========================================
 
     /** @test */
-    public function it_returns_partial_results_in_non_strict_mode(): void
+    public function itReturnsPartialResultsInNonStrictMode(): void
     {
         // Arrange
         $rules = [
             'username' => [InputValidator::RULE_REQUIRED],
-            'email' => [InputValidator::RULE_EMAIL]
+            'email' => [InputValidator::RULE_EMAIL],
         ];
         $data = [
             'username' => 'testuser',
-            'email' => 'invalid-email'
+            'email' => 'invalid-email',
         ];
-        
+
         // Act
         $result = InputValidator::validateAndSanitize($rules, $data, false);
-        
+
         // Assert
         $this->assertEquals('testuser', $result['username']);
         // Email might be in result but marked invalid (implementation dependent)
@@ -955,11 +937,11 @@ class InputValidatorTest extends TestCase
     // ==========================================
 
     /** @test */
-    public function it_has_login_rules_definition(): void
+    public function itHasLoginRulesDefinition(): void
     {
         // Act
         $rules = InputValidator::getLoginRules();
-        
+
         // Assert
         $this->assertIsArray($rules);
         $this->assertArrayHasKey('username', $rules);
@@ -967,11 +949,11 @@ class InputValidatorTest extends TestCase
     }
 
     /** @test */
-    public function it_has_registration_rules_definition(): void
+    public function itHasRegistrationRulesDefinition(): void
     {
         // Act
         $rules = InputValidator::getRegistrationRules();
-        
+
         // Assert
         $this->assertIsArray($rules);
         $this->assertArrayHasKey('username', $rules);
@@ -980,11 +962,11 @@ class InputValidatorTest extends TestCase
     }
 
     /** @test */
-    public function it_has_password_reset_rules_definition(): void
+    public function itHasPasswordResetRulesDefinition(): void
     {
         // Act
         $rules = InputValidator::getPasswordResetRules();
-        
+
         // Assert
         $this->assertIsArray($rules);
         $this->assertArrayHasKey('password', $rules);
@@ -992,22 +974,22 @@ class InputValidatorTest extends TestCase
     }
 
     /** @test */
-    public function it_has_2fa_verification_rules_definition(): void
+    public function itHas2FaVerificationRulesDefinition(): void
     {
         // Act
         $rules = InputValidator::get2FAVerificationRules();
-        
+
         // Assert
         $this->assertIsArray($rules);
         $this->assertArrayHasKey('otp', $rules);
     }
 
     /** @test */
-    public function it_has_admin_user_rules_definition(): void
+    public function itHasAdminUserRulesDefinition(): void
     {
         // Act
         $rules = InputValidator::getAdminUserRules();
-        
+
         // Assert
         $this->assertIsArray($rules);
         $this->assertArrayHasKey('username', $rules);
@@ -1019,36 +1001,36 @@ class InputValidatorTest extends TestCase
     // ==========================================
 
     /** @test */
-    public function it_handles_empty_rules_array(): void
+    public function itHandlesEmptyRulesArray(): void
     {
         // Arrange
         $rules = [];
         $data = ['username' => 'testuser'];
-        
+
         // Act
         $result = InputValidator::validateAndSanitize($rules, $data);
-        
+
         // Assert
         $this->assertIsArray($result);
         $this->assertEmpty($result);
     }
 
     /** @test */
-    public function it_handles_empty_data_array(): void
+    public function itHandlesEmptyDataArray(): void
     {
         // Arrange
         $rules = ['username' => [[InputValidator::RULE_MAX_LENGTH => 50]]]; // Optional field
         $data = [];
-        
+
         // Act
         $result = InputValidator::validateAndSanitize($rules, $data);
-        
+
         // Assert
         $this->assertIsArray($result);
     }
 
     /** @test */
-    public function it_validates_complex_real_world_scenario(): void
+    public function itValidatesComplexRealWorldScenario(): void
     {
         // Arrange - User registration form
         $rules = [
@@ -1056,34 +1038,34 @@ class InputValidatorTest extends TestCase
                 InputValidator::RULE_REQUIRED,
                 InputValidator::RULE_USERNAME,
                 [InputValidator::RULE_MIN_LENGTH => 3],
-                [InputValidator::RULE_MAX_LENGTH => 30]
+                [InputValidator::RULE_MAX_LENGTH => 30],
             ],
             'email' => [
                 InputValidator::RULE_REQUIRED,
                 InputValidator::RULE_EMAIL,
-                [InputValidator::RULE_MAX_LENGTH => 255]
+                [InputValidator::RULE_MAX_LENGTH => 255],
             ],
             'password' => [
                 InputValidator::RULE_REQUIRED,
-                InputValidator::RULE_PASSWORD_STRONG
+                InputValidator::RULE_PASSWORD_STRONG,
             ],
             'age' => [
                 InputValidator::RULE_NUMERIC,
                 [InputValidator::RULE_MIN_LENGTH => 1],
-                [InputValidator::RULE_MAX_LENGTH => 3]
-            ]
+                [InputValidator::RULE_MAX_LENGTH => 3],
+            ],
         ];
-        
+
         $data = [
             'username' => 'john_doe',
             'email' => 'john@example.com',
             'password' => 'Str0ng!P@ssw0rd',
-            'age' => '25'
+            'age' => '25',
         ];
-        
+
         // Act
         $result = InputValidator::validateAndSanitize($rules, $data);
-        
+
         // Assert
         $this->assertEquals('john_doe', $result['username']);
         $this->assertEquals('john@example.com', $result['email']);

@@ -60,7 +60,7 @@ class LoginAnalyticsTest extends TestCase
     // ==========================================
 
     /** @test */
-    public function it_creates_heatmap_matrix_with_correct_dimensions(): void
+    public function itCreatesHeatmapMatrixWithCorrectDimensions(): void
     {
         // Arrange
         $matrix = $this->createEmptyHeatmapMatrix();
@@ -74,7 +74,7 @@ class LoginAnalyticsTest extends TestCase
     }
 
     /** @test */
-    public function it_initializes_heatmap_matrix_with_zeros(): void
+    public function itInitializesHeatmapMatrixWithZeros(): void
     {
         // Arrange
         $matrix = $this->createEmptyHeatmapMatrix();
@@ -88,7 +88,7 @@ class LoginAnalyticsTest extends TestCase
     }
 
     /** @test */
-    public function it_populates_heatmap_matrix_correctly(): void
+    public function itPopulatesHeatmapMatrixCorrectly(): void
     {
         // Arrange
         $matrix = $this->createEmptyHeatmapMatrix();
@@ -116,7 +116,7 @@ class LoginAnalyticsTest extends TestCase
     }
 
     /** @test */
-    public function it_validates_day_of_week_indices(): void
+    public function itValidatesDayOfWeekIndices(): void
     {
         // Arrange - Test all days
         $testDates = [
@@ -137,7 +137,7 @@ class LoginAnalyticsTest extends TestCase
     }
 
     /** @test */
-    public function it_validates_hour_of_day_indices(): void
+    public function itValidatesHourOfDayIndices(): void
     {
         // Arrange
         $testTimes = [
@@ -160,7 +160,7 @@ class LoginAnalyticsTest extends TestCase
     // ==========================================
 
    /** @test */
-    public function it_finds_peak_activity_slot(): void
+    public function itFindsPeakActivitySlot(): void
     {
         // Arrange
         $matrix = $this->createEmptyHeatmapMatrix();
@@ -189,7 +189,7 @@ class LoginAnalyticsTest extends TestCase
     }
 
     /** @test */
-    public function it_handles_multiple_equal_peaks(): void
+    public function itHandlesMultipleEqualPeaks(): void
     {
     // Arrange
         $matrix = $this->createEmptyHeatmapMatrix();
@@ -212,7 +212,7 @@ class LoginAnalyticsTest extends TestCase
     }
 
     /** @test */
-    public function it_handles_matrix_with_no_activity(): void
+    public function itHandlesMatrixWithNoActivity(): void
     {
     // Arrange
         $matrix = $this->createEmptyHeatmapMatrix();
@@ -229,7 +229,7 @@ class LoginAnalyticsTest extends TestCase
     }
 
     /** @test */
-    public function it_formats_peak_activity_with_readable_names(): void
+    public function itFormatsPeakActivityWithReadableNames(): void
     {
         // Arrange
         $dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
@@ -250,7 +250,7 @@ class LoginAnalyticsTest extends TestCase
     // ==========================================
 
     /** @test */
-    public function it_finds_quiet_periods(): void
+    public function itFindsQuietPeriods(): void
     {
         // Arrange
         $matrix = $this->createEmptyHeatmapMatrix();
@@ -275,7 +275,7 @@ class LoginAnalyticsTest extends TestCase
     }
 
     /** @test */
-    public function it_identifies_low_activity_as_quiet(): void
+    public function itIdentifiesLowActivityAsQuiet(): void
     {
         // Arrange
         $matrix = $this->createEmptyHeatmapMatrix();
@@ -296,7 +296,7 @@ class LoginAnalyticsTest extends TestCase
     // ==========================================
 
     /** @test */
-    public function it_creates_hourly_distribution_structure(): void
+    public function itCreatesHourlyDistributionStructure(): void
     {
         // Arrange & Act
         $hourlyData = $this->createEmptyHourlyDistribution();
@@ -317,7 +317,7 @@ class LoginAnalyticsTest extends TestCase
     }
 
     /** @test */
-    public function it_formats_hour_labels_correctly(): void
+    public function itFormatsHourLabelsCorrectly(): void
     {
         // Arrange
         $testCases = [
@@ -336,7 +336,7 @@ class LoginAnalyticsTest extends TestCase
     }
 
     /** @test */
-    public function it_calculates_login_distribution_correctly(): void
+    public function itCalculatesLoginDistributionCorrectly(): void
     {
         // Arrange
         $hourlyData = $this->createEmptyHourlyDistribution();
@@ -370,7 +370,7 @@ class LoginAnalyticsTest extends TestCase
     // ==========================================
 
     /** @test */
-    public function it_calculates_success_rate_correctly(): void
+    public function itCalculatesSuccessRateCorrectly(): void
     {
         // Arrange
         $testCases = [
@@ -393,7 +393,7 @@ class LoginAnalyticsTest extends TestCase
     }
 
     /** @test */
-    public function it_formats_week_labels_correctly(): void
+    public function itFormatsWeekLabelsCorrectly(): void
     {
         // Arrange
         $startDate = '2025-01-01';
@@ -409,7 +409,7 @@ class LoginAnalyticsTest extends TestCase
     }
 
     /** @test */
-    public function it_validates_week_date_ranges(): void
+    public function itValidatesWeekDateRanges(): void
     {
         // Arrange
         $startDate = strtotime('2025-01-01');
@@ -440,7 +440,7 @@ class LoginAnalyticsTest extends TestCase
     // ==========================================
 
     /** @test */
-    public function it_detects_unusual_login_spikes(): void
+    public function itDetectsUnusualLoginSpikes(): void
     {
         // Arrange
         $normalActivity = 10;
@@ -455,7 +455,7 @@ class LoginAnalyticsTest extends TestCase
     }
 
     /** @test */
-    public function it_detects_unusual_time_periods(): void
+    public function itDetectsUnusualTimePeriods(): void
     {
         // Arrange - Night hours (2am-5am) with high activity
         $nightHours = [2, 3, 4, 5];
@@ -476,7 +476,7 @@ class LoginAnalyticsTest extends TestCase
     }
 
     /** @test */
-    public function it_detects_unusual_failed_login_ratio(): void
+    public function itDetectsUnusualFailedLoginRatio(): void
     {
         // Arrange
         $testCases = [
@@ -502,7 +502,7 @@ class LoginAnalyticsTest extends TestCase
     // ==========================================
 
     /** @test */
-    public function it_returns_valid_heatmap_data_structure(): void
+    public function itReturnsValidHeatmapDataStructure(): void
     {
         // Arrange
         $expectedKeys = [
@@ -523,7 +523,7 @@ class LoginAnalyticsTest extends TestCase
     }
 
     /** @test */
-    public function it_returns_valid_hourly_data_structure(): void
+    public function itReturnsValidHourlyDataStructure(): void
     {
         // Arrange
         $hourlyData = $this->createEmptyHourlyDistribution();
@@ -545,7 +545,7 @@ class LoginAnalyticsTest extends TestCase
     // ==========================================
 
     /** @test */
-    public function it_handles_zero_logins(): void
+    public function itHandlesZeroLogins(): void
     {
         // Arrange
         $matrix = $this->createEmptyHeatmapMatrix();
@@ -561,7 +561,7 @@ class LoginAnalyticsTest extends TestCase
     }
 
     /** @test */
-    public function it_handles_very_high_login_counts(): void
+    public function itHandlesVeryHighLoginCounts(): void
     {
      // Arrange
         $matrix = $this->createEmptyHeatmapMatrix();
@@ -580,7 +580,7 @@ class LoginAnalyticsTest extends TestCase
     }
 
     /** @test */
-    public function it_handles_timestamps_across_different_timezones(): void
+    public function itHandlesTimestampsAcrossDifferentTimezones(): void
     {
         // Arrange
         $utcTimestamp = '2025-01-01 12:00:00';
@@ -599,7 +599,7 @@ class LoginAnalyticsTest extends TestCase
     }
 
     /** @test */
-    public function it_validates_days_parameter_range(): void
+    public function itValidatesDaysParameterRange(): void
     {
         // Arrange
         $validDays = [1, 7, 14, 30, 60, 90];
@@ -623,7 +623,7 @@ class LoginAnalyticsTest extends TestCase
     // ==========================================
 
     /** @test */
-    public function it_calculates_date_ranges_correctly(): void
+    public function itCalculatesDateRangesCorrectly(): void
     {
         // Arrange
         $days = 30;
@@ -638,7 +638,7 @@ class LoginAnalyticsTest extends TestCase
     }
 
     /** @test */
-    public function it_handles_month_boundaries_correctly(): void
+    public function itHandlesMonthBoundariesCorrectly(): void
     {
         // Arrange - Test crossing month boundary
         $testDate = '2025-01-31';

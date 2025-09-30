@@ -7,13 +7,13 @@ use App\Utils\SessionUtil;
 
 /**
  * Login Flow Feature Tests
- * 
+ *
  * Tests complete user login workflows
  */
 class LoginFlowTest extends TestCase
 {
     /** @test */
-    public function user_can_complete_full_login_flow(): void
+    public function userCanCompleteFullLoginFlow(): void
     {
         // Step 1: User visits login page
         $_SERVER['REQUEST_URI'] = '/login';
@@ -57,7 +57,7 @@ class LoginFlowTest extends TestCase
     }
 
     /** @test */
-    public function user_with_2fa_completes_full_flow(): void
+    public function userWith2FaCompletesFullFlow(): void
     {
         // Set CSRF token direkt (ohne session_start)
         $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
@@ -98,7 +98,7 @@ class LoginFlowTest extends TestCase
     }
 
     /** @test */
-    public function failed_login_tracks_attempts(): void
+    public function failedLoginTracksAttempts(): void
     {
         $email = 'test@example.com';
 
@@ -116,7 +116,7 @@ class LoginFlowTest extends TestCase
     }
 
     /** @test */
-    public function account_locks_after_max_failed_attempts(): void
+    public function accountLocksAfterMaxFailedAttempts(): void
     {
         $email = 'test@example.com';
         $maxAttempts = 5;
@@ -133,7 +133,7 @@ class LoginFlowTest extends TestCase
     }
 
     /** @test */
-    public function session_expires_after_timeout(): void
+    public function sessionExpiresAfterTimeout(): void
     {
         $sessionTimeout = 1800; // 30 minutes
 
@@ -155,7 +155,7 @@ class LoginFlowTest extends TestCase
     }
 
     /** @test */
-    public function logout_clears_all_session_data(): void
+    public function logoutClearsAllSessionData(): void
     {
         // Setup authenticated session
         SessionUtil::set('authenticated', true);

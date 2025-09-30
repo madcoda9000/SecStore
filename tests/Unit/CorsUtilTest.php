@@ -61,7 +61,7 @@ class CorsUtilTest extends TestCase
         $cors = new CorsUtil(['https://allowed.com']);
 
         ob_start();
-        $cors->setupCors(true); 
+        $cors->setupCors(true);
         ob_end_clean();
 
         $headers = Flight::response()->headers();

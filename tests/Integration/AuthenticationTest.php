@@ -9,13 +9,13 @@ use Mockery;
 
 /**
  * Authentication Integration Tests
- * 
+ *
  * Tests login, logout, and authentication flows
  */
 class AuthenticationTest extends TestCase
 {
     /** @test */
-    public function it_validates_login_credentials(): void
+    public function itValidatesLoginCredentials(): void
     {
         $credentials = [
             'username' => 'testuser',
@@ -30,7 +30,7 @@ class AuthenticationTest extends TestCase
     }
 
     /** @test */
-    public function it_rejects_empty_credentials(): void
+    public function itRejectsEmptyCredentials(): void
     {
         $emptyUsername = ['username' => '', 'password' => 'test'];
         $emptyPassword = ['username' => 'test', 'password' => ''];
@@ -40,7 +40,7 @@ class AuthenticationTest extends TestCase
     }
 
     /** @test */
-    public function it_validates_password_complexity(): void
+    public function itValidatesPasswordComplexity(): void
     {
         $weakPasswords = ['123', 'pass', 'test'];
         $strongPassword = 'SecureP@ss123!';
@@ -57,7 +57,7 @@ class AuthenticationTest extends TestCase
     }
 
     /** @test */
-    public function it_creates_session_on_successful_login(): void
+    public function itCreatesSessionOnSuccessfulLogin(): void
     {
         $user = $this->createMockUser([
             'id' => 1,
@@ -84,7 +84,7 @@ class AuthenticationTest extends TestCase
     }
 
     /** @test */
-    public function it_destroys_session_on_logout(): void
+    public function itDestroysSessionOnLogout(): void
     {
         // Setup authenticated session
         SessionUtil::set('user', ['id' => 1, 'username' => 'testuser']);
@@ -98,7 +98,7 @@ class AuthenticationTest extends TestCase
     }
 
     /** @test */
-    public function it_regenerates_session_id_on_login(): void
+    public function itRegeneratesSessionIdOnLogin(): void
     {
         // In Test-Umgebung ist session_start() nach Output nicht möglich
         // Dieser Test kann nur in echter Runtime-Umgebung funktionieren
@@ -106,7 +106,7 @@ class AuthenticationTest extends TestCase
     }
 
     /** @test */
-    public function it_tracks_failed_login_attempts(): void
+    public function itTracksFailedLoginAttempts(): void
     {
         $email = 'test@example.com';
         
@@ -124,7 +124,7 @@ class AuthenticationTest extends TestCase
     }
 
     /** @test */
-    public function it_enforces_account_lockout_after_max_attempts(): void
+    public function itEnforcesAccountLockoutAfterMaxAttempts(): void
     {
         $maxAttempts = 5;
         $lockoutTime = 900; // 15 minutes
@@ -142,7 +142,7 @@ class AuthenticationTest extends TestCase
     }
 
     /** @test */
-    public function it_resets_failed_attempts_on_successful_login(): void
+    public function itResetsFailedAttemptsOnSuccessfulLogin(): void
     {
         $email = 'test@example.com';
         
@@ -155,7 +155,7 @@ class AuthenticationTest extends TestCase
     }
 
     /** @test */
-    public function it_validates_session_timeout(): void
+    public function itValidatesSessionTimeout(): void
     {
         $sessionTimeout = 1800; // 30 minutes
         $sessionStart = time() - 1900; // Started 31 minutes ago
@@ -166,7 +166,7 @@ class AuthenticationTest extends TestCase
     }
 
     /** @test */
-    public function it_handles_2fa_flow(): void
+    public function itHandles2FaFlow(): void
     {
         $user = $this->createMockUser([
             'id' => 1,
@@ -183,7 +183,7 @@ class AuthenticationTest extends TestCase
     }
 
     /** @test */
-    public function it_completes_2fa_verification(): void
+    public function itCompletes2FaVerification(): void
     {
         SessionUtil::set('2fa_user_id', 1);
         SessionUtil::set('2fa_pending', true);

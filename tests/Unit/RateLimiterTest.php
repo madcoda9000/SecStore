@@ -7,7 +7,7 @@ use App\Middleware\RateLimiter;
 
 /**
  * RateLimiter Unit Tests
- * 
+ *
  * Tests rate limiting functionality for SecStore
  * Adapted to work with session-based RateLimiter implementation
  */
@@ -50,7 +50,7 @@ class RateLimiterTest extends TestCase
     }
 
     /** @test */
-    public function it_initializes_with_default_limits(): void
+    public function itInitializesWithDefaultLimits(): void
     {
         $rateLimiter = new RateLimiter();
         
@@ -60,7 +60,7 @@ class RateLimiterTest extends TestCase
     }
 
     /** @test */
-    public function it_accepts_custom_limits(): void
+    public function itAcceptsCustomLimits(): void
     {
         $customLimits = [
             'test' => ['requests' => 3, 'window' => 60]
@@ -75,7 +75,7 @@ class RateLimiterTest extends TestCase
     }
 
     /** @test */
-    public function it_allows_requests_within_limit(): void
+    public function itAllowsRequestsWithinLimit(): void
     {
         $limits = [
             'test' => ['requests' => 5, 'window' => 60]
@@ -91,7 +91,7 @@ class RateLimiterTest extends TestCase
     }
 
     /** @test */
-    public function it_tracks_request_count_correctly(): void
+    public function itTracksRequestCountCorrectly(): void
     {
         $limits = [
             'test' => ['requests' => 10, 'window' => 60]
@@ -111,7 +111,7 @@ class RateLimiterTest extends TestCase
     }
 
     /** @test */
-    public function it_returns_correct_status_information(): void
+    public function itReturnsCorrectStatusInformation(): void
     {
         $limits = [
             'test' => ['requests' => 5, 'window' => 300]
@@ -144,7 +144,7 @@ class RateLimiterTest extends TestCase
     }
 
     /** @test */
-    public function it_uses_global_limit_as_fallback(): void
+    public function itUsesGlobalLimitAsFallback(): void
     {
         $rateLimiter = new RateLimiter();
         
@@ -156,7 +156,7 @@ class RateLimiterTest extends TestCase
     }
 
     /** @test */
-    public function it_has_correct_default_limits(): void
+    public function itHasCorrectDefaultLimits(): void
     {
         $rateLimiter = new RateLimiter();
         
@@ -175,7 +175,7 @@ class RateLimiterTest extends TestCase
     }
 
     /** @test */
-    public function it_stores_requests_in_session(): void
+    public function itStoresRequestsInSession(): void
     {
         $limits = [
             'test' => ['requests' => 5, 'window' => 60]
@@ -203,7 +203,7 @@ class RateLimiterTest extends TestCase
     }
 
     /** @test */
-    public function it_maintains_separate_limits_for_different_types(): void
+    public function itMaintainsSeparateLimitsForDifferentTypes(): void
     {
         $limits = [
             'login' => ['requests' => 2, 'window' => 60],
@@ -227,7 +227,7 @@ class RateLimiterTest extends TestCase
     }
 
     /** @test */
-    public function it_handles_zero_requests_correctly(): void
+    public function itHandlesZeroRequestsCorrectly(): void
     {
         $limits = [
             'test' => ['requests' => 5, 'window' => 60]
@@ -242,7 +242,7 @@ class RateLimiterTest extends TestCase
     }
 
     /** @test */
-    public function it_calculates_remaining_requests_correctly(): void
+    public function itCalculatesRemainingRequestsCorrectly(): void
     {
         $limits = [
             'test' => ['requests' => 10, 'window' => 60]
@@ -277,7 +277,7 @@ class RateLimiterTest extends TestCase
     }
 
     /** @test */
-    public function it_generates_consistent_identifier_for_same_client(): void
+    public function itGeneratesConsistentIdentifierForSameClient(): void
     {
         $_SERVER['REMOTE_ADDR'] = '192.168.1.100';
         $_SERVER['HTTP_USER_AGENT'] = 'TestBrowser/1.0';
@@ -296,7 +296,7 @@ class RateLimiterTest extends TestCase
     }
 
     /** @test */
-    public function it_handles_missing_user_agent_gracefully(): void
+    public function itHandlesMissingUserAgentGracefully(): void
     {
         unset($_SERVER['HTTP_USER_AGENT']);
         
@@ -307,7 +307,7 @@ class RateLimiterTest extends TestCase
     }
 
     /** @test */
-    public function it_provides_window_reset_timestamp(): void
+    public function itProvidesWindowResetTimestamp(): void
     {
         $limits = [
             'test' => ['requests' => 5, 'window' => 300]
@@ -326,7 +326,7 @@ class RateLimiterTest extends TestCase
     }
 
     /** @test */
-    public function it_handles_concurrent_limit_types(): void
+    public function itHandlesConcurrentLimitTypes(): void
     {
         $limits = [
             'type_a' => ['requests' => 3, 'window' => 60],

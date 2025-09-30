@@ -2,7 +2,7 @@
 
 /**
  * PHPUnit Test Bootstrap
- * 
+ *
  * Sets up the testing environment for SecStore
  */
 

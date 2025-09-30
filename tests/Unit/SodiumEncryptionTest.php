@@ -8,7 +8,7 @@ use Exception;
 
 /**
  * SodiumEncryption Unit Tests
- * 
+ *
  * Comprehensive tests for cryptographic operations including:
  * - Key generation and encoding
  * - Encryption and decryption
@@ -16,7 +16,7 @@ use Exception;
  * - Key derivation from passphrase
  * - Error handling and validation
  * - Edge cases and security properties
- * 
+ *
  * @package Tests\Unit
  */
 class SodiumEncryptionTest extends TestCase
@@ -59,7 +59,7 @@ class SodiumEncryptionTest extends TestCase
     // ==========================================
 
     /** @test */
-    public function it_generates_key_with_correct_length(): void
+    public function itGeneratesKeyWithCorrectLength(): void
     {
         // Act
         $key = SodiumEncryption::generateKey();
@@ -70,7 +70,7 @@ class SodiumEncryptionTest extends TestCase
     }
 
     /** @test */
-    public function it_generates_unique_keys(): void
+    public function itGeneratesUniqueKeys(): void
     {
         // Act
         $key1 = SodiumEncryption::generateKey();
@@ -84,7 +84,7 @@ class SodiumEncryptionTest extends TestCase
     }
 
     /** @test */
-    public function it_generates_cryptographically_random_keys(): void
+    public function itGeneratesCryptographicallyRandomKeys(): void
     {
         // Act - Generate multiple keys
         $keys = [];
@@ -102,7 +102,7 @@ class SodiumEncryptionTest extends TestCase
     // ==========================================
 
     /** @test */
-    public function it_encodes_key_to_base64url(): void
+    public function itEncodesKeyToBase64Url(): void
     {
         // Act
         $encoded = SodiumEncryption::encodeKey($this->testKey);
@@ -116,7 +116,7 @@ class SodiumEncryptionTest extends TestCase
     }
 
     /** @test */
-    public function it_decodes_key_from_base64url(): void
+    public function itDecodesKeyFromBase64Url(): void
     {
         // Arrange
         $encoded = SodiumEncryption::encodeKey($this->testKey);
@@ -130,7 +130,7 @@ class SodiumEncryptionTest extends TestCase
     }
 
     /** @test */
-    public function it_performs_encode_decode_roundtrip(): void
+    public function itPerformsEncodeDecodeRoundtrip(): void
     {
         // Act
         $encoded = SodiumEncryption::encodeKey($this->testKey);
@@ -141,7 +141,7 @@ class SodiumEncryptionTest extends TestCase
     }
 
     /** @test */
-    public function it_throws_exception_for_invalid_encoded_key_format(): void
+    public function itThrowsExceptionForInvalidEncodedKeyFormat(): void
     {
         // Arrange
         $invalidKey = 'not-valid-base64!!!';
@@ -155,7 +155,7 @@ class SodiumEncryptionTest extends TestCase
     }
 
     /** @test */
-    public function it_throws_exception_for_invalid_decoded_key_length(): void
+    public function itThrowsExceptionForInvalidDecodedKeyLength(): void
     {
         // Arrange - Create a valid base64 string but with wrong length
         $shortKey = base64_encode('tooshort');
@@ -174,7 +174,7 @@ class SodiumEncryptionTest extends TestCase
     // ==========================================
 
     /** @test */
-    public function it_encrypts_plaintext_successfully(): void
+    public function itEncryptsPlaintextSuccessfully(): void
     {
         // Arrange
         $plaintext = 'Secret message';
@@ -189,7 +189,7 @@ class SodiumEncryptionTest extends TestCase
     }
 
     /** @test */
-    public function it_decrypts_ciphertext_successfully(): void
+    public function itDecryptsCiphertextSuccessfully(): void
     {
         // Arrange
         $plaintext = 'Secret message';
@@ -203,7 +203,7 @@ class SodiumEncryptionTest extends TestCase
     }
 
     /** @test */
-    public function it_performs_encrypt_decrypt_roundtrip(): void
+    public function itPerformsEncryptDecryptRoundtrip(): void
     {
         // Arrange
         $plaintexts = [
@@ -225,7 +225,7 @@ class SodiumEncryptionTest extends TestCase
     }
 
     /** @test */
-    public function it_produces_different_ciphertexts_for_same_plaintext(): void
+    public function itProducesDifferentCiphertextsForSamePlaintext(): void
     {
         // Arrange
         $plaintext = 'Same message';
@@ -247,7 +247,7 @@ class SodiumEncryptionTest extends TestCase
     }
 
     /** @test */
-    public function it_throws_exception_for_invalid_key_length_on_encrypt(): void
+    public function itThrowsExceptionForInvalidKeyLengthOnEncrypt(): void
     {
         // Arrange
         $plaintext = 'Test message';
@@ -262,7 +262,7 @@ class SodiumEncryptionTest extends TestCase
     }
 
     /** @test */
-    public function it_throws_exception_for_invalid_key_length_on_decrypt(): void
+    public function itThrowsExceptionForInvalidKeyLengthOnDecrypt(): void
     {
         // Arrange
         $ciphertext = 'AW5vdF9hX3ZhbGlkX2NpcGhlcnRleHQ';
@@ -277,7 +277,7 @@ class SodiumEncryptionTest extends TestCase
     }
 
     /** @test */
-    public function it_throws_exception_for_invalid_ciphertext_encoding(): void
+    public function itThrowsExceptionForInvalidCiphertextEncoding(): void
     {
         // Arrange
         $invalidCiphertext = 'not!!!valid!!!base64!!!';
@@ -291,7 +291,7 @@ class SodiumEncryptionTest extends TestCase
     }
 
     /** @test */
-    public function it_throws_exception_for_too_short_ciphertext(): void
+    public function itThrowsExceptionForTooShortCiphertext(): void
     {
         // Arrange
         $shortCiphertext = base64_encode('short');
@@ -305,7 +305,7 @@ class SodiumEncryptionTest extends TestCase
     }
 
     /** @test */
-    public function it_throws_exception_for_wrong_decryption_key(): void
+    public function itThrowsExceptionForWrongDecryptionKey(): void
     {
         // Arrange
         $plaintext = 'Secret message';
@@ -321,7 +321,7 @@ class SodiumEncryptionTest extends TestCase
     }
 
     /** @test */
-    public function it_throws_exception_for_tampered_ciphertext(): void
+    public function itThrowsExceptionForTamperedCiphertext(): void
     {
         // Arrange
         $plaintext = 'Secret message';
@@ -343,7 +343,7 @@ class SodiumEncryptionTest extends TestCase
     // ==========================================
 
     /** @test */
-    public function it_encrypts_and_decrypts_with_associated_data(): void
+    public function itEncryptsAndDecryptsWithAssociatedData(): void
     {
         // Arrange
         $plaintext = 'Secret message';
@@ -358,7 +358,7 @@ class SodiumEncryptionTest extends TestCase
     }
 
     /** @test */
-    public function it_fails_decryption_with_wrong_associated_data(): void
+    public function itFailsDecryptionWithWrongAssociatedData(): void
     {
         // Arrange
         $plaintext = 'Secret message';
@@ -376,7 +376,7 @@ class SodiumEncryptionTest extends TestCase
     }
 
     /** @test */
-    public function it_fails_decryption_with_missing_associated_data(): void
+    public function itFailsDecryptionWithMissingAssociatedData(): void
     {
         // Arrange
         $plaintext = 'Secret message';
@@ -393,7 +393,7 @@ class SodiumEncryptionTest extends TestCase
     }
 
     /** @test */
-    public function it_encrypts_without_associated_data_by_default(): void
+    public function itEncryptsWithoutAssociatedDataByDefault(): void
     {
         // Arrange
         $plaintext = 'Secret message';
@@ -411,7 +411,7 @@ class SodiumEncryptionTest extends TestCase
     // ==========================================
 
     /** @test */
-    public function it_derives_key_from_passphrase_without_salt(): void
+    public function itDerivesKeyFromPassphraseWithoutSalt(): void
     {
         // Arrange
         $passphrase = 'my-secure-passphrase-123';
@@ -428,7 +428,7 @@ class SodiumEncryptionTest extends TestCase
     }
 
     /** @test */
-    public function it_derives_key_from_passphrase_with_salt(): void
+    public function itDerivesKeyFromPassphraseWithSalt(): void
     {
         // Arrange
         $passphrase = 'my-secure-passphrase-123';
@@ -443,7 +443,7 @@ class SodiumEncryptionTest extends TestCase
     }
 
     /** @test */
-    public function it_derives_same_key_for_same_passphrase_and_salt(): void
+    public function itDerivesSameKeyForSamePassphraseAndSalt(): void
     {
         // Arrange
         $passphrase = 'my-secure-passphrase-123';
@@ -458,7 +458,7 @@ class SodiumEncryptionTest extends TestCase
     }
 
     /** @test */
-    public function it_derives_different_keys_for_different_passphrases(): void
+    public function itDerivesDifferentKeysForDifferentPassphrases(): void
     {
         // Arrange
         $passphrase1 = 'passphrase-one';
@@ -474,7 +474,7 @@ class SodiumEncryptionTest extends TestCase
     }
 
     /** @test */
-    public function it_derives_different_keys_for_different_salts(): void
+    public function itDerivesDifferentKeysForDifferentSalts(): void
     {
         // Arrange
         $passphrase = 'same-passphrase';
@@ -490,7 +490,7 @@ class SodiumEncryptionTest extends TestCase
     }
 
     /** @test */
-    public function it_throws_exception_for_too_short_salt(): void
+    public function itThrowsExceptionForTooShortSalt(): void
     {
         // Arrange
         $passphrase = 'my-passphrase';
@@ -505,7 +505,7 @@ class SodiumEncryptionTest extends TestCase
     }
 
     /** @test */
-    public function it_uses_derived_key_for_encryption(): void
+    public function itUsesDerivedKeyForEncryption(): void
     {
         // Arrange
         $passphrase = 'my-secure-passphrase';
@@ -526,7 +526,7 @@ class SodiumEncryptionTest extends TestCase
     // ==========================================
 
     /** @test */
-    public function it_handles_empty_plaintext(): void
+    public function itHandlesEmptyPlaintext(): void
     {
         // Arrange
         $plaintext = '';
@@ -540,7 +540,7 @@ class SodiumEncryptionTest extends TestCase
     }
 
     /** @test */
-    public function it_handles_large_plaintext(): void
+    public function itHandlesLargePlaintext(): void
     {
         // Arrange
         $plaintext = str_repeat('Lorem ipsum dolor sit amet. ', 10000); // ~280KB
@@ -554,7 +554,7 @@ class SodiumEncryptionTest extends TestCase
     }
 
     /** @test */
-    public function it_handles_unicode_characters(): void
+    public function itHandlesUnicodeCharacters(): void
     {
         // Arrange
         $plaintext = '日本語 中文 한국어 العربية עברית Ελληνικά Кириллица 🔒🔐';
@@ -568,7 +568,7 @@ class SodiumEncryptionTest extends TestCase
     }
 
     /** @test */
-    public function it_handles_binary_data(): void
+    public function itHandlesBinaryData(): void
     {
         // Arrange
         $plaintext = random_bytes(1024); // 1KB random binary
@@ -582,7 +582,7 @@ class SodiumEncryptionTest extends TestCase
     }
 
     /** @test */
-    public function it_produces_url_safe_ciphertext(): void
+    public function itProducesUrlSafeCiphertext(): void
     {
         // Arrange
         $plaintext = 'Test message';
@@ -602,7 +602,7 @@ class SodiumEncryptionTest extends TestCase
     // ==========================================
 
     /** @test */
-    public function it_includes_version_in_envelope(): void
+    public function itIncludesVersionInEnvelope(): void
     {
         // Arrange
         $plaintext = 'Test message';
@@ -624,7 +624,7 @@ class SodiumEncryptionTest extends TestCase
     }
 
     /** @test */
-    public function it_rejects_unsupported_version(): void
+    public function itRejectsUnsupportedVersion(): void
     {
         // Arrange - Create ciphertext with wrong version
         $plaintext = 'Test message';
@@ -657,7 +657,7 @@ class SodiumEncryptionTest extends TestCase
     // ==========================================
 
     /** @test */
-    public function it_provides_authenticated_encryption(): void
+    public function itProvidesAuthenticatedEncryption(): void
     {
         // Arrange
         $plaintext = 'Secret message for testing authenticated encryption';
@@ -713,7 +713,7 @@ class SodiumEncryptionTest extends TestCase
     }
 
     /** @test */
-    public function it_uses_different_nonces_for_each_encryption(): void
+    public function itUsesDifferentNoncesForEachEncryption(): void
     {
         // Arrange
         $plaintext = 'Same message';
@@ -730,7 +730,7 @@ class SodiumEncryptionTest extends TestCase
     }
 
     /** @test */
-    public function it_maintains_confidentiality(): void
+    public function itMaintainsConfidentiality(): void
     {
         // Arrange
         $plaintext = 'Secret message';

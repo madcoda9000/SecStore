@@ -8,10 +8,10 @@ use ReflectionClass;
 
 /**
  * TranslationUtil Unit Tests
- * 
+ *
  * Tests multilingual functionality using REAL project translation files.
  * This test works with the actual app/lang/*.php files.
- * 
+ *
  * @package Tests\Unit
  */
 class TranslationUtilTest extends TestCase
@@ -79,7 +79,7 @@ class TranslationUtilTest extends TestCase
     // ==========================================
 
     /** @test */
-    public function it_initializes_with_default_language(): void
+    public function itInitializesWithDefaultLanguage(): void
     {
         // Arrange
         $_SERVER['HTTP_ACCEPT_LANGUAGE'] = 'en-US,en;q=0.9';
@@ -92,7 +92,7 @@ class TranslationUtilTest extends TestCase
     }
 
     /** @test */
-    public function it_initializes_with_provided_language(): void
+    public function itInitializesWithProvidedLanguage(): void
     {
         // Act
         @TranslationUtil::init('de');
@@ -102,7 +102,7 @@ class TranslationUtilTest extends TestCase
     }
 
     /** @test */
-    public function it_initializes_with_language_from_cookie(): void
+    public function itInitializesWithLanguageFromCookie(): void
     {
         // Arrange
         $_COOKIE['lang'] = 'de';
@@ -115,7 +115,7 @@ class TranslationUtilTest extends TestCase
     }
 
     /** @test */
-    public function it_prioritizes_parameter_over_cookie(): void
+    public function itPrioritizesParameterOverCookie(): void
     {
         // Arrange
         $_COOKIE['lang'] = 'de';
@@ -128,7 +128,7 @@ class TranslationUtilTest extends TestCase
     }
 
     /** @test */
-    public function it_prioritizes_cookie_over_browser_language(): void
+    public function itPrioritizesCookieOverBrowserLanguage(): void
     {
         // Arrange
         $_COOKIE['lang'] = 'de';
@@ -146,7 +146,7 @@ class TranslationUtilTest extends TestCase
     // ==========================================
 
     /** @test */
-    public function it_sets_language_successfully(): void
+    public function itSetsLanguageSuccessfully(): void
     {
         // Act
         @TranslationUtil::setLang('de');
@@ -156,7 +156,7 @@ class TranslationUtilTest extends TestCase
     }
 
     /** @test */
-    public function it_loads_translation_file_when_setting_language(): void
+    public function itLoadsTranslationFileWhenSettingLanguage(): void
     {
         // Act
         @TranslationUtil::setLang('en');
@@ -169,7 +169,7 @@ class TranslationUtilTest extends TestCase
     }
 
     /** @test */
-    public function it_does_not_change_language_for_nonexistent_file(): void
+    public function itDoesNotChangeLanguageForNonexistentFile(): void
     {
         // Arrange
         @TranslationUtil::setLang('en');
@@ -182,7 +182,7 @@ class TranslationUtilTest extends TestCase
     }
 
     /** @test */
-    public function it_changes_language_and_loads_new_translations(): void
+    public function itChangesLanguageAndLoadsNewTranslations(): void
     {
         // Arrange
         @TranslationUtil::setLang('en');
@@ -205,7 +205,7 @@ class TranslationUtilTest extends TestCase
     // ==========================================
 
     /** @test */
-    public function it_translates_existing_key(): void
+    public function itTranslatesExistingKey(): void
     {
         // Arrange
         @TranslationUtil::setLang('en');
@@ -219,7 +219,7 @@ class TranslationUtilTest extends TestCase
     }
 
     /** @test */
-    public function it_returns_key_for_missing_translation(): void
+    public function itReturnsKeyForMissingTranslation(): void
     {
         // Arrange
         @TranslationUtil::setLang('en');
@@ -232,7 +232,7 @@ class TranslationUtilTest extends TestCase
     }
 
     /** @test */
-    public function it_translates_multiple_keys(): void
+    public function itTranslatesMultipleKeys(): void
     {
         // Arrange
         @TranslationUtil::setLang('en');
@@ -249,7 +249,7 @@ class TranslationUtilTest extends TestCase
     }
 
     /** @test */
-    public function it_handles_empty_key(): void
+    public function itHandlesEmptyKey(): void
     {
         // Arrange
         @TranslationUtil::setLang('en');
@@ -266,7 +266,7 @@ class TranslationUtilTest extends TestCase
     // ==========================================
 
     /** @test */
-    public function it_detects_english_from_browser(): void
+    public function itDetectsEnglishFromBrowser(): void
     {
         // Arrange
         $_SERVER['HTTP_ACCEPT_LANGUAGE'] = 'en-US,en;q=0.9';
@@ -279,7 +279,7 @@ class TranslationUtilTest extends TestCase
     }
 
     /** @test */
-    public function it_detects_german_from_browser(): void
+    public function itDetectsGermanFromBrowser(): void
     {
         // Arrange
         $_SERVER['HTTP_ACCEPT_LANGUAGE'] = 'de-DE,de;q=0.9';
@@ -292,7 +292,7 @@ class TranslationUtilTest extends TestCase
     }
 
     /** @test */
-    public function it_falls_back_to_english_for_unsupported_language(): void
+    public function itFallsBackToEnglishForUnsupportedLanguage(): void
     {
         // Arrange
         $_SERVER['HTTP_ACCEPT_LANGUAGE'] = 'fr-FR,fr;q=0.9';
@@ -305,7 +305,7 @@ class TranslationUtilTest extends TestCase
     }
 
     /** @test */
-    public function it_handles_missing_accept_language_header(): void
+    public function itHandlesMissingAcceptLanguageHeader(): void
     {
         // Arrange
         unset($_SERVER['HTTP_ACCEPT_LANGUAGE']);
@@ -318,7 +318,7 @@ class TranslationUtilTest extends TestCase
     }
 
     /** @test */
-    public function it_handles_malformed_accept_language_header(): void
+    public function itHandlesMalformedAcceptLanguageHeader(): void
     {
         // Arrange
         $_SERVER['HTTP_ACCEPT_LANGUAGE'] = 'invalid-format';
@@ -335,7 +335,7 @@ class TranslationUtilTest extends TestCase
     // ==========================================
 
     /** @test */
-    public function it_only_accepts_supported_languages(): void
+    public function itOnlyAcceptsSupportedLanguages(): void
     {
         // Arrange
         $supportedLanguages = ['en', 'de'];
@@ -351,7 +351,7 @@ class TranslationUtilTest extends TestCase
     }
 
     /** @test */
-    public function it_ignores_unsupported_language_codes(): void
+    public function itIgnoresUnsupportedLanguageCodes(): void
     {
         // Arrange
         @TranslationUtil::setLang('en'); // Set initial valid language
@@ -373,7 +373,7 @@ class TranslationUtilTest extends TestCase
     // ==========================================
 
     /** @test */
-    public function it_preserves_translations_across_multiple_calls(): void
+    public function itPreservesTranslationsAcrossMultipleCalls(): void
     {
         // Arrange
         @TranslationUtil::setLang('en');
@@ -389,7 +389,7 @@ class TranslationUtilTest extends TestCase
     }
 
     /** @test */
-    public function it_handles_translation_with_special_characters(): void
+    public function itHandlesTranslationWithSpecialCharacters(): void
     {
         // Arrange
         @TranslationUtil::setLang('en');
@@ -403,7 +403,7 @@ class TranslationUtilTest extends TestCase
     }
 
     /** @test */
-    public function it_maintains_state_after_multiple_initializations(): void
+    public function itMaintainsStateAfterMultipleInitializations(): void
     {
         // Act
         @TranslationUtil::init('en');
@@ -418,7 +418,7 @@ class TranslationUtilTest extends TestCase
     }
 
     /** @test */
-    public function it_returns_consistent_language_code(): void
+    public function itReturnsConsistentLanguageCode(): void
     {
         // Arrange & Act
         @TranslationUtil::setLang('de');
@@ -437,7 +437,7 @@ class TranslationUtilTest extends TestCase
     // ==========================================
 
     /** @test */
-    public function it_switches_language_successfully(): void
+    public function itSwitchesLanguageSuccessfully(): void
     {
         // Arrange
         @TranslationUtil::setLang('en');
@@ -454,7 +454,7 @@ class TranslationUtilTest extends TestCase
     }
 
     /** @test */
-    public function it_switches_language_multiple_times(): void
+    public function itSwitchesLanguageMultipleTimes(): void
     {
         // Act & Assert
         @TranslationUtil::setLang('en');
@@ -468,7 +468,7 @@ class TranslationUtilTest extends TestCase
     }
 
     /** @test */
-    public function it_clears_previous_translations_on_language_switch(): void
+    public function itClearsPreviousTranslationsOnLanguageSwitch(): void
     {
         // Arrange
         @TranslationUtil::setLang('en');
@@ -489,7 +489,7 @@ class TranslationUtilTest extends TestCase
     // ==========================================
 
     /** @test */
-    public function it_respects_cookie_language_preference(): void
+    public function itRespectsCookieLanguagePreference(): void
     {
         // Arrange
         $_COOKIE['lang'] = 'de';
@@ -503,7 +503,7 @@ class TranslationUtilTest extends TestCase
     }
 
     /** @test */
-    public function it_ignores_invalid_cookie_language(): void
+    public function itIgnoresInvalidCookieLanguage(): void
     {
         // Arrange
         $_COOKIE['lang'] = 'invalid';
@@ -521,7 +521,7 @@ class TranslationUtilTest extends TestCase
     // ==========================================
 
     /** @test */
-    public function it_provides_full_translation_workflow(): void
+    public function itProvidesFullTranslationWorkflow(): void
     {
         // Scenario: User visits site, changes language, gets translations
         
@@ -547,7 +547,7 @@ class TranslationUtilTest extends TestCase
     }
 
     /** @test */
-    public function it_handles_missing_translation_gracefully(): void
+    public function itHandlesMissingTranslationGracefully(): void
     {
         // Arrange
         @TranslationUtil::setLang('en');
@@ -564,7 +564,7 @@ class TranslationUtilTest extends TestCase
     }
 
     /** @test */
-    public function it_loads_translations_into_memory(): void
+    public function itLoadsTranslationsIntoMemory(): void
     {
         // Arrange & Act
         @TranslationUtil::setLang('en');
@@ -577,7 +577,7 @@ class TranslationUtilTest extends TestCase
     }
 
     /** @test */
-    public function it_supports_hierarchical_translation_keys(): void
+    public function itSupportsHierarchicalTranslationKeys(): void
     {
         // Arrange
         @TranslationUtil::setLang('en');

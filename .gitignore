@@ -487,7 +487,12 @@ cache/*.php.lock
 # claude
 .claude
 
-# php unit cache
+# php unit cache and reports
 .phpunit.cache
+tests/reports/
+
 # php-cs-fixer cache
 .php-cs-fixer.cache
+
+# quodo
+.quodo

@@ -10,16 +10,16 @@ use ReflectionMethod;
 
 /**
  * SecurityMetrics Unit Tests
- * 
+ *
  * Tests security metrics calculation and analysis including:
  * - Security score calculation
  * - Critical alerts detection
  * - Dashboard data generation
  * - Anomaly detection logic
- * 
+ *
  * Note: This test focuses on the business logic and calculations.
  * Database-dependent methods are tested with mocked data.
- * 
+ *
  * @package Tests\Unit
  */
 class SecurityMetricsTest extends TestCase
@@ -60,7 +60,7 @@ class SecurityMetricsTest extends TestCase
     // ==========================================
 
     /** @test */
-    public function it_calculates_perfect_security_score(): void
+    public function itCalculatesPerfectSecurityScore(): void
     {
         // Arrange
         $summary = [
@@ -78,7 +78,7 @@ class SecurityMetricsTest extends TestCase
     }
 
     /** @test */
-    public function it_reduces_score_for_moderate_failed_logins(): void
+    public function itReducesScoreForModerateFailedLogins(): void
     {
         // Arrange
         $summary = [
@@ -96,7 +96,7 @@ class SecurityMetricsTest extends TestCase
     }
 
     /** @test */
-    public function it_reduces_score_for_high_failed_logins(): void
+    public function itReducesScoreForHighFailedLogins(): void
     {
         // Arrange
         $summary = [
@@ -114,7 +114,7 @@ class SecurityMetricsTest extends TestCase
     }
 
     /** @test */
-    public function it_reduces_score_for_csrf_violations(): void
+    public function itReducesScoreForCsrfViolations(): void
     {
         // Arrange
         $summary = [
@@ -132,7 +132,7 @@ class SecurityMetricsTest extends TestCase
     }
 
     /** @test */
-    public function it_caps_csrf_violation_penalty_at_30(): void
+    public function itCapsCsrfViolationPenaltyAt30(): void
     {
         // Arrange
         $summary = [
@@ -150,7 +150,7 @@ class SecurityMetricsTest extends TestCase
     }
 
     /** @test */
-    public function it_reduces_score_for_high_severity_alerts(): void
+    public function itReducesScoreForHighSeverityAlerts(): void
     {
         // Arrange
         $summary = [
@@ -171,7 +171,7 @@ class SecurityMetricsTest extends TestCase
     }
 
     /** @test */
-    public function it_reduces_score_for_medium_severity_alerts(): void
+    public function itReducesScoreForMediumSeverityAlerts(): void
     {
         // Arrange
         $summary = [
@@ -192,7 +192,7 @@ class SecurityMetricsTest extends TestCase
     }
 
     /** @test */
-    public function it_combines_multiple_penalties(): void
+    public function itCombinesMultiplePenalties(): void
     {
         // Arrange
         $summary = [
@@ -213,7 +213,7 @@ class SecurityMetricsTest extends TestCase
     }
 
     /** @test */
-    public function it_never_returns_negative_security_score(): void
+    public function itNeverReturnsNegativeSecurityScore(): void
     {
         // Arrange - Extreme case
         $summary = [
@@ -241,7 +241,7 @@ class SecurityMetricsTest extends TestCase
     // ==========================================
 
     /** @test */
-    public function it_detects_no_alerts_for_normal_activity(): void
+    public function itDetectsNoAlertsForNormalActivity(): void
     {
         // Arrange - Mock generateDailySummary
         $mockSummary = [
@@ -261,7 +261,7 @@ class SecurityMetricsTest extends TestCase
     }
 
     /** @test */
-    public function it_detects_excessive_failed_logins_alert(): void
+    public function itDetectsExcessiveFailedLoginsAlert(): void
     {
         // Arrange
         $mockSummary = [
@@ -280,7 +280,7 @@ class SecurityMetricsTest extends TestCase
     }
 
     /** @test */
-    public function it_detects_csrf_violations_alert(): void
+    public function itDetectsCsrfViolationsAlert(): void
     {
         // Arrange
         $mockSummary = [
@@ -299,7 +299,7 @@ class SecurityMetricsTest extends TestCase
     }
 
     /** @test */
-    public function it_detects_suspicious_activity_alert(): void
+    public function itDetectsSuspiciousActivityAlert(): void
     {
         // Arrange
         $mockSummary = [
@@ -321,7 +321,7 @@ class SecurityMetricsTest extends TestCase
     }
 
     /** @test */
-    public function it_detects_multiple_alerts_simultaneously(): void
+    public function itDetectsMultipleAlertsSimultaneously(): void
     {
         // Arrange
         $mockSummary = [
@@ -344,7 +344,7 @@ class SecurityMetricsTest extends TestCase
     }
 
     /** @test */
-    public function it_includes_recommendations_in_alerts(): void
+    public function itIncludesRecommendationsInAlerts(): void
     {
         // Arrange
         $mockSummary = [
@@ -366,7 +366,7 @@ class SecurityMetricsTest extends TestCase
     // ==========================================
 
     /** @test */
-    public function it_identifies_suspicious_ips_from_failed_logins(): void
+    public function itIdentifiesSuspiciousIpsFromFailedLogins(): void
     {
         // Arrange - Simulate failed login data
         $failedLogins = [
@@ -394,7 +394,7 @@ class SecurityMetricsTest extends TestCase
     }
 
     /** @test */
-    public function it_identifies_multiple_suspicious_ips(): void
+    public function itIdentifiesMultipleSuspiciousIps(): void
     {
         // Arrange
         $failedLogins = [];
@@ -425,7 +425,7 @@ class SecurityMetricsTest extends TestCase
     }
 
     /** @test */
-    public function it_handles_no_suspicious_activity(): void
+    public function itHandlesNoSuspiciousActivity(): void
     {
         // Arrange - All IPs have ≤10 attempts
         $failedLogins = [
@@ -447,7 +447,7 @@ class SecurityMetricsTest extends TestCase
     // ==========================================
 
     /** @test */
-    public function it_returns_valid_summary_structure(): void
+    public function itReturnsValidSummaryStructure(): void
     {
         // Arrange - Expected keys
         $expectedKeys = [
@@ -470,7 +470,7 @@ class SecurityMetricsTest extends TestCase
     }
 
     /** @test */
-    public function it_returns_valid_alert_structure(): void
+    public function itReturnsValidAlertStructure(): void
     {
         // Arrange
         $mockSummary = [
@@ -501,7 +501,7 @@ class SecurityMetricsTest extends TestCase
     // ==========================================
 
     /** @test */
-    public function it_handles_zero_login_attempts(): void
+    public function itHandlesZeroLoginAttempts(): void
     {
         // Arrange
         $summary = [
@@ -519,7 +519,7 @@ class SecurityMetricsTest extends TestCase
     }
 
     /** @test */
-    public function it_handles_null_suspicious_activity(): void
+    public function itHandlesNullSuspiciousActivity(): void
     {
         // Arrange
         $mockSummary = [
@@ -536,7 +536,7 @@ class SecurityMetricsTest extends TestCase
     }
 
     /** @test */
-    public function it_handles_boundary_value_for_failed_logins(): void
+    public function itHandlesBoundaryValueForFailedLogins(): void
     {
         // Test exactly at threshold
         $summary1 = ['failed_logins' => 50, 'csrf_violations' => 0];

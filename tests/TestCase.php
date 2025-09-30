@@ -7,7 +7,7 @@ use Mockery;
 
 /**
  * Base Test Case
- * 
+ *
  * Provides common functionality for all tests
  */
 abstract class TestCase extends PHPUnitTestCase

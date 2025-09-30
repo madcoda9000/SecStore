@@ -10,16 +10,16 @@ use ReflectionMethod;
 
 /**
  * LogUtil Unit Tests
- * 
+ *
  * Tests logging utility functionality including:
  * - Configuration loading
  * - Log type filtering
  * - IP address extraction
  * - File logging fallback
  * - Log message formatting
- * 
+ *
  * Note: Tests focus on business logic without database dependencies
- * 
+ *
  * @package Tests\Unit
  */
 class LogUtilTest extends TestCase
@@ -124,7 +124,7 @@ class LogUtilTest extends TestCase
     // ==========================================
 
     /** @test */
-    public function it_loads_configuration_lazily(): void
+    public function itLoadsConfigurationLazily(): void
     {
         // Arrange
         $this->assertNull($this->getStaticConfig());
@@ -140,7 +140,7 @@ class LogUtilTest extends TestCase
     }
 
     /** @test */
-    public function it_does_not_reload_configuration_if_already_loaded(): void
+    public function itDoesNotReloadConfigurationIfAlreadyLoaded(): void
     {
         // Arrange
         $this->setStaticConfig($this->mockConfig);
@@ -155,7 +155,7 @@ class LogUtilTest extends TestCase
     }
 
     /** @test */
-    public function it_loads_logging_configuration_with_all_flags(): void
+    public function itLoadsLoggingConfigurationWithAllFlags(): void
     {
         // Arrange & Act
         $this->setStaticConfig($this->mockConfig);
@@ -182,7 +182,7 @@ class LogUtilTest extends TestCase
     // ==========================================
 
     /** @test */
-    public function it_validates_all_log_types_exist(): void
+    public function itValidatesAllLogTypesExist(): void
     {
         // Arrange
         $expectedTypes = [
@@ -204,7 +204,7 @@ class LogUtilTest extends TestCase
     }
 
     /** @test */
-    public function it_creates_log_types_from_enum(): void
+    public function itCreatesLogTypesFromEnum(): void
     {
         // Assert
         $this->assertEquals('ERROR', LogType::ERROR->value);
@@ -221,7 +221,7 @@ class LogUtilTest extends TestCase
     // ==========================================
 
     /** @test */
-    public function it_determines_if_sql_logging_is_enabled(): void
+    public function itDeterminesIfSqlLoggingIsEnabled(): void
     {
         // Arrange
         $configEnabled = ['logging' => ['enableSqlLogging' => true]];
@@ -233,7 +233,7 @@ class LogUtilTest extends TestCase
     }
 
     /** @test */
-    public function it_determines_if_request_logging_is_enabled(): void
+    public function itDeterminesIfRequestLoggingIsEnabled(): void
     {
         // Arrange
         $config = $this->mockConfig;
@@ -243,7 +243,7 @@ class LogUtilTest extends TestCase
     }
 
     /** @test */
-    public function it_always_logs_error_type_regardless_of_config(): void
+    public function itAlwaysLogsErrorTypeRegardlessOfConfig(): void
     {
         // Arrange - All logging disabled
         $configAllDisabled = [
@@ -266,7 +266,7 @@ class LogUtilTest extends TestCase
     }
 
     /** @test */
-    public function it_validates_log_type_filtering_logic(): void
+    public function itValidatesLogTypeFilteringLogic(): void
     {
         // Arrange
         $this->setStaticConfig($this->mockConfig);
@@ -284,8 +284,7 @@ class LogUtilTest extends TestCase
         // Act & Assert
         foreach ($testCases as $case) {
             $shouldLog = $config['logging'][$case['configKey']];
-            $this->assertEquals($case['expected'], $shouldLog, 
-                "LogType {$case['type']->value} filtering failed");
+            $this->assertEquals($case['expected'], $shouldLog, "LogType {$case['type']->value} filtering failed");
         }
     }
 
@@ -294,7 +293,7 @@ class LogUtilTest extends TestCase
     // ==========================================
 
     /** @test */
-    public function it_extracts_ip_from_remote_addr(): void
+    public function itExtractsIpFromRemoteAddr(): void
     {
         // Arrange
         $_SERVER['REMOTE_ADDR'] = '192.168.1.100';
@@ -309,7 +308,7 @@ class LogUtilTest extends TestCase
     }
 
     /** @test */
-    public function it_prefers_x_forwarded_for_if_available(): void
+    public function itPrefersXForwardedForIfAvailable(): void
     {
         // Arrange
         $_SERVER['HTTP_X_FORWARDED_FOR'] = '10.0.0.1';
@@ -323,7 +322,7 @@ class LogUtilTest extends TestCase
     }
 
     /** @test */
-    public function it_handles_multiple_ips_in_x_forwarded_for(): void
+    public function itHandlesMultipleIpsInXForwardedFor(): void
     {
         // Arrange
         $_SERVER['HTTP_X_FORWARDED_FOR'] = '10.0.0.1, 172.16.0.1, 192.168.1.1';
@@ -336,7 +335,7 @@ class LogUtilTest extends TestCase
     }
 
     /** @test */
-    public function it_falls_back_to_unknown_if_no_ip_available(): void
+    public function itFallsBackToUnknownIfNoIpAvailable(): void
     {
         // Arrange
         unset($_SERVER['REMOTE_ADDR']);
@@ -351,7 +350,7 @@ class LogUtilTest extends TestCase
     }
 
     /** @test */
-    public function it_validates_ipv4_addresses(): void
+    public function itValidatesIpv4Addresses(): void
     {
         // Arrange
         $validIpv4 = [
@@ -372,7 +371,7 @@ class LogUtilTest extends TestCase
     }
 
     /** @test */
-    public function it_validates_ipv6_addresses(): void
+    public function itValidatesIpv6Addresses(): void
     {
         // Arrange
         $validIpv6 = [
@@ -392,7 +391,7 @@ class LogUtilTest extends TestCase
     // ==========================================
 
     /** @test */
-    public function it_formats_context_string_correctly(): void
+    public function itFormatsContextStringCorrectly(): void
     {
         // Arrange
         $file = 'LoginController';
@@ -407,7 +406,7 @@ class LogUtilTest extends TestCase
     }
 
     /** @test */
-    public function it_handles_empty_method_in_context(): void
+    public function itHandlesEmptyMethodInContext(): void
     {
         // Arrange
         $file = 'TestFile';
@@ -421,7 +420,7 @@ class LogUtilTest extends TestCase
     }
 
     /** @test */
-    public function it_handles_nested_file_paths_in_context(): void
+    public function itHandlesNestedFilePathsInContext(): void
     {
         // Arrange
         $file = 'App\\Controllers\\AuthController';
@@ -440,7 +439,7 @@ class LogUtilTest extends TestCase
     // ==========================================
 
     /** @test */
-    public function it_creates_log_directory_if_not_exists(): void
+    public function itCreatesLogDirectoryIfNotExists(): void
     {
         // Arrange
         $testDir = $this->testLogDir . '/new_dir';
@@ -459,7 +458,7 @@ class LogUtilTest extends TestCase
     }
 
     /** @test */
-    public function it_uses_correct_file_permissions_for_log_directory(): void
+    public function itUsesCorrectFilePermissionsForLogDirectory(): void
     {
         // Arrange
         $testDir = $this->testLogDir . '/secure_dir';
@@ -476,7 +475,7 @@ class LogUtilTest extends TestCase
     }
 
     /** @test */
-    public function it_formats_log_message_with_timestamp(): void
+    public function itFormatsLogMessageWithTimestamp(): void
     {
         // Arrange
         $message = 'Test log message';
@@ -492,7 +491,7 @@ class LogUtilTest extends TestCase
     }
 
     /** @test */
-    public function it_appends_to_log_file(): void
+    public function itAppendsToLogFile(): void
     {
         // Arrange
         $logFile = $this->testLogDir . '/test.log';
@@ -513,7 +512,7 @@ class LogUtilTest extends TestCase
     }
 
     /** @test */
-    public function it_uses_file_locking_when_writing(): void
+    public function itUsesFileLockingWhenWriting(): void
     {
         // Arrange
         $logFile = $this->testLogDir . '/locked.log';
@@ -535,7 +534,7 @@ class LogUtilTest extends TestCase
     // ==========================================
 
     /** @test */
-    public function it_validates_log_message_is_string(): void
+    public function itValidatesLogMessageIsString(): void
     {
         // Arrange
         $validMessages = [
@@ -551,7 +550,7 @@ class LogUtilTest extends TestCase
     }
 
     /** @test */
-    public function it_handles_empty_log_messages(): void
+    public function itHandlesEmptyLogMessages(): void
     {
         // Arrange
         $emptyMessage = '';
@@ -562,7 +561,7 @@ class LogUtilTest extends TestCase
     }
 
     /** @test */
-    public function it_handles_multiline_log_messages(): void
+    public function itHandlesMultilineLogMessages(): void
     {
         // Arrange
         $multilineMessage = "Line 1\nLine 2\nLine 3";
@@ -575,7 +574,7 @@ class LogUtilTest extends TestCase
     }
 
     /** @test */
-    public function it_handles_unicode_in_log_messages(): void
+    public function itHandlesUnicodeInLogMessages(): void
     {
         // Arrange
         $unicodeMessages = [
@@ -597,7 +596,7 @@ class LogUtilTest extends TestCase
     // ==========================================
 
     /** @test */
-    public function it_defaults_to_anonymous_user_when_no_session(): void
+    public function itDefaultsToAnonymousUserWhenNoSession(): void
     {
         // Arrange
         $_SESSION = [];
@@ -610,7 +609,7 @@ class LogUtilTest extends TestCase
     }
 
     /** @test */
-    public function it_extracts_username_from_session(): void
+    public function itExtractsUsernameFromSession(): void
     {
         // Arrange
         $_SESSION['user'] = ['username' => 'testuser'];
@@ -627,7 +626,7 @@ class LogUtilTest extends TestCase
     // ==========================================
 
     /** @test */
-    public function it_formats_datetime_correctly(): void
+    public function itFormatsDatetimeCorrectly(): void
     {
         // Arrange & Act
         $datetime = date('Y-m-d H:i:s');
@@ -640,7 +639,7 @@ class LogUtilTest extends TestCase
     }
 
     /** @test */
-    public function it_uses_consistent_datetime_format(): void
+    public function itUsesConsistentDatetimeFormat(): void
     {
         // Arrange
         $format = 'Y-m-d H:i:s';
@@ -666,7 +665,7 @@ class LogUtilTest extends TestCase
     // ==========================================
 
     /** @test */
-    public function it_validates_pagination_parameters(): void
+    public function itValidatesPaginationParameters(): void
     {
         // Arrange
         $page = 1;
@@ -679,7 +678,7 @@ class LogUtilTest extends TestCase
     }
 
     /** @test */
-    public function it_calculates_offset_correctly(): void
+    public function itCalculatesOffsetCorrectly(): void
     {
         // Arrange & Act
         $testCases = [
@@ -701,7 +700,7 @@ class LogUtilTest extends TestCase
     // ==========================================
 
     /** @test */
-    public function it_handles_very_long_log_messages(): void
+    public function itHandlesVeryLongLogMessages(): void
     {
         // Arrange
         $longMessage = str_repeat('A', 10000); // 10KB message
@@ -712,7 +711,7 @@ class LogUtilTest extends TestCase
     }
 
     /** @test */
-    public function it_handles_special_characters_in_context(): void
+    public function itHandlesSpecialCharactersInContext(): void
     {
         // Arrange
         $contexts = [
@@ -730,7 +729,7 @@ class LogUtilTest extends TestCase
     }
 
     /** @test */
-    public function it_validates_log_type_enum_values_are_strings(): void
+    public function itValidatesLogTypeEnumValuesAreStrings(): void
     {
         // Arrange
         $logTypes = [

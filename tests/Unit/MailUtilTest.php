@@ -11,15 +11,15 @@ use ReflectionClass;
 
 /**
  * MailUtil Unit Tests
- * 
+ *
  * Tests email utility functionality including:
  * - Configuration loading
  * - SMTP connection validation
  * - Email sending with templates
  * - Error handling
- * 
+ *
  * Note: Uses Mockery to mock PHPMailer and external dependencies
- * 
+ *
  * @package Tests\Unit
  */
 class MailUtilTest extends TestCase
@@ -99,7 +99,7 @@ class MailUtilTest extends TestCase
     // ==========================================
 
     /** @test */
-    public function it_loads_configuration_lazily(): void
+    public function itLoadsConfigurationLazily(): void
     {
         // Arrange - Config should be null initially
         $this->assertNull($this->getStaticConfig());
@@ -114,7 +114,7 @@ class MailUtilTest extends TestCase
     }
 
     /** @test */
-    public function it_does_not_reload_configuration_if_already_loaded(): void
+    public function itDoesNotReloadConfigurationIfAlreadyLoaded(): void
     {
         // Arrange
         $this->setStaticConfig($this->mockConfig);
@@ -129,7 +129,7 @@ class MailUtilTest extends TestCase
     }
 
     /** @test */
-    public function it_loads_mail_configuration_with_required_keys(): void
+    public function itLoadsMailConfigurationWithRequiredKeys(): void
     {
         // Arrange & Act
         $this->setStaticConfig($this->mockConfig);
@@ -149,7 +149,7 @@ class MailUtilTest extends TestCase
     // ==========================================
 
     /** @test */
-    public function it_validates_smtp_configuration_structure(): void
+    public function itValidatesSmtpConfigurationStructure(): void
     {
         // Arrange
         $config = $this->mockConfig['mail'];
@@ -163,7 +163,7 @@ class MailUtilTest extends TestCase
     }
 
     /** @test */
-    public function it_has_valid_smtp_port_numbers(): void
+    public function itHasValidSmtpPortNumbers(): void
     {
         // Arrange
         $validPorts = [25, 465, 587, 2525];
@@ -174,7 +174,7 @@ class MailUtilTest extends TestCase
     }
 
     /** @test */
-    public function it_has_valid_encryption_type(): void
+    public function itHasValidEncryptionType(): void
     {
         // Arrange
         $config = $this->mockConfig['mail'];
@@ -184,7 +184,7 @@ class MailUtilTest extends TestCase
     }
 
     /** @test */
-    public function it_has_valid_email_format_for_from_address(): void
+    public function itHasValidEmailFormatForFromAddress(): void
     {
         // Arrange
         $config = $this->mockConfig['mail'];
@@ -201,7 +201,7 @@ class MailUtilTest extends TestCase
     // ==========================================
 
     /** @test */
-    public function it_validates_recipient_email_format(): void
+    public function itValidatesRecipientEmailFormat(): void
     {
         // Arrange
         $validEmails = [
@@ -237,7 +237,7 @@ class MailUtilTest extends TestCase
     }
 
     /** @test */
-    public function it_validates_subject_is_not_empty(): void
+    public function itValidatesSubjectIsNotEmpty(): void
     {
         // Arrange
         $validSubjects = [
@@ -258,7 +258,7 @@ class MailUtilTest extends TestCase
     // ==========================================
 
     /** @test */
-    public function it_validates_template_names(): void
+    public function itValidatesTemplateNames(): void
     {
         // Arrange
         $validTemplates = [
@@ -279,7 +279,7 @@ class MailUtilTest extends TestCase
     }
 
     /** @test */
-    public function it_validates_template_data_is_array(): void
+    public function itValidatesTemplateDataIsArray(): void
     {
         // Arrange
         $validData = [
@@ -299,7 +299,7 @@ class MailUtilTest extends TestCase
     // ==========================================
 
     /** @test */
-    public function it_respects_enable_welcome_mail_flag(): void
+    public function itRespectsEnableWelcomeMailFlag(): void
     {
         // Test when enabled
         $configEnabled = $this->mockConfig;
@@ -313,7 +313,7 @@ class MailUtilTest extends TestCase
     }
 
     /** @test */
-    public function it_validates_welcome_mail_logic(): void
+    public function itValidatesWelcomeMailLogic(): void
     {
         // Arrange
         $template = 'welcome';
@@ -332,7 +332,7 @@ class MailUtilTest extends TestCase
     }
 
     /** @test */
-    public function it_sends_non_welcome_emails_regardless_of_flag(): void
+    public function itSendsNonWelcomeEmailsRegardlessOfFlag(): void
     {
         // Arrange
         $nonWelcomeTemplates = ['password_reset', '2fa_setup', 'account_locked'];
@@ -350,7 +350,7 @@ class MailUtilTest extends TestCase
     // ==========================================
 
     /** @test */
-    public function it_handles_invalid_smtp_credentials_gracefully(): void
+    public function itHandlesInvalidSmtpCredentialsGracefully(): void
     {
         // Arrange
         $invalidConfig = $this->mockConfig;
@@ -364,7 +364,7 @@ class MailUtilTest extends TestCase
     }
 
     /** @test */
-    public function it_handles_missing_mail_configuration(): void
+    public function itHandlesMissingMailConfiguration(): void
     {
         // Arrange
         $emptyConfig = [];
@@ -374,7 +374,7 @@ class MailUtilTest extends TestCase
     }
 
     /** @test */
-    public function it_handles_invalid_port_number(): void
+    public function itHandlesInvalidPortNumber(): void
     {
         // Arrange
         $invalidPorts = [-1, 0, 65536, 99999];
@@ -393,7 +393,7 @@ class MailUtilTest extends TestCase
     // ==========================================
 
     /** @test */
-    public function it_uses_reasonable_smtp_timeout(): void
+    public function itUsesReasonableSmtpTimeout(): void
     {
         // Arrange - Based on code: Timeout = 4 seconds
         $expectedTimeout = 4;
@@ -408,7 +408,7 @@ class MailUtilTest extends TestCase
     // ==========================================
 
     /** @test */
-    public function it_handles_special_characters_in_subject(): void
+    public function itHandlesSpecialCharactersInSubject(): void
     {
         // Arrange
         $subjectsWithSpecialChars = [
@@ -426,7 +426,7 @@ class MailUtilTest extends TestCase
     }
 
     /** @test */
-    public function it_handles_unicode_in_subject(): void
+    public function itHandlesUnicodeInSubject(): void
     {
         // Arrange
         $unicodeSubjects = [
@@ -449,7 +449,7 @@ class MailUtilTest extends TestCase
     // ==========================================
 
     /** @test */
-    public function it_handles_empty_from_name_gracefully(): void
+    public function itHandlesEmptyFromNameGracefully(): void
     {
         // Arrange
         $config = $this->mockConfig;
@@ -461,7 +461,7 @@ class MailUtilTest extends TestCase
     }
 
     /** @test */
-    public function it_validates_smtp_host_format(): void
+    public function itValidatesSmtpHostFormat(): void
     {
         // Arrange
         $validHosts = [
@@ -481,7 +481,7 @@ class MailUtilTest extends TestCase
     }
 
     /** @test */
-    public function it_handles_different_encryption_methods(): void
+    public function itHandlesDifferentEncryptionMethods(): void
     {
         // Arrange
         $encryptionMethods = [
@@ -502,7 +502,7 @@ class MailUtilTest extends TestCase
     // ==========================================
 
     /** @test */
-    public function it_constructs_valid_template_path(): void
+    public function itConstructsValidTemplatePath(): void
     {
         // Arrange
         $templateName = 'welcome';
@@ -515,7 +515,7 @@ class MailUtilTest extends TestCase
     }
 
     /** @test */
-    public function it_validates_template_file_extension(): void
+    public function itValidatesTemplateFileExtension(): void
     {
         // Arrange
         $templates = [
@@ -535,7 +535,7 @@ class MailUtilTest extends TestCase
     // ==========================================
 
     /** @test */
-    public function it_has_complete_mail_configuration_for_sending(): void
+    public function itHasCompleteMailConfigurationForSending(): void
     {
         // Arrange
         $config = $this->mockConfig['mail'];
@@ -558,7 +558,7 @@ class MailUtilTest extends TestCase
     }
 
     /** @test */
-    public function it_validates_complete_email_send_parameters(): void
+    public function itValidatesCompleteEmailSendParameters(): void
     {
         // Arrange - Simulate sendMail parameters
         $to = 'recipient@example.com';
@@ -584,7 +584,7 @@ class MailUtilTest extends TestCase
     // ==========================================
 
     /** @test */
-    public function it_constructs_valid_log_messages(): void
+    public function itConstructsValidLogMessages(): void
     {
         // Arrange
         $to = 'test@example.com';

@@ -7,7 +7,7 @@ use App\Utils\SessionUtil;
 
 /**
  * SessionUtil Unit Tests
- * 
+ *
  * Tests session management functionality
  */
 class SessionUtilTest extends TestCase
@@ -38,7 +38,7 @@ class SessionUtilTest extends TestCase
     }
 
     /** @test */
-    public function it_can_set_and_get_session_value(): void
+    public function itCanSetAndGetSessionValue(): void
     {
         SessionUtil::set('test_key', 'test_value');
         
@@ -46,13 +46,13 @@ class SessionUtilTest extends TestCase
     }
 
     /** @test */
-    public function it_returns_null_for_nonexistent_key(): void
+    public function itReturnsNullForNonexistentKey(): void
     {
         $this->assertNull(SessionUtil::get('nonexistent_key'));
     }
 
     /** @test */
-    public function it_can_remove_session_value(): void
+    public function itCanRemoveSessionValue(): void
     {
         SessionUtil::set('test_key', 'test_value');
         SessionUtil::remove('test_key');
@@ -61,7 +61,7 @@ class SessionUtilTest extends TestCase
     }
 
     /** @test */
-    public function it_can_check_if_key_exists(): void
+    public function itCanCheckIfKeyExists(): void
     {
         SessionUtil::set('existing_key', 'value');
         
@@ -70,7 +70,7 @@ class SessionUtilTest extends TestCase
     }
 
     /** @test */
-    public function it_can_destroy_session(): void
+    public function itCanDestroySession(): void
     {
         SessionUtil::set('test_key', 'test_value');
         SessionUtil::destroy();
@@ -79,7 +79,7 @@ class SessionUtilTest extends TestCase
     }
 
     /** @test */
-    public function it_generates_unique_csrf_tokens(): void
+    public function itGeneratesUniqueCsrfTokens(): void
     {
         // CSRF Token direkt generieren OHNE SessionUtil::getCsrfToken()
         // Das verhindert session_start() in Tests
@@ -95,7 +95,7 @@ class SessionUtilTest extends TestCase
     }
 
     /** @test */
-    public function it_validates_csrf_tokens_correctly(): void
+    public function itValidatesCsrfTokensCorrectly(): void
     {
         // Set token direkt OHNE SessionUtil::getCsrfToken()
         $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
@@ -107,7 +107,7 @@ class SessionUtilTest extends TestCase
     }
 
     /** @test */
-    public function it_stores_user_in_session(): void
+    public function itStoresUserInSession(): void
     {
         $user = [
             'id' => 1,
@@ -123,7 +123,7 @@ class SessionUtilTest extends TestCase
     }
 
     /** @test */
-    public function it_handles_session_timeout_calculation(): void
+    public function itHandlesSessionTimeoutCalculation(): void
     {
         SessionUtil::set('session_start', time() - 1000);
         

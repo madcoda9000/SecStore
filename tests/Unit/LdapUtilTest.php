@@ -84,7 +84,7 @@ class LdapUtilTest extends TestCase
     // ==========================================
 
     /** @test */
-    public function it_has_default_configuration_values(): void
+    public function itHasDefaultConfigurationValues(): void
     {
         // Arrange & Act
         $ldapHost = $this->getStaticProperty('ldapHost');
@@ -106,7 +106,7 @@ class LdapUtilTest extends TestCase
     }
 
     /** @test */
-    public function it_validates_ldap_port_is_within_valid_range(): void
+    public function itValidatesLdapPortIsWithinValidRange(): void
     {
         // Arrange
         $ldapPort = $this->getStaticProperty('ldapPort');
@@ -117,7 +117,7 @@ class LdapUtilTest extends TestCase
     }
 
     /** @test */
-    public function it_uses_standard_ldap_ports(): void
+    public function itUsesStandardLdapPorts(): void
     {
         // Arrange
         $standardPorts = [389, 636]; // 389 = LDAP, 636 = LDAPS
@@ -128,7 +128,7 @@ class LdapUtilTest extends TestCase
     }
 
     /** @test */
-    public function it_validates_ldap_host_format(): void
+    public function itValidatesLdapHostFormat(): void
     {
         // Arrange
         $ldapHost = $this->getStaticProperty('ldapHost');
@@ -142,7 +142,7 @@ class LdapUtilTest extends TestCase
     }
 
     /** @test */
-    public function it_validates_timeout_is_reasonable(): void
+    public function itValidatesTimeoutIsReasonable(): void
     {
         // Arrange
         $timeout = $this->getStaticProperty('timeout');
@@ -153,7 +153,7 @@ class LdapUtilTest extends TestCase
     }
 
     /** @test */
-    public function it_validates_domain_prefix_format(): void
+    public function itValidatesDomainPrefixFormat(): void
     {
         // Arrange
         $domainPrefix = $this->getStaticProperty('domainPrefix');
@@ -176,7 +176,7 @@ class LdapUtilTest extends TestCase
     // ==========================================
 
     /** @test */
-    public function it_rejects_empty_username(): void
+    public function itRejectsEmptyUsername(): void
     {
         // Arrange
         $emptyUsername = '';
@@ -190,7 +190,7 @@ class LdapUtilTest extends TestCase
     }
 
     /** @test */
-    public function it_rejects_empty_password(): void
+    public function itRejectsEmptyPassword(): void
     {
         // Arrange
         $validUsername = 'testuser';
@@ -204,7 +204,7 @@ class LdapUtilTest extends TestCase
     }
 
     /** @test */
-    public function it_rejects_both_empty_credentials(): void
+    public function itRejectsBothEmptyCredentials(): void
     {
         // Arrange
         $emptyUsername = '';
@@ -218,7 +218,7 @@ class LdapUtilTest extends TestCase
     }
 
     /** @test */
-    public function it_rejects_whitespace_only_username(): void
+    public function itRejectsWhitespaceOnlyUsername(): void
     {
         // Arrange
         $whitespaceUsername = '   ';
@@ -232,7 +232,7 @@ class LdapUtilTest extends TestCase
     }
 
     /** @test */
-    public function it_rejects_whitespace_only_password(): void
+    public function itRejectsWhitespaceOnlyPassword(): void
     {
         // Arrange
         $validUsername = 'testuser';
@@ -246,7 +246,7 @@ class LdapUtilTest extends TestCase
     }
 
     /** @test */
-    public function it_handles_null_username_safely(): void
+    public function itHandlesNullUsernameSafely(): void
     {
         // Arrange
         $nullUsername = null;
@@ -260,7 +260,7 @@ class LdapUtilTest extends TestCase
     }
 
     /** @test */
-    public function it_handles_null_password_safely(): void
+    public function itHandlesNullPasswordSafely(): void
     {
         // Arrange
         $validUsername = 'testuser';
@@ -278,7 +278,7 @@ class LdapUtilTest extends TestCase
     // ==========================================
 
     /** @test */
-    public function it_constructs_bind_dn_with_domain_prefix(): void
+    public function itConstructsBindDnWithDomainPrefix(): void
     {
         // Arrange
         $domainPrefix = 'TESTDOMAIN\\';
@@ -292,7 +292,7 @@ class LdapUtilTest extends TestCase
     }
 
     /** @test */
-    public function it_constructs_bind_dn_without_domain_prefix(): void
+    public function itConstructsBindDnWithoutDomainPrefix(): void
     {
         // Arrange
         $domainPrefix = '';
@@ -306,7 +306,7 @@ class LdapUtilTest extends TestCase
     }
 
     /** @test */
-    public function it_handles_special_characters_in_username(): void
+    public function itHandlesSpecialCharactersInUsername(): void
     {
         // Arrange
         $domainPrefix = 'DOMAIN\\';
@@ -325,7 +325,7 @@ class LdapUtilTest extends TestCase
     }
 
     /** @test */
-    public function it_preserves_case_in_username(): void
+    public function itPreservesCaseInUsername(): void
     {
      // Arrange
         $domainPrefix = 'DOMAIN\\';
@@ -340,7 +340,7 @@ class LdapUtilTest extends TestCase
     }
 
     /** @test */
-    public function it_validates_ldap_injection_attempts(): void
+    public function itValidatesLdapInjectionAttempts(): void
     {
         // Test for LDAP injection patterns
         // Real validation should be done by ldap_escape or similar
@@ -366,7 +366,7 @@ class LdapUtilTest extends TestCase
     // ==========================================
 
     /** @test */
-    public function it_handles_missing_config_file_gracefully(): void
+    public function itHandlesMissingConfigFileGracefully(): void
     {
         // This test documents expected behavior when config.php is missing
         // loadConfig() should either:
@@ -377,7 +377,7 @@ class LdapUtilTest extends TestCase
     }
 
     /** @test */
-    public function it_validates_ldap_host_is_not_empty(): void
+    public function itValidatesLdapHostIsNotEmpty(): void
     {
         // Arrange
         $ldapHost = $this->getStaticProperty('ldapHost');
@@ -391,7 +391,7 @@ class LdapUtilTest extends TestCase
     // ==========================================
 
     /** @test */
-    public function it_uses_ldap_protocol_version_3(): void
+    public function itUsesLdapProtocolVersion3(): void
     {
         // LDAP v3 is the current standard (RFC 4511)
         // The authenticate() method should set LDAP_OPT_PROTOCOL_VERSION to 3
@@ -411,7 +411,7 @@ class LdapUtilTest extends TestCase
     // ==========================================
 
     /** @test */
-    public function it_has_reasonable_network_timeout(): void
+    public function itHasReasonableNetworkTimeout(): void
     {
         // Arrange
         $timeout = $this->getStaticProperty('timeout');
@@ -426,7 +426,7 @@ class LdapUtilTest extends TestCase
     // ==========================================
 
     /** @test */
-    public function it_returns_boolean_from_authenticate(): void
+    public function itReturnsBooleanFromAuthenticate(): void
     {
         // Arrange
         $username = '';
@@ -440,7 +440,7 @@ class LdapUtilTest extends TestCase
     }
 
     /** @test */
-    public function it_returns_false_for_invalid_input(): void
+    public function itReturnsFalseForInvalidInput(): void
     {
         // Arrange
         $invalidInputs = [
@@ -492,7 +492,7 @@ class LdapUtilTest extends TestCase
      *    @group ldap
      *    @group slow
      */
-    public function it_documents_integration_test_requirements(): void
+    public function itDocumentsIntegrationTestRequirements(): void
     {
         $this->markTestSkipped(
             'This is a documentation test. ' .
