@@ -409,5 +409,33 @@
             <li class="success">It loads translations into memory</li>
             <li class="success">It supports hierarchical translation keys</li>
         </ul>
+        <h2>User (Tests\Unit\User)</h2>
+        <ul>
+            <li class="success">It creates user successfully</li>
+            <li class="success">It creates user with multiple roles</li>
+            <li class="success">It returns null when user creation fails</li>
+            <li class="success">It creates user with ldap enabled</li>
+            <li class="success">It finds user by id</li>
+            <li class="success">It returns false when user not found by id</li>
+            <li class="success">It handles invalid user ids with data set "zero"</li>
+            <li class="success">It handles invalid user ids with data set "negative"</li>
+            <li class="success">It handles invalid user ids with data set "non_existent"</li>
+            <li class="success">It sets new password successfully</li>
+            <li class="success">It returns false when user not found for password reset</li>
+            <li class="success">It clears reset token when setting new password</li>
+            <li class="success">It deletes user successfully</li>
+            <li class="success">It returns false when deleting non existent user</li>
+            <li class="success">It gets active session id</li>
+            <li class="success">It returns null when user has no active session</li>
+            <li class="success">It sets active session id</li>
+            <li class="success">It gets last known ip</li>
+            <li class="success">It returns null when user has no last known ip</li>
+            <li class="success">It updates last known ip</li>
+            <li class="success">It returns false when updating ip for non existent user</li>
+            <li class="success">It handles different ip formats with data set "ipv4"</li>
+            <li class="success">It handles different ip formats with data set "ipv6"</li>
+            <li class="success">It handles different ip formats with data set "localhost_ipv4"</li>
+            <li class="success">It handles different ip formats with data set "localhost_ipv6"</li>
+        </ul>
     </body>
 </html>
