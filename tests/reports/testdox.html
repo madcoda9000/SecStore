@@ -94,6 +94,27 @@
             <li class="success">Allow origins does nothing when origin not allowed</li>
             <li class="success">Setup cors handles options request</li>
         </ul>
+        <h2>Csrf Middleware (Tests\Unit\CsrfMiddleware)</h2>
+        <ul>
+            <li class="success">It validates matching tokens</li>
+            <li class="success">It rejects non matching tokens</li>
+            <li class="success">It rejects null request token</li>
+            <li class="success">It rejects null session token</li>
+            <li class="success">It rejects both tokens null</li>
+            <li class="success">It uses timing safe comparison</li>
+            <li class="success">It skips refresh for bulk user operations</li>
+            <li class="success">It skips refresh for rate limit routes</li>
+            <li class="success">It skips refresh for analytics data</li>
+            <li class="success">It does not skip refresh for regular routes</li>
+            <li class="success">It refreshes token for login route</li>
+            <li class="success">It refreshes token for password routes</li>
+            <li class="success">It refreshes token for 2fa routes</li>
+            <li class="success">It does not refresh for non critical routes</li>
+            <li class="success">It matches partial route strings</li>
+            <li class="success">It handles empty token strings</li>
+            <li class="success">It handles very long tokens</li>
+            <li class="success">It handles special characters in tokens</li>
+        </ul>
         <h2>Input Validator (Tests\Unit\InputValidator)</h2>
         <ul>
             <li class="success">It validates required fields</li>
