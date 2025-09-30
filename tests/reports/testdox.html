@@ -66,6 +66,45 @@
             <li class="success">It handles 2fa flow</li>
             <li class="success">It completes 2fa verification</li>
         </ul>
+        <h2>Log Util (Tests\Unit\LogUtil)</h2>
+        <ul>
+            <li class="success">It loads configuration lazily</li>
+            <li class="success">It does not reload configuration if already loaded</li>
+            <li class="success">It loads logging configuration with all flags</li>
+            <li class="success">It validates all log types exist</li>
+            <li class="success">It creates log types from enum</li>
+            <li class="success">It determines if sql logging is enabled</li>
+            <li class="success">It determines if request logging is enabled</li>
+            <li class="success">It always logs error type regardless of config</li>
+            <li class="success">It validates log type filtering logic</li>
+            <li class="success">It extracts ip from remote addr</li>
+            <li class="success">It prefers x forwarded for if available</li>
+            <li class="success">It handles multiple ips in x forwarded for</li>
+            <li class="success">It falls back to unknown if no ip available</li>
+            <li class="success">It validates ipv4 addresses</li>
+            <li class="success">It validates ipv6 addresses</li>
+            <li class="success">It formats context string correctly</li>
+            <li class="success">It handles empty method in context</li>
+            <li class="success">It handles nested file paths in context</li>
+            <li class="success">It creates log directory if not exists</li>
+            <li class="success">It uses correct file permissions for log directory</li>
+            <li class="success">It formats log message with timestamp</li>
+            <li class="success">It appends to log file</li>
+            <li class="success">It uses file locking when writing</li>
+            <li class="success">It validates log message is string</li>
+            <li class="success">It handles empty log messages</li>
+            <li class="success">It handles multiline log messages</li>
+            <li class="success">It handles unicode in log messages</li>
+            <li class="success">It defaults to anonymous user when no session</li>
+            <li class="success">It extracts username from session</li>
+            <li class="success">It formats datetime correctly</li>
+            <li class="success">It uses consistent datetime format</li>
+            <li class="success">It validates pagination parameters</li>
+            <li class="success">It calculates offset correctly</li>
+            <li class="success">It handles very long log messages</li>
+            <li class="success">It handles special characters in context</li>
+            <li class="success">It validates log type enum values are strings</li>
+        </ul>
         <h2>Login Flow (Tests\Feature\LoginFlow)</h2>
         <ul>
             <li class="success">User can complete full login flow</li>
