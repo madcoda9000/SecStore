@@ -6,41 +6,31 @@ use Flight;
 /**
  * Class Name: CorsUtil
  *
- * Hilfsklasse zur implementierung von CORS Regeln.
+ * Hilfsklasse zur Implementierung von CORS Regeln.
  *
  * @package App\Utils
- * @author Sascha Heimann
- * @version 1.0
- * @since 2025-02-24
- *
- * Änderungen:
- * - 1.0 (2025-02-24): Erstellt.
  */
 class CorsUtil
 {
     // properties
     public $allowedHosts;
 
-    // properties methods
-    
     /**
      * Sets the allowed hosts for CORS requests.
      *
-     * @param mixed $name The new value for allowed hosts.
-     *
+     * @param array $hostsArr The new value for allowed hosts.
      * @return void
      */
-
     public function setAllowedHosts($hostsArr)
     {
         $this->allowedHosts = $hostsArr;
     }
+
     /**
      * Retrieves the list of allowed hosts for CORS requests.
      *
-     * @return mixed The current list of allowed hosts.
+     * @return array The current list of allowed hosts.
      */
-
     public function getAllowedHosts()
     {
         return $this->allowedHosts;
@@ -59,18 +49,14 @@ class CorsUtil
     /**
      * Configures CORS headers based on the provided allowed hosts.
      *
-     * This method checks the incoming request for an origin and sets the appropriate
-     * CORS headers if the origin is allowed. It also handles preflight OPTIONS requests
-     * by setting the allowed methods and headers, and responds with a 200 status code.
-     *
-     * @param array $allowedhosts List of hosts allowed for CORS requests.
-     *
+     * @param bool $testing Set true to suppress exit() for PHPUnit tests.
      * @return void
      */
-    public function setupCors(): void
+    public function setupCors(bool $testing = false): void
     {
         $request = Flight::request();
         $response = Flight::response();
+
         if ($request->getVar('HTTP_ORIGIN') !== '') {
             $this->allowOrigins();
             $response->header('Access-Control-Allow-Credentials', 'true');
@@ -93,7 +79,10 @@ class CorsUtil
 
             $response->status(200);
             $response->send();
-            exit;
+
+            if (!$testing) {
+                exit;
+            }
         }
     }
 
@@ -105,11 +94,9 @@ class CorsUtil
      */
     private function allowOrigins(): void
     {
-        // ACHTUNG: allowedHosts ist defniert in config.php!
-
         $request = Flight::request();
 
-        if (in_array($request->getVar('HTTP_ORIGIN'), $this->getAllowedHosts(), true) === true) {
+        if (in_array($request->getVar('HTTP_ORIGIN'), $this->getAllowedHosts(), true)) {
             $response = Flight::response();
             $response->header("Access-Control-Allow-Origin", $request->getVar('HTTP_ORIGIN'));
         }
