@@ -499,3 +499,6 @@ tests/reports/
 
 # env
 .env
+
+# Backup files
+backups/

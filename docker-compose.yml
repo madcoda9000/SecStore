@@ -11,14 +11,8 @@ services:
     ports:
       - "8000:80"
     volumes:
-      # Persistent configuration
-      - ./config.php:/var/www/html/config.php
-      # Persistent cache
-      - ./cache:/var/www/html/cache
-      # Application logs
-      - ./logs:/var/www/html/logs
-      # PHP error log (from public/index.php)
-      - ./logs/error.log:/var/www/html/public/error.log
+      # Persistent data directory (configured via DATA_PATH in .env)
+      - ${DATA_PATH:-./docker-data}:/var/www/html/docker-data
     environment:
       - APACHE_RUN_USER=www-data
       - APACHE_RUN_GROUP=www-data

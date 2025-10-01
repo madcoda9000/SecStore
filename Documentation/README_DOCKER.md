@@ -18,7 +18,7 @@
 - [🌐 Accessing Services](#-accessing-services)
 - [📁 Project Structure](#-project-structure)
 - [🔄 Managing Containers](#-managing-containers)
-- [🎮 Managing Containers with makefile](#-managing-containers-with-makefile-optional)
+- [🔄 Manageing Containers with make file](#-managing-containers-with-makefile-optional)
 - [💾 Data Persistence](#-data-persistence)
 - [🛠️ Troubleshooting](#️-troubleshooting)
 - [🔒 Security Best Practices](#-security-best-practices)
@@ -156,16 +156,32 @@ cd SecStore
 # Copy environment template
 cp .env.example .env
 
-# Edit environment file (optional)
+# Edit environment file
 nano .env  # or your favorite editor
 ```
 
-**Recommended: Change default passwords in `.env`:**
+**Important: Configure data storage location in `.env`:**
 
 ```env
+# Where to store persistent data (config, cache, logs)
+DATA_PATH=./docker-data
+
+# Change passwords
 MYSQL_ROOT_PASSWORD=YourSecureRootPassword123!
 MYSQL_PASSWORD=YourSecureAppPassword123!
 ```
+
+**DATA_PATH Examples:**
+
+| Environment | Recommended Path | Example |
+|-------------|------------------|---------|
+| **Local Development** | `./docker-data` | Current directory |
+| **Proxmox LXC** | `/mnt/appdata/secstore` | Dedicated storage |
+| **Synology NAS** | `/volume1/docker/secstore` | Docker volume |
+| **Unraid** | `/mnt/user/appdata/secstore` | App data |
+| **Generic Linux** | `/opt/secstore-data` | System location |
+
+> **💡 Tip:** Choose a path on a volume with sufficient space and regular backups!
 
 ### **Step 3: Build and Start Containers**
 
@@ -236,8 +252,22 @@ docker-compose restart app
 
 | Variable | Default | Description |
 |----------|---------|-------------|
+| `DATA_PATH` | `./docker-data` | Storage location for persistent data |
 | `MYSQL_ROOT_PASSWORD` | `SecureRootPass123!` | MySQL root password |
 | `MYSQL_PASSWORD` | `SecureDBPass123!` | Application database password |
+
+**DATA_PATH Configuration:**
+
+This variable determines where SecStore stores all persistent data:
+- `config.php` - Application configuration
+- `cache/` - Latte template cache
+- `logs/` - Application and error logs
+
+Choose a location that:
+- ✅ Has sufficient disk space (minimum 500 MB recommended)
+- ✅ Is regularly backed up
+- ✅ Has good I/O performance for database operations
+- ✅ Is accessible by the Docker user
 
 ### **Database Connection**
 
@@ -258,6 +288,67 @@ All configuration changes are stored in volumes and persist across container res
 - ✅ `cache/` - Template cache
 - ✅ `logs/` - Application logs
 - ✅ MySQL data - Database content
+
+---
+
+## 🔧 Configuration
+
+### **Environment Variables (.env)**
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `DATA_PATH` | `./docker-data` | Storage location for persistent data |
+| `MYSQL_ROOT_PASSWORD` | `SecureRootPass123!` | MySQL root password |
+| `MYSQL_PASSWORD` | `SecureDBPass123!` | Application database password |
+
+### **DATA_PATH Configuration**
+
+**Why is DATA_PATH configurable?**
+
+Different hosting environments have different storage requirements:
+
+| Environment | Challenge | Solution with DATA_PATH |
+|-------------|-----------|------------------------|
+| **Proxmox LXC** | Data should persist on Proxmox storage, not container | Set to `/mnt/appdata/secstore` |
+| **Synology NAS** | Store on specific volume with RAID/backups | Set to `/volume1/docker/secstore` |
+| **Unraid** | Keep app data on array, not cache | Set to `/mnt/user/appdata/secstore` |
+| **Cloud VPS** | Mount external block storage | Set to mounted volume path |
+| **Development** | Keep data in project folder | Use default `./docker-data` |
+
+**What gets stored in DATA_PATH:**
+- `config.php` - Application configuration (passwords, SMTP, LDAP settings)
+- `cache/` - Latte template cache (can be regenerated)
+- `logs/` - Application and PHP error logs (important for debugging)
+
+**Storage Requirements:**
+- ✅ **Minimum:** 100 MB (just the application)
+- ✅ **Recommended:** 500 MB - 1 GB (with logs and growth)
+- ✅ **Permissions:** Docker user must have read/write access
+- ✅ **Backup:** Should be part of your backup strategy
+- ✅ **Performance:** SSD recommended for cache performance
+
+**Setting DATA_PATH:**
+
+```bash
+# Edit .env file
+nano .env
+
+# Set your path
+DATA_PATH=/your/preferred/location
+
+# Ensure directory exists and has correct permissions
+mkdir -p /your/preferred/location
+chmod 755 /your/preferred/location
+
+# Start containers
+docker-compose up -d
+```
+
+**💡 Pro Tip:** Choose a path that:
+1. Is on a volume with regular backups
+2. Has good I/O performance (SSD if possible)
+3. Is easy to remember and access
+4. Won't fill up (has enough free space)
 
 ---
 
@@ -304,12 +395,14 @@ SecStore/
 ├── .dockerignore          # Exclude from image
 ├── .env                   # Environment variables (create from .env.example)
 ├── .env.example           # Environment template
-├── config.php             # Generated by entrypoint (persistent)
-├── config.php_TEMPLATE    # Template for config
-├── cache/                 # Persistent cache (volume)
-├── logs/                  # Application logs (volume)
-│   └── error.log          # PHP error log (from public/index.php)
 └── vendor/                # Composer dependencies (auto-installed)
+
+Persistent Data Location (configured via DATA_PATH in .env):
+${DATA_PATH}/              # Default: ./docker-data/
+├── config.php             # Application configuration
+├── cache/                 # Latte template cache
+└── logs/                  # Application logs
+    └── error.log          # PHP error log
 ```
 
 ---
@@ -365,10 +458,12 @@ docker-compose exec -T db mysql -u secstore -p secstore < backup.sql
 docker-compose exec app tail -f /var/log/apache2/secstore_error.log
 
 # View PHP error log (from public/index.php)
-tail -f logs/error.log
+# Get DATA_PATH from .env
+DATA_PATH=$(grep DATA_PATH .env | cut -d '=' -f2)
+tail -f ${DATA_PATH}/logs/error.log
 
 # View application logs
-ls -la logs/
+ls -la ${DATA_PATH}/logs/
 ```
 
 ---
@@ -543,21 +638,24 @@ All important data persists across container restarts:
 
 | Volume | Location | Purpose |
 |--------|----------|---------|
-| `config.php` | `./config.php` | Application settings |
-| `cache/` | `./cache` | Latte template cache |
-| `logs/` | `./logs` | Application logs |
-| `logs/error.log` | `./logs/error.log` | PHP error log (from public/index.php) |
+| `${DATA_PATH}` | Configured in `.env` (default: `./docker-data`) | All persistent application data |
+| `${DATA_PATH}/config.php` | | Application settings |
+| `${DATA_PATH}/cache/` | | Latte template cache |
+| `${DATA_PATH}/logs/` | | Application logs including error.log |
 | `db_data` | Docker volume | MySQL database |
 
 ### **Backup Strategy**
 
 **Application Configuration:**
 ```bash
+# Get DATA_PATH from .env
+DATA_PATH=$(grep DATA_PATH .env | cut -d '=' -f2)
+
 # Backup config
-cp config.php config.php.backup
+cp ${DATA_PATH}/config.php ${DATA_PATH}/config.php.backup
 
 # Restore config
-cp config.php.backup config.php
+cp ${DATA_PATH}/config.php.backup ${DATA_PATH}/config.php
 docker-compose restart app
 ```
 
@@ -575,12 +673,11 @@ docker-compose exec -T db mysql -u root -p secstore < secstore_backup_20250101.s
 # Stop containers
 docker-compose down
 
+# Get DATA_PATH from .env
+DATA_PATH=$(grep DATA_PATH .env | cut -d '=' -f2)
+
 # Backup everything
-tar -czf secstore_complete_backup.tar.gz \
-    config.php \
-    cache/ \
-    logs/ \
-    .env
+tar -czf secstore_complete_backup.tar.gz ${DATA_PATH} .env
 
 # Backup database volume
 docker run --rm \
@@ -627,39 +724,46 @@ cat config.php
 **Problem: Permission errors**
 ```bash
 # Fix cache permissions
-docker-compose exec app chown -R www-data:www-data /var/www/html/cache
-docker-compose exec app chmod -R 775 /var/www/html/cache
+docker-compose exec app chown -R www-data:www-data /var/www/html/docker-data/cache
+docker-compose exec app chmod -R 775 /var/www/html/docker-data/cache
 
-# Fix config permissions
-sudo chown $USER:$USER config.php
-chmod 664 config.php
+# Fix config permissions on host
+DATA_PATH=$(grep DATA_PATH .env | cut -d '=' -f2)
+sudo chown $USER:$USER ${DATA_PATH}/config.php
+chmod 664 ${DATA_PATH}/config.php
 ```
 
 ### **Application Issues**
 
 **Problem: Setup wizard not starting**
 ```bash
+# Get DATA_PATH from .env
+DATA_PATH=$(grep DATA_PATH .env | cut -d '=' -f2)
+
 # Check if config.php exists and is valid
-cat config.php
+cat ${DATA_PATH}/config.php
 
 # Delete config to restart setup
-rm config.php
+rm ${DATA_PATH}/config.php
 docker-compose restart app
 ```
 
 **Problem: White screen / 500 error**
 ```bash
-# Check PHP error logs (from public/index.php)
-tail -f logs/error.log
+# Get DATA_PATH from .env
+DATA_PATH=$(grep DATA_PATH .env | cut -d '=' -f2)
+
+# Check PHP error logs
+tail -f ${DATA_PATH}/logs/error.log
 
 # Check Apache error logs
 docker-compose exec app tail -f /var/log/apache2/secstore_error.log
 
 # Check all application logs
-ls -la logs/
+ls -la ${DATA_PATH}/logs/
 
 # Clear cache
-docker-compose exec app rm -rf /var/www/html/cache/*
+docker-compose exec app rm -rf /var/www/html/docker-data/cache/*
 ```
 
 **Problem: Composer dependencies missing**
@@ -694,10 +798,10 @@ docker-compose exec app php -i | grep opcache
 | Error | Solution |
 |-------|----------|
 | `Port 8000 already in use` | Change port in `docker-compose.yml` or stop conflicting service |
-| `Permission denied: config.php` | Run: `chmod 664 config.php` |
+| `Permission denied: config.php` | Run: `chmod 664 docker-data/config.php` |
 | `Database 'secstore' doesn't exist` | Run setup wizard or create manually via phpMyAdmin |
 | `Class not found` | Run: `docker-compose exec app composer install` |
-| `Cannot write to cache` | Run: `docker-compose exec app chmod -R 775 cache` |
+| `Cannot write to cache` | Run: `docker-compose exec app chmod -R 775 docker-data/cache` |
 
 ---
 

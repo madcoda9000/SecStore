@@ -8,10 +8,31 @@
 
 ```bash
 cp .env.example .env
+# Edit .env: Set DATA_PATH to your preferred storage location
 docker-compose up -d
 ```
 
 Open `http://localhost:8000` → Follow Setup Wizard → Done! 🎉
+
+---
+
+## 📍 Data Storage
+
+Configure in `.env`:
+
+```env
+# Local development
+DATA_PATH=./docker-data
+
+# Proxmox
+DATA_PATH=/mnt/appdata/secstore
+
+# Synology
+DATA_PATH=/volume1/docker/secstore
+
+# Unraid
+DATA_PATH=/mnt/user/appdata/secstore
+```
 
 ---
 
@@ -68,11 +89,11 @@ make info         # Show credentials
 
 ```bash
 # Clear cache
-docker-compose exec app rm -rf /var/www/html/cache/*
+docker-compose exec app rm -rf /var/www/html/docker-data/cache/*
 
 # View logs
 docker-compose logs -f                    # All container logs
-tail -f logs/error.log                    # PHP error log
+tail -f docker-data/logs/error.log        # PHP error log
 docker-compose exec app tail -f /var/log/apache2/secstore_error.log  # Apache logs
 
 # Update application
@@ -85,7 +106,7 @@ docker-compose exec db mysqldump -u secstore -p secstore > backup.sql
 docker-compose exec -T db mysql -u secstore -p secstore < backup.sql
 
 # Fix permissions
-docker-compose exec app chown -R www-data:www-data /var/www/html
+docker-compose exec app chown -R www-data:www-data /var/www/html/docker-data
 ```
 
 ---
@@ -111,14 +132,16 @@ cat config.php
 
 ### Permission errors
 ```bash
-docker-compose exec app chmod -R 775 /var/www/html/cache
-chmod 664 config.php
+DATA_PATH=$(grep DATA_PATH .env | cut -d '=' -f2)
+docker-compose exec app chmod -R 775 /var/www/html/docker-data/cache
+chmod 664 ${DATA_PATH}/config.php
 ```
 
 ### Reset everything
 ```bash
+DATA_PATH=$(grep DATA_PATH .env | cut -d '=' -f2)
 docker-compose down -v
-rm config.php
+rm -rf ${DATA_PATH}
 docker-compose up -d
 # Setup wizard will start again
 ```
@@ -129,9 +152,9 @@ docker-compose up -d
 
 All stored in volumes - survives container restarts:
 
-- ✅ `config.php` - Configuration
-- ✅ `cache/` - Template cache  
-- ✅ `logs/` - Application logs
+- ✅ `docker-data/config.php` - Configuration
+- ✅ `docker-data/cache/` - Template cache  
+- ✅ `docker-data/logs/` - Application logs
 - ✅ `db_data` - MySQL database
 
 ---

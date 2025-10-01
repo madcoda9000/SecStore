@@ -63,10 +63,12 @@ logs-db: ## Show logs from database container only
 	@docker-compose logs -f db
 
 logs-error: ## Show PHP error log
-	@tail -f logs/error.log
+	@DATA_PATH=$(grep DATA_PATH .env | cut -d '=' -f2); \
+	tail -f "$DATA_PATH/logs/error.log"
 
 logs-app-files: ## Show application log files
-	@ls -la logs/
+	@DATA_PATH=$(grep DATA_PATH .env | cut -d '=' -f2); \
+	ls -la "$DATA_PATH/logs/"
 
 status: ## Show status of all containers
 	@echo "$(BLUE)Container Status:$(NC)"
@@ -89,9 +91,9 @@ phpmyadmin: ## Open phpMyAdmin in browser
 
 clean: ## Remove all containers and volumes (DESTRUCTIVE!)
 	@echo "$(RED)⚠️  WARNING: This will delete all data!$(NC)"
-	@echo -n "Are you sure? [y/N] " && read ans && [ $${ans:-N} = y ]
+	@echo -n "Are you sure? [y/N] " && read ans && [ ${ans:-N} = y ]
 	@docker-compose down -v
-	@rm -f config.php
+	@rm -rf docker-data/
 	@echo "$(GREEN)✓ All containers and data removed$(NC)"
 
 backup: ## Create backup of database and config
@@ -131,13 +133,13 @@ composer: ## Run composer command (usage: make composer CMD="install")
 
 clear-cache: ## Clear application cache
 	@echo "$(BLUE)Clearing cache...$(NC)"
-	@docker-compose exec app rm -rf /var/www/html/cache/*
+	@docker-compose exec app rm -rf /var/www/html/docker-data/cache/*
 	@echo "$(GREEN)✓ Cache cleared$(NC)"
 
 permissions: ## Fix file permissions
 	@echo "$(BLUE)Fixing permissions...$(NC)"
-	@docker-compose exec app chown -R www-data:www-data /var/www/html
-	@docker-compose exec app chmod -R 775 /var/www/html/cache
+	@docker-compose exec app chown -R www-data:www-data /var/www/html/docker-data
+	@docker-compose exec app chmod -R 775 /var/www/html/docker-data/cache
 	@echo "$(GREEN)✓ Permissions fixed$(NC)"
 
 info: ## Show connection information
