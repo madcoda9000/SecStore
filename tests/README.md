@@ -84,23 +84,13 @@ sudo dnf install php-xdebug
 php -m | grep xdebug
 ```
 
-## ✅ Coverage Goals
-
-| Component | Target | Current |
-|-----------|--------|---------|
-| **SessionUtil** | 90% | - |
-| **RateLimiter** | 85% | - |
-| **AuthController** | 80% | - |
-| **User Model** | 85% | - |
-| **Overall** | 60%+ | - |
-
 ## 🧪 Writing Tests
 
 ### Test Naming Convention
 
 ```php
 /** @test */
-public function it_validates_user_credentials(): void
+public function itValidatesUserCredentials(): void
 {
     // Arrange
     $credentials = ['username' => 'test', 'password' => 'pass'];
@@ -240,7 +230,7 @@ $this->assertTrue(SessionUtil::get('authenticated'));
 ## 📝 Best Practices
 
 1. **One assertion per test** (when possible)
-2. **Use descriptive test names** (`it_validates_email_format`)
+2. **Use descriptive test names** (`itValidatesEmailFormat`)
 3. **Follow AAA pattern** (Arrange, Act, Assert)
 4. **Test edge cases** (empty strings, null values, max limits)
 5. **Clean up after tests** (done automatically in `tearDown()`)
@@ -280,8 +270,6 @@ chmod +x .git/hooks/pre-commit
 1. **Run tests:** `composer test`
 2. **Check coverage:** `composer test:coverage`
 3. **Write new tests** for your features
-4. **Aim for 60%+ coverage** before production
+4. **Aim for 30%+ coverage** (See [TESTING.md](TESTING.md))
 
 ---
-
-**Remember:** Good tests = reliable code = confident deployments 🚀
