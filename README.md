@@ -325,7 +325,7 @@ We welcome contributions! 🎉
 | 📖 **[INSTALL.md](Documentation/INSTALL.md)** | Complete installation and setup guide |
 | 📝 **[CHANGELOG.md](Documentation/CHANGELOG.md)** | Version history and release notes |
 | 🔒 **[SECURITY.md](Documentation/SECURITY.md)** | Security policies and vulnerability reporting ||
-| 📝 **[TESTING.md](tests/TESTING.md)** | Overview and Instructions for tests |
+| 📝 **[README.md](tests/README.md)** | Overview and Instructions for tests |
 | 🐳 **[DOCKER.md](#)** | Docker setup (planned) |
 
 ---
