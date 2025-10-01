@@ -1,0 +1,75 @@
+# Git files
+.git/
+.gitignore
+.gitattributes
+
+# Docker files (avoid recursion)
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# Documentation
+Documentation/
+*.md
+LICENSE
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+.qodo
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Composer
+vendor/
+composer.lock
+
+# Cache and temporary files
+cache/*
+!cache/.gitkeep
+logs/*
+!logs/.gitkeep
+*.log
+
+# Configuration files (will be mounted as volumes)
+config.php
+config-*.php
+!config.php_TEMPLATE
+
+# Test files
+tests/
+phpunit.xml
+.phpunit.cache/
+
+# Build artifacts
+*.tar.gz
+*.zip
+
+# Backup files
+*~
+*.bak
+*.backup
+*copy*
+
+# Node modules (if any)
+node_modules/
+
+# Coverage reports
+coverage/
+
+# CI/CD
+.github/
+.gitlab-ci.yml
+
+# Security files
+*.key
+*.pem
+*.crt
+*.credentials

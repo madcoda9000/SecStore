@@ -71,7 +71,41 @@
 
 ## 🚀 Quick Start
 
-### **1-Minute Setup (Automatic)**
+### **🐳 Docker Installation (Recommended)**
+
+**The easiest way to run SecStore** - Production-ready in under 60 seconds:
+
+```bash
+# Clone repository
+git clone https://github.com/madcoda9000/SecStore.git
+cd SecStore
+
+# Configure environment (optional - adjust database passwords)
+cp .env.example .env
+
+# Start containers
+docker-compose up -d
+
+# Open browser
+http://localhost:8000
+```
+
+**🎉 Done!** Follow the web-based setup wizard to configure your database and admin account.
+
+**What you get:**
+- ✅ PHP 8.3 with all required extensions
+- ✅ MySQL 8.0 database
+- ✅ phpMyAdmin for database management
+- ✅ Persistent storage for config, cache, and logs
+- ✅ Automatic setup with one command
+
+**Full Docker documentation:** [📖 README_DOCKER.md](README_DOCKER.md)
+
+---
+
+### **⚙️ Manual Installation (Alternative)**
+
+For custom environments or when Docker is not available:
 
 ```bash
 # Clone repository
@@ -79,11 +113,11 @@ git clone https://github.com/madcoda9000/SecStore.git
 cd SecStore
 
 # Run automatic setup script
-chmod +x setup.sh && ./setup.sh
+chmod +x secstore_setup.sh && ./secstore_setup.sh
 
-# Customize configuration
+# Configure application
 cp config.php_TEMPLATE config.php
-# -> Enter DB credentials
+# -> Edit config.php with your database credentials
 
 # Start development server
 php -S localhost:8000 -t public
@@ -93,9 +127,7 @@ php -S localhost:8000 -t public
 
 **Default Login:** `super.admin` / `Test1000!` *(⚠️ Change password immediately!)*
 
-### **Manual Installation**
-
-For detailed installation instructions and production setup see **[📖 INSTALL.md](Documentation/INSTALL.md)**
+**For detailed manual installation:** [📖 INSTALL.md](Documentation/INSTALL.md)
 
 ---
 
@@ -246,6 +278,11 @@ For detailed installation instructions and production setup see **[📖 INSTALL.
 
 ### 🔧 **System Requirements**
 
+> **🐳 Using Docker?** Skip these requirements! Docker handles everything automatically.  
+> See [README_DOCKER.md](Documentation/README_DOCKER.md) for Docker installation.
+
+**For manual installation:**
+
 | Component | Minimum | Recommended |
 |-----------|---------|-------------|
 | **PHP** | 8.3+ | 8.3+ (latest) |
@@ -322,11 +359,12 @@ We welcome contributions! 🎉
 
 | Document | Description |
 |----------|-------------|
-| 📖 **[INSTALL.md](Documentation/INSTALL.md)** | Complete installation and setup guide |
+| 🐳 **[README_DOCKER.md](Documentation/README_DOCKER.md)** | **Docker installation guide (recommended)** |
+| 📖 **[INSTALL.md](Documentation/INSTALL.md)** | Complete manual installation and setup guide |
+| 🧑‍💻 **[DEVDOC.md](Documentation/DEVDOC.md)** | Developer documentation for extending SecStore |
 | 📝 **[CHANGELOG.md](Documentation/CHANGELOG.md)** | Version history and release notes |
-| 🔒 **[SECURITY.md](Documentation/SECURITY.md)** | Security policies and vulnerability reporting ||
-| 📝 **[README.md](tests/README.md)** | Overview and Instructions for tests |
-| 🐳 **[DOCKER.md](#)** | Docker setup (planned) |
+| 🔒 **[SECURITY.md](Documentation/SECURITY.md)** | Security policies and vulnerability reporting |
+| 📝 **[Test README](tests/README.md)** | Overview and instructions for tests |
 
 ---
 

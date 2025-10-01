@@ -9,8 +9,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased] - Next Version
 ### Planned
-- Docker container support
 - Backup/restore functionality
+
+---
+
+## [1.3.2] - 2025-10-01
+### ✨ Added
+- **Docker support with complete containerization**
+- **Dockerfile for PHP 8.3** with all required extensions
+- **docker-compose.yml** with MySQL 8.0 and phpMyAdmin
+- **Automatic setup** via docker-entrypoint.sh
+- **Persistent volumes** for config, cache, logs and database
+- **Optional Makefile** for developer convenience
+- **Comprehensive Docker documentation** ([README_DOCKER.md](README_DOCKER.md) and [DOCKER_QUICKSTART.md](DOCKER_QUICKSTART.md))
 
 ---
 
