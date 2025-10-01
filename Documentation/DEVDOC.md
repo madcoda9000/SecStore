@@ -70,6 +70,117 @@ composer global require squizlabs/php_codesniffer
 composer global require friendsofphp/php-cs-fixer
 ```
 
+### **🎣 Git Hooks Setup (Important!)**
+
+**SecStore uses Git hooks for code quality and automatic CHANGELOG management.**
+
+After cloning the repository, install the Git hooks:
+
+```bash
+# Make setup script executable
+chmod +x setup-hooks.sh
+
+# Install all Git hooks
+./setup-hooks.sh
+```
+
+**What gets installed:**
+
+| Hook | Purpose | Trigger |
+|------|---------|---------|
+| **pre-commit** | Security check | Before every commit |
+| **prepare-commit-msg** | CHANGELOG automation | Before commit message |
+
+#### **Pre-Commit Hook (Security)**
+
+Blocks commits of sensitive files:
+
+```bash
+# These files will be BLOCKED:
+- config*.php (except templates)
+- .env* (except .env.example)
+- *.key, *.credentials
+- *backup*, *copy*
+
+# These files are ALLOWED:
+- config.php_TEMPLATE
+- config.php.example
+- .env.example
+```
+
+**Testing the hook:**
+
+```bash
+# This should be blocked
+echo "test" > config-production.php
+git add config-production.php
+git commit -m "test"  # ❌ Commit blocked
+
+# Clean up
+rm config-production.php
+```
+
+#### **Prepare-Commit-Msg Hook (CHANGELOG)**
+
+Automatically updates `Documentation/CHANGELOG.md` with your commits:
+
+```bash
+# Use Conventional Commits
+git commit -m "feat: Add new user export feature"
+git commit -m "fix: Correct session timeout bug"
+git commit -m "docs: Update installation guide"
+```
+
+**Result in CHANGELOG.md:**
+
+```markdown
+## [1.3.2] - 2025-10-15
+### ✨ Added
+- **Add new user export feature**
+
+### 🐛 Fixed
+- **Correct session timeout bug**
+
+### 📝 Documentation
+- **Update installation guide**
+```
+
+**Supported commit types:**
+
+| Type | Category | Usage |
+|------|----------|-------|
+| `feat:` | ✨ Added | New features |
+| `fix:` | 🐛 Fixed | Bug fixes |
+| `docs:` | 📝 Documentation | Documentation changes |
+| `refactor:` | 🔄 Changed | Code refactoring |
+| `test:` | 🧪 Testing | Test additions/changes |
+| `chore:` | 🔧 Maintenance | Maintenance tasks |
+| `security:` | 🔒 Security | Security improvements |
+| `perf:` | ⚡ Performance | Performance improvements |
+
+**📖 Full documentation:** See [GIT_HOOKS.md](GIT_HOOKS.md) for detailed usage guide.
+
+### **Verify Installation**
+
+Check if hooks are properly installed:
+
+```bash
+# Check hooks are executable
+ls -la .git/hooks/
+
+# Should show:
+# -rwxr-xr-x ... pre-commit
+# -rwxr-xr-x ... prepare-commit-msg
+
+# Test with a commit
+echo "test" > test.txt
+git add test.txt
+git commit -m "test: Verify hooks are working"
+
+# Check if CHANGELOG.md was updated
+git diff Documentation/CHANGELOG.md
+```
+
 ---
 
 ## 📦 SecStore Installation
@@ -83,6 +194,9 @@ cd SecStore
 
 # Install dependencies (with dev tools)
 composer install
+
+# Install Git hooks (important!)
+./setup-hooks.sh
 
 # Create configuration template
 cp config.php_TEMPLATE config.php
@@ -120,61 +234,85 @@ SecStore features an intuitive **4-step web-based setup wizard** that automatica
    http://localhost:8000
    ```
 
-2. **The setup wizard automatically activates** if:
-   - `config.php` is missing
-   - Database is not configured
-   - Setup hasn't been completed
+2. **Follow the wizard steps:**
+   - Step 1: Verify `config.php` exists
+   - Step 2: Check file permissions
+   - Step 3: Configure database connection
+   - Step 4: Set up email (optional)
 
-3. **Follow the guided steps:**
+3. **Login with default credentials:**
+   - Username: `super.admin`
+   - Password: `Test1000!`
+   - ⚠️ **Change immediately after first login!**
 
-#### **Step 1: Configuration File**
-- The wizard checks if `config.php` exists
-- If missing, shows exact commands to run:
-  ```bash
-  cp config.php_TEMPLATE config.php
-  chmod 664 config.php
-  chown www-data:www-data config.php
-  ```
+---
 
-#### **Step 2: File Permissions**
-- Verifies web server can write to configuration file
-- Shows permission fix commands if needed
+## 🔄 Development Workflow
 
-#### **Step 3: Database Configuration**
-- Interactive form for database credentials:
-  - **Host**: Usually `localhost`
-  - **Database Name**: e.g., `secstore_dev`
-  - **Username**: Your MySQL/MariaDB user
-  - **Password**: Your database password
-- **Automatic validation** - tests connection before saving
-- **Schema creation** - creates all tables and indexes
-- **Admin user creation** - sets up default administrator
+### **Daily Development Routine**
 
-#### **Step 4: Email Configuration (Optional)**
-- Configure SMTP settings for email features
-- **Can be skipped** and configured later in admin panel
-- Validates SMTP connection before saving
+```bash
+# 1. Pull latest changes
+git pull origin main
 
-### **🔐 Default Login Credentials**
+# 2. Update dependencies if needed
+composer install
 
-After successful setup:
+# 3. Start development server
+php -S localhost:8000 -t public
 
-| Field | Value |
-|-------|-------|
-| **Username** | `super.admin` |
-| **Password** | `Test1000!` |
-| **Email** | `super.admin@test.local` |
+# 4. Make your changes
+# ... develop features ...
 
-> **⚠️ Important:** Change the default password immediately after first login!
+# 5. Commit with Conventional Commits
+git add .
+git commit -m "feat: Add awesome new feature"
 
-### **🎯 Setup URLs**
+# 6. CHANGELOG.md is automatically updated!
+# 7. Push changes
+git push origin main
+```
 
-| URL | Purpose |
-|-----|---------|
-| `http://localhost:8000/` | Main entry - auto-redirects to setup if needed |
-| `http://localhost:8000/setup` | Direct access to setup wizard |
+### **Code Quality Checks**
 
-> **💡 Tip:** The setup wizard is automatically disabled after completion for security.
+```bash
+# Check PSR-12 compliance
+vendor/bin/phpcs app/
+
+# Auto-fix code style
+vendor/bin/php-cs-fixer fix
+
+# Clear template cache
+rm -rf cache/*.php
+
+# Regenerate autoloader
+composer dump-autoload
+```
+
+### **Common Development Commands**
+
+```bash
+# Database connection test
+php -r "
+\$config = include 'config.php';
+try {
+    \$pdo = new PDO(
+        'mysql:host='.\$config['db']['host'].';dbname='.\$config['db']['name'], 
+        \$config['db']['user'], 
+        \$config['db']['pass']
+    );
+    echo 'Database connection: OK\n';
+} catch(Exception \$e) {
+    echo 'Database connection failed: ' . \$e->getMessage() . \"\n\";
+}
+"
+
+# Export database schema (for documentation)
+php generate_schema.php
+
+# Development server with XDebug
+php -S localhost:8000 -t public -d xdebug.mode=debug
+```
 
 ---
 
