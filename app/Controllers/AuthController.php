@@ -299,28 +299,25 @@ class AuthController
             return;
         }
 
-        $user = User::findUserByUsername($username);
-
-        if ($user === false) {
-            LogUtil::logAction(LogType::AUDIT, 'AuthController', 'login', 'FAILED: username not found.', $username);
-            Flight::latte()->render('login.latte', [
-                'title' => TranslationUtil::t('login.title'),
-                'error' => TranslationUtil::t('login.msg.error6'),
-                'sessionTimeout' => SessionUtil::getSessionTimeout(),
-                'lang' => Flight::get('lang'),
-                "application" => $config["application"],
-            ]);
+        // brute force check to avoid login enumeration
+        if (BruteForceUtil::isLockedOut($username)) {
+            LogUtil::logAction(LogType::AUDIT, 'AuthController', 'login', 'FAILED: brute-force lockout.', $username);
+            $this->renderLoginError('login.msg.error5', $config);
             return;
         }
 
-        // Brute-Force-Prüfung
-        if (BruteForceUtil::isLockedOut($user->email)) {
-            LogUtil::logAction(LogType::AUDIT, 'AuthController', 'login', 'FAILED: user account locked out for 15min.', $user->email);
+        $user = User::findUserByUsername($username);
+
+        if ($user === false) {
+            // check dummy hash to mitigate timing attacks
+            password_verify($password, '$2y$10$dummyhashxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx');
+            BruteForceUtil::recordFailedLogin($username);
+            LogUtil::logAction(LogType::AUDIT, 'AuthController', 'login', 'FAILED: username not found.', $username);
             Flight::latte()->render('login.latte', [
                 'title' => TranslationUtil::t('login.title'),
-                'lang' => Flight::get('lang'),
-                'error' => TranslationUtil::t('login.msg.error5'),
+                'error' => TranslationUtil::t('login.msg.error1'),
                 'sessionTimeout' => SessionUtil::getSessionTimeout(),
+                'lang' => Flight::get('lang'),
                 "application" => $config["application"],
             ]);
             return;
@@ -328,11 +325,12 @@ class AuthController
 
         // check for open password reset token
         if ($user !== false && !empty($user->reset_token)) {
+            BruteForceUtil::recordFailedLogin($username);
             LogUtil::logAction(LogType::AUDIT, 'AuthController', 'login', 'FAILED: user has an open password reset request.', $user->email);
             Flight::latte()->render('login.latte', [
                 'title' => TranslationUtil::t('login.title'),
                 'lang' => Flight::get('lang'),
-                'error' => TranslationUtil::t('login.msg.error4'),
+                'error' => TranslationUtil::t('login.msg.error1'),
                 'sessionTimeout' => SessionUtil::getSessionTimeout(),
                 "application" => $config["application"],
             ]);
@@ -344,11 +342,12 @@ class AuthController
         if ($user->ldapEnabled === 1) {
             $isAuthenticated = LdapUtil::authenticate($username, $password);
             if ($isAuthenticated === false) {
+                BruteForceUtil::recordFailedLogin($username);
                 LogUtil::logAction(LogType::AUDIT, 'AuthController', 'login', 'FAILED: ' . $user->username . ': ldap authentication failed.', $user->email);
                 Flight::latte()->render('login.latte', [
                     'title' => TranslationUtil::t('login.title'),
                     'lang' => Flight::get('lang'),
-                    'error' => TranslationUtil::t('login.msg.error3'),
+                    'error' => TranslationUtil::t('login.msg.error1'),
                     'sessionTimeout' => SessionUtil::getSessionTimeout(),
                     "application" => $config["application"],
                 ]);
@@ -369,11 +368,12 @@ class AuthController
         if ($user !== false && $isAuthenticated === true) {
             // prüfen ob user account aktiv ist
             if ($user->status === 0) {
+                BruteForceUtil::recordFailedLogin($username);
                 LogUtil::logAction(LogType::AUDIT, 'AuthController', 'login', 'FAILED: user account deactivated.', $user->email);
                 Flight::latte()->render('login.latte', [
                     'title' => TranslationUtil::t('login.title'),
                     'lang' => Flight::get('lang'),
-                    'error' => TranslationUtil::t('login.msg.error2'),
+                    'error' => TranslationUtil::t('login.msg.error1'),
                     'sessionTimeout' => SessionUtil::getSessionTimeout(),
                     "application" => $config["application"],
                 ]);
