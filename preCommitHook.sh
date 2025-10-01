@@ -11,6 +11,7 @@ ALLOWED_TEMPLATES=(
     "config.php.example"
     "config.example.php"
     ".env.example"
+    ".env.EXAMPLE"
     ".env.template"
     #"*.php.backup"          # ← Backup-Dateien erlauben
     #"*.backup"              # ← Allgemeine Backup-Dateien

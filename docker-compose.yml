@@ -1,0 +1,80 @@
+version: '3.8'
+
+services:
+  # SecStore Application
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: secstore_app
+    restart: unless-stopped
+    ports:
+      - "8000:80"
+    volumes:
+      # Persistent configuration
+      - ./config.php:/var/www/html/config.php
+      # Persistent cache
+      - ./cache:/var/www/html/cache
+      # Application logs
+      - ./logs:/var/www/html/logs
+      # PHP error log (from public/index.php)
+      - ./logs/error.log:/var/www/html/public/error.log
+    environment:
+      - APACHE_RUN_USER=www-data
+      - APACHE_RUN_GROUP=www-data
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - secstore_network
+
+  # MySQL Database
+  db:
+    image: mysql:8.0
+    container_name: secstore_db
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-SecureRootPass123!}
+      MYSQL_DATABASE: secstore
+      MYSQL_USER: secstore
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-SecureDBPass123!}
+    volumes:
+      # Persistent database storage
+      - db_data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+    command: --default-authentication-plugin=mysql_native_password
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD:-SecureRootPass123!}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    networks:
+      - secstore_network
+
+  # phpMyAdmin (Optional - for database management)
+  phpmyadmin:
+    image: phpmyadmin:latest
+    container_name: secstore_phpmyadmin
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    environment:
+      PMA_HOST: db
+      PMA_PORT: 3306
+      PMA_USER: root
+      PMA_PASSWORD: ${MYSQL_ROOT_PASSWORD:-SecureRootPass123!}
+      UPLOAD_LIMIT: 20M
+    depends_on:
+      - db
+    networks:
+      - secstore_network
+
+networks:
+  secstore_network:
+    driver: bridge
+
+volumes:
+  db_data:
+    driver: local
