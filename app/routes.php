@@ -171,6 +171,10 @@ authRoute('POST', '/register', function () {
     (new AuthController())->register();
 }, 'register');
 
+authRoute('GET', '/verify/@token', function ($token) {
+    (new AuthController())->verify($token);
+}, 'register');
+
 // Login
 authRoute('GET', '/login', function () {
     (new AuthController())->showLogin();

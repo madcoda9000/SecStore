@@ -44,6 +44,8 @@ try {
         `created_at` timestamp NULL DEFAULT current_timestamp(),
         `activeSessionId` varchar(255) DEFAULT '',
         `lastKnownIp` varchar(255) DEFAULT '',
+        'verification_token' VARCHAR(255) DEFAULT '',
+        'verification_token' VARCHAR(255) DEFAULT NULL,
         PRIMARY KEY (`id`),
         UNIQUE KEY `email` (`email`),
         UNIQUE KEY `username` (`username`)

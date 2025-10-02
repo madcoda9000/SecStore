@@ -24,7 +24,90 @@ class User extends ORM
 {
     protected static $tableName = 'users'; // Der Tabellenname
 
+    /**
+     * Setzt den Verifizierungs-Token für einen Benutzer.
+     * 
+     * @param int $userId Die ID des Benutzers
+     * @param string $token Der Verifizierungs-Token
+     * @param DateTime $expires Ablaufzeit des Tokens
+     * @return bool True bei Erfolg, false bei Fehler
+     */
+    public static function setVerificationToken($userId, $token, $expires)
+    {
+        ORM::configure('logging', true);
+        $user = self::findUserById($userId);
 
+        if ($user !== false) {
+            $user->verification_token = $token;
+            $user->verification_token_expires = $expires->format('Y-m-d H:i:s');
+            $erg = $user->save();
+
+            // Query loggen
+            $queries = ORM::get_query_log();
+            if (!empty($queries)) {
+                $lastQuery = end($queries);
+                LogUtil::logAction(LogType::SQL, 'User.php', 'setVerificationToken', $lastQuery);
+            }
+
+            return $erg;
+        }
+
+        return false;
+    }
+
+    /**
+     * Verifiziert einen Benutzer anhand des Tokens.
+     * 
+     * @param string $token Der Verifizierungs-Token
+     * @return array|false Array mit User-Daten bei Erfolg, false bei Fehler
+     */
+    public static function verifyUserByToken($token)
+    {
+        ORM::configure('logging', true);
+
+        $user = ORM::for_table(self::$tableName)
+            ->where('verification_token', $token)
+            ->find_one();
+
+        // Query loggen
+        $queries = ORM::get_query_log();
+        if (!empty($queries)) {
+            $lastQuery = end($queries);
+            LogUtil::logAction(LogType::SQL, 'User.php', 'verifyUserByToken', $lastQuery);
+        }
+
+        if ($user === false) {
+            return false;
+        }
+
+        // Prüfen ob Token abgelaufen ist
+        $now = new \DateTime();
+        $expires = new \DateTime($user->verification_token_expires);
+
+        if ($now > $expires) {
+            return false; // Token abgelaufen
+        }
+
+        // User aktivieren
+        $user->status = 1;
+        $user->verification_token = null;
+        $user->verification_token_expires = null;
+        $user->save();
+
+        // Query loggen
+        $queries = ORM::get_query_log();
+        if (!empty($queries)) {
+            $lastQuery = end($queries);
+            LogUtil::logAction(LogType::SQL, 'User.php', 'verifyUserByToken', $lastQuery);
+        }
+
+        return [
+            'username' => $user->username,
+            'email' => $user->email,
+            'firstname' => $user->firstname,
+            'lastname' => $user->lastname
+        ];
+    }
 
     /**
      * Erstellt einen neuen Benutzer.

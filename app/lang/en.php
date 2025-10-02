@@ -18,6 +18,7 @@ return [
     'login.msg.error4' => 'You have an open password reset request. Please check your email.',
     'login.msg.error5' => 'Too many failed login attempts! Please try again later.',
     'login.msg.error6' => 'Incorrect username or password!',
+    'login.msg.error7' => 'Your account has not been verified yet. Please check your emails.',
     'register.title' => 'Register',
     'register.username' => 'Username',
     'register.email' => 'Email',
@@ -482,4 +483,20 @@ return [
     // Database Success
     'setup.database.success.title' => 'Database configured successfully',
     'setup.database.success.desc' => 'All tables have been created and the database is ready.',
+
+    // Verification
+    'register.msg.successVerification' => 'Registration successful! Please check your email and click the verification link.',
+    'verify.title' => 'Account Verification',
+    'verify.successTitle' => 'Successfully Verified!',
+    'verify.errorTitle' => 'Verification Failed',
+    'verify.msg.success' => 'Your account has been successfully verified! You can now log in.',
+    'verify.msg.error' => 'The verification link is invalid or expired.',
+    'verify.welcomeUser' => 'Welcome, ',
+    'verify.loginButton' => 'Login Now',
+    'verify.registerButton' => 'Register Again',
+    'verify.backToLogin' => 'Back to Login',
+    'verify.possibleReasons' => 'Possible reasons:',
+    'verify.reason1' => 'The verification link is older than 24 hours',
+    'verify.reason2' => 'The link has already been used',
+    'verify.reason3' => 'The link is invalid or has been tampered with',    
 ];

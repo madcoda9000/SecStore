@@ -28,6 +28,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### 🐛 Fixed
 - **removed debug messages from CHANGELOG**
 
+
+### 📝 Documentation
+- **Add quick-commit.sh documentation to DEVDOC**
+
 ---
 
 ## [1.3.1] - 2025-08-15

@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Your Password reset request</title>
+    <title>Verify Your Account</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -43,21 +43,29 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>Password reset request</h1>
+            <h1>Verify your Account</h1>
         </div>
         <div class="content">
             <h2>Hallo {$name}!</h2>
-            <p>You've requested to reset your password. Please use the button below to finish your password reset.</p>
+            <p>Thank you for registering with SecStore. To complete your registration, please verify your email address by clicking the button below:</p>
             <p>&nbsp;</p>
-            <p><a href="{$url}" style="display:inline-block; padding:10px 15px; color:white; background-color:#ff0055; text-decoration:none; border-radius:5px;">Reset my password..</a></p>
+            <p><a href="{$verificationLink}" style="display:inline-block; padding:10px 15px; color:white; background-color:#ff0055; text-decoration:none; border-radius:5px;">Verify my Account..</a></p>
             <br><br>
-            <p>
-            <b style='color:#ff0055;font-weight:bold;'>NOTE:</b>&nbsp;If you've not initiated this password reset request. Please do nothing and contact your administrator as soon as possible!
+            <p>Or copy and paste this link into your browser:</p>
+            <p style="word-break: break-all; background: white; padding: 10px; border-radius: 5px;color:#000;">
+                {$verificationLink}
             </p>
+            
+            <div class="warning">
+                <strong>Important:</strong> This verification link will expire in <strong>{$expiresIn}</strong>.
+            </div>
+            
+            <p>If you didn't create an account with SecStore, you can safely ignore this email.</p>
         </div>
+        
         <div class="footer">
-            <p>&copy; 2025 SecStore. Alle Rechte vorbehalten.</p>
+            <p>&copy; {date('Y')} SecStore. All rights reserved.</p>
         </div>
-    </div>
+    </div> 
 </body>
 </html>

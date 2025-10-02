@@ -1,0 +1,103 @@
+{* verify.latte - Account Verification *}
+{extends '_authLayout.latte'}
+
+{block content}
+<div class="container">
+    <div class="card p-4 shadow-sm login-card shadow-lg" style="width: 100%; max-width: 450px;">
+        
+        {if $success}
+            {* Erfolgreiche Verifizierung *}
+            <div class="text-center">
+                <div class="verification-icon text-success mb-3">
+                    <i class="bi bi-check-circle-fill" style="font-size: 4rem;"></i>
+                </div>
+                <h3 class="text-success mb-3">{trans('verify.title')}</h3>
+            </div>
+
+            <div class="alert alert-success" role="alert">
+                <div class="d-flex gap-3">
+                    <span><i class="bi bi-check-circle-fill text-success"></i></span>
+                    <div class="d-flex flex-column gap-2">
+                        <h6 class="mb-0 text-success">{trans('verify.successTitle')}</h6>
+                        <p class="mb-0">{$message}</p>
+                        <p class="mb-0 mt-2">
+                            <strong>{trans('verify.welcomeUser')}{$username}</strong>
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="d-grid gap-2 mt-4">
+                <a href="/login" class="btn btn-primary btn-lg">
+                    <i class="bi bi-box-arrow-in-right me-2"></i>{trans('verify.loginButton')}
+                </a>
+            </div>
+
+        {else}
+            {* Fehlgeschlagene Verifizierung *}
+            <div class="text-center">
+                <div class="verification-icon text-danger mb-3">
+                    <i class="bi bi-x-circle-fill" style="font-size: 4rem;"></i>
+                </div>
+                <h3 class="text-danger mb-3">{trans('verify.title')}</h3>
+            </div>
+
+            <div class="alert alert-danger" role="alert">
+                <div class="d-flex gap-3">
+                    <span><i class="bi bi-exclamation-circle-fill text-danger"></i></span>
+                    <div class="d-flex flex-column gap-2">
+                        <h6 class="mb-0 text-danger">{trans('verify.errorTitle')}</h6>
+                        <p class="mb-0">{$error}</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="alert alert-info mt-3" role="alert">
+                <div class="d-flex gap-3">
+                    <span><i class="bi bi-info-circle-fill text-info"></i></span>
+                    <div class="d-flex flex-column gap-2">
+                        <h6 class="mb-0 text-info">{trans('verify.possibleReasons')}</h6>
+                        <ul class="mb-0 ps-3">
+                            <li>{trans('verify.reason1')}</li>
+                            <li>{trans('verify.reason2')}</li>
+                            <li>{trans('verify.reason3')}</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="d-grid gap-2 mt-4">
+                <a href="/register" class="btn btn-secondary btn-lg">
+                    <i class="bi bi-person-fill-add me-2"></i>{trans('verify.registerButton')}
+                </a>
+                <a href="/login" class="btn btn-outline-primary">
+                    <i class="bi bi-box-arrow-in-right me-2"></i>{trans('verify.backToLogin')}
+                </a>
+            </div>
+
+        {/if}
+
+        {* Sprachauswahl *}
+        <div class="p-3 mt-3" style="display:flex; flex-direction:column; justify-content:center; align-items:center;">
+            <form method="get" action="">
+                <div class="dropdown">
+                    <button class="btn btn-outline-none dropdown-toggle d-flex align-items-center gap-2" type="button" id="langMenu" data-bs-toggle="dropdown" aria-expanded="false">
+                        <img src="/img/flags/{$lang}.svg" alt="{$lang}" width="20" height="14">
+                        <span class="d-none d-md-inline">
+                            {if $lang === 'de'}{trans('language.german')}{elseif $lang === 'en'}{trans('language.english')}{/if}
+                        </span>
+                    </button>
+                    <ul class="dropdown-menu" aria-labelledby="langMenu">
+                        <li><a class="dropdown-item" href="?lang=de">
+                            <img src="/img/flags/de.svg" alt="de" width="20" height="14"> {trans('language.german')}
+                        </a></li>
+                        <li><a class="dropdown-item" href="?lang=en">
+                            <img src="/img/flags/en.svg" alt="en" width="20" height="14"> {trans('language.english')}
+                        </a></li>
+                    </ul>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{/block}

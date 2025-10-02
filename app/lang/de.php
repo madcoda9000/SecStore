@@ -18,6 +18,7 @@ return [
     'login.msg.error4' => 'Sie haben eine offene Passwort reset Anforderung. Bitte überprüfen Sie Ihre E-Mails.',
     'login.msg.error5' => 'Zuviele fehlgeschlagene Anmeldeversuche! Bitte versuchen Sie es später erneut.',
     'login.msg.error6' => 'Falscher Benutzername oder Passwort!',
+    'login.msg.error7' => 'Ihr Account wurde noch nicht verifiziert. Bitte prüfen Sie Ihre E-Mails.',
     'register.title' => 'Registrieren',
     'register.username' => 'Benutzername',
     'register.email' => 'E-Mail',
@@ -479,4 +480,21 @@ Wenn Sie LDAP für diesen Benutzer aktivieren, generieren Sie einfach ein belieb
     // Database Success
     'setup.database.success.title' => 'Datenbank erfolgreich konfiguriert',
     'setup.database.success.desc' => 'Alle Tabellen wurden erstellt und die Datenbank ist bereit.',
+
+    // Verification
+    'register.msg.successVerification' => 'Registrierung erfolgreich! Bitte überprüfen Sie Ihre E-Mails und klicken Sie auf den Verifizierungslink.',
+    'verify.title' => 'Account Verifizierung',
+    'verify.successTitle' => 'Erfolgreich verifiziert!',
+    'verify.errorTitle' => 'Verifizierung fehlgeschlagen',
+    'verify.msg.success' => 'Ihr Account wurde erfolgreich verifiziert! Sie können sich jetzt anmelden.',
+    'verify.msg.error' => 'Der Verifizierungslink ist ungültig oder abgelaufen.',
+    'verify.welcomeUser' => 'Willkommen, {$username}!',
+    'verify.loginButton' => 'Jetzt anmelden',
+    'verify.registerButton' => 'Erneut registrieren',
+    'verify.backToLogin' => 'Zurück zur Anmeldung',
+    'verify.possibleReasons' => 'Mögliche Gründe:',
+    'verify.reason1' => 'Der Verifizierungslink ist bereits älter als 24 Stunden',
+    'verify.reason2' => 'Der Link wurde bereits verwendet',
+    'verify.reason3' => 'Der Link ist ungültig oder wurde manipuliert',
+
 ];

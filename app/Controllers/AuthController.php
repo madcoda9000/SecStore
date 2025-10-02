@@ -84,7 +84,7 @@ class AuthController
         try {
             // Use new comprehensive validation system
             $rules = InputValidator::getRegistrationRules();
-            
+
             // Add firstname and lastname rules (specific to this registration form)
             $rules['firstname'] = [
                 InputValidator::RULE_REQUIRED,
@@ -96,7 +96,7 @@ class AuthController
                 [InputValidator::RULE_MIN_LENGTH => 1],
                 [InputValidator::RULE_MAX_LENGTH => 255]
             ];
-            
+
             // Validate all inputs using the new system
             $validated = InputValidator::validateAndSanitize($rules, $_POST);
 
@@ -109,7 +109,7 @@ class AuthController
         } catch (InvalidArgumentException $e) {
             // Log validation failure with user context for security monitoring
             LogUtil::logAction(LogType::AUDIT, 'AuthController', 'register', 'Validation failed: ' . $e->getMessage(), $user);
-            
+
             // Render registration form with error message
             Flight::latte()->render('register.latte', [
                 'title' => TranslationUtil::t('register.title'),
@@ -124,21 +124,38 @@ class AuthController
         // Check if user already exists (business logic validation)
         $userCheck = User::checkIfUserExists($user, $email);
 
+        // Load config for email link generation
+        $configFile = "../config.php";
+        $config = include $configFile;
+
         if ($userCheck === "false") {
-            // Create new user
-            $newUser = User::createUser($user, $email, $firstname, $lastname, 1, $password, 'User');
-            
+            // Create new user mit status = 0 (nicht verifiziert)
+            $newUser = User::createUser($user, $email, $firstname, $lastname, 0, $password, 'User');
+
             if ($newUser !== null) {
-                // Success: Log and send welcome email
-                LogUtil::logAction(LogType::AUDIT, 'AuthController', 'register', 'SUCCESS: registered new user.', $user);
-                
-                MailUtil::sendMail($email, "SecStore: Welcome to SecStore", "welcome", [
-                    'name' => $firstname . ' ' . $lastname
+                // Verifizierungs-Token generieren
+                $verificationToken = bin2hex(random_bytes(32));
+                $tokenExpires = new \DateTime();
+                $tokenExpires->modify('+24 hours'); // Token 24h gültig
+
+                // Token speichern
+                User::setVerificationToken($newUser->id, $verificationToken, $tokenExpires);
+
+                // Verifizierungs-Link erstellen
+                $verificationLink = $config['application']['appUrl'] . '/verify/' . $verificationToken;
+
+                // Verifizierungs-Email senden
+                LogUtil::logAction(LogType::AUDIT, 'AuthController', 'register', 'SUCCESS: registered new user (pending verification).', $user);
+
+                MailUtil::sendMail($email, "SecStore: Verify your account", "verification", [
+                    'name' => $firstname . ' ' . $lastname,
+                    'verificationLink' => $verificationLink,
+                    'expiresIn' => '24 hours'
                 ]);
-                
+
                 Flight::latte()->render('register.latte', [
                     'title' => TranslationUtil::t('register.title'),
-                    'message' => TranslationUtil::t('register.msg.success'),
+                    'message' => TranslationUtil::t('register.msg.successVerification'),
                     'sessionTimeout' => SessionUtil::getSessionTimeout(),
                     'lang' => Flight::get('lang'),
                     'smtpInvalid' => MailUtil::checkConnection()
@@ -147,7 +164,7 @@ class AuthController
             } else {
                 // Database error during user creation
                 LogUtil::logAction(LogType::AUDIT, 'AuthController', 'register', 'ERROR: could not create new user.', $user);
-                
+
                 Flight::latte()->render('register.latte', [
                     'title' => TranslationUtil::t('register.title'),
                     'error' => TranslationUtil::t('register.msg.errorGeneral'),
@@ -160,13 +177,62 @@ class AuthController
         } else {
             // User already exists (username or email taken)
             LogUtil::logAction(LogType::AUDIT, 'AuthController', 'register', 'FAILED: ' . $userCheck, $user);
-            
+
             Flight::latte()->render('register.latte', [
                 'title' => TranslationUtil::t('register.title'),
                 'error' => $userCheck,
                 'sessionTimeout' => SessionUtil::getSessionTimeout(),
                 'lang' => Flight::get('lang'),
                 'smtpInvalid' => MailUtil::checkConnection()
+            ]);
+            return;
+        }
+    }
+
+    /**
+     * Verifiziert einen Benutzer-Account anhand des Tokens.
+     * 
+     * @param string $token Der Verifizierungs-Token aus der URL
+     * @return void
+     */
+    public function verify($token)
+    {
+        // Token validieren und User verifizieren
+        $userData = User::verifyUserByToken($token);
+
+        if ($userData !== false) {
+            // Erfolg: User wurde verifiziert
+            LogUtil::logAction(
+                LogType::AUDIT,
+                'AuthController',
+                'verify',
+                'SUCCESS: User verified account.',
+                $userData['username']
+            );
+
+            Flight::latte()->render('verify.latte', [
+                'title' => TranslationUtil::t('verify.title'),
+                'success' => true,
+                'message' => TranslationUtil::t('verify.msg.success'),
+                'username' => $userData['username'],
+                'lang' => Flight::get('lang')
+            ]);
+            return;
+        } else {
+            // Fehler: Token ungültig oder abgelaufen
+            LogUtil::logAction(
+                LogType::SECURITY,
+                'AuthController',
+                'verify',
+                'FAILED: Invalid or expired verification token.',
+                'unknown'
+            );
+
+            Flight::latte()->render('verify.latte', [
+                'title' => TranslationUtil::t('verify.title'),
+                'success' => false,
+                'error' => TranslationUtil::t('verify.msg.error'),
+                'lang' => Flight::get('lang')
             ]);
             return;
         }
@@ -323,6 +389,20 @@ class AuthController
             return;
         }
 
+        // check if account is verified
+        if ($user->status == 0 && !empty($user->verification_token)) {
+            LogUtil::logAction(LogType::SECURITY, 'AuthController', 'login', 'FAILED: Account not verified.', $username);
+
+            Flight::latte()->render('login.latte', [
+                'title' => TranslationUtil::t('login.title'),
+                'error' => TranslationUtil::t('login.msg.error7'),
+                'sessionTimeout' => SessionUtil::getSessionTimeout(),
+                'lang' => Flight::get('lang'),
+                "application" => $config["application"],
+            ]);
+            return;
+        }
+
         // check for open password reset token
         if ($user !== false && !empty($user->reset_token)) {
             BruteForceUtil::recordFailedLogin($username);
@@ -332,6 +412,20 @@ class AuthController
                 'lang' => Flight::get('lang'),
                 'error' => TranslationUtil::t('login.msg.error1'),
                 'sessionTimeout' => SessionUtil::getSessionTimeout(),
+                "application" => $config["application"],
+            ]);
+            return;
+        }
+
+        // check if user account is deactivated
+        if ($user->status == 0) {
+            LogUtil::logAction(LogType::SECURITY, 'AuthController', 'login', 'FAILED: Account deactivated.', $username);
+
+            Flight::latte()->render('login.latte', [
+                'title' => TranslationUtil::t('login.title'),
+                'error' => TranslationUtil::t('login.msg.error2'),
+                'sessionTimeout' => SessionUtil::getSessionTimeout(),
+                'lang' => Flight::get('lang'),
                 "application" => $config["application"],
             ]);
             return;
@@ -629,7 +723,7 @@ class AuthController
                     [InputValidator::RULE_MAX_LENGTH => 255]
                 ]
             ], $_POST);
-            
+
             $email = $validated['email'];
         } catch (InvalidArgumentException $e) {
             LogUtil::logAction(LogType::AUDIT, 'AuthController', 'forgotPassword', $e->getMessage(), "UNKNOWN_USER");
@@ -654,12 +748,17 @@ class AuthController
         }
 
         if ($user !== false && empty($user->reset_token)) {
+
+            $configFile = "../config.php";
+            $config = include $configFile;
+
             $token = bin2hex(random_bytes(50));
             $erg = User::setResetToken($token, $email);
 
             if ($erg) {
                 $name = trim($user->firstname . ' ' . $user->lastname);
-                MailUtil::sendMail($user->email, "SecStore: your password reset request", "pwReset", ['name' => $name, 'token' => $token]);
+                $url = $config['application']['appUrl'] . '/reset-password/' . $token;
+                MailUtil::sendMail($user->email, "SecStore: your password reset request", "pwReset", ['name' => $name, 'token' => $token, 'url' => $url]);
                 LogUtil::logAction(LogType::AUDIT, 'AuthController', 'forgotPassword', 'SUCCESS: requested pw reset.', $email);
                 Flight::latte()->render('forgot_password.latte', [
                     'title' => TranslationUtil::t('login.title'),
