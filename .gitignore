@@ -489,7 +489,8 @@ cache/*.php.lock
 
 # php unit cache and reports
 .phpunit.cache
-tests/reports/
+tests/reports/*.xml
+tests/reports/*.html
 
 # php-cs-fixer cache
 .php-cs-fixer.cache
