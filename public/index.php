@@ -128,7 +128,9 @@ if (!$needsSetup) {
  */
 if (!$needsSetup) {
     $CorsUtil = new CorsUtil($config['allowedHosts']);
-    $app->before('start', [$CorsUtil, 'setupCors']);
+    $app->before('start', function() use ($CorsUtil) {
+        $CorsUtil->setupCors(false);  // false for normal operation
+    });
 }
 
 /**

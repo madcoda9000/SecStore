@@ -13,7 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [1.3.2] - 2025-10-01
+## [1.3.2] - 2025-10-02
 ### ✨ Added
 - **Docker support with complete containerization**
 - **Dockerfile for PHP 8.3** with all required extensions
@@ -23,7 +23,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Optional Makefile** for developer convenience
 - **Comprehensive Docker documentation** ([README_DOCKER.md](README_DOCKER.md) and [DOCKER_QUICKSTART.md](DOCKER_QUICKSTART.md))
 
+
+### 🧪 Testing
+- **Debug test2 commit**
+
 ---
+
+
+### 🧪 Testing
+- **Debug test commit**
 
 ## [1.3.1] - 2025-08-15
 ### ✨ Added
@@ -193,4 +201,3 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-*For detailed upgrade instructions and migration guides, check our [Documentation](Documentation/)*
