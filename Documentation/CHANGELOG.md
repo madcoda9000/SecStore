@@ -15,6 +15,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.3.2] - 2025-10-02
 ### ✨ Added
+- **Implemented 2fa Backup codes**
+- **Implemented 2fa Backup Codes**
 - **Implemented Register verification with token**
 - **Implemented Git-Hooks with automatic CHANGELOG management**
 - **Docker support with complete containerization**
