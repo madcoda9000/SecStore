@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.3.2] - 2025-10-02
 ### ✨ Added
+- **Implemented Git-Hooks with automatic CHANGELOG management**
 - **Docker support with complete containerization**
 - **Dockerfile for PHP 8.3** with all required extensions
 - **docker-compose.yml** with MySQL 8.0 and phpMyAdmin
@@ -23,15 +24,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Optional Makefile** for developer convenience
 - **Comprehensive Docker documentation** ([README_DOCKER.md](README_DOCKER.md) and [DOCKER_QUICKSTART.md](DOCKER_QUICKSTART.md))
 
-
-### 🧪 Testing
-- **Debug test2 commit**
-
 ---
-
-
-### 🧪 Testing
-- **Debug test commit**
 
 ## [1.3.1] - 2025-08-15
 ### ✨ Added
