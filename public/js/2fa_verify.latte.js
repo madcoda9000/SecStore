@@ -137,7 +137,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (backupInput) {
         backupInput.addEventListener('input', function(e) {
             let value = this.value.replace(/[^A-Za-z0-9]/g, '').toUpperCase();
-            
+            let err = "ljköl";
             // Auto-format with dash
             if (value.length > 4) {
                 value = value.slice(0, 4) + '-' + value.slice(4, 8);

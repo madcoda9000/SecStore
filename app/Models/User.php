@@ -104,6 +104,7 @@ class User extends ORM
     {
         $backupCodesJson = self::getBackupCodes($userId);
         return BackupCodeUtil::countRemainingCodes($backupCodesJson);
+        
     }
 
     /**

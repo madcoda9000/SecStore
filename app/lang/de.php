@@ -527,5 +527,4 @@ Wenn Sie LDAP für diesen Benutzer aktivieren, generieren Sie einfach ein belieb
     'verify.reason1' => 'Der Verifizierungslink ist bereits älter als 24 Stunden',
     'verify.reason2' => 'Der Link wurde bereits verwendet',
     'verify.reason3' => 'Der Link ist ungültig oder wurde manipuliert',
-
 ];

@@ -530,4 +530,5 @@ return [
     'verify.reason1' => 'The verification link is older than 24 hours',
     'verify.reason2' => 'The link has already been used',
     'verify.reason3' => 'The link is invalid or has been tampered with',
+    
 ];
