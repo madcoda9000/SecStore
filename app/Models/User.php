@@ -6,6 +6,7 @@ use ORM;
 use App\Utils\LogType;
 use App\Utils\LogUtil;
 use App\Utils\TranslationUtil;
+use App\Utils\BackupCodeUtil;
 
 /**
  * Class Name: User
@@ -23,6 +24,113 @@ use App\Utils\TranslationUtil;
 class User extends ORM
 {
     protected static $tableName = 'users'; // Der Tabellenname
+
+    /**
+     * Sets backup codes for a user identified by their ID.
+     *
+     * @param int $userId The ID of the user
+     * @param string $hashedCodesJson JSON string of hashed backup codes
+     * @return bool True if codes were successfully saved, false otherwise
+     */
+    public static function setBackupCodes(int $userId, string $hashedCodesJson): bool
+    {
+        ORM::configure('logging', true);
+        $user = self::findUserById($userId);
+        if ($user !== false) {
+            $user->mfaBackupCodes = $hashedCodesJson;
+            $erg = $user->save();
+
+            // Log query
+            $queries = ORM::get_query_log();
+            if (!empty($queries)) {
+                $lastQuery = end($queries);
+                LogUtil::logAction(LogType::SQL, 'User.php', 'setBackupCodes', $lastQuery);
+            }
+
+            return $erg;
+        }
+        return false;
+    }
+
+    /**
+     * Gets the backup codes JSON for a user.
+     *
+     * @param int $userId The ID of the user
+     * @return string|null JSON string of backup codes or null if not found
+     */
+    public static function getBackupCodes(int $userId): ?string
+    {
+        $user = self::findUserById($userId);
+        if ($user !== false) {
+            return $user->mfaBackupCodes;
+        }
+        return null;
+    }
+
+    /**
+     * Updates backup codes for a user (e.g., after one is used).
+     *
+     * @param int $userId The ID of the user
+     * @param string $updatedCodesJson Updated JSON string of backup codes
+     * @return bool True if update was successful, false otherwise
+     */
+    public static function updateBackupCodes(int $userId, string $updatedCodesJson): bool
+    {
+        ORM::configure('logging', true);
+        $user = self::findUserById($userId);
+        if ($user !== false) {
+            $user->mfaBackupCodes = $updatedCodesJson;
+            $erg = $user->save();
+
+            // Log query
+            $queries = ORM::get_query_log();
+            if (!empty($queries)) {
+                $lastQuery = end($queries);
+                LogUtil::logAction(LogType::SQL, 'User.php', 'updateBackupCodes', $lastQuery);
+            }
+
+            return $erg;
+        }
+        return false;
+    }
+
+    /**
+     * Counts remaining backup codes for a user.
+     *
+     * @param int $userId The ID of the user
+     * @return int Number of remaining unused backup codes
+     */
+    public static function countRemainingBackupCodes(int $userId): int
+    {
+        $backupCodesJson = self::getBackupCodes($userId);
+        return BackupCodeUtil::countRemainingCodes($backupCodesJson);
+    }
+
+    /**
+     * Resets (clears) all backup codes for a user.
+     *
+     * @param int $userId The ID of the user
+     * @return bool True if reset was successful, false otherwise
+     */
+    public static function clearBackupCodes(int $userId): bool
+    {
+        ORM::configure('logging', true);
+        $user = self::findUserById($userId);
+        if ($user !== false) {
+            $user->mfaBackupCodes = null;
+            $erg = $user->save();
+
+            // Log query
+            $queries = ORM::get_query_log();
+            if (!empty($queries)) {
+                $lastQuery = end($queries);
+                LogUtil::logAction(LogType::SQL, 'User.php', 'clearBackupCodes', $lastQuery);
+            }
+
+            return $erg;
+        }
+        return false;
+    }
 
     /**
      * Setzt den Verifizierungs-Token für einen Benutzer.

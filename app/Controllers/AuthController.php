@@ -14,6 +14,7 @@ use App\Utils\LogUtil;
 use App\Utils\LdapUtil;
 use App\Utils\TranslationUtil;
 use App\Utils\InputValidator;
+use App\Utils\BackupCodeUtil;
 use InvalidArgumentException;
 
 /**
@@ -539,19 +540,17 @@ class AuthController
     }
 
     /**
-     * Enables 2FA for the user.
+     * Enables 2FA for the user with backup codes.
      *
-     * This method generates a new secret and QR code for the user, and stores
-     * the secret in the database. It also renders the enable_2fa template with
-     * the necessary data.
+     * This method generates a new secret and QR code for the user, generates
+     * backup codes, and stores them in the database. It also renders the 
+     * enable_2fa template with the necessary data including backup codes.
      *
-     * @param bool $isMfaStartSetup If true, the user is starting the 2FA setup
-     *     process.
+     * @param bool $isMfaStartSetup If true, the user is starting the 2FA setup process.
      * @param int|null $usId The user ID to be used for enabling 2FA.
      */
     public function enable2FA($isMfaStartSetup = false, $usId = null)
     {
-
         if ($isMfaStartSetup && $usId) {
             User::disableMfaSetupForUser($usId);
             SessionUtil::set('2fa_user_id', $usId);
@@ -561,20 +560,37 @@ class AuthController
         if ($user === false) {
             Flight::redirect('/login');
         }
+
         $tfa = new TwoFactorAuth(new EndroidQrCodeProvider());
-        $secret = $tfa->createSecret(); // Geheimen Schlüssel generieren
-        $qrCodeUrl = $tfa->getQRCodeImageAsDataUri($user->username, $secret); // QR-Code generieren
+        $secret = $tfa->createSecret();
+        $qrCodeUrl = $tfa->getQRCodeImageAsDataUri($user->username, $secret);
 
-        // Geheimen Schlüssel in der Datenbank speichern
+        // Generate backup codes
+        $backupCodes = BackupCodeUtil::generateBackupCodes();
+        $hashedCodes = BackupCodeUtil::hashBackupCodes($backupCodes);
+
+        // Save secret and backup codes to database
         User::setMfaToken($secret, $user->id);
+        User::setBackupCodes($user->id, $hashedCodes);
 
-        // An das Template übergeben
+        // Log the action
+        LogUtil::logAction(
+            LogType::AUDIT,
+            'AuthController',
+            'enable2FA',
+            'SUCCESS: Generated 2FA secret and backup codes for user',
+            $user->username
+        );
+
+        // Pass data to template
         Flight::latte()->render('enable_2fa.latte', [
             'title' => TranslationUtil::t('2fasetup.title'),
             'lang' => Flight::get('lang'),
             'user' => $user,
+            'sessionTimeout' => SessionUtil::getSessionTimeout(),
             'qrCodeUrl' => $qrCodeUrl,
             'secret' => $secret,
+            'backupCodes' => $backupCodes,
             'enforced' => $user->mfaEnforced
         ]);
     }
@@ -616,12 +632,12 @@ class AuthController
     }
 
     /**
-     * Verifies the 2FA code sent by the user.
+     * Verifies the 2FA code or backup code sent by the user.
      *
-     * This method expects the 2FA code to be sent via POST request.
-     * If the code is valid, it sets the user session and redirects to the
-     * dashboard. If the code is invalid, it renders the 2fa_verify template
-     * with an error message.
+     * This method expects either a TOTP code or a backup code to be sent via POST.
+     * If a TOTP code is valid, it sets the user session and redirects to dashboard.
+     * If a backup code is valid, it marks the code as used, sets session, and redirects.
+     * If neither is valid, it renders the 2fa_verify template with an error message.
      */
     public function verify2FA()
     {
@@ -637,37 +653,82 @@ class AuthController
 
         $request = Flight::request();
         $otp = "";
+        $isBackupCode = isset($_POST['backup_code']) && $_POST['backup_code'] === '1';
 
         try {
-            $rules = InputValidator::get2FAVerificationRules();
-            $validated = InputValidator::validateAndSanitize($rules, $_POST);
-            $otp = $validated['otp'];
+            if ($isBackupCode) {
+                // Validate backup code format
+                $rules['backup_code_value'] = [InputValidator::RULE_REQUIRED];
+                $validated = InputValidator::validateAndSanitize($rules, $_POST);
+                $otp = $validated['backup_code_value'];
+
+                // Verify backup code
+                $backupCodesJson = User::getBackupCodes($user->id);
+                $codeIndex = BackupCodeUtil::verifyBackupCode($otp, $backupCodesJson);
+
+                if ($codeIndex !== false) {
+                    // Mark code as used
+                    $updatedCodes = BackupCodeUtil::markCodeAsUsed($backupCodesJson, $codeIndex);
+                    User::updateBackupCodes($user->id, $updatedCodes);
+
+                    // Log successful backup code usage
+                    LogUtil::logAction(
+                        LogType::AUDIT,
+                        'AuthController',
+                        'verify2FA',
+                        'SUCCESS: Backup code used for 2FA verification',
+                        $user->username
+                    );
+
+                    // Check remaining codes and warn if low
+                    $remainingCodes = BackupCodeUtil::countRemainingCodes($updatedCodes);
+                    if ($remainingCodes <= 3 && $remainingCodes > 0) {
+                        SessionUtil::set('backup_codes_low_warning', $remainingCodes);
+                    }
+
+                    SessionUtil::set('user', $user);
+                    unset($_SESSION['2fa_user_id']);
+                    Flight::redirect('/home');
+                } else {
+                    throw new InvalidArgumentException(TranslationUtil::t('2faverify.msg.error.backupcode'));
+                }
+            } else {
+                // Standard TOTP verification
+                $rules = InputValidator::get2FAVerificationRules();
+                $validated = InputValidator::validateAndSanitize($rules, $_POST);
+                $otp = $validated['otp'];
+
+                $tfa = new TwoFactorAuth(new EndroidQrCodeProvider());
+                if ($tfa->verifyCode($user->mfaSecret, $otp)) {
+                    LogUtil::logAction(
+                        LogType::AUDIT,
+                        'AuthController',
+                        'verify2FA',
+                        'SUCCESS: 2FA verification successful',
+                        $user->username
+                    );
+                    SessionUtil::set('user', $user);
+                    unset($_SESSION['2fa_user_id']);
+                    Flight::redirect('/home');
+                } else {
+                    throw new InvalidArgumentException(TranslationUtil::t('2faverify.msg.error1'));
+                }
+            }
         } catch (InvalidArgumentException $e) {
-            LogUtil::logAction(LogType::AUDIT, 'AuthController', 'verify2FA', $e->getMessage(), $user->username);
+            LogUtil::logAction(
+                LogType::AUDIT,
+                'AuthController',
+                'verify2FA',
+                'FAILED: ' . $e->getMessage(),
+                $user->username
+            );
             Flight::latte()->render('2fa_verify.latte', [
                 'title' => TranslationUtil::t('2faverify.title'),
                 'lang' => Flight::get('lang'),
+                'sessionTimeout' => SessionUtil::getSessionTimeout(),
                 'error' => $e->getMessage(),
             ]);
             return;
-        }
-
-        $tfa = new TwoFactorAuth(new EndroidQrCodeProvider());
-        if ($tfa->verifyCode($user->mfaSecret, $otp)) {
-            // SessionUtil::set('id', $user->id);
-            // SessionUtil::set('isAdmin', in_array('Admin', explode(',', $user->roles)) ? 1 : 0);
-            // SessionUtil::set('username', $user->username);
-            // SessionUtil::set('email', $user->email);
-            LogUtil::logAction(LogType::AUDIT, 'AuthController', 'verify2FA', 'SUCCESS: 2FA verification successful', $user->username);
-            SessionUtil::Set('user', $user);
-            unset($_SESSION['2fa_user_id']); // Session aufräumen
-            Flight::redirect('/home');
-        } else {
-            Flight::latte()->render('2fa_verify.latte', [
-                'title' => TranslationUtil::t('2faverify.title'),
-                'lang' => Flight::get('lang'),
-                'error' => TranslationUtil::t('2faverify.msg.error1'),
-            ]);
         }
     }
 

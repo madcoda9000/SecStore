@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.3.2] - 2025-10-02
 ### ✨ Added
+- **Implemented Register verification with token**
 - **Implemented Git-Hooks with automatic CHANGELOG management**
 - **Docker support with complete containerization**
 - **Dockerfile for PHP 8.3** with all required extensions

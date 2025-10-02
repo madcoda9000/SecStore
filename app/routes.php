@@ -193,10 +193,30 @@ authRoute('GET', '/2fa-verify', function () {
     (new AuthController())->verify2FA();
 }, '2fa');
 
+authRoute('GET', '/2fa-verify/@comesFrom2faEnable', function ($comesFrom2faEnable) {
+    (new AuthController())->show2faVerify($comesFrom2faEnable);
+}, '2fa');
+
 secureRoute('GET /enable-2fa(/@comesFromSettings)', function ($comesFromSettings) use ($csrfMiddleware) {
     $csrfMiddleware->before([]);
     (new ProfileController())->enable2FA($comesFromSettings);
 }, '2fa');
+
+securePostRoute('/regenerateBackupCodes', function () {
+    (new ProfileController())->regenerateBackupCodes();
+});
+
+secureRoute('GET /getBackupCodesCount', function () {
+    (new ProfileController())->getBackupCodesCount();
+});
+
+securePostRoute('/admin/resetUserBackupCodes', function () {
+    AdminController::resetUserBackupCodes();
+}, 'Admin');
+
+secureRoute('GET /admin/getUserBackupCodesInfo', function () {
+    AdminController::getUserBackupCodesInfo();
+}, 'Admin');
 
 // Passwort vergessen
 authRoute('GET', '/forgot-password', function () {

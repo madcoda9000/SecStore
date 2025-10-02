@@ -11,6 +11,7 @@ use RobThree\Auth\TwoFactorAuth;
 use RobThree\Auth\Providers\Qr\EndroidQrCodeProvider;
 use App\Utils\TranslationUtil;
 use App\Utils\InputValidator;
+use App\Utils\BackupCodeUtil;
 use Exception;
 use InvalidArgumentException;
 
@@ -31,27 +32,158 @@ class ProfileController
 {
 
     /**
-     * Shows the profile of the currently logged in user.
+     * Regenerates backup codes for the current user.
+     *
+     * Generates new backup codes, invalidating all previous codes.
+     * Returns the new codes for display to the user.
+     *
+     * @return void
+     */
+    public function regenerateBackupCodes()
+    {
+        $user = User::findUserById(SessionUtil::get('user')['id']);
+        if ($user === false) {
+            Flight::redirect('/login');
+            exit;
+        }
+
+        // Generate new backup codes
+        $backupCodes = BackupCodeUtil::generateBackupCodes();
+        $hashedCodes = BackupCodeUtil::hashBackupCodes($backupCodes);
+
+        // Save to database
+        $result = User::setBackupCodes($user->id, $hashedCodes);
+
+        // Log action
+        LogUtil::logAction(
+            LogType::AUDIT,
+            'ProfileController',
+            'regenerateBackupCodes',
+            'SUCCESS: Regenerated backup codes for user',
+            $user->username
+        );
+
+        if ($result) {
+            // Return codes as JSON for AJAX request
+            if (
+                !empty($_SERVER["HTTP_X_REQUESTED_WITH"]) &&
+                strtolower($_SERVER["HTTP_X_REQUESTED_WITH"]) === "xmlhttprequest"
+            ) {
+                Flight::json([
+                    'success' => true,
+                    'codes' => $backupCodes,
+                    'message' => TranslationUtil::t('profile.backupcodes.regenerate.success')
+                ]);
+                return;
+            }
+
+            // For non-AJAX, render profile with codes
+            $this->showProfileWithBackupCodes($backupCodes);
+        } else {
+            $this->handleResponse(false, TranslationUtil::t('profile.backupcodes.regenerate.error'));
+        }
+    }
+
+    /**
+     * Shows the profile page with newly generated backup codes.
+     *
+     * @param array $newBackupCodes Array of plain-text backup codes to display
+     * @return void
+     */
+    private function showProfileWithBackupCodes(array $newBackupCodes)
+    {
+        $user = User::findUserById(SessionUtil::get('user')['id']);
+        if ($user === false) {
+            Flight::redirect('/login');
+            exit;
+        }
+
+        $tfa = new TwoFactorAuth(new EndroidQrCodeProvider());
+        $qrCodeUrl = null;
+
+        if ($user->mfaSecret !== '') {
+            $qrCodeUrl = $tfa->getQRCodeImageAsDataUri($user->username, $user->mfaSecret);
+        }
+
+        $remainingCodes = User::countRemainingBackupCodes($user->id);
+
+        Flight::latte()->render('profile.latte', [
+            'title' => TranslationUtil::t('profile.title'),
+            'user' => $user,
+            'qrCodeUrl' => $qrCodeUrl,
+            'sessionTimeout' => SessionUtil::getRemainingTime(),
+            'newBackupCodes' => $newBackupCodes,
+            'remainingBackupCodes' => $remainingCodes,
+            'showBackupCodesModal' => true
+        ]);
+    }
+
+    /**
+     * Gets the count of remaining backup codes for the current user.
+     *
+     * @return void
+     */
+    public function getBackupCodesCount()
+    {
+        $user = User::findUserById(SessionUtil::get('user')['id']);
+        if ($user === false) {
+            Flight::json(['success' => false, 'message' => 'User not found']);
+            return;
+        }
+
+        $remainingCodes = User::countRemainingBackupCodes($user->id);
+
+        Flight::json([
+            'success' => true,
+            'count' => $remainingCodes
+        ]);
+    }
+
+    /**
+     * Renders the profile page with 2FA and backup codes information.
+     *
+     * This method renders the profile page and provides the necessary
+     * data to the template. It expects the user to be logged in.
+     *
+     * @return void
      */
     public function showProfile()
     {
-        $user = SessionUtil::get('user');
+        $user = User::findUserById(SessionUtil::get('user')['id']);
+        if ($user === false) {
+            Flight::redirect('/login');
+            exit;
+        }
+
         $tfa = new TwoFactorAuth(new EndroidQrCodeProvider());
-        $qrCodeUrl = '';
-        if ($user->mfaSecret) {
-            $secret = $user->mfaSecret; // Geheimen Schlüssel generieren
-            $qrCodeUrl = $tfa->getQRCodeImageAsDataUri($user->username, $secret); // QR-Code generieren
+        $qrCodeUrl = null;
+
+        if ($user->mfaSecret !== '') {
+            $qrCodeUrl = $tfa->getQRCodeImageAsDataUri($user->username, $user->mfaSecret);
+        }
+
+        // Get remaining backup codes count
+        $remainingBackupCodes = 0;
+        if ($user->mfaEnabled === 1 && $user->mfaSecret !== '') {
+            $remainingBackupCodes = User::countRemainingBackupCodes($user->id);
+        }
+
+        // Check for low backup codes warning from session
+        $backupCodesWarning = null;
+        if (SessionUtil::get('backup_codes_low_warning') !== null) {
+            $backupCodesWarning = SessionUtil::get('backup_codes_low_warning');
+            SessionUtil::remove('backup_codes_low_warning');
         }
 
         Flight::latte()->render('profile.latte', [
-            'title' => 'User Profile',
+            'title' => TranslationUtil::t('profile.title'),
             'user' => $user,
-            'sessionTimeout' => SessionUtil::getRemainingTime(),
             'qrCodeUrl' => $qrCodeUrl,
+            'sessionTimeout' => SessionUtil::getRemainingTime(),
+            'remainingBackupCodes' => $remainingBackupCodes,
+            'backupCodesWarning' => $backupCodesWarning
         ]);
-        return;
     }
-
 
 
 
@@ -285,7 +417,21 @@ class ProfileController
             Flight::redirect('/login');
         }
 
+        // Disable 2FA and reset secret
         User::disableAndReset2FA($user->id);
+
+        // Clear backup codes
+        User::clearBackupCodes($user->id);
+
+        // Log action
+        LogUtil::logAction(
+            LogType::AUDIT,
+            'ProfileController',
+            'disableAndReset2FA',
+            'SUCCESS: Disabled 2FA and cleared backup codes for user',
+            $user->username
+        );
+
         Flight::redirect('/logout');
     }
 
@@ -304,7 +450,8 @@ class ProfileController
      */
     private static function handleResponse(bool $success, ?string $errorMessage = null)
     {
-        if (!empty($_SERVER["HTTP_X_REQUESTED_WITH"]) &&
+        if (
+            !empty($_SERVER["HTTP_X_REQUESTED_WITH"]) &&
             strtolower($_SERVER["HTTP_X_REQUESTED_WITH"]) === "xmlhttprequest"
         ) {
             Flight::json(["success" => $success, "message" => $errorMessage]);

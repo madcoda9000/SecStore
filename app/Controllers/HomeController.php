@@ -4,6 +4,7 @@ namespace APP\Controllers;
 
 use App\Models\User;
 use App\Utils\SessionUtil;
+use App\Utils\TranslationUtil;
 use Flight;
 
 /**
@@ -22,16 +23,34 @@ use Flight;
 class HomeController
 {
 
-    /**
-     * Shows the dashboard.
-     *
-     * If the user is not logged in, it redirects to the login page.
-     * Otherwise, it renders the dashboard template with the title "Dashboard".
-     */
-    public function showHome()
-    {
-        Flight::latte()->render('home.latte', ['title' => 'Home', 'sessionTimeout' => SessionUtil::getRemainingTime(), 'user' => SessionUtil::get('user')]);
+    
+/**
+ * Renders the home page.
+ *
+ * This method renders the home page and provides the necessary
+ * data to the template. It expects the user to be logged in.
+ * Also checks for low backup codes warning from session.
+ *
+ * @return void
+ */
+public function showHome()
+{
+    $user = SessionUtil::get('user');
+    
+    // Check for low backup codes warning from session
+    $backupCodesWarning = SessionUtil::get('backup_codes_low_warning');
+    if ($backupCodesWarning !== null) {
+        // Keep the warning for this page load but remove from session
+        SessionUtil::remove('backup_codes_low_warning');
     }
+    
+    Flight::latte()->render('home.latte', [
+        'title' => TranslationUtil::t('home.title'),
+        'user' => $user,
+        'sessionTimeout' => SessionUtil::getRemainingTime(),
+        'backupCodesWarning' => $backupCodesWarning
+    ]);
+}
 
     /**
      * Logs out the current user by destroying the session and redirecting to the login page.

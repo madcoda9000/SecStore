@@ -40,6 +40,7 @@ try {
         `mfaEnabled` int(11) NOT NULL DEFAULT 0,
         `mfaEnforced` int(11) NOT NULL DEFAULT 0,
         `mfaSecret` varchar(2500) NOT NULL DEFAULT '',
+        'mfaBackupCodes' TEXT NULL DEFAULT NULL,
         `ldapEnabled` int(11) NOT NULL DEFAULT 0,
         `created_at` timestamp NULL DEFAULT current_timestamp(),
         `activeSessionId` varchar(255) DEFAULT '',

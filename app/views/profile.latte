@@ -195,7 +195,44 @@
                                         <span>{$user['mfaSecret']}</span>
                                     </div>
                                 </div>  
-                            {/if}                             
+                            {/if}   
+                             {* Backup Codes Section - Only show if 2FA is enabled *}
+{if $user['mfaEnabled'] === 1 && $user['mfaSecret'] !== ''}
+<hr class="my-4">
+<div class="mb-4">
+    <h4 class="mb-3">
+        <i class="bi bi-key-fill"></i> {trans('profile.backupcodes.title')}
+    </h4>
+
+    <div class="card">
+        <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <div>
+                    <h6 class="mb-1">{trans('profile.backupcodes.remaining')}</h6>
+                    <p class="text-muted mb-0" id="backup-codes-count">
+                        <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                        Loading...
+                    </p>
+                </div>
+                <button type="button" class="btn btn-primary" id="regenerate-backup-codes">
+                    <i class="bi bi-arrow-clockwise"></i> {trans('profile.backupcodes.regenerate')}
+                </button>
+            </div>
+
+            {* Warning for low backup codes *}
+            <div id="backup-codes-warning" class="alert alert-warning d-none" role="alert">
+                <i class="bi bi-exclamation-triangle-fill"></i> 
+                <span id="backup-codes-warning-text"></span>
+            </div>
+
+            <div class="alert alert-info mb-0">
+                <i class="bi bi-info-circle-fill"></i>
+                <small>{trans('2fasetup.backupcodes.description')}</small>
+            </div>
+        </div>
+    </div>
+</div>
+{/if}                          
                         </form>                            
                         {if $user['mfaEnforced'] === 0 && $user['mfaEnabled']===1 && !$user['mfaSecret']}
                             <br>
@@ -220,5 +257,58 @@
         </div>
     </div>
 
+
+
+{* Modal for displaying new backup codes *}
+<div class="modal fade" id="backupCodesModal" tabindex="-1" aria-labelledby="backupCodesModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-warning text-dark">
+                <h5 class="modal-title" id="backupCodesModalLabel">
+                    <i class="bi bi-exclamation-triangle-fill"></i> {trans('profile.backupcodes.modal.title')}
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-warning">
+                    <strong>{trans('profile.backupcodes.modal.warning')}</strong>
+                </div>
+                
+                <div class="mb-3">
+                    <div class="d-flex justify-content-end mb-2">
+                        <button type="button" class="btn btn-sm btn-outline-primary me-1" id="modal-copy-codes">
+                            <i class="bi bi-clipboard"></i> Copy
+                        </button>
+                        <button type="button" class="btn btn-sm btn-outline-secondary me-1" id="modal-download-codes">
+                            <i class="bi bi-download"></i> Download
+                        </button>
+                        <button type="button" class="btn btn-sm btn-outline-secondary" id="modal-print-codes">
+                            <i class="bi bi-printer"></i> Print
+                        </button>
+                    </div>
+                    <pre id="modal-backup-codes-display" class="bg-light p-3" style="border: 1px solid #dee2e6; border-radius: 4px; font-family: 'Courier New', monospace; font-size: 14px; max-height: 300px; overflow-y: auto;"></pre>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">
+                    <i class="bi bi-check-circle"></i> {trans('profile.backupcodes.modal.close')}
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{* Hidden data for translations *}
+<div id="backup-codes-translations" style="display:none;"
+     data-remaining="{trans('profile.backupcodes.remaining')}"
+     data-none="{trans('profile.backupcodes.none')}"
+     data-warning-low="{trans('profile.backupcodes.warning.low')}"
+     data-regenerate-confirm="{trans('profile.backupcodes.regenerate.confirm')}"
+     data-regenerate-success="{trans('profile.backupcodes.regenerate.success')}"
+     data-regenerate-error="{trans('profile.backupcodes.regenerate.error')}"
+     data-codes-copied="{trans('2fasetup.backupcodes.copied')}">
+</div>
+
 <script src="/js/profile.latte-min.js"></script>
+<script src="/js/profile-backup-codes-min.js"></script> 
 {/block}

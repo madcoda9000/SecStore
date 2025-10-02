@@ -30,6 +30,79 @@ use InvalidArgumentException;
  */
 class AdminController
 {
+    /**
+     * Resets (clears) backup codes for a user.
+     *
+     * This method is called through an AJAX request from the user list page.
+     * It retrieves the user ID from the request body and clears all backup codes
+     * for the specified user. This forces the user to generate new codes.
+     *
+     * @return array JSON response containing the operation status
+     */
+    public static function resetUserBackupCodes()
+    {
+        $userId = isset($_POST["id"]) ? $_POST["id"] : null;
+
+        if (!$userId) {
+            return self::handleResponse(false, "Ungültige Benutzer-ID.");
+        }
+
+        $user = User::findUserById($userId);
+        if ($user === false) {
+            return self::handleResponse(false, "Benutzer nicht gefunden.");
+        }
+
+        $erg = User::clearBackupCodes($userId);
+
+        // Log action
+        LogUtil::logAction(
+            LogType::AUDIT,
+            "AdminController",
+            "resetUserBackupCodes",
+            "SUCCESS: Reset backup codes for user " . $userId . " (" . $user->username . ")",
+            SessionUtil::get("user")["username"]
+        );
+
+        if ($erg) {
+            return self::handleResponse(true, "Backup-Codes erfolgreich zurückgesetzt.");
+        } else {
+            return self::handleResponse(false, "Fehler beim Zurücksetzen der Backup-Codes.");
+        }
+    }
+
+    /**
+     * Gets backup codes information for a user.
+     *
+     * Returns the count of remaining backup codes for the specified user.
+     *
+     * @return array JSON response with backup codes count
+     */
+    public static function getUserBackupCodesInfo()
+    {
+        $userId = isset($_GET["id"]) ? $_GET["id"] : null;
+
+        if (!$userId) {
+            Flight::json(["success" => false, "message" => "Ungültige Benutzer-ID."]);
+            return;
+        }
+
+        $user = User::findUserById($userId);
+        if ($user === false) {
+            Flight::json(["success" => false, "message" => "Benutzer nicht gefunden."]);
+            return;
+        }
+
+        $remainingCodes = User::countRemainingBackupCodes($userId);
+        $hasBackupCodes = !empty($user->mfaBackupCodes);
+
+        Flight::json([
+            "success" => true,
+            "userId" => $userId,
+            "username" => $user->username,
+            "hasBackupCodes" => $hasBackupCodes,
+            "remainingCodes" => $remainingCodes
+        ]);
+    }
 
     /**
      * AJAX Endpoint für Analytics-Daten
@@ -989,7 +1062,8 @@ class AdminController
         );
 
         // Prüfen, ob es eine AJAX-Anfrage ist
-        if (!empty($_SERVER["HTTP_X_REQUESTED_WITH"]) &&
+        if (
+            !empty($_SERVER["HTTP_X_REQUESTED_WITH"]) &&
             strtolower($_SERVER["HTTP_X_REQUESTED_WITH"]) == "xmlhttprequest"
         ) {
             // JSON-Antwort für AJAX
@@ -1308,7 +1382,8 @@ class AdminController
      */
     private static function handleResponse(bool $success, ?string $errorMessage = null)
     {
-        if (!empty($_SERVER["HTTP_X_REQUESTED_WITH"]) &&
+        if (
+            !empty($_SERVER["HTTP_X_REQUESTED_WITH"]) &&
             strtolower($_SERVER["HTTP_X_REQUESTED_WITH"]) === "xmlhttprequest"
         ) {
             Flight::json(["success" => $success]);

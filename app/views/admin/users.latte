@@ -166,6 +166,7 @@
                     <th>{trans('users.type')}</th>
                     <th>Ac</th>
                     <th>2FA</th>
+                    <th style="min-width:50px !important;text-align:center;">Backup</th>
                     <th>Enf</th>
                     <th>{trans('users.username')}</th>
                     <th>Email</th>                    
@@ -234,6 +235,15 @@
                                 <i id="mfaEnabled{$use->id}" class="bi-x-circle-fill text-secondary" data-bs-toggle="tooltip" title="{trans('users.popup.no2fa')}"></i>
                             {/if}
                         </td>
+                        <td style="min-width:50px !important;text-align:center;" class="backup-codes-cell" data-user-id="{$use->id}">
+                            {if $use->mfaEnabled === 1}
+                                <span class="spinner-border spinner-border-sm text-secondary" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </span>
+                            {else}
+                                <i class="bi-dash-circle text-secondary" data-bs-toggle="tooltip" title="{trans('users.popup.no2fa')}"></i>
+                            {/if}
+                        </td>
                         <td style="min-width:40px !important;text-align:center;">
                             {if $use->username === 'super.admin'}
                                 <i class="bi-check-circle-fill text-secondary" data-bs-toggle="tooltip" title="{trans('users.popup.no2faforadmin')}"></i>
@@ -246,7 +256,7 @@
                                    data-operation="disable"
                                    style="cursor:pointer;" 
                                    data-bs-toggle="tooltip" 
-                                   title="{trans('users.popup.2faenforce')}"></i>
+                                   title="{trans('users.popup.2faunenforce')}"></i>
                             {else}
                                 <i id="enforceStatus{$use->id}" class="bi-x-circle-fill text-danger user-action-btn" 
                                    data-action="toggle-mfa-enforcement" 
@@ -254,9 +264,9 @@
                                    data-operation="enable"
                                    style="cursor:pointer;" 
                                    data-bs-toggle="tooltip" 
-                                   title="{trans('users.popup.2faunenforce')}"></i>
+                                   title="{trans('users.popup.2faenforce')}"></i>
                             {/if}
-                        </td>
+                        </td>                        
                         <td>
                             <strong>{$use->username}</strong><br>
                             <!-- <span class="text-muted">{$use->firstname} {$use->lastname}</span><br> -->
@@ -368,6 +378,15 @@
                                    style="cursor:pointer;" 
                                    data-bs-toggle="tooltip" 
                                    title="{trans('users.popup.2faunenforce')}"></i>
+                            {/if}<br>
+                        <strong>Backup: </strong>
+                            {if $use->mfaEnabled === 1}
+                                <span class="backup-codes-cell-mobile spinner-border spinner-border-sm text-secondary" 
+                                    data-user-id="{$use->id}" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </span>
+                            {else}
+                                <i class="bi-dash-circle text-secondary" data-bs-toggle="tooltip" title="{trans('users.popup.no2fa')}"></i>
                             {/if}<br>
                     </p>
                     
@@ -581,5 +600,5 @@
 
 {* EXTERNE SCRIPTS (CSP-konform) *}
 <script src="/js/admin/users.latte.js"></script>
-
+<script src="/js/admin/admin-backup-codes-display-min.js"></script>
 {/block}
