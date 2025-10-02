@@ -15,6 +15,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.3.2] - 2025-10-02
 ### ✨ Added
+- **
+# Please enter the commit message for your changes. Lines starting
+# with '#' will be ignored, and an empty message aborts the commit.
+#
+# On branch main
+# Your branch is ahead of 'origin/main' by 1 commit.
+#   (use "git push" to publish your local commits)
+#
+# Changes to be committed:
+#	modified:   Documentation/CHANGELOG.md
+#**
 - **Implemented 2fa Backup codes**
 - **Implemented 2fa Backup Codes**
 - **Implemented Register verification with token**
