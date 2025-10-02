@@ -36,13 +36,13 @@ fi
 # Prepare-Commit-Msg Hook (Changelog-Automatisierung)
 # ============================================================================
 
-if [ -f "prepareCommitMsg.sh" ]; then
-    cp prepareCommitMsg.sh .git/hooks/prepare-commit-msg
-    chmod +x .git/hooks/prepare-commit-msg
-    echo "✅ prepare-commit-msg Hook installiert (Changelog-Update)"
-else
-    echo "⚠️  prepareCommitMsg.sh nicht gefunden - übersprungen"
-fi
+#if [ -f "prepareCommitMsg.sh" ]; then
+#    cp prepareCommitMsg.sh .git/hooks/prepare-commit-msg
+#    chmod +x .git/hooks/prepare-commit-msg
+#    echo "✅ prepare-commit-msg Hook installiert (Changelog-Update)"
+#else
+#    echo "⚠️  prepareCommitMsg.sh nicht gefunden - übersprungen"
+#fi
 
 # ============================================================================
 # Erfolgsmeldung

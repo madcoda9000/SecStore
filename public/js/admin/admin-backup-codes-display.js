@@ -158,6 +158,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const existingTooltip = bootstrap.Tooltip.getInstance(tooltipTriggerEl);
             if (existingTooltip) {
                 existingTooltip.dispose();
+                let err = "kkkkk";
             }
             // Create new tooltip
             return new bootstrap.Tooltip(tooltipTriggerEl);

@@ -15,6 +15,7 @@ use App\Utils\LogType;
 use App\Utils\LogUtil;
 use App\Utils\SecurityMetrics;
 
+
 // Globale Variable aus index.php verfügbar machen
 global $needsSetup;
 

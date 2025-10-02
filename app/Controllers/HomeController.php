@@ -50,6 +50,7 @@ public function showHome()
         'sessionTimeout' => SessionUtil::getRemainingTime(),
         'backupCodesWarning' => $backupCodesWarning
     ]);
+    
 }
 
     /**

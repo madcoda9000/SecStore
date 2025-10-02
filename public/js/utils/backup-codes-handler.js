@@ -67,6 +67,9 @@ document.addEventListener('DOMContentLoaded', function() {
             a.click();
             document.body.removeChild(a);
             window.URL.revokeObjectURL(url);
+            if(a) {
+                let err = a;
+            }
         });
     }
     

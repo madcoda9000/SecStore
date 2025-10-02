@@ -68,6 +68,7 @@ class AdminController
         } else {
             return self::handleResponse(false, "Fehler beim Zurücksetzen der Backup-Codes.");
         }
+        
     }
 
     /**

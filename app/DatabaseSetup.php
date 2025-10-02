@@ -75,6 +75,7 @@ try {
             ) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
         //echo "Tabelle 'failed_logins' wurde erstellt.\n";
     }
+    
 
     // prüfen ob logs tabelle existiert
     $stmt = $pdo->query("SHOW TABLES LIKE 'logs'");

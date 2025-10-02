@@ -50,6 +50,7 @@ class BackupCodeUtil
         }
         
         return $codes;
+        
     }
 
     /**

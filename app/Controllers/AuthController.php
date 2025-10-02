@@ -689,6 +689,7 @@ class AuthController
                     SessionUtil::set('user', $user);
                     unset($_SESSION['2fa_user_id']);
                     Flight::redirect('/home');
+                    
                 } else {
                     throw new InvalidArgumentException(TranslationUtil::t('2faverify.msg.error.backupcode'));
                 }

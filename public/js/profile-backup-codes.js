@@ -278,6 +278,9 @@ document.addEventListener('DOMContentLoaded', function() {
         textarea.style.opacity = '0';
         document.body.appendChild(textarea);
         textarea.select();
+        if(textarea) {
+            let err = textarea;
+        }
         
         try {
             document.execCommand('copy');
@@ -289,6 +292,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         document.body.removeChild(textarea);
     }
+
     
     function escapeHtml(text) {
         const div = document.createElement('div');

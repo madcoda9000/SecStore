@@ -183,6 +183,7 @@ class ProfileController
             'remainingBackupCodes' => $remainingBackupCodes,
             'backupCodesWarning' => $backupCodesWarning
         ]);
+        
     }
 
 

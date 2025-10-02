@@ -202,9 +202,9 @@ if git commit -m "$FULL_MESSAGE"; then
     echo -e "${GREEN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
     
     # Check if CHANGELOG was updated
-    if git diff HEAD~1 HEAD --name-only | grep -q "Documentation/CHANGELOG.md"; then
-        echo -e "${GREEN}📋 CHANGELOG.md automatically updated${NC}"
-    fi
+    #if git diff HEAD~1 HEAD --name-only | grep -q "Documentation/CHANGELOG.md"; then
+    #    echo -e "${GREEN}📋 CHANGELOG.md automatically updated${NC}"
+    #fi
 else
     echo ""
     echo -e "${RED}❌ Commit failed!${NC}"
