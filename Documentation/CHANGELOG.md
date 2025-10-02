@@ -24,6 +24,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Optional Makefile** for developer convenience
 - **Comprehensive Docker documentation** ([README_DOCKER.md](README_DOCKER.md) and [DOCKER_QUICKSTART.md](DOCKER_QUICKSTART.md))
 
+
+### 🐛 Fixed
+- **removed debug messages from CHANGELOG**
+
 ---
 
 ## [1.3.1] - 2025-08-15

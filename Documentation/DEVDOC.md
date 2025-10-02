@@ -249,6 +249,74 @@ SecStore features an intuitive **4-step web-based setup wizard** that automatica
 
 ## 🔄 Development Workflow
 
+### **Quick Commit Helper (Recommended)**
+
+SecStore includes an interactive **quick-commit.sh** script that streamlines the Git workflow:
+
+```bash
+# Make it executable (first time only)
+chmod +x quick-commit.sh
+
+# Use it for every commit
+./quick-commit.sh
+```
+
+**What it does:**
+
+1. 📊 **Shows current Git status** - All changes at a glance
+2. 📦 **Stages all changes** - One-click "add all" option
+3. 💬 **Interactive commit type selection** - Menu with all Conventional Commit types
+4. 📝 **Message input** - Just type the description (prefix is added automatically)
+5. 🎯 **Optional scope** - Add context like `(auth)`, `(api)`, etc.
+6. ✅ **Confirmation** - Preview final message before committing
+7. 🚀 **Automatic CHANGELOG update** - Via prepare-commit-msg hook
+8. 🌐 **Optional push** - Push to remote with one keystroke
+
+**Interactive Menu:**
+
+```
+💬 Select commit type:
+
+  1) feat:      ✨ New feature
+  2) fix:       🐛 Bug fix
+  3) docs:      📝 Documentation
+  4) refactor:  🔄 Code refactoring
+  5) test:      🧪 Tests
+  6) chore:     🔧 Maintenance
+  7) style:     💅 Code style
+  8) perf:      ⚡ Performance
+  9) security:  🔒 Security
+ 10) breaking:  ⚠️  Breaking change
+ 11) custom     ✏️  Custom message (no prefix)
+
+Choose [1-11]: 1
+📝 Commit message: feat: Add user export functionality
+🎯 Add scope? (e.g., auth, api, docs) [optional]: api
+
+Final commit message: "feat(api): Add user export functionality"
+✅ Proceed with commit? [Y/n]: y
+
+✅ CHANGELOG.md aktualisiert
+🌐 Push to remote? [y/N]: y
+```
+
+**Alternative: Manual Git workflow**
+
+If you prefer traditional Git commands:
+
+```bash
+# Stage changes
+git add .
+
+# Commit with Conventional Commits
+git commit -m "feat: Your feature description"
+
+# CHANGELOG.md is automatically updated by the hook!
+
+# Push
+git push origin main
+```
+
 ### **Daily Development Routine**
 
 ```bash
@@ -264,13 +332,14 @@ php -S localhost:8000 -t public
 # 4. Make your changes
 # ... develop features ...
 
-# 5. Commit with Conventional Commits
-git add .
-git commit -m "feat: Add awesome new feature"
+# 5. Commit using quick-commit script
+./quick-commit.sh
 
-# 6. CHANGELOG.md is automatically updated!
-# 7. Push changes
-git push origin main
+# That's it! The script handles:
+# - Staging
+# - Conventional Commit formatting
+# - CHANGELOG.md updates
+# - Pushing to remote
 ```
 
 ### **Code Quality Checks**
@@ -312,6 +381,69 @@ php generate_schema.php
 
 # Development server with XDebug
 php -S localhost:8000 -t public -d xdebug.mode=debug
+```
+
+### **Git Workflow Tips**
+
+**Commit Message Best Practices:**
+
+✅ **Good:**
+```bash
+./quick-commit.sh
+# Select: 1 (feat)
+# Message: Add CSV export for user list
+# Scope: export
+# Result: "feat(export): Add CSV export for user list"
+```
+
+❌ **Bad:**
+```bash
+git commit -m "changes"
+git commit -m "fixed stuff"
+git commit -m "wip"
+```
+
+**When to use which commit type:**
+
+| Use Case | Type | Example |
+|----------|------|---------|
+| New feature | `feat` | Add OAuth2 authentication |
+| Bug fix | `fix` | Resolve session timeout issue |
+| Documentation | `docs` | Update API documentation |
+| Refactoring | `refactor` | Simplify authentication logic |
+| Tests | `test` | Add unit tests for login |
+| Dependencies | `chore` | Update composer packages |
+| Security fix | `security` | Patch XSS vulnerability |
+| Performance | `perf` | Optimize database queries |
+
+**Skipping hooks (emergency only):**
+
+```bash
+# Skip all hooks (use with caution!)
+git commit --no-verify -m "emergency fix"
+```
+
+⚠️ **Warning:** This skips security checks too!
+
+### **Global Quick Commit Access (Optional)**
+
+Make quick-commit.sh available from anywhere:
+
+```bash
+# Option 1: Create alias in ~/.bashrc or ~/.zshrc
+echo 'alias qc="./quick-commit.sh"' >> ~/.bashrc
+source ~/.bashrc
+
+# Now use:
+qc
+
+# Option 2: Add to PATH (system-wide)
+sudo cp quick-commit.sh /usr/local/bin/qc
+sudo chmod +x /usr/local/bin/qc
+
+# Use from any directory:
+cd ~/my-project
+qc
 ```
 
 ---
