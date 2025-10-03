@@ -652,6 +652,18 @@ class AuthController
         }
 
         $request = Flight::request();
+
+        // check if this is a get request
+        $request = Flight::request();
+        if ($request->method !== 'POST') {
+            // GET-Request: only show page
+            Flight::latte()->render('2fa_verify.latte', [
+                'title' => TranslationUtil::t('2faverify.title'),
+                'lang' => Flight::get('lang'),
+            ]);
+            return;
+        }
+
         $otp = "";
         $isBackupCode = isset($_POST['backup_code']) && $_POST['backup_code'] === '1';
 
@@ -689,7 +701,6 @@ class AuthController
                     SessionUtil::set('user', $user);
                     unset($_SESSION['2fa_user_id']);
                     Flight::redirect('/home');
-                    
                 } else {
                     throw new InvalidArgumentException(TranslationUtil::t('2faverify.msg.error.backupcode'));
                 }
