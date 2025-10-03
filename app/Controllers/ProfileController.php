@@ -65,8 +65,7 @@ class ProfileController
 
         if ($result) {
             // Return codes as JSON for AJAX request
-            if (
-                !empty($_SERVER["HTTP_X_REQUESTED_WITH"]) &&
+            if (!empty($_SERVER["HTTP_X_REQUESTED_WITH"]) &&
                 strtolower($_SERVER["HTTP_X_REQUESTED_WITH"]) === "xmlhttprequest"
             ) {
                 Flight::json([
@@ -183,7 +182,6 @@ class ProfileController
             'remainingBackupCodes' => $remainingBackupCodes,
             'backupCodesWarning' => $backupCodesWarning
         ]);
-        
     }
 
 
@@ -451,8 +449,7 @@ class ProfileController
      */
     private static function handleResponse(bool $success, ?string $errorMessage = null)
     {
-        if (
-            !empty($_SERVER["HTTP_X_REQUESTED_WITH"]) &&
+        if (!empty($_SERVER["HTTP_X_REQUESTED_WITH"]) &&
             strtolower($_SERVER["HTTP_X_REQUESTED_WITH"]) === "xmlhttprequest"
         ) {
             Flight::json(["success" => $success, "message" => $errorMessage]);

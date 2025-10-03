@@ -192,7 +192,7 @@ class AuthController
 
     /**
      * Verifiziert einen Benutzer-Account anhand des Tokens.
-     * 
+     *
      * @param string $token Der Verifizierungs-Token aus der URL
      * @return void
      */
@@ -543,7 +543,7 @@ class AuthController
      * Enables 2FA for the user with backup codes.
      *
      * This method generates a new secret and QR code for the user, generates
-     * backup codes, and stores them in the database. It also renders the 
+     * backup codes, and stores them in the database. It also renders the
      * enable_2fa template with the necessary data including backup codes.
      *
      * @param bool $isMfaStartSetup If true, the user is starting the 2FA setup process.
@@ -821,7 +821,6 @@ class AuthController
         }
 
         if ($user !== false && empty($user->reset_token)) {
-
             $configFile = "../config.php";
             $config = include $configFile;
 

@@ -3,24 +3,23 @@
 namespace App\Controllers;
 
 use App\Models\User;
-use App\Utils\SessionUtil;
-use App\Utils\LogType;
-use App\Utils\LogUtil;
-use App\Utils\TranslationUtil;
-use App\Utils\SecurityMetrics;
 use App\Utils\InputValidator;
 use App\Utils\LoginAnalytics;
-use ORM;
-use Flight;
+use App\Utils\LogType;
+use App\Utils\LogUtil;
+use App\Utils\SecurityMetrics;
+use App\Utils\SessionUtil;
+use App\Utils\TranslationUtil;
 use Exception;
+use Flight;
 use InvalidArgumentException;
+use ORM;
 
 /**
  * Class Name: AdminController
  *
  * Controller Klasse für Methoden im Admin Kontext
  *
- * @package App\Controllers
  * @author Sascha Heimann
  * @version 1.0
  * @since 2025-02-24
@@ -41,15 +40,15 @@ class AdminController
      */
     public static function resetUserBackupCodes()
     {
-        $userId = isset($_POST["id"]) ? $_POST["id"] : null;
+        $userId = isset($_POST['id']) ? $_POST['id'] : null;
 
         if (!$userId) {
-            return self::handleResponse(false, "Ungültige Benutzer-ID.");
+            return self::handleResponse(false, 'Ungültige Benutzer-ID.');
         }
 
         $user = User::findUserById($userId);
         if ($user === false) {
-            return self::handleResponse(false, "Benutzer nicht gefunden.");
+            return self::handleResponse(false, 'Benutzer nicht gefunden.');
         }
 
         $erg = User::clearBackupCodes($userId);
@@ -57,16 +56,16 @@ class AdminController
         // Log action
         LogUtil::logAction(
             LogType::AUDIT,
-            "AdminController",
-            "resetUserBackupCodes",
-            "SUCCESS: Reset backup codes for user " . $userId . " (" . $user->username . ")",
-            SessionUtil::get("user")["username"]
+            'AdminController',
+            'resetUserBackupCodes',
+            'SUCCESS: Reset backup codes for user ' . $userId . ' (' . $user->username . ')',
+            SessionUtil::get('user')['username']
         );
 
         if ($erg) {
-            return self::handleResponse(true, "Backup-Codes erfolgreich zurückgesetzt.");
+            return self::handleResponse(true, 'Backup-Codes erfolgreich zurückgesetzt.');
         } else {
-            return self::handleResponse(false, "Fehler beim Zurücksetzen der Backup-Codes.");
+            return self::handleResponse(false, 'Fehler beim Zurücksetzen der Backup-Codes.');
         }
     }
 
@@ -79,16 +78,18 @@ class AdminController
      */
     public static function getUserBackupCodesInfo()
     {
-        $userId = isset($_GET["id"]) ? $_GET["id"] : null;
+        $userId = isset($_GET['id']) ? $_GET['id'] : null;
 
         if (!$userId) {
-            Flight::json(["success" => false, "message" => "Ungültige Benutzer-ID."]);
+            Flight::json(['success' => false, 'message' => 'Ungültige Benutzer-ID.']);
+
             return;
         }
 
         $user = User::findUserById($userId);
         if ($user === false) {
-            Flight::json(["success" => false, "message" => "Benutzer nicht gefunden."]);
+            Flight::json(['success' => false, 'message' => 'Benutzer nicht gefunden.']);
+
             return;
         }
 
@@ -96,11 +97,11 @@ class AdminController
         $hasBackupCodes = !empty($user->mfaBackupCodes);
 
         Flight::json([
-            "success" => true,
-            "userId" => $userId,
-            "username" => $user->username,
-            "hasBackupCodes" => $hasBackupCodes,
-            "remainingCodes" => $remainingCodes
+            'success' => true,
+            'userId' => $userId,
+            'username' => $user->username,
+            'hasBackupCodes' => $hasBackupCodes,
+            'remainingCodes' => $remainingCodes,
         ]);
     }
 
@@ -113,7 +114,7 @@ class AdminController
 
         try {
             $type = $_GET['type'] ?? 'heatmap';
-            $days = (int)($_GET['days'] ?? 30);
+            $days = (int) ($_GET['days'] ?? 30);
 
             switch ($type) {
                 case 'heatmap':
@@ -125,7 +126,7 @@ class AdminController
                     break;
 
                 case 'weekly':
-                    $weeks = max(1, min(12, (int)($_GET['weeks'] ?? 4)));
+                    $weeks = max(1, min(12, (int) ($_GET['weeks'] ?? 4)));
                     $data = LoginAnalytics::getWeeklyTrends($weeks);
                     break;
 
@@ -141,7 +142,7 @@ class AdminController
                 'success' => true,
                 'data' => $data,
                 'type' => $type,
-                'generated_at' => date('Y-m-d H:i:s')
+                'generated_at' => date('Y-m-d H:i:s'),
             ]);
         } catch (Exception $e) {
             LogUtil::logAction(
@@ -154,7 +155,7 @@ class AdminController
             Flight::json([
                 'success' => false,
                 'error' => 'Analytics data unavailable',
-                'message' => $e->getMessage()
+                'message' => $e->getMessage(),
             ], 500);
         }
     }
@@ -207,7 +208,7 @@ class AdminController
                 'message' => $e->getMessage(),
                 'user' => SessionUtil::get('user'),
                 'sessionTimeout' => SessionUtil::getRemainingTime(),
-                'title' => 'Error'
+                'title' => 'Error',
             ]);
         }
     }
@@ -217,7 +218,7 @@ class AdminController
      */
     public function getSecurityMetrics()
     {
-        $user = User::findUserById(SessionUtil::get("user")["id"]);
+        $user = User::findUserById(SessionUtil::get('user')['id']);
 
         $timeframe = $_GET['timeframe'] ?? '24h';
 
@@ -238,8 +239,9 @@ class AdminController
     /**
      * Method to fetch client ip address
      */
-    public function getClientIp() {
-         // Get client IP address
+    public function getClientIp()
+    {
+        // Get client IP address
         $clientIp = $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0';
 
         // Check for proxy headers
@@ -249,6 +251,7 @@ class AdminController
         } elseif (!empty($_SERVER['HTTP_CLIENT_IP'])) {
             $clientIp = $_SERVER['HTTP_CLIENT_IP'];
         }
+
         return $clientIp;
     }
 
@@ -265,45 +268,43 @@ class AdminController
      * have admin privileges, it redirects to the login page or displays a
      * 403 error.
      */
-
     public function showSettings()
     {
-        if (SessionUtil::get("user")["id"] === null) {
-            Flight::redirect("/login");
+        if (SessionUtil::get('user')['id'] === null) {
+            Flight::redirect('/login');
         }
 
-        $configFile = "../config.php";
+        $configFile = '../config.php';
         $config = include $configFile;
-        $user = User::findUserById(SessionUtil::get("user")["id"]);
+        $user = User::findUserById(SessionUtil::get('user')['id']);
 
         if ($user !== false) {
-            $roles = explode(",", $user->roles);
-            if (in_array("Admin", $roles)) {
-                $configFile = "../config.php";
+            $roles = explode(',', $user->roles);
+            if (in_array('Admin', $roles)) {
+                $configFile = '../config.php';
                 $config = include $configFile;
                 $isWritable = is_writable($configFile);
-                Flight::latte()->render("admin/settings.latte", [
-                    "mail" => $config["mail"],
-                    "bruteForceSettings" => $config["bruteForceSettings"],
-                    "application" => $config["application"],
-                    "logging" => $config["logging"],
-                    "ldap" => $config["ldapSettings"],
-                    "clientIp" => $this->getClientIp(),
-                    "security" => $config["security"],
-                    "title" => "Settings",
-                    "user" => $user,
-                    "sessionTimeout" => SessionUtil::getRemainingTime(),
-                    "configWritable" => $isWritable,
+                Flight::latte()->render('admin/settings.latte', [
+                    'mail' => $config['mail'],
+                    'bruteForceSettings' => $config['bruteForceSettings'],
+                    'application' => $config['application'],
+                    'logging' => $config['logging'],
+                    'ldap' => $config['ldapSettings'],
+                    'clientIp' => $this->getClientIp(),
+                    'security' => $config['security'],
+                    'title' => 'Settings',
+                    'user' => $user,
+                    'sessionTimeout' => SessionUtil::getRemainingTime(),
+                    'configWritable' => $isWritable,
                 ]);
             } else {
                 http_response_code(403);
-                throw new \Exception(TranslationUtil::t("error1"), 403);
+                throw new \Exception(TranslationUtil::t('error1'), 403);
             }
         } else {
-            Flight::redirect("/login");
+            Flight::redirect('/login');
         }
     }
-
 
     /**
      * Updates the security settings (IP Whitelist).
@@ -322,14 +323,14 @@ class AdminController
      */
     public function updateSecuritySettings($formData)
     {
-        if (SessionUtil::get("user")["id"] === null) {
-            Flight::redirect("/login");
+        if (SessionUtil::get('user')['id'] === null) {
+            Flight::redirect('/login');
         }
 
-        $user = User::findUserById(SessionUtil::get("user")["id"]);
+        $user = User::findUserById(SessionUtil::get('user')['id']);
         if ($user !== false) {
             // Parse IP whitelist from textarea (one IP per line)
-            $ipWhitelistRaw = $formData["adminIpWhitelist"] ?? "";
+            $ipWhitelistRaw = $formData['adminIpWhitelist'] ?? '';
             $ipWhitelistArray = array_filter(
                 array_map('trim', explode("\n", $ipWhitelistRaw)),
                 function ($ip) {
@@ -340,47 +341,48 @@ class AdminController
             // Validate each IP/CIDR entry
             foreach ($ipWhitelistArray as $entry) {
                 if (!self::validateIpOrCidr($entry)) {
-                    $configFile = "../config.php";
+                    $configFile = '../config.php';
                     $config = include $configFile;
-                    Flight::latte()->render("admin/settings.latte", [
-                        "error" => str_replace(
+                    Flight::latte()->render('admin/settings.latte', [
+                        'error' => str_replace(
                             '{0}',
                             $entry,
-                            TranslationUtil::t("security.ip_whitelist.error_invalid_ip")
+                            TranslationUtil::t('security.ip_whitelist.error_invalid_ip')
                         ),
-                        "mail" => $config["mail"] ?? [],
-                        "bruteForceSettings" => $config["bruteForceSettings"] ?? [],
-                        "application" => $config["application"] ?? [],
-                        "logging" => $config["logging"] ?? [],
-                        "ldap" => $config["ldapSettings"] ?? [],
-                        "security" => $config["security"] ?? [],
-                        "clientIp" => $this->getClientIp(),
-                        "title" => "Settings",
-                        "user" => $user,
-                        "sessionTimeout" => SessionUtil::getRemainingTime(),
-                        "configWritable" => is_writable("../config.php"),
+                        'mail' => $config['mail'] ?? [],
+                        'bruteForceSettings' => $config['bruteForceSettings'] ?? [],
+                        'application' => $config['application'] ?? [],
+                        'logging' => $config['logging'] ?? [],
+                        'ldap' => $config['ldapSettings'] ?? [],
+                        'security' => $config['security'] ?? [],
+                        'clientIp' => $this->getClientIp(),
+                        'title' => 'Settings',
+                        'user' => $user,
+                        'sessionTimeout' => SessionUtil::getRemainingTime(),
+                        'configWritable' => is_writable('../config.php'),
                     ]);
+
                     return;
                 }
-            }            
+            }
 
             // Read old configuration
-            $configFile = "../config.php";
+            $configFile = '../config.php';
             $isWritable = is_writable($configFile);
             $config = include $configFile;
 
             // create new config
             $newConfig = [
                 // dont modify the key!!
-                "key" => $config['security']['key'],
-                "enableIpWhitelist" => isset($formData["enableIpWhitelist"]),
-                "adminIpWhitelist" => $ipWhitelistArray,
+                'key' => $config['security']['key'],
+                'enableIpWhitelist' => isset($formData['enableIpWhitelist']),
+                'adminIpWhitelist' => $ipWhitelistArray,
             ];
 
             // Load file as text
             $configContent = file_get_contents($configFile);
             if ($configContent === false) {
-                throw new Exception(TranslationUtil::t("error2"));
+                throw new Exception(TranslationUtil::t('error2'));
             }
 
             // Find and replace current $security array
@@ -388,19 +390,19 @@ class AdminController
 
             // New security array as formatted PHP code
             $newSecurityArray = var_export($newConfig, true);
-            $newSecurityArray = preg_replace("/^array \(/", "[", $newSecurityArray);
-            $newSecurityArray = preg_replace('/\)$/', "]", $newSecurityArray);
-            $newSecurityArray = preg_replace('/=> \n\s+/', "=> ", $newSecurityArray);
-            $newSecurityArray = preg_replace('/\d+ => /', "", $newSecurityArray); // Remove numeric keys
+            $newSecurityArray = preg_replace("/^array \(/", '[', $newSecurityArray);
+            $newSecurityArray = preg_replace('/\)$/', ']', $newSecurityArray);
+            $newSecurityArray = preg_replace('/=> \n\s+/', '=> ', $newSecurityArray);
+            $newSecurityArray = preg_replace('/\d+ => /', '', $newSecurityArray); // Remove numeric keys
 
             // Build new security block
-            $replacement = '$security = ' . $newSecurityArray . ";";
+            $replacement = '$security = ' . $newSecurityArray . ';';
 
             // Generate new config code
             $newConfigContent = preg_replace($pattern, $replacement, $configContent);
 
             if ($newConfigContent === null) {
-                throw new Exception(TranslationUtil::t("error3"));
+                throw new Exception(TranslationUtil::t('error3'));
             }
 
             // Save file with new content
@@ -412,29 +414,29 @@ class AdminController
             // Log action
             LogUtil::logAction(
                 LogType::AUDIT,
-                "AdminController",
-                "updateSecuritySettings",
-                "SUCCESS: saved Security settings.",
+                'AdminController',
+                'updateSecuritySettings',
+                'SUCCESS: saved Security settings.',
                 $user->username
             );
 
             // Render template with success message
-            Flight::latte()->render("admin/settings.latte", [
-                "success" => TranslationUtil::t("security.ip_whitelist.success"),
-                "mail" => $savedconfig["mail"],
-                "bruteForceSettings" => $savedconfig["bruteForceSettings"],
-                "application" => $savedconfig["application"],
-                "logging" => $savedconfig["logging"],
-                "ldap" => $savedconfig["ldapSettings"],
-                "clientIp" => $this->getClientIp(),
-                "security" => $savedconfig["security"],
-                "title" => "Settings",
-                "user" => $user,
-                "sessionTimeout" => SessionUtil::getRemainingTime(),
-                "configWritable" => $isWritable,
+            Flight::latte()->render('admin/settings.latte', [
+                'success' => TranslationUtil::t('security.ip_whitelist.success'),
+                'mail' => $savedconfig['mail'],
+                'bruteForceSettings' => $savedconfig['bruteForceSettings'],
+                'application' => $savedconfig['application'],
+                'logging' => $savedconfig['logging'],
+                'ldap' => $savedconfig['ldapSettings'],
+                'clientIp' => $this->getClientIp(),
+                'security' => $savedconfig['security'],
+                'title' => 'Settings',
+                'user' => $user,
+                'sessionTimeout' => SessionUtil::getRemainingTime(),
+                'configWritable' => $isWritable,
             ]);
         } else {
-            Flight::redirect("/login");
+            Flight::redirect('/login');
         }
     }
 
@@ -467,7 +469,6 @@ class AdminController
         return filter_var($entry, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) !== false;
     }
 
-
     /**
      * Updates the LDAP settings in the configuration file based on the provided form data.
      *
@@ -492,73 +493,74 @@ class AdminController
      */
     public function updateLdapSettings($formData)
     {
-        if (SessionUtil::get("user")["id"] === null) {
-            Flight::redirect("/login");
+        if (SessionUtil::get('user')['id'] === null) {
+            Flight::redirect('/login');
         }
-        $user = User::findUserById(SessionUtil::get("user")["id"]);
+        $user = User::findUserById(SessionUtil::get('user')['id']);
         if ($user !== false) {
             $newConfig = [
-                "ldapHost" => $formData["ldapHost"] === null ? '' : $formData["ldapHost"],
-                "ldapPort" => $formData["ldapPort"] === null ? 636  : (int) $formData["ldapPort"],
-                "domainPrefix" => $formData["domainPrefix"] === null ? '' : trim($formData["domainPrefix"]),
+                'ldapHost' => $formData['ldapHost'] === null ? '' : $formData['ldapHost'],
+                'ldapPort' => $formData['ldapPort'] === null ? 636 : (int) $formData['ldapPort'],
+                'domainPrefix' => $formData['domainPrefix'] === null ? '' : trim($formData['domainPrefix']),
             ];
 
             // Zusätzliche Validierung
-            if (!empty($newConfig["ldapHost"])) {
+            if (!empty($newConfig['ldapHost'])) {
                 // Host muss mit ldap:// oder ldaps:// beginnen
-                if (
-                    !str_starts_with($newConfig["ldapHost"], 'ldap://') &&
-                    !str_starts_with($newConfig["ldapHost"], 'ldaps://')
+                if (!str_starts_with($newConfig['ldapHost'], 'ldap://') &&
+                    !str_starts_with($newConfig['ldapHost'], 'ldaps://')
                 ) {
-                    $configFile = "../config.php";
+                    $configFile = '../config.php';
                     $config = include $configFile;
-                    Flight::latte()->render("admin/settings.latte", [
-                        "mail" => $config["mail"],
-                        "bruteForceSettings" => $config["bruteForceSettings"],
-                        "application" => $config["application"],
-                        "logging" => $config["logging"],
-                        "ldap" => $config["ldapSettings"],
-                        "clientIp" => $this->getClientIp(),
-                        "security" => $config["security"],
-                        "title" => "Settings",
-                        "user" => $user,
-                        "sessionTimeout" => SessionUtil::getRemainingTime(),
-                        "configWritable" => is_writable("../config.php"),
-                        "error" => "LDAP Host must start with ldap:// or ldaps://"
+                    Flight::latte()->render('admin/settings.latte', [
+                        'mail' => $config['mail'],
+                        'bruteForceSettings' => $config['bruteForceSettings'],
+                        'application' => $config['application'],
+                        'logging' => $config['logging'],
+                        'ldap' => $config['ldapSettings'],
+                        'clientIp' => $this->getClientIp(),
+                        'security' => $config['security'],
+                        'title' => 'Settings',
+                        'user' => $user,
+                        'sessionTimeout' => SessionUtil::getRemainingTime(),
+                        'configWritable' => is_writable('../config.php'),
+                        'error' => 'LDAP Host must start with ldap:// or ldaps://',
                     ]);
+
                     return;
                 }
             }
 
             // Port validieren
-            if ($newConfig["ldapPort"] < 1 || $newConfig["ldapPort"] > 65535) {
-                $configFile = "../config.php";
+            if ($newConfig['ldapPort'] < 1 || $newConfig['ldapPort'] > 65535) {
+                $configFile = '../config.php';
                 $config = include $configFile;
-                Flight::latte()->render("admin/settings.latte", [
-                    "mail" => $config["mail"],
-                    "bruteForceSettings" => $config["bruteForceSettings"],
-                    "application" => $config["application"],
-                    "logging" => $config["logging"],
-                    "ldap" => $config["ldapSettings"],
-                    "security" => $config["security"],
-                    "clientIp" => $this->getClientIp(),
-                    "title" => "Settings",
-                    "user" => $user,
-                    "sessionTimeout" => SessionUtil::getRemainingTime(),
-                    "configWritable" => is_writable("../config.php"),
-                    "error" => "Invalid LDAP port. Must be between 1 and 65535."
+                Flight::latte()->render('admin/settings.latte', [
+                    'mail' => $config['mail'],
+                    'bruteForceSettings' => $config['bruteForceSettings'],
+                    'application' => $config['application'],
+                    'logging' => $config['logging'],
+                    'ldap' => $config['ldapSettings'],
+                    'security' => $config['security'],
+                    'clientIp' => $this->getClientIp(),
+                    'title' => 'Settings',
+                    'user' => $user,
+                    'sessionTimeout' => SessionUtil::getRemainingTime(),
+                    'configWritable' => is_writable('../config.php'),
+                    'error' => 'Invalid LDAP port. Must be between 1 and 65535.',
                 ]);
+
                 return;
             }
 
             // Alte Konfiguration einlesen
-            $configFile = "../config.php";
+            $configFile = '../config.php';
             $isWritable = is_writable($configFile);
             $config = include $configFile;
             // Alte Datei als Text laden
             $configContent = file_get_contents($configFile);
             if ($configContent === false) {
-                throw new Exception(TranslationUtil::t("error2"));
+                throw new Exception(TranslationUtil::t('error2'));
             }
 
             // Aktuelles `$ldapSettings`-Array suchen und ersetzen
@@ -566,18 +568,18 @@ class AdminController
 
             // Neues Mail-Array als formatierter PHP-Code
             $newldapArray = var_export($newConfig, true);
-            $newldapArray = preg_replace("/^array \(/", "[", $newldapArray);
-            $newldapArray = preg_replace('/\)$/', "]", $newldapArray);
-            $newldapArray = preg_replace('/=> \n\s+/', "=> ", $newldapArray); // Mehrzeilige Werte schöner formatieren
+            $newldapArray = preg_replace("/^array \(/", '[', $newldapArray);
+            $newldapArray = preg_replace('/\)$/', ']', $newldapArray);
+            $newldapArray = preg_replace('/=> \n\s+/', '=> ', $newldapArray); // Mehrzeilige Werte schöner formatieren
 
             // Neuen Mail-Block zusammenbauen
-            $replacement = '$ldapSettings = ' . $newldapArray . ";";
+            $replacement = '$ldapSettings = ' . $newldapArray . ';';
 
             // Neuen Config-Code generieren
             $newConfigContent = preg_replace($pattern, $replacement, $configContent);
 
             if ($newConfigContent === null) {
-                throw new Exception(TranslationUtil::t("error3"));
+                throw new Exception(TranslationUtil::t('error3'));
             }
 
             // Datei mit neuem Inhalt speichern
@@ -589,29 +591,29 @@ class AdminController
             // log action
             LogUtil::logAction(
                 LogType::AUDIT,
-                "AdminController",
-                "updateLogSettings",
-                "SUCCESS: saved Logsettings.",
+                'AdminController',
+                'updateLogSettings',
+                'SUCCESS: saved Logsettings.',
                 $user->username
             );
 
             // template redner und meldung ausgeben
-            Flight::latte()->render("admin/settings.latte", [
-                "success" => TranslationUtil::t("settings.success1"),
-                "mail" => $savedconfig["mail"],
-                "bruteForceSettings" => $savedconfig["bruteForceSettings"],
-                "application" => $savedconfig["application"],
-                "logging" => $savedconfig["logging"],
-                "ldap" => $savedconfig["ldapSettings"],
-                "clientIp" => $this->getClientIp(),
-                "security" => $savedconfig["security"],
-                "title" => "Settings",
-                "user" => $user,
-                "sessionTimeout" => SessionUtil::getRemainingTime(),
-                "configWritable" => $isWritable,
+            Flight::latte()->render('admin/settings.latte', [
+                'success' => TranslationUtil::t('settings.success1'),
+                'mail' => $savedconfig['mail'],
+                'bruteForceSettings' => $savedconfig['bruteForceSettings'],
+                'application' => $savedconfig['application'],
+                'logging' => $savedconfig['logging'],
+                'ldap' => $savedconfig['ldapSettings'],
+                'clientIp' => $this->getClientIp(),
+                'security' => $savedconfig['security'],
+                'title' => 'Settings',
+                'user' => $user,
+                'sessionTimeout' => SessionUtil::getRemainingTime(),
+                'configWritable' => $isWritable,
             ]);
         } else {
-            Flight::redirect("/login");
+            Flight::redirect('/login');
         }
     }
 
@@ -633,27 +635,27 @@ class AdminController
      */
     public function updateLogSettings($formData)
     {
-        if (SessionUtil::get("user")["id"] === null) {
-            Flight::redirect("/login");
+        if (SessionUtil::get('user')['id'] === null) {
+            Flight::redirect('/login');
         }
-        $user = User::findUserById(SessionUtil::get("user")["id"]);
+        $user = User::findUserById(SessionUtil::get('user')['id']);
         if ($user !== false) {
             $newConfig = [
-                "enableSqlLogging" => $formData["enableSqlLogging"] === null ? false : true,
-                "enableRequestLogging" => $formData["enableRequestLogging"] === null ? false : true,
-                "enableAuditLogging" => $formData["enableAuditLogging"] === null ? false : true,
-                "enableMailLogging" => $formData["enableMailLogging"] === null ? false : true,
-                "enableSystemLogging" => $formData["enableSystemLogging"] === null ? false : true,
+                'enableSqlLogging' => $formData['enableSqlLogging'] === null ? false : true,
+                'enableRequestLogging' => $formData['enableRequestLogging'] === null ? false : true,
+                'enableAuditLogging' => $formData['enableAuditLogging'] === null ? false : true,
+                'enableMailLogging' => $formData['enableMailLogging'] === null ? false : true,
+                'enableSystemLogging' => $formData['enableSystemLogging'] === null ? false : true,
             ];
 
             // Alte Konfiguration einlesen
-            $configFile = "../config.php";
+            $configFile = '../config.php';
             $isWritable = is_writable($configFile);
             $config = include $configFile;
             // Alte Datei als Text laden
             $configContent = file_get_contents($configFile);
             if ($configContent === false) {
-                throw new Exception(TranslationUtil::t("error2"));
+                throw new Exception(TranslationUtil::t('error2'));
             }
 
             // Aktuelles `$logging`-Array suchen und ersetzen
@@ -661,18 +663,18 @@ class AdminController
 
             // Neues Mail-Array als formatierter PHP-Code
             $newLoggingArray = var_export($newConfig, true);
-            $newLoggingArray = preg_replace("/^array \(/", "[", $newLoggingArray);
-            $newLoggingArray = preg_replace('/\)$/', "]", $newLoggingArray);
-            $newLoggingArray = preg_replace('/=> \n\s+/', "=> ", $newLoggingArray); // Mehrzeilige Werte schöner formatieren
+            $newLoggingArray = preg_replace("/^array \(/", '[', $newLoggingArray);
+            $newLoggingArray = preg_replace('/\)$/', ']', $newLoggingArray);
+            $newLoggingArray = preg_replace('/=> \n\s+/', '=> ', $newLoggingArray); // Mehrzeilige Werte schöner formatieren
 
             // Neuen Mail-Block zusammenbauen
-            $replacement = '$logging = ' . $newLoggingArray . ";";
+            $replacement = '$logging = ' . $newLoggingArray . ';';
 
             // Neuen Config-Code generieren
             $newConfigContent = preg_replace($pattern, $replacement, $configContent);
 
             if ($newConfigContent === null) {
-                throw new Exception(TranslationUtil::t("error3"));
+                throw new Exception(TranslationUtil::t('error3'));
             }
 
             // Datei mit neuem Inhalt speichern
@@ -684,29 +686,29 @@ class AdminController
             // log action
             LogUtil::logAction(
                 LogType::AUDIT,
-                "AdminController",
-                "updateLogSettings",
-                "SUCCESS: saved Logsettings.",
+                'AdminController',
+                'updateLogSettings',
+                'SUCCESS: saved Logsettings.',
                 $user->username
             );
 
             // template redner und meldung ausgeben
-            Flight::latte()->render("admin/settings.latte", [
-                "success" => TranslationUtil::t("settings.success1"),
-                "mail" => $savedconfig["mail"],
-                "bruteForceSettings" => $savedconfig["bruteForceSettings"],
-                "application" => $savedconfig["application"],
-                "logging" => $savedconfig["logging"],
-                "ldap" => $savedconfig["ldapSettings"],
-                "security" => $savedconfig["security"],
-                "clientIp" => $this->getClientIp(),
-                "title" => "Settings",
-                "user" => $user,
-                "sessionTimeout" => SessionUtil::getRemainingTime(),
-                "configWritable" => $isWritable,
+            Flight::latte()->render('admin/settings.latte', [
+                'success' => TranslationUtil::t('settings.success1'),
+                'mail' => $savedconfig['mail'],
+                'bruteForceSettings' => $savedconfig['bruteForceSettings'],
+                'application' => $savedconfig['application'],
+                'logging' => $savedconfig['logging'],
+                'ldap' => $savedconfig['ldapSettings'],
+                'security' => $savedconfig['security'],
+                'clientIp' => $this->getClientIp(),
+                'title' => 'Settings',
+                'user' => $user,
+                'sessionTimeout' => SessionUtil::getRemainingTime(),
+                'configWritable' => $isWritable,
             ]);
         } else {
-            Flight::redirect("/login");
+            Flight::redirect('/login');
         }
     }
 
@@ -728,30 +730,30 @@ class AdminController
      */
     public function updateMailSettings($formData)
     {
-        if (SessionUtil::get("user")["id"] === null) {
-            Flight::redirect("/login");
+        if (SessionUtil::get('user')['id'] === null) {
+            Flight::redirect('/login');
         }
-        $user = User::findUserById(SessionUtil::get("user")["id"]);
+        $user = User::findUserById(SessionUtil::get('user')['id']);
         if ($user !== false) {
             $newConfig = [
-                "host" => $formData["host"],
-                "username" => $formData["username"],
-                "password" => $formData["password"],
-                "encryption" => $formData["encryption"],
-                "port" => (int) $formData["port"],
-                "fromEmail" => $formData["fromEmail"],
-                "fromName" => $formData["fromName"],
-                "enableWelcomeMail" => isset($formData["enableWelcomeMail"]),
+                'host' => $formData['host'],
+                'username' => $formData['username'],
+                'password' => $formData['password'],
+                'encryption' => $formData['encryption'],
+                'port' => (int) $formData['port'],
+                'fromEmail' => $formData['fromEmail'],
+                'fromName' => $formData['fromName'],
+                'enableWelcomeMail' => isset($formData['enableWelcomeMail']),
             ];
 
             // Alte Konfiguration einlesen
-            $configFile = "../config.php";
+            $configFile = '../config.php';
             $isWritable = is_writable($configFile);
             $config = include $configFile;
             // Alte Datei als Text laden
             $configContent = file_get_contents($configFile);
             if ($configContent === false) {
-                throw new Exception(TranslationUtil::t("error2"));
+                throw new Exception(TranslationUtil::t('error2'));
             }
 
             // Aktuelles `$mail`-Array suchen und ersetzen
@@ -759,18 +761,18 @@ class AdminController
 
             // Neues Mail-Array als formatierter PHP-Code
             $newMailArray = var_export($newConfig, true);
-            $newMailArray = preg_replace("/^array \(/", "[", $newMailArray);
-            $newMailArray = preg_replace('/\)$/', "]", $newMailArray);
-            $newMailArray = preg_replace('/=> \n\s+/', "=> ", $newMailArray); // Mehrzeilige Werte schöner formatieren
+            $newMailArray = preg_replace("/^array \(/", '[', $newMailArray);
+            $newMailArray = preg_replace('/\)$/', ']', $newMailArray);
+            $newMailArray = preg_replace('/=> \n\s+/', '=> ', $newMailArray); // Mehrzeilige Werte schöner formatieren
 
             // Neuen Mail-Block zusammenbauen
-            $replacement = '$mail = ' . $newMailArray . ";";
+            $replacement = '$mail = ' . $newMailArray . ';';
 
             // Neuen Config-Code generieren
             $newConfigContent = preg_replace($pattern, $replacement, $configContent);
 
             if ($newConfigContent === null) {
-                throw new Exception(TranslationUtil::t("error3"));
+                throw new Exception(TranslationUtil::t('error3'));
             }
 
             // Datei mit neuem Inhalt speichern
@@ -782,29 +784,29 @@ class AdminController
             // log action
             LogUtil::logAction(
                 LogType::AUDIT,
-                "AdminController",
-                "updateMailSettings",
-                "SUCCESS: saved Mailsettings.",
+                'AdminController',
+                'updateMailSettings',
+                'SUCCESS: saved Mailsettings.',
                 $user->username
             );
 
             // template redner und meldung ausgeben
-            Flight::latte()->render("admin/settings.latte", [
-                "success" => TranslationUtil::t("settings.success1"),
-                "mail" => $savedconfig["mail"],
-                "bruteForceSettings" => $savedconfig["bruteForceSettings"],
-                "application" => $savedconfig["application"],
-                "logging" => $savedconfig["logging"],
-                "ldap" => $savedconfig["ldapSettings"],
-                "security" => $savedconfig["security"],
-                "clientIp" => $this->getClientIp(),
-                "title" => "Settings",
-                "user" => $user,
-                "sessionTimeout" => SessionUtil::getRemainingTime(),
-                "configWritable" => $isWritable,
+            Flight::latte()->render('admin/settings.latte', [
+                'success' => TranslationUtil::t('settings.success1'),
+                'mail' => $savedconfig['mail'],
+                'bruteForceSettings' => $savedconfig['bruteForceSettings'],
+                'application' => $savedconfig['application'],
+                'logging' => $savedconfig['logging'],
+                'ldap' => $savedconfig['ldapSettings'],
+                'security' => $savedconfig['security'],
+                'clientIp' => $this->getClientIp(),
+                'title' => 'Settings',
+                'user' => $user,
+                'sessionTimeout' => SessionUtil::getRemainingTime(),
+                'configWritable' => $isWritable,
             ]);
         } else {
-            Flight::redirect("/login");
+            Flight::redirect('/login');
         }
     }
 
@@ -820,26 +822,26 @@ class AdminController
      */
     public function updateApplicationSettings($formData)
     {
-        if (SessionUtil::get("user")["id"] === null) {
-            Flight::redirect("/login");
+        if (SessionUtil::get('user')['id'] === null) {
+            Flight::redirect('/login');
         }
-        $user = User::findUserById(SessionUtil::get("user")["id"]);
+        $user = User::findUserById(SessionUtil::get('user')['id']);
         if ($user !== false) {
             $newConfig = [
-                "appUrl" => $formData["appUrl"],
-                "sessionTimeout" => (int) $formData["sessionTimeout"],
-                "allowPublicRegister" => (bool) $formData["allowPublicRegister"],
-                "allowPublicPasswordReset" => (bool) $formData["allowPublicPasswordReset"]
+                'appUrl' => $formData['appUrl'],
+                'sessionTimeout' => (int) $formData['sessionTimeout'],
+                'allowPublicRegister' => (bool) $formData['allowPublicRegister'],
+                'allowPublicPasswordReset' => (bool) $formData['allowPublicPasswordReset'],
             ];
 
             // Alte Konfiguration einlesen
-            $configFile = "../config.php";
+            $configFile = '../config.php';
             $isWritable = is_writable($configFile);
             $config = include $configFile;
             // Alte Datei als Text laden
             $configContent = file_get_contents($configFile);
             if ($configContent === false) {
-                throw new Exception(TranslationUtil::t("error2"));
+                throw new Exception(TranslationUtil::t('error2'));
             }
 
             // Aktuelles `$application`-Array suchen und ersetzen
@@ -847,18 +849,18 @@ class AdminController
 
             // Neues application-Array als formatierter PHP-Code
             $newApplicationArray = var_export($newConfig, true);
-            $newApplicationArray = preg_replace("/^array \(/", "[", $newApplicationArray);
-            $newApplicationArray = preg_replace('/\)$/', "]", $newApplicationArray);
-            $newApplicationArray = preg_replace('/=> \n\s+/', "=> ", $newApplicationArray); // Mehrzeilige Werte schöner formatieren
+            $newApplicationArray = preg_replace("/^array \(/", '[', $newApplicationArray);
+            $newApplicationArray = preg_replace('/\)$/', ']', $newApplicationArray);
+            $newApplicationArray = preg_replace('/=> \n\s+/', '=> ', $newApplicationArray); // Mehrzeilige Werte schöner formatieren
 
             // Neuen application-Block zusammenbauen
-            $replacement = '$application = ' . $newApplicationArray . ";";
+            $replacement = '$application = ' . $newApplicationArray . ';';
 
             // Neuen Config-Code generieren
             $newConfigContent = preg_replace($pattern, $replacement, $configContent);
 
             if ($newConfigContent === null) {
-                throw new Exception(TranslationUtil::t("error3"));
+                throw new Exception(TranslationUtil::t('error3'));
             }
 
             // Datei mit neuem Inhalt speichern
@@ -870,29 +872,29 @@ class AdminController
             // log action
             LogUtil::logAction(
                 LogType::AUDIT,
-                "AdminController",
-                "updateApplicationSettings",
-                "SUCCESS: saved Applicationsettings.",
+                'AdminController',
+                'updateApplicationSettings',
+                'SUCCESS: saved Applicationsettings.',
                 $user->username
             );
 
             // template redner und meldung ausgeben
-            Flight::latte()->render("admin/settings.latte", [
-                "success" => TranslationUtil::t("settings.success1"),
-                "mail" => $savedconfig["mail"],
-                "bruteForceSettings" => $savedconfig["bruteForceSettings"],
-                "application" => $savedconfig["application"],
-                "logging" => $savedconfig["logging"],
-                "ldap" => $savedconfig["ldapSettings"],
-                "security" => $savedconfig["security"],
-                "clientIp" => $this->getClientIp(),
-                "title" => "Settings",
-                "user" => $user,
-                "sessionTimeout" => SessionUtil::getRemainingTime(),
-                "configWritable" => $isWritable,
+            Flight::latte()->render('admin/settings.latte', [
+                'success' => TranslationUtil::t('settings.success1'),
+                'mail' => $savedconfig['mail'],
+                'bruteForceSettings' => $savedconfig['bruteForceSettings'],
+                'application' => $savedconfig['application'],
+                'logging' => $savedconfig['logging'],
+                'ldap' => $savedconfig['ldapSettings'],
+                'security' => $savedconfig['security'],
+                'clientIp' => $this->getClientIp(),
+                'title' => 'Settings',
+                'user' => $user,
+                'sessionTimeout' => SessionUtil::getRemainingTime(),
+                'configWritable' => $isWritable,
             ]);
         } else {
-            Flight::redirect("/login");
+            Flight::redirect('/login');
         }
     }
 
@@ -913,25 +915,25 @@ class AdminController
      */
     public function updateBruteForceSettings($formData)
     {
-        if (SessionUtil::get("user")["id"] === null) {
-            Flight::redirect("/login");
+        if (SessionUtil::get('user')['id'] === null) {
+            Flight::redirect('/login');
         }
-        $user = User::findUserById(SessionUtil::get("user")["id"]);
+        $user = User::findUserById(SessionUtil::get('user')['id']);
         if ($user !== false) {
             $newConfig = [
-                "enableBruteForce" => $formData["enableBruteForce"] === null ? false : true,
-                "maxAttempts" => (int) $formData["maxAttempts"],
-                "lockTime" => (int) $formData["lockTime"],
+                'enableBruteForce' => $formData['enableBruteForce'] === null ? false : true,
+                'maxAttempts' => (int) $formData['maxAttempts'],
+                'lockTime' => (int) $formData['lockTime'],
             ];
 
             // Alte Konfiguration einlesen
-            $configFile = "../config.php";
+            $configFile = '../config.php';
             $isWritable = is_writable($configFile);
             $config = include $configFile;
             // Alte Datei als Text laden
             $configContent = file_get_contents($configFile);
             if ($configContent === false) {
-                throw new Exception(TranslationUtil::t("error2"));
+                throw new Exception(TranslationUtil::t('error2'));
             }
 
             // Aktuelles `$bruteForceSettings`-Array suchen und ersetzen
@@ -939,18 +941,18 @@ class AdminController
 
             // Neues bruteForceSettings-Array als formatierter PHP-Code
             $newBruteForceArray = var_export($newConfig, true);
-            $newBruteForceArray = preg_replace("/^array \(/", "[", $newBruteForceArray);
-            $newBruteForceArray = preg_replace('/\)$/', "]", $newBruteForceArray);
-            $newBruteForceArray = preg_replace('/=> \n\s+/', "=> ", $newBruteForceArray); // Mehrzeilige Werte schöner formatieren
+            $newBruteForceArray = preg_replace("/^array \(/", '[', $newBruteForceArray);
+            $newBruteForceArray = preg_replace('/\)$/', ']', $newBruteForceArray);
+            $newBruteForceArray = preg_replace('/=> \n\s+/', '=> ', $newBruteForceArray); // Mehrzeilige Werte schöner formatieren
 
             // Neuen bruteForceSettings-Block zusammenbauen
-            $replacement = '$bruteForceSettings = ' . $newBruteForceArray . ";";
+            $replacement = '$bruteForceSettings = ' . $newBruteForceArray . ';';
 
             // Neuen Config-Code generieren
             $newConfigContent = preg_replace($pattern, $replacement, $configContent);
 
             if ($newConfigContent === null) {
-                throw new Exception(TranslationUtil::t("error3"));
+                throw new Exception(TranslationUtil::t('error3'));
             }
 
             // Datei mit neuem Inhalt speichern
@@ -962,29 +964,29 @@ class AdminController
             // log action
             LogUtil::logAction(
                 LogType::AUDIT,
-                "AdminController",
-                "updateBruteForceSettings",
-                "SUCCESS: saved BruteForce sttings.",
+                'AdminController',
+                'updateBruteForceSettings',
+                'SUCCESS: saved BruteForce sttings.',
                 $user->username
             );
 
             // template redner und meldung ausgeben
-            Flight::latte()->render("admin/settings.latte", [
-                "success" => TranslationUtil::t("settings.success1"),
-                "mail" => $savedconfig["mail"],
-                "bruteForceSettings" => $savedconfig["bruteForceSettings"],
-                "application" => $savedconfig["application"],
-                "logging" => $savedconfig["logging"],
-                "ldap" => $savedconfig["ldapSettings"],
-                "clientIp" => $this->getClientIp(),
-                "security" => $savedconfig["security"],
-                "title" => "Settings",
-                "user" => $user,
-                "sessionTimeout" => SessionUtil::getRemainingTime(),
-                "configWritable" => $isWritable,
+            Flight::latte()->render('admin/settings.latte', [
+                'success' => TranslationUtil::t('settings.success1'),
+                'mail' => $savedconfig['mail'],
+                'bruteForceSettings' => $savedconfig['bruteForceSettings'],
+                'application' => $savedconfig['application'],
+                'logging' => $savedconfig['logging'],
+                'ldap' => $savedconfig['ldapSettings'],
+                'clientIp' => $this->getClientIp(),
+                'security' => $savedconfig['security'],
+                'title' => 'Settings',
+                'user' => $user,
+                'sessionTimeout' => SessionUtil::getRemainingTime(),
+                'configWritable' => $isWritable,
             ]);
         } else {
-            Flight::redirect("/login");
+            Flight::redirect('/login');
         }
     }
 
@@ -999,21 +1001,21 @@ class AdminController
      */
     public function showUsers()
     {
-        if (SessionUtil::get("iuser")["id"] === null) {
-            Flight::redirect("/login");
+        if (SessionUtil::get('iuser')['id'] === null) {
+            Flight::redirect('/login');
         }
-        $user = User::findUserById(SessionUtil::get("user")["id"]);
+        $user = User::findUserById(SessionUtil::get('user')['id']);
         if ($user !== false) {
-            $roles = explode(",", $user->roles);
-            if (in_array("Admin", $roles)) {
+            $roles = explode(',', $user->roles);
+            if (in_array('Admin', $roles)) {
                 $users = User::getAllUsers();
-                Flight::render("admin/users", ["users" => $users]);
+                Flight::render('admin/users', ['users' => $users]);
             } else {
                 //Flight::redirect('/login');
-                echo "403";
+                echo '403';
             }
         } else {
-            Flight::redirect("/login");
+            Flight::redirect('/login');
         }
     }
 
@@ -1027,17 +1029,17 @@ class AdminController
      */
     public function showCreateUser()
     {
-        if (SessionUtil::get("user")["id"] === null) {
-            Flight::redirect("/login");
+        if (SessionUtil::get('user')['id'] === null) {
+            Flight::redirect('/login');
         }
 
-        $roles = ORM::for_table("roles")->find_array();
+        $roles = ORM::for_table('roles')->find_array();
 
-        Flight::latte()->render("admin/createUser.latte", [
-            "title" => TranslationUtil::t("user.new.title"),
-            "user" => SessionUtil::get("user"),
-            "sessionTimeout" => SessionUtil::getRemainingTime(),
-            "roles" => $roles,
+        Flight::latte()->render('admin/createUser.latte', [
+            'title' => TranslationUtil::t('user.new.title'),
+            'user' => SessionUtil::get('user'),
+            'sessionTimeout' => SessionUtil::getRemainingTime(),
+            'roles' => $roles,
         ]);
     }
 
@@ -1057,29 +1059,29 @@ class AdminController
         $rules['firstname'] = [
             InputValidator::RULE_REQUIRED,
             [InputValidator::RULE_MIN_LENGTH => 1],
-            [InputValidator::RULE_MAX_LENGTH => 255]
+            [InputValidator::RULE_MAX_LENGTH => 255],
         ];
         $rules['lastname'] = [
             InputValidator::RULE_REQUIRED,
             [InputValidator::RULE_MIN_LENGTH => 1],
-            [InputValidator::RULE_MAX_LENGTH => 255]
+            [InputValidator::RULE_MAX_LENGTH => 255],
         ];
         $rules['password'] = [
             InputValidator::RULE_REQUIRED,
-            InputValidator::RULE_PASSWORD_STRONG
+            InputValidator::RULE_PASSWORD_STRONG,
         ];
         $rules['email'] = [
             InputValidator::RULE_REQUIRED,
-            InputValidator::RULE_EMAIL
+            InputValidator::RULE_EMAIL,
         ];
         $rules['status'] = [
-            InputValidator::RULE_REQUIRED
+            InputValidator::RULE_REQUIRED,
         ];
         $rules['roles'] = [
-            InputValidator::RULE_REQUIRED
+            InputValidator::RULE_REQUIRED,
         ];
         $rules['ldapEnabled'] = [
-            InputValidator::RULE_REQUIRED
+            InputValidator::RULE_REQUIRED,
         ];
 
         try {
@@ -1087,19 +1089,20 @@ class AdminController
             $validated = InputValidator::validateAndSanitize($rules, $_POST);
 
             // Extract validated data
-            $email = $validated["email"];
-            $user = $validated["username"];
-            $firstname = $validated["firstname"];
-            $lastname = $validated["lastname"];
-            $password = password_hash($validated["password"], PASSWORD_DEFAULT);
+            $email = $validated['email'];
+            $user = $validated['username'];
+            $firstname = $validated['firstname'];
+            $lastname = $validated['lastname'];
+            $password = password_hash($validated['password'], PASSWORD_DEFAULT);
             $status = $validated['status'] ?? 0;
-            $roles = $validated['roles'] ?? "";
+            $roles = $validated['roles'] ?? '';
             $ldapEnabled = $validated['ldapEnabled'] ?? false;
 
             // Check if user already exists
             $userCheck = User::checkIfUserExists($user, $email);
-            if ($userCheck !== "false") {
-                Flight::json(["success" => false, "message" => TranslationUtil::t("user.new.error1")]);
+            if ($userCheck !== 'false') {
+                Flight::json(['success' => false, 'message' => TranslationUtil::t('user.new.error1')]);
+
                 return;
             }
 
@@ -1107,24 +1110,25 @@ class AdminController
             $newUser = User::createUser($user, $email, $firstname, $lastname, $status, $password, $roles, $ldapEnabled == true ? 1 : 0);
 
             if (!$newUser) {
-                Flight::json(["success" => false, "message" => TranslationUtil::t("user.new.error2")]);
+                Flight::json(['success' => false, 'message' => TranslationUtil::t('user.new.error2')]);
             }
 
-            LogUtil::logAction(LogType::AUDIT, "AdminController", "createUser", "SUCCESS: created new user.");
-            Flight::json(["success" => true, "message" => TranslationUtil::t("user.new.success")]);
+            LogUtil::logAction(LogType::AUDIT, 'AdminController', 'createUser', 'SUCCESS: created new user.');
+            Flight::json(['success' => true, 'message' => TranslationUtil::t('user.new.success')]);
         } catch (InvalidArgumentException $e) {
             LogUtil::logAction(
                 LogType::AUDIT,
-                "AdminController",
-                "createUser",
-                "User creation validation failed: " . $e->getMessage(),
-                SessionUtil::get("user")["username"]
+                'AdminController',
+                'createUser',
+                'User creation validation failed: ' . $e->getMessage(),
+                SessionUtil::get('user')['username']
             );
 
             Flight::json([
-                "success" => false,
-                "message" => $e->getMessage()
+                'success' => false,
+                'message' => $e->getMessage(),
             ]);
+
             return;
         }
     }
@@ -1140,19 +1144,19 @@ class AdminController
      */
     public function showEditeUser($userId)
     {
-        if (SessionUtil::get("user")["id"] === null) {
-            Flight::redirect("/login");
+        if (SessionUtil::get('user')['id'] === null) {
+            Flight::redirect('/login');
         }
 
-        $roles = ORM::for_table("roles")->find_array();
+        $roles = ORM::for_table('roles')->find_array();
 
-        Flight::latte()->render("admin/editUser.latte", [
-            "title" => TranslationUtil::t("user.edit.title"),
-            "user" => SessionUtil::get("user"),
-            "sessionTimeout" => SessionUtil::getRemainingTime(),
-            "roles" => $roles,
-            "user" => SessionUtil::get("user"),
-            "userToEdit" => User::findUserById($userId),
+        Flight::latte()->render('admin/editUser.latte', [
+            'title' => TranslationUtil::t('user.edit.title'),
+            'user' => SessionUtil::get('user'),
+            'sessionTimeout' => SessionUtil::getRemainingTime(),
+            'roles' => $roles,
+            'user' => SessionUtil::get('user'),
+            'userToEdit' => User::findUserById($userId),
         ]);
     }
 
@@ -1177,8 +1181,8 @@ class AdminController
      */
     public static function updateUser()
     {
-        if (SessionUtil::get("user")["id"] === null) {
-            Flight::redirect("/login");
+        if (SessionUtil::get('user')['id'] === null) {
+            Flight::redirect('/login');
         }
 
         $rules = InputValidator::getAdminUserRules();
@@ -1187,39 +1191,39 @@ class AdminController
         $rules['firstname'] = [
             InputValidator::RULE_REQUIRED,
             [InputValidator::RULE_MIN_LENGTH => 1],
-            [InputValidator::RULE_MAX_LENGTH => 255]
+            [InputValidator::RULE_MAX_LENGTH => 255],
         ];
         $rules['lastname'] = [
             InputValidator::RULE_REQUIRED,
             [InputValidator::RULE_MIN_LENGTH => 1],
-            [InputValidator::RULE_MAX_LENGTH => 255]
+            [InputValidator::RULE_MAX_LENGTH => 255],
         ];
         $rules['username'] = [
             InputValidator::RULE_REQUIRED,
             [InputValidator::RULE_MIN_LENGTH => 1],
-            [InputValidator::RULE_MAX_LENGTH => 255]
+            [InputValidator::RULE_MAX_LENGTH => 255],
         ];
         $rules['email'] = [
             InputValidator::RULE_REQUIRED,
-            InputValidator::RULE_EMAIL
+            InputValidator::RULE_EMAIL,
         ];
-        if (isset($_POST["password"]) && $_POST["password"] !== "") {
+        if (isset($_POST['password']) && $_POST['password'] !== '') {
             $rules['password'] = [
                 InputValidator::RULE_REQUIRED,
-                InputValidator::RULE_PASSWORD_STRONG
+                InputValidator::RULE_PASSWORD_STRONG,
             ];
         }
         $rules['status'] = [
-            InputValidator::RULE_REQUIRED
+            InputValidator::RULE_REQUIRED,
         ];
         $rules['roles'] = [
-            InputValidator::RULE_REQUIRED
+            InputValidator::RULE_REQUIRED,
         ];
         $rules['ldapEnabled'] = [
-            InputValidator::RULE_REQUIRED
+            InputValidator::RULE_REQUIRED,
         ];
         $rules['id'] = [
-            InputValidator::RULE_REQUIRED
+            InputValidator::RULE_REQUIRED,
         ];
 
         try {
@@ -1227,16 +1231,16 @@ class AdminController
             $validated = InputValidator::validateAndSanitize($rules, $_POST);
 
             // Extract validated data
-            $userId = $validated["id"];
-            $email = $validated["email"];
-            $username = $validated["username"];
-            $firstname = $validated["firstname"];
-            $lastname = $validated["lastname"];
+            $userId = $validated['id'];
+            $email = $validated['email'];
+            $username = $validated['username'];
+            $firstname = $validated['firstname'];
+            $lastname = $validated['lastname'];
             $status = $validated['status'] ?? 0;
-            $roles = $validated['roles'] ?? "";
+            $roles = $validated['roles'] ?? '';
             $password = null;
-            if (isset($validated["password"]) && !empty($validated["password"])) {
-                $password = password_hash($validated["password"], PASSWORD_DEFAULT);
+            if (isset($validated['password']) && !empty($validated['password'])) {
+                $password = password_hash($validated['password'], PASSWORD_DEFAULT);
             }
             $ldapEnabled = $validated['ldapEnabled'] ?? 0;
 
@@ -1244,26 +1248,27 @@ class AdminController
             $erg = User::updateuser($userId, $email, $username, $firstname, $lastname, $status, $roles, $password, $ldapEnabled);
 
             // log action
-            LogUtil::logAction(LogType::AUDIT, "AdminController", "updateUser", "SUCCESS: updated user " . $username . ".");
+            LogUtil::logAction(LogType::AUDIT, 'AdminController', 'updateUser', 'SUCCESS: updated user ' . $username . '.');
 
             if ($erg === true) {
-                Flight::json(["success" => true, "message" => TranslationUtil::t('user.edit.success') . $ldapEnabled . ""]);
+                Flight::json(['success' => true, 'message' => TranslationUtil::t('user.edit.success') . $ldapEnabled . '']);
             } else {
-                Flight::json(["success" => false, "message" => TranslationUtil::t("user.edit.error1")]);
+                Flight::json(['success' => false, 'message' => TranslationUtil::t('user.edit.error1')]);
             }
         } catch (InvalidArgumentException $e) {
             LogUtil::logAction(
                 LogType::AUDIT,
-                "AdminController",
-                "updateUser",
-                "User update validation failed: " . $e->getMessage(),
-                SessionUtil::get("user")["username"]
+                'AdminController',
+                'updateUser',
+                'User update validation failed: ' . $e->getMessage(),
+                SessionUtil::get('user')['username']
             );
 
             Flight::json([
-                "success" => false,
-                "message" => $e->getMessage()
+                'success' => false,
+                'message' => $e->getMessage(),
             ]);
+
             return;
         }
     }
@@ -1277,20 +1282,19 @@ class AdminController
      * a JSON response containing the user data and total user count. Otherwise, it renders
      * the user list page with the retrieved data.
      */
-
     public function fetchUsersPaged()
     {
-        $page = isset($_GET["page"]) ? max(1, (int) $_GET["page"]) : 1;
-        $pageSize = isset($_GET["pageSize"]) ? max(1, (int) $_GET["pageSize"]) : 10;
-        $search = isset($_GET["search"]) ? trim($_GET["search"]) : "";
+        $page = isset($_GET['page']) ? max(1, (int) $_GET['page']) : 1;
+        $pageSize = isset($_GET['pageSize']) ? max(1, (int) $_GET['pageSize']) : 10;
+        $search = isset($_GET['search']) ? trim($_GET['search']) : '';
 
         $offset = ($page - 1) * $pageSize;
 
-        $erg = User::getUsersPaged($offset, $pageSize, isset($_GET["search"]) ? trim($_GET["search"]) : null);
+        $erg = User::getUsersPaged($offset, $pageSize, isset($_GET['search']) ? trim($_GET['search']) : null);
 
         if ($erg) {
-            $totalUsers = $erg["totalUsers"];
-            $users = $erg["users"];
+            $totalUsers = $erg['totalUsers'];
+            $users = $erg['users'];
         } else {
             $totalUsers = 0;
             $users = [];
@@ -1299,43 +1303,42 @@ class AdminController
         // log action
         LogUtil::logAction(
             LogType::AUDIT,
-            "AdminController",
-            "fetchUsersPaged",
-            "SUCCESS: fetched list of users.",
-            SessionUtil::get("user")["username"]
+            'AdminController',
+            'fetchUsersPaged',
+            'SUCCESS: fetched list of users.',
+            SessionUtil::get('user')['username']
         );
 
         // Prüfen, ob es eine AJAX-Anfrage ist
-        if (
-            !empty($_SERVER["HTTP_X_REQUESTED_WITH"]) &&
-            strtolower($_SERVER["HTTP_X_REQUESTED_WITH"]) == "xmlhttprequest"
+        if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) &&
+            strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest'
         ) {
             // JSON-Antwort für AJAX
             Flight::json([
-                "users" => array_map(function ($user) {
+                'users' => array_map(function ($user) {
                     return [
-                        "id" => $user->id,
-                        "status" => $user->status,
-                        "username" => $user->username,
-                        "email" => $user->email,
-                        "mfaEnabled" => $user->mfaEnabled,
-                        "mfaEnforced" => $user->mfaEnforced,
-                        "mfaSecret" => $user->mfaSecret,
+                        'id' => $user->id,
+                        'status' => $user->status,
+                        'username' => $user->username,
+                        'email' => $user->email,
+                        'mfaEnabled' => $user->mfaEnabled,
+                        'mfaEnforced' => $user->mfaEnforced,
+                        'mfaSecret' => $user->mfaSecret,
                     ];
                 }, $users),
-                "totalUsers" => $totalUsers,
+                'totalUsers' => $totalUsers,
             ]);
         } else {
-            Flight::latte()->render("admin/users.latte", [
-                "users" => $users,
-                "page" => $page,
-                "pageSize" => $pageSize,
-                "totalUsers" => $totalUsers,
-                "search" => $search,
-                "title" => "Users",
-                "message" => empty($users) ? "No users found for criteria: " . $search . "." : null,
-                "user" => SessionUtil::get("user"),
-                "sessionTimeout" => SessionUtil::getRemainingTime(),
+            Flight::latte()->render('admin/users.latte', [
+                'users' => $users,
+                'page' => $page,
+                'pageSize' => $pageSize,
+                'totalUsers' => $totalUsers,
+                'search' => $search,
+                'title' => 'Users',
+                'message' => empty($users) ? 'No users found for criteria: ' . $search . '.' : null,
+                'user' => SessionUtil::get('user'),
+                'sessionTimeout' => SessionUtil::getRemainingTime(),
             ]);
         }
     }
@@ -1355,11 +1358,11 @@ class AdminController
      */
     public function deleteUser()
     {
-        $userIdToDelete = isset($_POST["id"]) ? (int) $_POST["id"] : null;
+        $userIdToDelete = isset($_POST['id']) ? (int) $_POST['id'] : null;
 
         // Falls keine ID vorhanden ist -> Fehler zurückgeben
         if (!$userIdToDelete) {
-            return self::handleResponse(false, "Ungültige Benutzer-ID.");
+            return self::handleResponse(false, 'Ungültige Benutzer-ID.');
         }
 
         // Benutzer löschen
@@ -1368,16 +1371,16 @@ class AdminController
         // log action
         LogUtil::logAction(
             LogType::AUDIT,
-            "AdminController",
-            "deleteUser",
-            "SUCCESS: deleted user " . $userIdToDelete . ".",
-            SessionUtil::get("user")["username"]
+            'AdminController',
+            'deleteUser',
+            'SUCCESS: deleted user ' . $userIdToDelete . '.',
+            SessionUtil::get('user')['username']
         );
 
         if ($erg) {
             return self::handleResponse(true);
         } else {
-            return self::handleResponse(false, "Fehler beim Löschen des Benutzers.");
+            return self::handleResponse(false, 'Fehler beim Löschen des Benutzers.');
         }
     }
 
@@ -1396,10 +1399,10 @@ class AdminController
      */
     public static function disableMfa()
     {
-        $userId = isset($_POST["id"]) ? $_POST["id"] : null;
+        $userId = isset($_POST['id']) ? $_POST['id'] : null;
 
         if (!$userId) {
-            return self::handleResponse(false, "Ungültige Benutzer-ID.");
+            return self::handleResponse(false, 'Ungültige Benutzer-ID.');
         }
 
         $erg = User::disableMfaForUser($userId);
@@ -1407,16 +1410,16 @@ class AdminController
         // log action
         LogUtil::logAction(
             LogType::AUDIT,
-            "AdminController",
-            "disableMfa",
-            "SUCCESS: disabled 2FA for user " . $userId . ".",
-            SessionUtil::get("user")["username"]
+            'AdminController',
+            'disableMfa',
+            'SUCCESS: disabled 2FA for user ' . $userId . '.',
+            SessionUtil::get('user')['username']
         );
 
         if ($erg) {
             return self::handleResponse(true);
         } else {
-            return self::handleResponse(false, "Fehler beim speichern des 2FA Status.");
+            return self::handleResponse(false, 'Fehler beim speichern des 2FA Status.');
         }
     }
 
@@ -1433,10 +1436,10 @@ class AdminController
      */
     public static function enableMfa()
     {
-        $userId = isset($_POST["id"]) ? $_POST["id"] : null;
+        $userId = isset($_POST['id']) ? $_POST['id'] : null;
 
         if (!$userId) {
-            return self::handleResponse(false, "Ungültige Benutzer-ID.");
+            return self::handleResponse(false, 'Ungültige Benutzer-ID.');
         }
 
         $erg = User::enableMfaForUser($userId);
@@ -1444,16 +1447,16 @@ class AdminController
         // log action
         LogUtil::logAction(
             LogType::AUDIT,
-            "AdminController",
-            "enableMfa",
-            "SUCCESS: enabled 2FA for user " . $userId . ".",
-            SessionUtil::get("user")["username"]
+            'AdminController',
+            'enableMfa',
+            'SUCCESS: enabled 2FA for user ' . $userId . '.',
+            SessionUtil::get('user')['username']
         );
 
         if ($erg) {
             return self::handleResponse(true);
         } else {
-            return self::handleResponse(false, "Fehler beim speichern des 2FA Status.");
+            return self::handleResponse(false, 'Fehler beim speichern des 2FA Status.');
         }
     }
 
@@ -1470,10 +1473,10 @@ class AdminController
      */
     public static function enforceMfa()
     {
-        $userId = isset($_POST["id"]) ? $_POST["id"] : null;
+        $userId = isset($_POST['id']) ? $_POST['id'] : null;
 
         if (!$userId) {
-            return self::handleResponse(false, "Ungültige Benutzer-ID.");
+            return self::handleResponse(false, 'Ungültige Benutzer-ID.');
         }
 
         $erg = User::enforceMfa($userId);
@@ -1481,16 +1484,16 @@ class AdminController
         // log action
         LogUtil::logAction(
             LogType::AUDIT,
-            "AdminController.php",
-            "enforeMfa",
-            "SUCCESS: enforced 2FA for user " . $userId . ".",
-            SessionUtil::get("user")["username"]
+            'AdminController.php',
+            'enforeMfa',
+            'SUCCESS: enforced 2FA for user ' . $userId . '.',
+            SessionUtil::get('user')['username']
         );
 
         if ($erg) {
             return self::handleResponse(true);
         } else {
-            return self::handleResponse(false, "Fehler beim speichern des 2FA Status.");
+            return self::handleResponse(false, 'Fehler beim speichern des 2FA Status.');
         }
     }
 
@@ -1509,10 +1512,10 @@ class AdminController
      */
     public static function unenforceMfa()
     {
-        $userId = isset($_POST["id"]) ? $_POST["id"] : null;
+        $userId = isset($_POST['id']) ? $_POST['id'] : null;
 
         if (!$userId) {
-            return self::handleResponse(false, "Ungültige Benutzer-ID.");
+            return self::handleResponse(false, 'Ungültige Benutzer-ID.');
         }
 
         $erg = User::unenforceMfa($userId);
@@ -1520,16 +1523,16 @@ class AdminController
         // log action
         LogUtil::logAction(
             LogType::AUDIT,
-            "AdminController",
-            "unenforeMfa",
-            "SUCCESS: unenforced 2FA for user " . $userId . ".",
-            SessionUtil::get("user")["username"]
+            'AdminController',
+            'unenforeMfa',
+            'SUCCESS: unenforced 2FA for user ' . $userId . '.',
+            SessionUtil::get('user')['username']
         );
 
         if ($erg) {
             return self::handleResponse(true);
         } else {
-            return self::handleResponse(false, "Fehler beim speichern des 2FA Status.");
+            return self::handleResponse(false, 'Fehler beim speichern des 2FA Status.');
         }
     }
 
@@ -1548,10 +1551,10 @@ class AdminController
      */
     public static function disableUser()
     {
-        $userId = isset($_POST["id"]) ? $_POST["id"] : null;
+        $userId = isset($_POST['id']) ? $_POST['id'] : null;
 
         if (!$userId) {
-            return self::handleResponse(false, "Ungültige Benutzer-ID.");
+            return self::handleResponse(false, 'Ungültige Benutzer-ID.');
         }
 
         $erg = User::updateUserStatus($userId, 0);
@@ -1559,16 +1562,16 @@ class AdminController
         // log action
         LogUtil::logAction(
             LogType::AUDIT,
-            "AdminController",
-            "disableUser",
-            "SUCCESS: deactivated user " . $userId . ".",
-            SessionUtil::get("user")["username"]
+            'AdminController',
+            'disableUser',
+            'SUCCESS: deactivated user ' . $userId . '.',
+            SessionUtil::get('user')['username']
         );
 
         if ($erg) {
             return self::handleResponse(true);
         } else {
-            return self::handleResponse(false, "Fehler beim speichern des Useraccount-Status.");
+            return self::handleResponse(false, 'Fehler beim speichern des Useraccount-Status.');
         }
     }
 
@@ -1587,10 +1590,10 @@ class AdminController
      */
     public static function enableUser()
     {
-        $userId = isset($_POST["id"]) ? $_POST["id"] : null;
+        $userId = isset($_POST['id']) ? $_POST['id'] : null;
 
         if (!$userId) {
-            return self::handleResponse(false, "Ungültige Benutzer-ID.");
+            return self::handleResponse(false, 'Ungültige Benutzer-ID.');
         }
 
         $erg = User::updateUserStatus($userId, 1);
@@ -1598,16 +1601,16 @@ class AdminController
         // log action
         LogUtil::logAction(
             LogType::AUDIT,
-            "AdminController",
-            "enableUser",
-            "SUCCESS: activated user " . $userId . ".",
-            SessionUtil::get("user")["username"]
+            'AdminController',
+            'enableUser',
+            'SUCCESS: activated user ' . $userId . '.',
+            SessionUtil::get('user')['username']
         );
 
         if ($erg) {
             return self::handleResponse(true);
         } else {
-            return self::handleResponse(false, "Fehler beim speichern des Useraccount-Status.");
+            return self::handleResponse(false, 'Fehler beim speichern des Useraccount-Status.');
         }
     }
 
@@ -1626,35 +1629,35 @@ class AdminController
      */
     private static function handleResponse(bool $success, ?string $errorMessage = null)
     {
-        if (
-            !empty($_SERVER["HTTP_X_REQUESTED_WITH"]) &&
-            strtolower($_SERVER["HTTP_X_REQUESTED_WITH"]) === "xmlhttprequest"
+        if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) &&
+            strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest'
         ) {
-            Flight::json(["success" => $success]);
+            Flight::json(['success' => $success]);
+
             return;
         }
 
         // Falls kein AJAX-Request -> Benutzerliste erneut abrufen
-        $page = isset($_GET["page"]) ? max(1, (int) $_GET["page"]) : 1;
-        $pageSize = isset($_GET["pageSize"]) ? max(1, (int) $_GET["pageSize"]) : 10;
-        $search = isset($_GET["search"]) ? trim($_GET["search"]) : "";
+        $page = isset($_GET['page']) ? max(1, (int) $_GET['page']) : 1;
+        $pageSize = isset($_GET['pageSize']) ? max(1, (int) $_GET['pageSize']) : 10;
+        $search = isset($_GET['search']) ? trim($_GET['search']) : '';
 
         $offset = ($page - 1) * $pageSize;
         $erg = User::getUsersPaged($offset, $pageSize, $search);
 
-        $totalUsers = $erg["totalUsers"] ?? 0;
-        $users = $erg["users"] ?? [];
+        $totalUsers = $erg['totalUsers'] ?? 0;
+        $users = $erg['users'] ?? [];
 
-        Flight::latte()->render("admin/users.latte", [
-            "users" => $users,
-            "page" => $page,
-            "pageSize" => $pageSize,
-            "totalUsers" => $totalUsers,
-            "search" => $search,
-            "title" => "Users",
-            "error" => $success ? null : $errorMessage,
-            "user" => SessionUtil::get("user"),
-            "sessionTimeout" => SessionUtil::getRemainingTime(),
+        Flight::latte()->render('admin/users.latte', [
+            'users' => $users,
+            'page' => $page,
+            'pageSize' => $pageSize,
+            'totalUsers' => $totalUsers,
+            'search' => $search,
+            'title' => 'Users',
+            'error' => $success ? null : $errorMessage,
+            'user' => SessionUtil::get('user'),
+            'sessionTimeout' => SessionUtil::getRemainingTime(),
         ]);
     }
 
@@ -1668,10 +1671,10 @@ class AdminController
      */
     public static function showRoles()
     {
-        Flight::latte()->render("admin/roles.latte", [
-            "title" => TranslationUtil::t("roles.title"),
-            "user" => SessionUtil::get("user"),
-            "sessionTimeout" => SessionUtil::getRemainingTime(),
+        Flight::latte()->render('admin/roles.latte', [
+            'title' => TranslationUtil::t('roles.title'),
+            'user' => SessionUtil::get('user'),
+            'sessionTimeout' => SessionUtil::getRemainingTime(),
         ]);
     }
 
@@ -1684,19 +1687,20 @@ class AdminController
      */
     public function checkUsers()
     {
-        $roleName = Flight::request()->query["role"] ?? null;
+        $roleName = Flight::request()->query['role'] ?? null;
 
         if (!$roleName) {
-            Flight::json(["error" => TranslationUtil::t('roles.error3')], 400);
+            Flight::json(['error' => TranslationUtil::t('roles.error3')], 400);
+
             return;
         }
 
         // Prüfen, ob die Rolle irgendwo in der Spalte `roles` enthalten ist
-        $userCount = ORM::for_table("users")
-            ->where_raw("FIND_IN_SET(?, roles)", [$roleName])
+        $userCount = ORM::for_table('users')
+            ->where_raw('FIND_IN_SET(?, roles)', [$roleName])
             ->count();
 
-        Flight::json(["inUse" => $userCount > 0]);
+        Flight::json(['inUse' => $userCount > 0]);
     }
 
     /**
@@ -1714,19 +1718,19 @@ class AdminController
      */
     public static function listRoles()
     {
-        ORM::configure("logging", true);
-        $page = isset($_GET["page"]) ? (int) $_GET["page"] : 1;
-        $pageSize = isset($_GET["pageSize"]) ? (int) $_GET["pageSize"] : 10;
-        $search = isset($_GET["search"]) ? trim($_GET["search"]) : "";
+        ORM::configure('logging', true);
+        $page = isset($_GET['page']) ? (int) $_GET['page'] : 1;
+        $pageSize = isset($_GET['pageSize']) ? (int) $_GET['pageSize'] : 10;
+        $search = isset($_GET['search']) ? trim($_GET['search']) : '';
 
         // Zähle die gesamte Anzahl an Treffern ohne Limitierung
-        $totalRoles = ORM::for_table("roles")
-            ->where_like("roleName", "%$search%")
+        $totalRoles = ORM::for_table('roles')
+            ->where_like('roleName', "%$search%")
             ->count();
 
         // Führe die eigentliche Abfrage mit Limitierung durch
-        $roles = ORM::for_table("roles")
-            ->where_like("roleName", "%$search%")
+        $roles = ORM::for_table('roles')
+            ->where_like('roleName', "%$search%")
             ->offset(($page - 1) * $pageSize)
             ->limit($pageSize)
             ->find_array();
@@ -1736,20 +1740,20 @@ class AdminController
 
         if (!empty($queries)) {
             $lastQuery = end($queries);
-            LogUtil::logAction(LogType::SQL, "AdminController", "listRoles", $lastQuery);
+            LogUtil::logAction(LogType::SQL, 'AdminController', 'listRoles', $lastQuery);
         }
 
         // Berechne die Gesamtseitenzahl
         $totalPages = ceil($totalRoles / $pageSize);
 
-        LogUtil::logAction(LogType::AUDIT, "AdminController", "listRoles", "SUCCESS: fetched list of roles.");
+        LogUtil::logAction(LogType::AUDIT, 'AdminController', 'listRoles', 'SUCCESS: fetched list of roles.');
 
         Flight::json([
-            "roles" => $roles,
-            "total" => $totalRoles,
-            "totalPages" => $totalPages,
-            "page" => $page,
-            "pageSize" => $pageSize,
+            'roles' => $roles,
+            'total' => $totalRoles,
+            'totalPages' => $totalPages,
+            'page' => $page,
+            'pageSize' => $pageSize,
         ]);
     }
 
@@ -1777,20 +1781,21 @@ class AdminController
 
             $roleName = $validated['roleName'];
 
-            ORM::configure("logging", true);
-            if (ORM::for_table("roles")->where("roleName", $roleName)->find_one()) {
+            ORM::configure('logging', true);
+            if (ORM::for_table('roles')->where('roleName', $roleName)->find_one()) {
                 // letzte query loggen
-                ORM::configure("logging", true);
+                ORM::configure('logging', true);
                 $queries = ORM::get_query_log();
                 if (!empty($queries)) {
                     $lastQuery = end($queries);
-                    LogUtil::logAction(LogType::SQL, "LogController", "listLogs", $lastQuery);
+                    LogUtil::logAction(LogType::SQL, 'LogController', 'listLogs', $lastQuery);
                 }
-                Flight::json(["success" => false, "message" => TranslationUtil::t("roles.error5")]);
+                Flight::json(['success' => false, 'message' => TranslationUtil::t('roles.error5')]);
+
                 return;
             }
 
-            $role = ORM::for_table("roles")->create();
+            $role = ORM::for_table('roles')->create();
             $role->roleName = $roleName;
             $role->save();
 
@@ -1798,30 +1803,32 @@ class AdminController
             $queries = ORM::get_query_log();
             if (!empty($queries)) {
                 $lastQuery = end($queries);
-                LogUtil::logAction(LogType::SQL, "LogController", "listLogs", $lastQuery);
+                LogUtil::logAction(LogType::SQL, 'LogController', 'listLogs', $lastQuery);
             }
 
             // log action
             LogUtil::logAction(
                 LogType::AUDIT,
-                "AdminController",
-                "addRole",
-                "SUCCESS: added role " . $roleName . ".",
-                SessionUtil::get("user")["username"]
+                'AdminController',
+                'addRole',
+                'SUCCESS: added role ' . $roleName . '.',
+                SessionUtil::get('user')['username']
             );
 
-            Flight::json(["success" => true, "message" => TranslationUtil::t('roles.error6'), "role" => $role->as_array()]);
+            Flight::json(['success' => true, 'message' => TranslationUtil::t('roles.error6'), 'role' => $role->as_array()]);
         } catch (InvalidArgumentException $e) {
             Flight::json([
-                "success" => false,
-                "message" => $e->getMessage()
+                'success' => false,
+                'message' => $e->getMessage(),
             ]);
+
             return;
         } catch (Exception $e) {
             Flight::json([
-                "success" => false,
-                "message" => $e->getMessage()
+                'success' => false,
+                'message' => $e->getMessage(),
             ]);
+
             return;
         }
     }
@@ -1845,31 +1852,33 @@ class AdminController
             try {
                 $rules['id'] = [
                     InputValidator::RULE_REQUIRED,
-                    InputValidator::RULE_NUMERIC
+                    InputValidator::RULE_NUMERIC,
                 ];
 
                 $validated = InputValidator::validateAndSanitize($rules, $_POST);
 
                 $roleId = (int) $validated['id'];
-                $role = ORM::for_table("roles")->find_one($roleId);
+                $role = ORM::for_table('roles')->find_one($roleId);
 
                 if (!$role) {
-                    Flight::json(["success" => false, "message" => "Role not found."]);
+                    Flight::json(['success' => false, 'message' => 'Role not found.']);
+
                     return;
                 }
-                ORM::configure("logging", true);
-                $usersWithRole = ORM::for_table("users")
-                    ->where("roles", $role->roleName)
+                ORM::configure('logging', true);
+                $usersWithRole = ORM::for_table('users')
+                    ->where('roles', $role->roleName)
                     ->count();
                 // letzte query loggen
-                ORM::configure("logging", true);
+                ORM::configure('logging', true);
                 $queries = ORM::get_query_log();
                 if (!empty($queries)) {
                     $lastQuery = end($queries);
-                    LogUtil::logAction(LogType::SQL, "LogController", "listLogs", $lastQuery);
+                    LogUtil::logAction(LogType::SQL, 'LogController', 'listLogs', $lastQuery);
                 }
                 if ($usersWithRole > 0) {
-                    Flight::json(["success" => false, "message" => "Cannot delete role. It is assigned to users."]);
+                    Flight::json(['success' => false, 'message' => 'Cannot delete role. It is assigned to users.']);
+
                     return;
                 }
 
@@ -1878,31 +1887,33 @@ class AdminController
                 $queries = ORM::get_query_log();
                 if (!empty($queries)) {
                     $lastQuery = end($queries);
-                    LogUtil::logAction(LogType::SQL, "LogController", "listLogs", $lastQuery);
+                    LogUtil::logAction(LogType::SQL, 'LogController', 'listLogs', $lastQuery);
                 }
 
                 // log action
                 LogUtil::logAction(
                     LogType::AUDIT,
-                    "AdminController",
-                    "deleteRole",
-                    "SUCCESS: deleted role " . $role->roleName . ".",
-                    SessionUtil::get("user")["username"]
+                    'AdminController',
+                    'deleteRole',
+                    'SUCCESS: deleted role ' . $role->roleName . '.',
+                    SessionUtil::get('user')['username']
                 );
 
-                Flight::json(["success" => true, "message" => "Role deleted successfully."]);
+                Flight::json(['success' => true, 'message' => 'Role deleted successfully.']);
             } catch (InvalidArgumentException $e) {
                 Flight::json([
-                    "success" => false,
-                    "message" => $e->getMessage()
+                    'success' => false,
+                    'message' => $e->getMessage(),
                 ]);
+
                 return;
             }
         } catch (Exception $e) {
             Flight::json([
-                "success" => false,
-                "message" => $e->getMessage()
+                'success' => false,
+                'message' => $e->getMessage(),
             ]);
+
             return;
         }
     }
@@ -1916,8 +1927,9 @@ class AdminController
      */
     public static function bulkUserOperations()
     {
-        if (SessionUtil::get("user")["id"] === null) {
-            Flight::json(["success" => false, "message" => "Unauthorized"]);
+        if (SessionUtil::get('user')['id'] === null) {
+            Flight::json(['success' => false, 'message' => 'Unauthorized']);
+
             return;
         }
 
@@ -1933,12 +1945,13 @@ class AdminController
         if (empty($userIds) || !is_array($userIds)) {
             LogUtil::logAction(
                 LogType::SYSTEM,
-                "AdminController",
-                "bulkUserOperations",
-                "No users selected - userIds: " . json_encode($userIds),
-                SessionUtil::get("user")["username"]
+                'AdminController',
+                'bulkUserOperations',
+                'No users selected - userIds: ' . json_encode($userIds),
+                SessionUtil::get('user')['username']
             );
-            Flight::json(["success" => false, "message" => "No users selected"]);
+            Flight::json(['success' => false, 'message' => 'No users selected']);
+
             return;
         }
 
@@ -1975,7 +1988,8 @@ class AdminController
                 break;
 
             default:
-                Flight::json(["success" => false, "message" => "Unknown operation: " . $operation]);
+                Flight::json(['success' => false, 'message' => 'Unknown operation: ' . $operation]);
+
                 return;
         }
 
@@ -1993,35 +2007,35 @@ class AdminController
         // Log bulk operation
         LogUtil::logAction(
             LogType::AUDIT,
-            "AdminController",
-            "bulkUserOperations",
+            'AdminController',
+            'bulkUserOperations',
             sprintf(
-                "BULK %s: %d success, %d failed, %d skipped",
+                'BULK %s: %d success, %d failed, %d skipped',
                 strtoupper($operation),
                 $success,
                 $failed,
                 $skipped
             ),
-            SessionUtil::get("user")["username"]
+            SessionUtil::get('user')['username']
         );
 
         Flight::json([
-            "success" => $success > 0,
-            "operation" => $operation,
-            "summary" => [
-                "total" => count($userIds),
-                "success" => $success,
-                "failed" => $failed,
-                "skipped" => $skipped
+            'success' => $success > 0,
+            'operation' => $operation,
+            'summary' => [
+                'total' => count($userIds),
+                'success' => $success,
+                'failed' => $failed,
+                'skipped' => $skipped,
             ],
-            "details" => $results,
-            "message" => sprintf(
-                "%s: %d successful, %d failed, %d skipped",
+            'details' => $results,
+            'message' => sprintf(
+                '%s: %d successful, %d failed, %d skipped',
                 ucfirst($operation),
                 $success,
                 $failed,
                 $skipped
-            )
+            ),
         ]);
     }
 
@@ -2031,7 +2045,7 @@ class AdminController
     private static function bulkDeleteUsers(array $userIds): array
     {
         $results = [];
-        $currentUser = SessionUtil::get("user");
+        $currentUser = SessionUtil::get('user');
 
         foreach ($userIds as $userId) {
             // Get user info first
@@ -2041,7 +2055,7 @@ class AdminController
                 $results[] = [
                     'userId' => $userId,
                     'status' => 'failed',
-                    'reason' => 'User not found'
+                    'reason' => 'User not found',
                 ];
                 continue;
             }
@@ -2052,7 +2066,7 @@ class AdminController
                     'userId' => $userId,
                     'username' => $user['username'],
                     'status' => 'skipped',
-                    'reason' => 'Cannot delete super.admin account'
+                    'reason' => 'Cannot delete super.admin account',
                 ];
                 continue;
             }
@@ -2063,7 +2077,7 @@ class AdminController
                     'userId' => $userId,
                     'username' => $user['username'],
                     'status' => 'skipped',
-                    'reason' => 'Cannot delete your own account'
+                    'reason' => 'Cannot delete your own account',
                 ];
                 continue;
             }
@@ -2076,14 +2090,14 @@ class AdminController
                     'userId' => $userId,
                     'username' => $user['username'],
                     'status' => 'success',
-                    'reason' => 'User deleted successfully'
+                    'reason' => 'User deleted successfully',
                 ];
             } else {
                 $results[] = [
                     'userId' => $userId,
                     'username' => $user['username'],
                     'status' => 'failed',
-                    'reason' => 'Database error during deletion'
+                    'reason' => 'Database error during deletion',
                 ];
             }
         }
@@ -2106,7 +2120,7 @@ class AdminController
                 $results[] = [
                     'userId' => $userId,
                     'status' => 'failed',
-                    'reason' => 'User not found'
+                    'reason' => 'User not found',
                 ];
                 continue;
             }
@@ -2117,7 +2131,7 @@ class AdminController
                     'userId' => $userId,
                     'username' => $user['username'],
                     'status' => 'skipped',
-                    'reason' => 'Cannot disable super.admin account'
+                    'reason' => 'Cannot disable super.admin account',
                 ];
                 continue;
             }
@@ -2128,7 +2142,7 @@ class AdminController
                     'userId' => $userId,
                     'username' => $user['username'],
                     'status' => 'skipped',
-                    'reason' => 'User already ' . ($status ? 'enabled' : 'disabled')
+                    'reason' => 'User already ' . ($status ? 'enabled' : 'disabled'),
                 ];
                 continue;
             }
@@ -2141,21 +2155,20 @@ class AdminController
                     'userId' => $userId,
                     'username' => $user['username'],
                     'status' => 'success',
-                    'reason' => 'User ' . $statusText . 'd successfully'
+                    'reason' => 'User ' . $statusText . 'd successfully',
                 ];
             } else {
                 $results[] = [
                     'userId' => $userId,
                     'username' => $user['username'],
                     'status' => 'failed',
-                    'reason' => 'Database error during ' . $statusText
+                    'reason' => 'Database error during ' . $statusText,
                 ];
             }
         }
 
         return $results;
     }
-
 
     /**
      * Bulk MFA enforcement
@@ -2172,7 +2185,7 @@ class AdminController
                 $results[] = [
                     'userId' => $userId,
                     'status' => 'failed',
-                    'reason' => 'User not found'
+                    'reason' => 'User not found',
                 ];
                 continue;
             }
@@ -2183,7 +2196,7 @@ class AdminController
                     'userId' => $userId,
                     'username' => $user['username'],
                     'status' => 'skipped',
-                    'reason' => 'Cannot enforce MFA for super.admin'
+                    'reason' => 'Cannot enforce MFA for super.admin',
                 ];
                 continue;
             }
@@ -2196,7 +2209,7 @@ class AdminController
                     'userId' => $userId,
                     'username' => $user['username'],
                     'status' => 'skipped',
-                    'reason' => 'MFA already ' . ($enforce ? 'enforced' : 'not enforced') . ' for user'
+                    'reason' => 'MFA already ' . ($enforce ? 'enforced' : 'not enforced') . ' for user',
                 ];
                 continue;
             }
@@ -2211,14 +2224,14 @@ class AdminController
                     'userId' => $userId,
                     'username' => $user['username'],
                     'status' => 'success',
-                    'reason' => 'MFA ' . $action . 'ment updated successfully'
+                    'reason' => 'MFA ' . $action . 'ment updated successfully',
                 ];
             } else {
                 $results[] = [
                     'userId' => $userId,
                     'username' => $user['username'],
                     'status' => 'failed',
-                    'reason' => 'Database error during MFA ' . $action . 'ment'
+                    'reason' => 'Database error during MFA ' . $action . 'ment',
                 ];
             }
         }
@@ -2231,8 +2244,9 @@ class AdminController
      */
     public static function exportUsers()
     {
-        if (SessionUtil::get("user")["id"] === null) {
-            Flight::json(["success" => false, "message" => "Unauthorized"]);
+        if (SessionUtil::get('user')['id'] === null) {
+            Flight::json(['success' => false, 'message' => 'Unauthorized']);
+
             return;
         }
 
@@ -2251,7 +2265,7 @@ class AdminController
         if ($format === 'csv') {
             self::exportUsersCSV($users);
         } else {
-            Flight::json(["success" => false, "message" => "Unsupported format"]);
+            Flight::json(['success' => false, 'message' => 'Unsupported format']);
         }
     }
 
@@ -2281,7 +2295,7 @@ class AdminController
             'MFA Enforced',
             'LDAP Enabled',
             'Created',
-            'Last Login'
+            'Last Login',
         ]);
 
         // User data
@@ -2298,7 +2312,7 @@ class AdminController
                 $user['mfaEnforced'] ? 'Yes' : 'No',
                 $user['ldapEnabled'] ? 'Yes' : 'No',
                 $user['created'] ?? '',
-                $user['lastLogin'] ?? ''
+                $user['lastLogin'] ?? '',
             ]);
         }
 
@@ -2307,10 +2321,10 @@ class AdminController
         // Log export
         LogUtil::logAction(
             LogType::AUDIT,
-            "AdminController",
-            "exportUsers",
-            "SUCCESS: exported " . count($users) . " users to CSV",
-            SessionUtil::get("user")["username"]
+            'AdminController',
+            'exportUsers',
+            'SUCCESS: exported ' . count($users) . ' users to CSV',
+            SessionUtil::get('user')['username']
         );
 
         exit;

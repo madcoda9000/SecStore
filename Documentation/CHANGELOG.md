@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.3.2] - 2025-10-03
 ### ✨ Added
+- **implemented ip-whitelist feature**
 - **Implemented 2fa Backup codes**
 - **Implemented Register verification with token**
 - **Implemented Git-Hooks**
