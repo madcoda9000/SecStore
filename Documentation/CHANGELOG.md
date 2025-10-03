@@ -17,10 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### ✨ Added
 - **Implemented 2fa Backup codes**
 - **Implemented Register verification with token**
-- **Implemented 2fa Backup codes**
-- **Implemented 2fa Backup Codes**
-- **Implemented Register verification with token**
-- **Implemented Git-Hooks with automatic CHANGELOG management**
+- **Implemented Git-Hooks**
 - **Docker support with complete containerization**
 - **Dockerfile for PHP 8.3** with all required extensions
 - **docker-compose.yml** with MySQL 8.0 and phpMyAdmin
