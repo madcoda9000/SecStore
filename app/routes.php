@@ -11,6 +11,7 @@ use App\Middleware\AdminCheckMiddleware;
 use App\Middleware\AuthCheckMiddleware;
 use App\Middleware\CsrfMiddleware;
 use App\Middleware\RateLimiter;
+use App\Middleware\IpWhitelistMiddleware;
 use App\Utils\LogType;
 use App\Utils\LogUtil;
 use App\Utils\SecurityMetrics;
@@ -79,17 +80,22 @@ function secureRoute(string $pattern, callable $handler, string $limitType = 'gl
         // 2. Request Logging
         LogUtil::logAction(LogType::REQUEST, 'routes.php', 'secureRoute', $_SERVER['REQUEST_METHOD'] . ': ' . $_SERVER['REQUEST_URI']);
 
-        // 3. Authentication Check
+        // 3. IP Whitelist Check (only for admin routes)
+        if ($requireAdmin) {
+            IpWhitelistMiddleware::checkIpWhitelist();
+        }
+
+        // 4. Authentication Check
         if ($requireAuth) {
             AuthCheckMiddleware::checkIfAuthenticated();
         }
 
-        // 4. Admin Check
+        // 5. Admin Check
         if ($requireAdmin) {
             AdminCheckMiddleware::checkForAdminRole();
         }
 
-        // 5. Handler ausführen
+        // 6. Handler ausführen
         return $handler(...$params);
     });
 }
@@ -305,6 +311,10 @@ secureRoute('GET /admin/settings', function () {
 }, 'admin', true);
 
 // Admin Settings Updates
+securePostRoute('/admin/updateSecuritySettings', function () {
+    (new AdminController())->updateSecuritySettings(Flight::request()->data);
+}, 'admin', true);
+
 securePostRoute('/admin/updateLogSettings', function () {
     (new AdminController())->updateLogSettings(Flight::request()->data);
 }, 'admin', true);

@@ -26,8 +26,9 @@
 
 ### 🛡️ **Security first**
 - **Zero-Trust architecture** with session fingerprinting
-- **2FA support** (TOTP) with QR code setup
+- **2FA support** (TOTP) with QR code setup and backup codes
 - **Advanced rate limiting** with intelligent scopes
+- **IP-Whitelisting** with admin  interface
 - **Security dashboard** Login Ananlytics, Security Events, 
 
 </td>
@@ -36,6 +37,7 @@
 ### ⚡ **Developer Experience**
 - **One-click installation** with automatic setup script
 - **PSR-12 compliant** with code quality tools
+- **GitHub Hooks** with automatic CHANGELOG.md update
 - **Modern PHP 8.3+** with type declarations
 - **Latte templates** for clean, secure views
 

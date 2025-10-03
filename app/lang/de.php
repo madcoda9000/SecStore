@@ -527,4 +527,27 @@ Wenn Sie LDAP für diesen Benutzer aktivieren, generieren Sie einfach ein belieb
     'verify.reason1' => 'Der Verifizierungslink ist bereits älter als 24 Stunden',
     'verify.reason2' => 'Der Link wurde bereits verwendet',
     'verify.reason3' => 'Der Link ist ungültig oder wurde manipuliert',
+
+    // Security IP Whitelist
+    'security.ip_whitelist.title' => 'IP-Whitelist Einstellungen',
+    'security.ip_whitelist.enable' => 'IP-Whitelist aktivieren',
+    'security.ip_whitelist.enable_help' => 'Beschränkt den Zugriff auf den Admin-Bereich auf angegebene IP-Adressen',
+    'security.ip_whitelist.addresses' => 'Erlaubte IP-Adressen',
+    'security.ip_whitelist.addresses_help' => 'Eine IP-Adresse oder CIDR-Bereich pro Zeile eingeben (z.B. 192.168.1.100 oder 10.0.0.0/24)',
+    'security.ip_whitelist.current_ip' => 'Ihre aktuelle IP',
+    'security.ip_whitelist.current_ip_help' => 'Stellen Sie sicher, dass Sie Ihre aktuelle IP zur Whitelist hinzufügen, bevor Sie die Funktion aktivieren!',
+    'security.ip_whitelist.submit' => 'Sicherheitseinstellungen speichern',
+    'security.ip_whitelist.warning' => 'Warnung: Das Aktivieren der IP-Whitelist ohne Ihre aktuelle IP sperrt Sie aus!',
+    'security.ip_whitelist.placeholder' => '192.168.1.100\n10.0.0.0/24\n172.16.0.0/16',
+
+    // Error messages for access denied page
+    'security.ip_whitelist.access_denied' => 'Zugriff verweigert',
+    'security.ip_whitelist.ip_not_allowed' => 'Ihre IP-Adresse ist nicht berechtigt, auf diesen Bereich zuzugreifen.',
+    'security.ip_whitelist.your_ip' => 'Ihre IP-Adresse',
+    'security.ip_whitelist.contact_admin' => 'Bitte kontaktieren Sie Ihren Systemadministrator, wenn Sie glauben, dass dies ein Fehler ist.',
+
+    // Success/Error messages  
+    'security.ip_whitelist.success' => 'Sicherheitseinstellungen erfolgreich gespeichert',
+    'security.ip_whitelist.error_invalid_ip' => 'Ungültige IP-Adresse oder CIDR-Notation: {0}',
+    'security.ip_whitelist.error_save' => 'Fehler beim Speichern der Sicherheitseinstellungen',
 ];

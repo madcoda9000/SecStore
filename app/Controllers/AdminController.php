@@ -236,6 +236,23 @@ class AdminController
     }
 
     /**
+     * Method to fetch client ip address
+     */
+    public function getClientIp() {
+         // Get client IP address
+        $clientIp = $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0';
+
+        // Check for proxy headers
+        if (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+            $ips = explode(',', $_SERVER['HTTP_X_FORWARDED_FOR']);
+            $clientIp = trim($ips[0]);
+        } elseif (!empty($_SERVER['HTTP_CLIENT_IP'])) {
+            $clientIp = $_SERVER['HTTP_CLIENT_IP'];
+        }
+        return $clientIp;
+    }
+
+    /**
      * Settings page methods
      */
 
@@ -254,7 +271,11 @@ class AdminController
         if (SessionUtil::get("user")["id"] === null) {
             Flight::redirect("/login");
         }
+
+        $configFile = "../config.php";
+        $config = include $configFile;
         $user = User::findUserById(SessionUtil::get("user")["id"]);
+
         if ($user !== false) {
             $roles = explode(",", $user->roles);
             if (in_array("Admin", $roles)) {
@@ -267,6 +288,8 @@ class AdminController
                     "application" => $config["application"],
                     "logging" => $config["logging"],
                     "ldap" => $config["ldapSettings"],
+                    "clientIp" => $this->getClientIp(),
+                    "security" => $config["security"],
                     "title" => "Settings",
                     "user" => $user,
                     "sessionTimeout" => SessionUtil::getRemainingTime(),
@@ -279,6 +302,169 @@ class AdminController
         } else {
             Flight::redirect("/login");
         }
+    }
+
+
+    /**
+     * Updates the security settings (IP Whitelist).
+     *
+     * This method checks if the user is logged in and has the necessary
+     * privileges. If so, it updates the security settings based on the
+     * provided form data. The method reads the existing configuration file,
+     * modifies the security settings, and writes the updated configuration
+     * back to the file. If successful, it renders the settings page with a
+     * success message. If the user is not authenticated, it redirects to the
+     * login page.
+     *
+     * @param array $formData An associative array containing the new security
+     * settings, with keys: 'enableIpWhitelist' and 'adminIpWhitelist'.
+     * @throws Exception If the configuration file cannot be read or updated.
+     */
+    public function updateSecuritySettings($formData)
+    {
+        if (SessionUtil::get("user")["id"] === null) {
+            Flight::redirect("/login");
+        }
+
+        $user = User::findUserById(SessionUtil::get("user")["id"]);
+        if ($user !== false) {
+            // Parse IP whitelist from textarea (one IP per line)
+            $ipWhitelistRaw = $formData["adminIpWhitelist"] ?? "";
+            $ipWhitelistArray = array_filter(
+                array_map('trim', explode("\n", $ipWhitelistRaw)),
+                function ($ip) {
+                    return !empty($ip);
+                }
+            );
+
+            // Validate each IP/CIDR entry
+            foreach ($ipWhitelistArray as $entry) {
+                if (!self::validateIpOrCidr($entry)) {
+                    $configFile = "../config.php";
+                    $config = include $configFile;
+                    Flight::latte()->render("admin/settings.latte", [
+                        "error" => str_replace(
+                            '{0}',
+                            $entry,
+                            TranslationUtil::t("security.ip_whitelist.error_invalid_ip")
+                        ),
+                        "mail" => $config["mail"] ?? [],
+                        "bruteForceSettings" => $config["bruteForceSettings"] ?? [],
+                        "application" => $config["application"] ?? [],
+                        "logging" => $config["logging"] ?? [],
+                        "ldap" => $config["ldapSettings"] ?? [],
+                        "security" => $config["security"] ?? [],
+                        "clientIp" => $this->getClientIp(),
+                        "title" => "Settings",
+                        "user" => $user,
+                        "sessionTimeout" => SessionUtil::getRemainingTime(),
+                        "configWritable" => is_writable("../config.php"),
+                    ]);
+                    return;
+                }
+            }            
+
+            // Read old configuration
+            $configFile = "../config.php";
+            $isWritable = is_writable($configFile);
+            $config = include $configFile;
+
+            // create new config
+            $newConfig = [
+                // dont modify the key!!
+                "key" => $config['security']['key'],
+                "enableIpWhitelist" => isset($formData["enableIpWhitelist"]),
+                "adminIpWhitelist" => $ipWhitelistArray,
+            ];
+
+            // Load file as text
+            $configContent = file_get_contents($configFile);
+            if ($configContent === false) {
+                throw new Exception(TranslationUtil::t("error2"));
+            }
+
+            // Find and replace current $security array
+            $pattern = '/(\$security\s*=\s*\[)(.*?)(\];)/s';
+
+            // New security array as formatted PHP code
+            $newSecurityArray = var_export($newConfig, true);
+            $newSecurityArray = preg_replace("/^array \(/", "[", $newSecurityArray);
+            $newSecurityArray = preg_replace('/\)$/', "]", $newSecurityArray);
+            $newSecurityArray = preg_replace('/=> \n\s+/', "=> ", $newSecurityArray);
+            $newSecurityArray = preg_replace('/\d+ => /', "", $newSecurityArray); // Remove numeric keys
+
+            // Build new security block
+            $replacement = '$security = ' . $newSecurityArray . ";";
+
+            // Generate new config code
+            $newConfigContent = preg_replace($pattern, $replacement, $configContent);
+
+            if ($newConfigContent === null) {
+                throw new Exception(TranslationUtil::t("error3"));
+            }
+
+            // Save file with new content
+            file_put_contents($configFile, $newConfigContent);
+
+            // Reload new config
+            $savedconfig = include $configFile;
+
+            // Log action
+            LogUtil::logAction(
+                LogType::AUDIT,
+                "AdminController",
+                "updateSecuritySettings",
+                "SUCCESS: saved Security settings.",
+                $user->username
+            );
+
+            // Render template with success message
+            Flight::latte()->render("admin/settings.latte", [
+                "success" => TranslationUtil::t("security.ip_whitelist.success"),
+                "mail" => $savedconfig["mail"],
+                "bruteForceSettings" => $savedconfig["bruteForceSettings"],
+                "application" => $savedconfig["application"],
+                "logging" => $savedconfig["logging"],
+                "ldap" => $savedconfig["ldapSettings"],
+                "clientIp" => $this->getClientIp(),
+                "security" => $savedconfig["security"],
+                "title" => "Settings",
+                "user" => $user,
+                "sessionTimeout" => SessionUtil::getRemainingTime(),
+                "configWritable" => $isWritable,
+            ]);
+        } else {
+            Flight::redirect("/login");
+        }
+    }
+
+    /**
+     * Validates an IP address or CIDR notation.
+     *
+     * @param string $entry The IP address or CIDR range to validate
+     * @return bool True if valid, false otherwise
+     */
+    private static function validateIpOrCidr(string $entry): bool
+    {
+        // Check if it's a CIDR notation
+        if (strpos($entry, '/') !== false) {
+            list($ip, $mask) = explode('/', $entry);
+
+            // Validate IP part
+            if (!filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
+                return false;
+            }
+
+            // Validate mask (must be 0-32)
+            if (!is_numeric($mask) || $mask < 0 || $mask > 32) {
+                return false;
+            }
+
+            return true;
+        }
+
+        // Single IP address
+        return filter_var($entry, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) !== false;
     }
 
 
@@ -332,6 +518,8 @@ class AdminController
                         "application" => $config["application"],
                         "logging" => $config["logging"],
                         "ldap" => $config["ldapSettings"],
+                        "clientIp" => $this->getClientIp(),
+                        "security" => $config["security"],
                         "title" => "Settings",
                         "user" => $user,
                         "sessionTimeout" => SessionUtil::getRemainingTime(),
@@ -352,6 +540,8 @@ class AdminController
                     "application" => $config["application"],
                     "logging" => $config["logging"],
                     "ldap" => $config["ldapSettings"],
+                    "security" => $config["security"],
+                    "clientIp" => $this->getClientIp(),
                     "title" => "Settings",
                     "user" => $user,
                     "sessionTimeout" => SessionUtil::getRemainingTime(),
@@ -413,6 +603,8 @@ class AdminController
                 "application" => $savedconfig["application"],
                 "logging" => $savedconfig["logging"],
                 "ldap" => $savedconfig["ldapSettings"],
+                "clientIp" => $this->getClientIp(),
+                "security" => $savedconfig["security"],
                 "title" => "Settings",
                 "user" => $user,
                 "sessionTimeout" => SessionUtil::getRemainingTime(),
@@ -506,6 +698,8 @@ class AdminController
                 "application" => $savedconfig["application"],
                 "logging" => $savedconfig["logging"],
                 "ldap" => $savedconfig["ldapSettings"],
+                "security" => $savedconfig["security"],
+                "clientIp" => $this->getClientIp(),
                 "title" => "Settings",
                 "user" => $user,
                 "sessionTimeout" => SessionUtil::getRemainingTime(),
@@ -602,6 +796,8 @@ class AdminController
                 "application" => $savedconfig["application"],
                 "logging" => $savedconfig["logging"],
                 "ldap" => $savedconfig["ldapSettings"],
+                "security" => $savedconfig["security"],
+                "clientIp" => $this->getClientIp(),
                 "title" => "Settings",
                 "user" => $user,
                 "sessionTimeout" => SessionUtil::getRemainingTime(),
@@ -688,6 +884,8 @@ class AdminController
                 "application" => $savedconfig["application"],
                 "logging" => $savedconfig["logging"],
                 "ldap" => $savedconfig["ldapSettings"],
+                "security" => $savedconfig["security"],
+                "clientIp" => $this->getClientIp(),
                 "title" => "Settings",
                 "user" => $user,
                 "sessionTimeout" => SessionUtil::getRemainingTime(),
@@ -778,6 +976,8 @@ class AdminController
                 "application" => $savedconfig["application"],
                 "logging" => $savedconfig["logging"],
                 "ldap" => $savedconfig["ldapSettings"],
+                "clientIp" => $this->getClientIp(),
+                "security" => $savedconfig["security"],
                 "title" => "Settings",
                 "user" => $user,
                 "sessionTimeout" => SessionUtil::getRemainingTime(),

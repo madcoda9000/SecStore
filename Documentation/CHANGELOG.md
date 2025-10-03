@@ -28,6 +28,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 
 ### 🐛 Fixed
+- **prevent account enumeration**
 - **avoid LDAP injection and added LDAP Security Tset**
 - **implemented prepareCommitMsg.sh**
 - **changelog**

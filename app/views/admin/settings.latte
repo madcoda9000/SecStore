@@ -248,6 +248,64 @@
                 </div>
                 </div>
             </div>
+            <div class="accordion-item">
+    <h2 class="accordion-header">
+        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSix" aria-expanded="false" aria-controls="collapseSix">
+            <i class="bi-shield-lock-fill" style="margin-right:10px;"></i>{trans('security.ip_whitelist.title')}
+        </button>
+    </h2>
+    <div id="collapseSix" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
+        <div class="accordion-body">
+            <form id="securityForm" method="post" action="/admin/updateSecuritySettings" style="padding:10px;">
+                
+                {if $security['enableIpWhitelist'] ?? false}
+                    <div class="alert alert-warning" role="alert">
+                        <i class="bi-exclamation-triangle-fill"></i> {trans('security.ip_whitelist.warning')}
+                    </div>
+                {/if}
+
+                <div class="form-check mb-3">
+                    <input class="form-check-input" type="checkbox" name="enableIpWhitelist" id="enableIpWhitelist" n:attr="checked: $security['enableIpWhitelist'] ?? false">
+                    <label for="enableIpWhitelist" class="form-check-label">
+                        {trans('security.ip_whitelist.enable')}
+                    </label>
+                    <div class="form-text">{trans('security.ip_whitelist.enable_help')}</div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="currentIp" class="form-label">{trans('security.ip_whitelist.current_ip')}:</label>
+                    <input type="text" class="form-control" id="currentIp" value="{$clientIp}" readonly>
+                    <div class="form-text text-danger">
+                        <i class="bi-exclamation-circle-fill"></i> {trans('security.ip_whitelist.current_ip_help')}
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="adminIpWhitelist" class="form-label">{trans('security.ip_whitelist.addresses')}:</label>
+                    <textarea 
+                        class="form-control font-monospace" 
+                        name="adminIpWhitelist" 
+                        id="adminIpWhitelist" 
+                        rows="8" 
+                        style="font-size: 0.9rem;"
+                        placeholder="{trans('security.ip_whitelist.placeholder')}"
+                    >{implode("\n", $security['adminIpWhitelist'] ?? [])}</textarea>
+                    <div class="form-text">{trans('security.ip_whitelist.addresses_help')}</div>
+                </div>
+
+                <div class="mb-3" style="display:none;">
+                    <label for="securityKey" class="form-label">Security Key:</label>
+                    <input type="text" class="form-control" name="securityKey" id="securityKey" value="{$security['key'] ?? 'ENTER_YOUR_SECRET_KEY_HERE'}" readonly>
+                </div>
+
+                <input type="hidden" name="csrf_token" value="{$_SESSION['csrf_token']}">
+                <button class="btn btn-primary w-100 mt-2" type="submit">
+                    {trans('security.ip_whitelist.submit')}
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
         </div>    
     </div>
 <script src="/js/admin/settings.latte-min.js"></script>

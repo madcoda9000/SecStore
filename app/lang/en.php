@@ -530,5 +530,27 @@ return [
     'verify.reason1' => 'The verification link is older than 24 hours',
     'verify.reason2' => 'The link has already been used',
     'verify.reason3' => 'The link is invalid or has been tampered with',
-    
+
+    // Security IP Whitelist
+    'security.ip_whitelist.title' => 'IP Whitelist Settings',
+    'security.ip_whitelist.enable' => 'Enable IP Whitelist',
+    'security.ip_whitelist.enable_help' => 'Restricts admin area access to specified IP addresses',
+    'security.ip_whitelist.addresses' => 'Allowed IP Addresses',
+    'security.ip_whitelist.addresses_help' => 'Enter one IP address or CIDR range per line (e.g., 192.168.1.100 or 10.0.0.0/24)',
+    'security.ip_whitelist.current_ip' => 'Your Current IP',
+    'security.ip_whitelist.current_ip_help' => 'Make sure to add your current IP to the whitelist before enabling!',
+    'security.ip_whitelist.submit' => 'Save Security Settings',
+    'security.ip_whitelist.warning' => 'Warning: Enabling IP whitelist without adding your current IP will lock you out!',
+    'security.ip_whitelist.placeholder' => '192.168.1.100\n10.0.0.0/24\n172.16.0.0/16',
+
+    // Error messages for access denied page
+    'security.ip_whitelist.access_denied' => 'Access Denied',
+    'security.ip_whitelist.ip_not_allowed' => 'Your IP address is not authorized to access this area.',
+    'security.ip_whitelist.your_ip' => 'Your IP Address',
+    'security.ip_whitelist.contact_admin' => 'Please contact your system administrator if you believe this is an error.',
+
+    // Success/Error messages
+    'security.ip_whitelist.success' => 'Security settings saved successfully',
+    'security.ip_whitelist.error_invalid_ip' => 'Invalid IP address or CIDR notation: {0}',
+    'security.ip_whitelist.error_save' => 'Failed to save security settings',
 ];
