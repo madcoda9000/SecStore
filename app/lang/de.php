@@ -546,8 +546,13 @@ Wenn Sie LDAP für diesen Benutzer aktivieren, generieren Sie einfach ein belieb
     'security.ip_whitelist.your_ip' => 'Ihre IP-Adresse',
     'security.ip_whitelist.contact_admin' => 'Bitte kontaktieren Sie Ihren Systemadministrator, wenn Sie glauben, dass dies ein Fehler ist.',
 
-    // Success/Error messages  
+    // Success/Error messages
     'security.ip_whitelist.success' => 'Sicherheitseinstellungen erfolgreich gespeichert',
     'security.ip_whitelist.error_invalid_ip' => 'Ungültige IP-Adresse oder CIDR-Notation: {0}',
     'security.ip_whitelist.error_save' => 'Fehler beim Speichern der Sicherheitseinstellungen',
+
+    // logs export
+    'logs.export.btn' => 'Als CSV exportieren',
+    'logs.export.all' => 'Alle Logs exportieren',
+    'logs.export.filtered' => 'Gefilterte Logs exportieren',
 ];

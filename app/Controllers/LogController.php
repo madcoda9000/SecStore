@@ -6,15 +6,14 @@ use App\Utils\LogType;
 use App\Utils\LogUtil;
 use App\Utils\SessionUtil;
 use App\Utils\TranslationUtil;
-use ORM;
 use Flight;
+use ORM;
 
 /**
  * Class Name: LogController
  *
  * Controller Klasse für Log Methoden im Admin Kontext
  *
- * @package App\Controllers
  * @author Sascha Heimann
  * @version 1.0
  * @since 2025-02-24
@@ -26,18 +25,123 @@ class LogController
 {
 
     /**
+     * Export logs to CSV format
+     *
+     * @return void
+     */
+    public static function exportLogs()
+    {
+        if (SessionUtil::get('user')['id'] === null) {
+            Flight::json(['success' => false, 'message' => 'Unauthorized']);
+            return;
+        }
+
+        $logType = $_GET['type'] ?? 'AUDIT';
+        $search = $_GET['search'] ?? '';
+
+        // Get all logs for export (without pagination)
+        $logs = self::getLogsForExport($logType, $search);
+
+        self::exportLogsCSV($logs, $logType);
+    }
+
+    /**
+     * Get logs for export without pagination
+     *
+     * @param string $logType The type of log to retrieve
+     * @param string $search Optional search query
+     * @return array Array of log entries
+     */
+    private static function getLogsForExport($logType, $search)
+    {
+        ORM::configure('logging', true);
+
+        $query = ORM::for_table('logs')
+            ->where('type', $logType);
+
+        if (!empty($search)) {
+            $query->where_raw('(user LIKE ? OR context LIKE ? OR message LIKE ?)', [
+                "%$search%",
+                "%$search%",
+                "%$search%"
+            ]);
+        }
+
+        $logs = $query
+            ->order_by_desc('id')
+            ->find_array();
+
+        return $logs;
+    }
+
+    /**
+     * Export logs as CSV
+     *
+     * @param array $logs Array of log entries
+     * @param string $logType Type of logs being exported
+     * @return void
+     */
+    private static function exportLogsCSV(array $logs, string $logType)
+    {
+        $filename = strtolower($logType) . '_logs_export_' . date('Y-m-d_H-i-s') . '.csv';
+
+        header('Content-Type: text/csv; charset=utf-8');
+        header('Content-Disposition: attachment; filename="' . $filename . '"');
+        header('Cache-Control: no-cache, must-revalidate');
+
+        $output = fopen('php://output', 'w');
+
+        // BOM für korrekte UTF-8 Darstellung in Excel
+        fprintf($output, chr(0xEF) . chr(0xBB) . chr(0xBF));
+
+        // CSV Header
+        fputcsv($output, [
+            'ID',
+            'Type',
+            'Date/Time',
+            'User',
+            'Context',
+            'Message'
+        ]);
+
+        // Log data
+        foreach ($logs as $log) {
+            fputcsv($output, [
+                $log['id'],
+                $log['type'],
+                $log['datum_zeit'],
+                $log['user'] ?? 'System',
+                $log['context'],
+                $log['message']
+            ]);
+        }
+
+        fclose($output);
+
+        // Log export action
+        LogUtil::logAction(
+            LogType::AUDIT,
+            'LogController',
+            'exportLogs',
+            'SUCCESS: exported ' . count($logs) . ' ' . $logType . ' logs to CSV',
+            SessionUtil::get('user')['username']
+        );
+
+        exit;
+    }
+
+    /**
      * Renders the audit logs view.
      *
      * This function uses the Latte templating engine to render the 'admin/logsAudit.latte' view.
      * It provides the view with the title 'Audit Logs', the current user session, and the remaining session timeout.
      */
-
     public static function showAuditLogs()
     {
         Flight::latte()->render('admin/logsAudit.latte', [
             'title' => TranslationUtil::t('logs.audit.title'),
             'user' => SessionUtil::get('user'),
-            'sessionTimeout' => SessionUtil::getRemainingTime()
+            'sessionTimeout' => SessionUtil::getRemainingTime(),
         ]);
     }
 
@@ -65,13 +169,12 @@ class LogController
      * This function utilizes the Latte templating engine to render the 'admin/logsSystem.latte' view.
      * It provides the view with the title 'System Logs', the current user session, and the remaining session timeout.
      */
-
     public static function showSystemLogs()
     {
         Flight::latte()->render('admin/logsSystem.latte', [
             'title' => TranslationUtil::t('logs.audit.system'),
             'user' => SessionUtil::get('user'),
-            'sessionTimeout' => SessionUtil::getRemainingTime()
+            'sessionTimeout' => SessionUtil::getRemainingTime(),
         ]);
     }
 
@@ -104,7 +207,7 @@ class LogController
         Flight::latte()->render('admin/logsSecurity.latte', [
             'title' => TranslationUtil::t('logs.audit.system'),
             'user' => SessionUtil::get('user'),
-            'sessionTimeout' => SessionUtil::getRemainingTime()
+            'sessionTimeout' => SessionUtil::getRemainingTime(),
         ]);
     }
 
@@ -126,7 +229,6 @@ class LogController
         self::listLogs('SECURITY', $search, $page, $pageSize);
     }
 
-
     /**
      * Renders the request logs view.
      *
@@ -138,7 +240,7 @@ class LogController
         Flight::latte()->render('admin/logsRequest.latte', [
             'title' => TranslationUtil::t('logs.audit.request'),
             'user' => SessionUtil::get('user'),
-            'sessionTimeout' => SessionUtil::getRemainingTime()
+            'sessionTimeout' => SessionUtil::getRemainingTime(),
         ]);
     }
 
@@ -171,7 +273,7 @@ class LogController
         Flight::latte()->render('admin/logsDb.latte', [
             'title' => TranslationUtil::t('logs.audit.database'),
             'user' => SessionUtil::get('user'),
-            'sessionTimeout' => SessionUtil::getRemainingTime()
+            'sessionTimeout' => SessionUtil::getRemainingTime(),
         ]);
     }
 
@@ -199,13 +301,12 @@ class LogController
      * This function uses the Latte templating engine to render the 'admin/logsMail.latte' view.
      * It provides the view with the title 'Mail Logs', the current user session, and the remaining session timeout.
      */
-
     public static function showMailLogs()
     {
         Flight::latte()->render('admin/logsMail.latte', [
             'title' => TranslationUtil::t('logs.audit.mail'),
             'user' => SessionUtil::get('user'),
-            'sessionTimeout' => SessionUtil::getRemainingTime()
+            'sessionTimeout' => SessionUtil::getRemainingTime(),
         ]);
     }
 
@@ -238,7 +339,7 @@ class LogController
         Flight::latte()->render('admin/logsError.latte', [
             'title' => TranslationUtil::t('logs.audit.error'),
             'user' => SessionUtil::get('user'),
-            'sessionTimeout' => SessionUtil::getRemainingTime()
+            'sessionTimeout' => SessionUtil::getRemainingTime(),
         ]);
     }
 
@@ -277,25 +378,27 @@ class LogController
         // Basis-Query erstellen
         $query = ORM::for_table('logs')
             ->where('type', $logType);
-    
+
         // Falls ein Suchbegriff vorhanden ist, in den Spalten user, context und message suchen
         if (!empty($search)) {
             $query->where_raw('(user LIKE ? OR context LIKE ? OR message LIKE ?)', [
-                "%$search%", "%$search%", "%$search%"
+                "%$search%",
+                "%$search%",
+                "%$search%",
             ]);
         }
-    
+
         // Gesamtanzahl der passenden Logs ermitteln
         $totalLogs = clone $query; // Klonen, um die Zählung nicht zu beeinflussen
         $totalLogs = $totalLogs->count();
-    
+
         // Sortierung nach ID aufsteigend hinzufügen, dann Pagination anwenden
         $logs = $query
             ->order_by_desc('id')
             ->offset(($page - 1) * $pageSize)
             ->limit($pageSize)
             ->find_array();
-    
+
         // letzte query loggen
         $queries = ORM::get_query_log();
         if (!empty($queries)) {
@@ -307,14 +410,14 @@ class LogController
         $totalPages = ceil($totalLogs / $pageSize);
 
         LogUtil::logAction(LogType::AUDIT, 'LogController', 'listLogs', 'SUCCESS: fetched ' . $logType . ' logs.');
-    
+
         // JSON-Antwort zurückgeben
         Flight::json([
             'logs' => $logs,
             'total' => $totalLogs,
             'totalPages' => $totalPages,
             'page' => $page,
-            'pageSize' => $pageSize
+            'pageSize' => $pageSize,
         ]);
     }
 }

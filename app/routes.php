@@ -16,7 +16,6 @@ use App\Utils\LogType;
 use App\Utils\LogUtil;
 use App\Utils\SecurityMetrics;
 
-
 // Globale Variable aus index.php verfügbar machen
 global $needsSetup;
 
@@ -481,6 +480,11 @@ foreach ($fetchLogRoutes as $route => $method) {
         (new LogController())->$method();
     }, 'admin', true);
 }
+
+// Log Export Route
+secureRoute('GET /admin/logs/export', function () {
+    (new LogController())->exportLogs();
+}, 'admin', true);
 
 // ==========================================
 // UTILITY ROUTES

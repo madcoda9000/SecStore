@@ -5,8 +5,13 @@
 <link rel="stylesheet" href="/css/mobile-logs.css">
 
 <div class="container py-4" style="flex:1">
-    <h1 class="mb-5"><span class="bi bi-database-fill">&nbsp;</span>{trans('logs.database.title')}</h1>
-    <div class="d-flex justify-content-between mb-3">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="mb-0"><span class="bi bi-database-fill">&nbsp;</span>{trans('logs.database.title')}</h1>
+        <button type="button" class="btn btn-success" id="exportLogsBtn">
+            <span class="bi bi-download"></span>&nbsp;{trans('logs.export.btn')}
+        </button>
+    </div>
+        <div class="d-flex justify-content-between mb-3">
         <div>
             <label for="pageSize" class="me-2 desktop-pager-label">{trans('pager.pageSize')}:</label>
             <select id="pageSize" class="form-select d-inline w-auto">
@@ -64,11 +69,12 @@
 
 <!-- Data-Attribute für Config -->
 <div id="log-config" 
-     data-type="error"
+     data-type="sql"
      data-fetch-url="/admin/logs/fetchDblogs"
      data-auto-fetch="true"
      style="display:none;"></div>
 
 <!-- Externe Scripts -->
 <script src="/js/utils/logs-universal.js"></script>
+<script src="/js/utils/logs-export-min.js"></script>
 {/block}

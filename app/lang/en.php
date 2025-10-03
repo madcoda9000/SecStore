@@ -553,4 +553,9 @@ return [
     'security.ip_whitelist.success' => 'Security settings saved successfully',
     'security.ip_whitelist.error_invalid_ip' => 'Invalid IP address or CIDR notation: {0}',
     'security.ip_whitelist.error_save' => 'Failed to save security settings',
+
+    // logs export
+    'logs.export.btn' => 'Export as CSV',
+    'logs.export.all' => 'Export all logs',
+    'logs.export.filtered' => 'Export filtered logs',
 ];
