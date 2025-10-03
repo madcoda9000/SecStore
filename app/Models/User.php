@@ -104,7 +104,6 @@ class User extends ORM
     {
         $backupCodesJson = self::getBackupCodes($userId);
         return BackupCodeUtil::countRemainingCodes($backupCodesJson);
-        
     }
 
     /**
@@ -231,27 +230,38 @@ class User extends ORM
      */
     public static function createUser($username, $email, $firstname, $lastname, $status, $password, $roles, $ldapEnabled = 0)
     {
-        ORM::configure('logging', true);
-        $user = ORM::for_table(self::$tableName)->create();
-        $user->username = $username;
-        $user->email = $email;
-        $user->firstname = $firstname;
-        $user->lastname = $lastname;
-        $user->status = $status;
-        $user->password = $password;
-        $user->roles = $roles;
-        $user->ldapEnabled = $ldapEnabled; // LDAP-Flag setzen
-        $erg = $user->save() ? $user : null; // Rückgabe des Benutzers oder null
+        try {
+            ORM::configure('logging', true);
+            $user = ORM::for_table(self::$tableName)->create();
+            $user->username = $username;
+            $user->email = $email;
+            $user->firstname = $firstname;
+            $user->lastname = $lastname;
+            $user->status = $status;
+            $user->password = $password;
+            $user->roles = $roles;
+            $user->ldapEnabled = $ldapEnabled;
 
+            $erg = $user->save() ? $user : null;
 
-        // letzte query loggen
-        $queries = ORM::get_query_log();
-        if (!empty($queries)) {
-            $lastQuery = end($queries);
-            LogUtil::logAction(LogType::SQL, 'User.php', 'createUser', $lastQuery);
+            // letzte query loggen
+            $queries = ORM::get_query_log();
+            if (!empty($queries)) {
+                $lastQuery = end($queries);
+                LogUtil::logAction(LogType::SQL, 'User.php', 'createUser', $lastQuery);
+            }
+
+            return $erg;
+        } catch (\PDOException $e) {
+            // Log the error
+            LogUtil::logAction(
+                LogType::ERROR,
+                'User.php',
+                'createUser',
+                'Failed to create user: ' . $e->getMessage()
+            );
+            return null;
         }
-
-        return $erg;
     }
 
 

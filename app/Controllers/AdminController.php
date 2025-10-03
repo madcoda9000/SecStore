@@ -68,7 +68,6 @@ class AdminController
         } else {
             return self::handleResponse(false, "Fehler beim Zurücksetzen der Backup-Codes.");
         }
-        
     }
 
     /**
@@ -315,8 +314,52 @@ class AdminController
             $newConfig = [
                 "ldapHost" => $formData["ldapHost"] === null ? '' : $formData["ldapHost"],
                 "ldapPort" => $formData["ldapPort"] === null ? 636  : (int) $formData["ldapPort"],
-                "domainPrefix" => $formData["domainPrefix"] === null ? '' : addslashes($formData["domainPrefix"]),
+                "domainPrefix" => $formData["domainPrefix"] === null ? '' : trim($formData["domainPrefix"]),
             ];
+
+            // Zusätzliche Validierung
+            if (!empty($newConfig["ldapHost"])) {
+                // Host muss mit ldap:// oder ldaps:// beginnen
+                if (
+                    !str_starts_with($newConfig["ldapHost"], 'ldap://') &&
+                    !str_starts_with($newConfig["ldapHost"], 'ldaps://')
+                ) {
+                    $configFile = "../config.php";
+                    $config = include $configFile;
+                    Flight::latte()->render("admin/settings.latte", [
+                        "mail" => $config["mail"],
+                        "bruteForceSettings" => $config["bruteForceSettings"],
+                        "application" => $config["application"],
+                        "logging" => $config["logging"],
+                        "ldap" => $config["ldapSettings"],
+                        "title" => "Settings",
+                        "user" => $user,
+                        "sessionTimeout" => SessionUtil::getRemainingTime(),
+                        "configWritable" => is_writable("../config.php"),
+                        "error" => "LDAP Host must start with ldap:// or ldaps://"
+                    ]);
+                    return;
+                }
+            }
+
+            // Port validieren
+            if ($newConfig["ldapPort"] < 1 || $newConfig["ldapPort"] > 65535) {
+                $configFile = "../config.php";
+                $config = include $configFile;
+                Flight::latte()->render("admin/settings.latte", [
+                    "mail" => $config["mail"],
+                    "bruteForceSettings" => $config["bruteForceSettings"],
+                    "application" => $config["application"],
+                    "logging" => $config["logging"],
+                    "ldap" => $config["ldapSettings"],
+                    "title" => "Settings",
+                    "user" => $user,
+                    "sessionTimeout" => SessionUtil::getRemainingTime(),
+                    "configWritable" => is_writable("../config.php"),
+                    "error" => "Invalid LDAP port. Must be between 1 and 65535."
+                ]);
+                return;
+            }
 
             // Alte Konfiguration einlesen
             $configFile = "../config.php";

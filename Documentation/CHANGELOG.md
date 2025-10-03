@@ -13,7 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [1.3.2] - 2025-10-02
+## [1.3.2] - 2025-10-03
 ### ✨ Added
 - **Implemented 2fa Backup codes**
 - **Implemented Register verification with token**
@@ -28,6 +28,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 
 ### 🐛 Fixed
+- **implemented prepareCommitMsg.sh**
 - **changelog**
 - **removed debug messages from CHANGELOG**
 
