@@ -396,7 +396,7 @@ class AuthController
 
             Flight::latte()->render('login.latte', [
                 'title' => TranslationUtil::t('login.title'),
-                'error' => TranslationUtil::t('login.msg.error7'),
+                'error' => TranslationUtil::t('login.msg.error1'),
                 'sessionTimeout' => SessionUtil::getSessionTimeout(),
                 'lang' => Flight::get('lang'),
                 "application" => $config["application"],
@@ -424,7 +424,7 @@ class AuthController
 
             Flight::latte()->render('login.latte', [
                 'title' => TranslationUtil::t('login.title'),
-                'error' => TranslationUtil::t('login.msg.error2'),
+                'error' => TranslationUtil::t('login.msg.error1'),
                 'sessionTimeout' => SessionUtil::getSessionTimeout(),
                 'lang' => Flight::get('lang'),
                 "application" => $config["application"],
