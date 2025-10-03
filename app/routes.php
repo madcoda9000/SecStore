@@ -486,6 +486,11 @@ secureRoute('GET /admin/logs/export', function () {
     (new LogController())->exportLogs();
 }, 'admin', true);
 
+// Log Truncate Route
+secureRoute('POST /admin/logs/truncate', function () {
+    (new LogController())->truncateLogs();
+}, 'admin', true);
+
 // ==========================================
 // UTILITY ROUTES
 // ==========================================

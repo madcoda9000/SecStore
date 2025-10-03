@@ -558,4 +558,16 @@ return [
     'logs.export.btn' => 'Export as CSV',
     'logs.export.all' => 'Export all logs',
     'logs.export.filtered' => 'Export filtered logs',
+
+    // Logs truncate
+    'logs.truncate.btn' => 'Delete all logs',
+    'logs.truncate.modal.title' => 'Really delete logs?',
+    'logs.truncate.modal.warning' => '⚠️ WARNING: This action cannot be undone!',
+    'logs.truncate.modal.backup' => 'It is strongly recommended to create an export as backup first.',
+    'logs.truncate.modal.confirm' => 'Do you really want to permanently delete all {type} logs?',
+    'logs.truncate.modal.btn.cancel' => 'Cancel',
+    'logs.truncate.modal.btn.export' => 'Export first',
+    'logs.truncate.modal.btn.delete' => 'Delete logs',
+    'logs.truncate.success' => '{count} logs successfully deleted',
+    'logs.truncate.error' => 'Error deleting logs',
 ];

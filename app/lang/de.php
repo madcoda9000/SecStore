@@ -555,4 +555,16 @@ Wenn Sie LDAP für diesen Benutzer aktivieren, generieren Sie einfach ein belieb
     'logs.export.btn' => 'Als CSV exportieren',
     'logs.export.all' => 'Alle Logs exportieren',
     'logs.export.filtered' => 'Gefilterte Logs exportieren',
+
+    // logs truncate
+    'logs.truncate.btn' => 'Alle Logs löschen',
+    'logs.truncate.modal.title' => 'Logs wirklich löschen?',
+    'logs.truncate.modal.warning' => '⚠️ WARNUNG: Diese Aktion kann nicht rückgängig gemacht werden!',
+    'logs.truncate.modal.backup' => 'Es wird dringend empfohlen, vorher einen Export als Backup zu erstellen.',
+    'logs.truncate.modal.confirm' => 'Möchten Sie wirklich alle {type}-Logs unwiderruflich löschen?',
+    'logs.truncate.modal.btn.cancel' => 'Abbrechen',
+    'logs.truncate.modal.btn.export' => 'Erst exportieren',
+    'logs.truncate.modal.btn.delete' => 'Logs löschen',
+    'logs.truncate.success' => '{count} Logs erfolgreich gelöscht',
+    'logs.truncate.error' => 'Fehler beim Löschen der Logs',
 ];

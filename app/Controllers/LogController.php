@@ -8,6 +8,7 @@ use App\Utils\SessionUtil;
 use App\Utils\TranslationUtil;
 use Flight;
 use ORM;
+use Exception;
 
 /**
  * Class Name: LogController
@@ -23,6 +24,75 @@ use ORM;
  */
 class LogController
 {
+
+    /**
+     * Truncate (delete all) logs of a specific type
+     *
+     * @return void
+     */
+    public static function truncateLogs()
+    {
+        if (SessionUtil::get('user')['id'] === null) {
+            Flight::json(['success' => false, 'message' => 'Unauthorized']);
+            return;
+        }
+
+        $logType = $_POST['type'] ?? '';
+
+        if (empty($logType)) {
+            Flight::json(['success' => false, 'message' => 'Log type missing']);
+            return;
+        }
+
+        try {
+            ORM::configure('logging', true);
+
+            // Count logs before deletion
+            $count = ORM::for_table('logs')
+                ->where('type', $logType)
+                ->count();
+
+            // Delete all logs of this type
+            $result = ORM::for_table('logs')
+                ->where('type', $logType)
+                ->delete_many();
+
+            if ($result) {
+                // Log the truncate action
+                LogUtil::logAction(
+                    LogType::AUDIT,
+                    'LogController',
+                    'truncateLogs',
+                    'SUCCESS: truncated ' . $count . ' ' . $logType . ' logs',
+                    SessionUtil::get('user')['username']
+                );
+
+                Flight::json([
+                    'success' => true,
+                    'message' => 'Logs deleted successfully',
+                    'count' => $count
+                ]);
+            } else {
+                Flight::json([
+                    'success' => false,
+                    'message' => 'No logs found to delete'
+                ]);
+            }
+        } catch (Exception $e) {
+            LogUtil::logAction(
+                LogType::ERROR,
+                'LogController',
+                'truncateLogs',
+                'ERROR: ' . $e->getMessage(),
+                SessionUtil::get('user')['username']
+            );
+
+            Flight::json([
+                'success' => false,
+                'message' => 'Error deleting logs: ' . $e->getMessage()
+            ]);
+        }
+    }
 
     /**
      * Export logs to CSV format

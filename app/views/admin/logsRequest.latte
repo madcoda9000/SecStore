@@ -7,9 +7,14 @@
 <div class="container py-4" style="flex:1">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1 class="mb-0"><span class="bi bi-hdd-network-fill">&nbsp;</span>{trans('logs.request.title')}</h1>
-        <button type="button" class="btn btn-success" id="exportLogsBtn">
+        <div>
+        <button type="button" class="btn btn-success me-2" id="exportLogsBtn">
             <span class="bi bi-download"></span>&nbsp;{trans('logs.export.btn')}
         </button>
+        <button type="button" class="btn btn-danger" id="truncateLogsBtn">
+            <span class="bi bi-trash"></span>&nbsp;{trans('logs.truncate.btn')}
+        </button>
+    </div>
     </div>
     <div class="d-flex justify-content-between mb-3">
         <div>
@@ -60,6 +65,45 @@
     </div>
 </div>
 
+<!-- Truncate Confirmation Modal -->
+    <div class="modal fade" id="truncateModal" tabindex="-1" aria-labelledby="truncateModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title" id="truncateModalLabel">
+                        <span class="bi bi-exclamation-triangle-fill"></span>&nbsp;{trans('logs.truncate.modal.title')}
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="alert alert-warning">
+                        <strong>{trans('logs.truncate.modal.warning')}</strong>
+                    </div>
+                    <p>{trans('logs.truncate.modal.backup')}</p>
+                    <p id="truncateConfirmText" class="fw-bold"></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        {trans('logs.truncate.modal.btn.cancel')}
+                    </button>
+                    <button type="button" class="btn btn-success" id="exportFirstBtn">
+                        <span class="bi bi-download"></span>&nbsp;{trans('logs.truncate.modal.btn.export')}
+                    </button>
+                    <button type="button" class="btn btn-danger" id="confirmTruncateBtn">
+                        <span class="bi bi-trash"></span>&nbsp;{trans('logs.truncate.modal.btn.delete')}
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<!-- Data-Attribute für Truncate Messages -->
+<div id="truncate-messages" 
+     data-confirm="{trans('logs.truncate.modal.confirm')}"
+     data-success="{trans('logs.truncate.success')}"
+     data-error="{trans('logs.truncate.error')}"
+     style="display:none;"></div>
+
 <!-- Data-Attribute für Messages -->
 <div id="log-messages" 
      data-msg4="{trans('pager.page')}"
@@ -75,6 +119,7 @@
      style="display:none;"></div>
 
 <!-- Externe Scripts -->
-<script src="/js/utils/logs-universal.js"></script>
-<script src="/js/utils/logs-export-min.js"></script>
+<script src="/js/utils/logs-universal-min.js"></script>
+    <script src="/js/utils/logs-export-min.js"></script>
+    <script src="/js/utils/logs-truncate-min.js"></script>
 {/block}
