@@ -89,7 +89,6 @@ chmod +x setup-hooks.sh
 | Hook | Purpose | Trigger |
 |------|---------|---------|
 | **pre-commit** | Security check | Before every commit |
-| **prepare-commit-msg** | CHANGELOG automation | Before commit message |
 
 #### **Pre-Commit Hook (Security)**
 
@@ -118,31 +117,6 @@ git commit -m "test"  # ❌ Commit blocked
 
 # Clean up
 rm config-production.php
-```
-
-#### **Prepare-Commit-Msg Hook (CHANGELOG)**
-
-Automatically updates `Documentation/CHANGELOG.md` with your commits:
-
-```bash
-# Use Conventional Commits
-git commit -m "feat: Add new user export feature"
-git commit -m "fix: Correct session timeout bug"
-git commit -m "docs: Update installation guide"
-```
-
-**Result in CHANGELOG.md:**
-
-```markdown
-## [1.3.2] - 2025-10-15
-### ✨ Added
-- **Add new user export feature**
-
-### 🐛 Fixed
-- **Correct session timeout bug**
-
-### 📝 Documentation
-- **Update installation guide**
 ```
 
 **Supported commit types:**
