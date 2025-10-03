@@ -33,6 +33,18 @@ else
 fi
 
 # ============================================================================
+# Prepare-Commit-Msg Hook (Changelog-Automatisierung)
+# ============================================================================
+
+if [ -f "prepareCommitMsg.sh" ]; then
+    cp prepareCommitMsg.sh .git/hooks/prepare-commit-msg
+    chmod +x .git/hooks/prepare-commit-msg
+    echo "✅ prepare-commit-msg Hook installiert (Changelog-Update)"
+else
+    echo "⚠️  prepareCommitMsg.sh nicht gefunden - übersprungen"
+fi
+
+# ============================================================================
 # Erfolgsmeldung
 # ============================================================================
 
@@ -43,6 +55,9 @@ echo ""
 echo "📋 Installierte Hooks:"
 if [ -f ".git/hooks/pre-commit" ]; then
     echo "   ✓ pre-commit         → Blockiert sensitive Dateien"
+fi
+if [ -f ".git/hooks/prepare-commit-msg" ]; then
+    echo "   ✓ prepare-commit-msg → Aktualisiert CHANGELOG.md"
 fi
 echo ""
 echo "💡 Verwendung:"
