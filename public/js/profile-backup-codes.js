@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const countElement = document.getElementById('backup-codes-count');
     const regenerateButton = document.getElementById('regenerate-backup-codes');
     const warningElement = document.getElementById('backup-codes-warning');
-    const warningText = document.getElementById('backup-codes-warning-text');
+    const warningText = document.getElementById('backup-codes-warning-text')  || 'You only have {count} backup codes left';
     const translationsElement = document.getElementById('backup-codes-translations');
     const modal = new bootstrap.Modal(document.getElementById('backupCodesModal'));
     const modalDisplay = document.getElementById('modal-backup-codes-display');

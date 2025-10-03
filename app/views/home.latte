@@ -8,7 +8,7 @@
         {if isset($backupCodesWarning) && $backupCodesWarning !== null}
         <div class="alert alert-warning alert-dismissible fade show" role="alert">
             <i class="bi bi-exclamation-triangle-fill"></i>
-            <strong>{trans('profile.backupcodes.warning.low')|replace:'{count}', $backupCodesWarning}</strong>
+            <strong>{str_replace('{count}', $backupCodesWarning, trans('profile.backupcodes.warning.low'))}</strong>
             <br>
             <small><a href="/profile" class="alert-link">{trans('profile.backupcodes.regenerate')}</a></small>
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
