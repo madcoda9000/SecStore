@@ -13,8 +13,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [1.4.0] - 2025-10-03
+## [1.4.0] - 2025-10-05
 ### ✨ Added
+- **Implemented Azure SSO login**
 - **implemented truncate logs**
 - **Implemented Logs Export function**
 

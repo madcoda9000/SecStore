@@ -48,6 +48,7 @@
 
 ### 🌐 **Enterprise-Ready**
 - **LDAP integration** for corporate environments
+- **Azure / Entra ID SSO**
 - **Granular role management** (RBAC)
 - **Comprehensive audit logging** of all actions
 - **Multi-language support** (DE/EN)

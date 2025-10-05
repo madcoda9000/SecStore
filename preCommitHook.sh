@@ -13,33 +13,42 @@ ALLOWED_TEMPLATES=(
     ".env.example"
     ".env.EXAMPLE"
     ".env.template"
-    #"*.php.backup"          # ← Backup-Dateien erlauben
-    #"*.backup"              # ← Allgemeine Backup-Dateien
 )
 
-# Funktion: Prüfen ob Datei in erlaubten Templates ist (mit Wildcard-Support)
-is_allowed_template() {
+# Erlaubte Dateinamen-Muster (basename matching)
+ALLOWED_PATTERNS=(
+    "admin-backup-codes-display.js"
+    "admin-backup-codes-display-min.js"
+)
+
+# Funktion: Prüfen ob Dateiname erlaubt ist
+is_allowed_file() {
     local file="$1"
+    local basename=$(basename "$file")
+    
+    # Prüfe exakte Übereinstimmung mit Templates
     for template in "${ALLOWED_TEMPLATES[@]}"; do
-        # Exakte Übereinstimmung
-        if [[ "$file" == "$template" ]]; then
-            return 0  # Erlaubt
-        fi
-        # Wildcard-Übereinstimmung (für *.backup etc.)
-        if [[ "$file" == $template ]]; then
-            return 0  # Erlaubt
+        if [[ "$file" == "$template" || "$basename" == "$template" ]]; then
+            return 0
         fi
     done
-    return 1  # Nicht erlaubt
+    
+    # Prüfe Patterns
+    for pattern in "${ALLOWED_PATTERNS[@]}"; do
+        if [[ "$basename" == "$pattern" ]]; then
+            return 0
+        fi
+    done
+    
+    return 1
 }
 
-# Sensitive Dateien finden (aber Templates ausschließen)
+# Sensitive Dateien finden
 SENSITIVE_FILES=""
 for file in $STAGED_FILES; do
     # Prüfe auf sensitive Muster
     if [[ "$file" =~ (config.*\.php|\.env|\.key|\.pem|\.credentials|.*copy.*|.*backup.*) ]]; then
-        # Prüfe ob es eine erlaubte Template-Datei ist
-        if ! is_allowed_template "$file"; then
+        if ! is_allowed_file "$file"; then
             SENSITIVE_FILES="$SENSITIVE_FILES$file\n"
         fi
     fi
@@ -49,10 +58,10 @@ done
 if [ ! -z "$SENSITIVE_FILES" ]; then
     echo "❌ WARNUNG: Sensitive Dateien erkannt!"
     echo -e "Blockierte Dateien:\n$SENSITIVE_FILES"
-    echo "💡 Tipp: Template-Dateien wie 'config.php_TEMPLATE' und '*.backup' sind erlaubt."
+    echo "💡 Tipp: Template-Dateien wie 'config.php_TEMPLATE' sind erlaubt."
     echo "Commit wurde abgebrochen. Bitte .gitignore prüfen."
     exit 1
 fi
 
 echo "✅ Keine sensitiven Dateien gefunden."
-echo "📋 Erlaubte Template-Dateien: ${ALLOWED_TEMPLATES[*]}"
+exit 0

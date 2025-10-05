@@ -1208,6 +1208,25 @@ class AdminController
             InputValidator::RULE_REQUIRED,
         ];
 
+        // Important: for entra ID users usernaname have to be = Email
+        // Also: Set Username-Validation conditional
+        $isEntraIdUser = isset($_POST['entraIdEnabled']) && $_POST['entraIdEnabled'] == 1;
+
+        if ($isEntraIdUser) {
+            // For Entra ID: Username must be email
+            $rules['username'] = [
+                InputValidator::RULE_REQUIRED,
+                InputValidator::RULE_EMAIL,
+                [InputValidator::RULE_MAX_LENGTH => 255],
+            ];
+        } else {
+            // For normalUser: Standard Username-Validierung
+            $rules['username'] = [
+                InputValidator::RULE_REQUIRED,
+                InputValidator::RULE_USERNAME,
+            ];
+        }
+
         try {
             // Validate all input data
             $validated = InputValidator::validateAndSanitize($rules, $_POST);
@@ -1347,11 +1366,6 @@ class AdminController
             [InputValidator::RULE_MIN_LENGTH => 1],
             [InputValidator::RULE_MAX_LENGTH => 255],
         ];
-        $rules['username'] = [
-            InputValidator::RULE_REQUIRED,
-            [InputValidator::RULE_MIN_LENGTH => 1],
-            [InputValidator::RULE_MAX_LENGTH => 255],
-        ];
         $rules['email'] = [
             InputValidator::RULE_REQUIRED,
             InputValidator::RULE_EMAIL,
@@ -1377,6 +1391,25 @@ class AdminController
         $rules['id'] = [
             InputValidator::RULE_REQUIRED,
         ];
+
+        // Important: for entra ID users usernaname have to be = Email
+        // Also: Set Username-Validation conditional
+        $isEntraIdUser = isset($_POST['entraIdEnabled']) && $_POST['entraIdEnabled'] == 1;
+
+        if ($isEntraIdUser) {
+            // For Entra ID: Username must be email
+            $rules['username'] = [
+                InputValidator::RULE_REQUIRED,
+                InputValidator::RULE_EMAIL,
+                [InputValidator::RULE_MAX_LENGTH => 255],
+            ];
+        } else {
+            // For normalUser: Standard Username-Validierung
+            $rules['username'] = [
+                InputValidator::RULE_REQUIRED,
+                InputValidator::RULE_USERNAME,
+            ];
+        }
 
         try {
             // Validate all input data
@@ -1497,6 +1530,7 @@ class AdminController
                         'mfaEnabled' => $user->mfaEnabled,
                         'mfaEnforced' => $user->mfaEnforced,
                         'mfaSecret' => $user->mfaSecret,
+                        'entraIdEnabled' => $user->entraIdEnabled,
                     ];
                 }, $users),
                 'totalUsers' => $totalUsers,
@@ -1802,7 +1836,7 @@ class AdminController
      */
     private static function handleResponse(bool $success, ?string $errorMessage = null)
     {
-        if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) &&
+        if (empty($_SERVER['HTTP_X_REQUESTED_WITH']) &&
             strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest'
         ) {
             Flight::json(['success' => $success]);

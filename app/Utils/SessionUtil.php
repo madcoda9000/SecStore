@@ -96,7 +96,7 @@ class SessionUtil
             'domain' => '',
             'secure' => self::isHttps(),
             'httponly' => true,
-            'samesite' => 'Strict'
+            'samesite' => 'Lax'
         ]);
     }
 
@@ -386,7 +386,7 @@ class SessionUtil
                     'domain' => '',
                     'secure' => self::isHttps(),
                     'httponly' => true,
-                    'samesite' => 'Strict'
+                    'samesite' => 'Lax'
                 ]);
             }
         }

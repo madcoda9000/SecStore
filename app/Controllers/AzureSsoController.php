@@ -405,6 +405,6 @@ class AzureSsoController
             "Successful Azure SSO login for: {$email}"
         );
 
-        Flight::redirect('/');
+        Flight::redirect('/home');
     }
 }
