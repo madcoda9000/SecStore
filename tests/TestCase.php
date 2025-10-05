@@ -20,20 +20,20 @@ abstract class TestCase extends PHPUnitTestCase
     protected function setUp(): void
     {
         parent::setUp();
-        
+
         // Setup database once per test run
         if (!self::$databaseSetupDone) {
             $this->setUpDatabase();
             self::$databaseSetupDone = true;
         }
-        
+
         // Reset session for each test
         $_SESSION = [];
-        
+
         // Reset POST/GET data
         $_POST = [];
         $_GET = [];
-        
+
         // Mock basic server variables
         $this->mockServerVariables();
     }
@@ -63,13 +63,12 @@ abstract class TestCase extends PHPUnitTestCase
                     PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
                 ]
             ]);
-            
+
             // Set the PDO instance
             ORM::set_db(self::$pdo);
 
             // Create database schema
             $this->createDatabaseSchema();
-            
         } catch (\Exception $e) {
             $this->fail('Failed to setup test database: ' . $e->getMessage());
         }
@@ -99,10 +98,12 @@ abstract class TestCase extends PHPUnitTestCase
                 mfaSecret VARCHAR(2500) NOT NULL DEFAULT '',
                 mfaBackupCodes TEXT NULL DEFAULT NULL,
                 ldapEnabled INTEGER NOT NULL DEFAULT 0,
+                entraIdEnabled INTEGER NOT NULL DEFAULT 0,  /* <-- DIESE ZEILE FEHLT */
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 activeSessionId VARCHAR(255) DEFAULT '',
                 lastKnownIp VARCHAR(255) DEFAULT '',
-                verification_token VARCHAR(255) DEFAULT NULL
+                verification_token VARCHAR(255) DEFAULT NULL,
+                verification_token_expires DATETIME DEFAULT NULL
             )
         ");
 
@@ -299,7 +300,7 @@ abstract class TestCase extends PHPUnitTestCase
     protected function dumpDatabase(?string $table = null): void
     {
         echo "\n=== DATABASE DUMP ===\n";
-        
+
         if ($table) {
             $tables = [$table];
         } else {
@@ -320,7 +321,7 @@ abstract class TestCase extends PHPUnitTestCase
                 echo "Error: " . $e->getMessage() . "\n";
             }
         }
-        
+
         echo "\n====================\n\n";
     }
 }

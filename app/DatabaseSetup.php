@@ -42,7 +42,7 @@ try {
         `mfaSecret` varchar(2500) NOT NULL DEFAULT '',
         'mfaBackupCodes' TEXT NULL DEFAULT NULL,
         `ldapEnabled` TINYINT(1) NOT NULL DEFAULT 0,
-        'entraIdEnabled' TINYINT(1) NOT NULL DEFAULT 0 
+        `entraIdEnabled` TINYINT(1) NOT NULL DEFAULT 0,
         `created_at` timestamp NULL DEFAULT current_timestamp(),
         `activeSessionId` varchar(255) DEFAULT '',
         `lastKnownIp` varchar(255) DEFAULT '',
