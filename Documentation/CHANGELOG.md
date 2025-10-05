@@ -24,6 +24,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **added missing columns to TestCase.php**
 - **various Azure SSO fixes**
 
+
+### 📝 Documentation
+- **updated README**
+
 ---
 
 ## [1.3.2] - 2025-10-03

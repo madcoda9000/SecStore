@@ -299,61 +299,90 @@ php -S localhost:8000 -t public
 
 ## 📂 Project Architecture
 
+SecStore follows a **Model-View-Controller (MVC)** architecture with additional middleware and utility layers for enhanced security.
+
 ```
 SecStore/
 ├── 📁 app/                    # Core Application
 │   ├── Controllers/           # MVC Controllers
-│   ├── Models/               # Data Models  
-│   ├── Utils/                # Helper Classes
-│   ├── Middleware/           # Request Middleware
-│   └── views/                # Latte Templates
+│   ├── Models/               # Data Models (Paris ORM)
+│   ├── Utils/                # Helper Classes (Session, Log, Security, etc.)
+│   ├── Middleware/           # Request Middleware (CSRF, Auth, Rate Limiting)
+│   ├── views/                # Latte Templates
+│   └── lang/                 # Translations (DE/EN)
 ├── 📁 public/                # Web Root (Entry Point)
+│   ├── index.php            # Application Bootstrap
 │   ├── css/                  # Stylesheets
-│   ├── js/                   # JavaScript Files
-│   └── index.php            # Application Bootstrap
+│   └── js/                   # JavaScript Files
 ├── 📁 Documentation/         # Project Documentation
+│   ├── ARCHITECTURE.md      # Complete architecture documentation
 │   ├── INSTALL.md           # Installation Guide
-│   ├── CHANGELOG.md         # Version History
+│   ├── DEVDOC.md            # Developer Guide
 │   ├── SECURITY.md          # Security Policy
-│   └── Screenshots/         # UI Screenshots
+│   └── CHANGELOG.md         # Version History
+├── 📁 database/              # Database Schema Files
+├── 📁 tests/                 # PHPUnit Tests (Unit & Integration)
 ├── 📁 cache/                 # Template Cache
-├── ⚙️ config.php            # Main Configuration
-├── 🔐 generate_key.php      # Crypto Key Generator
-├── 🚀 setup.sh             # Auto-Setup Script
-└── 📋 composer.json         # Dependencies
+├── config.php               # Main Configuration
+└── composer.json            # Dependencies
 ```
+### **🏗️ Architecture Highlights**
+
+- **MVC Pattern** - Clean separation of concerns
+- **Middleware Stack** - Rate Limiting → CSRF → Authentication → Authorization
+- **Security-First** - Session fingerprinting, CSRF tokens, input validation
+- **Extensible** - Easy to add custom controllers, models, and utilities
+- **CSP-Compliant** - No inline scripts or styles
+
+**📖 For complete architecture details, request lifecycle, and extension guide:**  
+👉 **[ARCHITECTURE.md](Documentation/ARCHITECTURE.md)**
 
 ---
 
 ## 🛠️ Development
 
-### **Development Setup**
+SecStore is designed as a **boilerplate for building custom web applications** with modern security features built-in.
+
+### **Quick Start**
 
 ```bash
 # Install dependencies with dev tools
 composer install
 
-# Check code quality
-vendor/bin/phpcs                # PSR-12 Compliance Check
-vendor/bin/php-cs-fixer fix     # Auto-Format Code
+# Install Git hooks for code quality
+./setup-hooks.sh
 
-# Development Server
+# Start development server
 php -S localhost:8000 -t public
 ```
+
+### **📖 Complete Developer Guide**
+
+**Everything you need to extend SecStore:**
+
+👉 **[DEVDOC.md](Documentation/DEVDOC.md)** - Complete step-by-step developer documentation
+
+**What's inside:**
+- 🔧 Development environment setup & tools
+- 📄 Creating custom pages, controllers, and models
+- 🛣️ Adding routes and navigation
+- 💾 CSP-compliant JavaScript integration
+- 🌍 Multilingual support implementation
+- 🧪 Testing strategies and best practices
+- 📚 Code quality guidelines and Git workflow
 
 ### **Contributing**
 
 We welcome contributions! 🎉
 
-1. **Fork** the repository
-2. **Create branch** for new feature (`feature/amazing-feature`)
-3. **Commit** changes (`git commit -m 'Add amazing feature'`)
-4. **Push** to branch (`git push origin feature/amazing-feature`)
-5. **Open Pull Request**
+1. Fork the repository
+2. Create a feature branch
+3. Follow the guidelines in [DEVDOC.md](Documentation/DEVDOC.md)
+4. Open a Pull Request
 
 **Coding Standards:**
 - ✅ PSR-12 compliant PHP code
-- ✅ Meaningful commit messages  
+- ✅ Conventional Commits (use `./quick-commit.sh`)
 - ✅ Tests for new features
 - ✅ Update documentation
 
@@ -363,12 +392,14 @@ We welcome contributions! 🎉
 
 | Document | Description |
 |----------|-------------|
-| 🐳 **[README_DOCKER.md](Documentation/README_DOCKER.md)** | **Docker installation guide (recommended)** |
+| 🏗️ **[ARCHITECTURE.md](Documentation/ARCHITECTURE.md)** | **Complete technical architecture and request lifecycle** |
 | 📖 **[INSTALL.md](Documentation/INSTALL.md)** | Complete manual installation and setup guide |
-| 🧑‍💻 **[DEVDOC.md](Documentation/DEVDOC.md)** | Developer documentation for extending SecStore |
-| 📝 **[CHANGELOG.md](Documentation/CHANGELOG.md)** | Version history and release notes |
+| 🐳 **[README_DOCKER.md](Documentation/README_DOCKER.md)** | Docker installation guide (recommended) |
+| 🧑‍💻 **[DEVDOC.md](Documentation/DEVDOC.md)** | Developer guide for extending SecStore |
+| 🧪 **[TESTING.md](Documentation/TESTING.md)** | Testing strategy and pragmatic approach |
 | 🔒 **[SECURITY.md](Documentation/SECURITY.md)** | Security policies and vulnerability reporting |
-| 📝 **[Test README](tests/README.md)** | Overview and instructions for tests |
+| 📝 **[CHANGELOG.md](Documentation/CHANGELOG.md)** | Version history and release notes |
+| 🔍 **[GIT_HOOKS.md](Documentation/GIT_HOOKS.md)** | Git hooks setup and usage guide |
 
 ---
 
