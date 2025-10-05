@@ -163,6 +163,7 @@ php -S localhost:8000 -t public
 
 - ✅ **Multi-Factor Authentication (MFA/2FA)** with TOTP standard
 - ✅ **LDAP integration** for enterprise connectivity
+- ✅ **Azure / Entra ID SSO** for enterprise connectivity
 - ✅ **Session security** with fingerprinting and auto-regeneration
 - ✅ **Brute-force protection** with intelligent blocking mechanisms
 - ✅ **Password security** with BCRYPT hashing (60 characters)
