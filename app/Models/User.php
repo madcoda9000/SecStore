@@ -134,7 +134,7 @@ class User extends ORM
 
     /**
      * Setzt den Verifizierungs-Token für einen Benutzer.
-     * 
+     *
      * @param int $userId Die ID des Benutzers
      * @param string $token Der Verifizierungs-Token
      * @param DateTime $expires Ablaufzeit des Tokens
@@ -165,7 +165,7 @@ class User extends ORM
 
     /**
      * Verifiziert einen Benutzer anhand des Tokens.
-     * 
+     *
      * @param string $token Der Verifizierungs-Token
      * @return array|false Array mit User-Daten bei Erfolg, false bei Fehler
      */
@@ -226,9 +226,11 @@ class User extends ORM
      * @param string $status Der Account Status des Benutzers (z.B. "active" = 1 oder "inactive" = 0)
      * @param string $password Das Passwort (gehasht)
      * @param string $roles Die Rollen des Benutzers (z.B. "User" oder "Admin" oder mehere Rollen. Z.b. "User,IT,HR")
+     * @param int $ldapEnabled ldap Authentifizierung aktiviert (0 = nein, 1 = ja)
+     * @param int $entraIdEnabled Entra ID/Azure SSO Authentifizierung aktiviert (0 = nein, 1 = ja)
      * @return User|null Der neue Benutzer oder null, wenn der Benutzer nicht erstellt werden konnte
      */
-    public static function createUser($username, $email, $firstname, $lastname, $status, $password, $roles, $ldapEnabled = 0)
+    public static function createUser($username, $email, $firstname, $lastname, $status, $password, $roles, $ldapEnabled = 0, $entraIdEnabled = 0)
     {
         try {
             ORM::configure('logging', true);
@@ -241,6 +243,7 @@ class User extends ORM
             $user->password = $password;
             $user->roles = $roles;
             $user->ldapEnabled = $ldapEnabled;
+            $user->entraIdEnabled = $entraIdEnabled;
 
             $erg = $user->save() ? $user : null;
 
@@ -433,9 +436,11 @@ class User extends ORM
      * @param string $status The new status for the user.
      * @param string $roles The new roles for the user.
      * @param string $password The new password for the user, or null if password should not be changed.
+     * @param int $ldapEnabled ldap Authentifizierung aktiviert (0 = nein, 1 = ja)
+     * @param int $entraIdEnabled Entra ID/Azure SSO Authentifizierung aktiviert (0 = nein, 1 = ja)
      * @return bool True if the user was successfully updated, false otherwise.
      */
-    public static function updateuser($userId, $email, $username, $firstname, $lastname, $status, $roles, $password, $ldapEnabled = 0)
+    public static function updateuser($userId, $email, $username, $firstname, $lastname, $status, $roles, $password, $ldapEnabled = 0, $entraIdEnabled = 0)
     {
         ORM::configure('logging', true);
         $user = self::findUserById($userId);
@@ -448,6 +453,7 @@ class User extends ORM
             $user->status = $status;
             $user->roles = $roles;
             $user->ldapEnabled = $ldapEnabled; // LDAP-Flag setzen
+            $user->entraIdEnabled = $entraIdEnabled;
             if ($password !== null) {
                 $user->password = $password;
             }

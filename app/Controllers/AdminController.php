@@ -296,6 +296,7 @@ class AdminController
                     'user' => $user,
                     'sessionTimeout' => SessionUtil::getRemainingTime(),
                     'configWritable' => $isWritable,
+                    'azureSso' => $config['azureSso'] ?? [],
                 ]);
             } else {
                 http_response_code(403);
@@ -303,6 +304,112 @@ class AdminController
             }
         } else {
             Flight::redirect('/login');
+        }
+    }
+
+    /**
+     * Update Azure SSO / Entra ID settings in configuration file
+     *
+     * @param array $formData Form data containing Azure SSO configuration
+     * @return void
+     */
+    public function updateAzureSsoSettings($formData): void
+    {
+        if (SessionUtil::get('user')['id'] === null) {
+            Flight::redirect('/login');
+            return;
+        }
+
+        $user = User::findUserById(SessionUtil::get('user')['id']);
+        if ($user === false) {
+            Flight::redirect('/login');
+            return;
+        }
+
+        $newConfig = [
+            'enabled' => isset($formData['azureEnabled']) && $formData['azureEnabled'] === 'on',
+            'tenantId' => $formData['azureTenantId'] ?? '',
+            'clientId' => $formData['azureClientId'] ?? '',
+            'clientSecret' => $formData['azureClientSecret'] ?? '',
+            'redirectUri' => $formData['azureRedirectUri'] ?? '',
+        ];
+
+        try {
+            $configFile = '../config.php';
+            $config = include $configFile;
+            $configContent = file_get_contents($configFile);
+
+            if ($configContent === false) {
+                throw new Exception(TranslationUtil::t('settings.error2'));
+            }
+
+            // Suche und ersetze $azureSso Array
+            $pattern = '/(\$azureSso\s*=\s*\[)(.*?)(\];)/s';
+            $newAzureArray = var_export($newConfig, true);
+            $newAzureArray = preg_replace("/^array \(/", '[', $newAzureArray);
+            $newAzureArray = preg_replace('/\)$/', ']', $newAzureArray);
+            $newAzureArray = preg_replace('/=> \n\s+/', '=> ', $newAzureArray);
+
+            $replacement = '$azureSso = ' . $newAzureArray . ';';
+            $newConfigContent = preg_replace($pattern, $replacement, $configContent);
+
+            if ($newConfigContent === null) {
+                throw new Exception(TranslationUtil::t('settings.error3'));
+            }
+
+            file_put_contents($configFile, $newConfigContent);
+
+            LogUtil::logAction(
+                LogType::AUDIT,
+                'AdminController',
+                'updateAzureSsoSettings',
+                'Azure SSO settings updated',
+                SessionUtil::get('user')['username']
+            );
+
+            // Config neu laden
+            $config = include $configFile;
+
+            Flight::latte()->render('admin/settings.latte', [
+                'mail' => $config['mail'],
+                'bruteForceSettings' => $config['bruteForceSettings'],
+                'application' => $config['application'],
+                'logging' => $config['logging'],
+                'ldap' => $config['ldapSettings'],
+                'azureSso' => $newConfig,
+                'security' => $config['security'] ?? [],
+                'clientIp' => $this->getClientIp(),
+                'title' => 'Settings',
+                'user' => $user,
+                'sessionTimeout' => SessionUtil::getRemainingTime(),
+                'configWritable' => is_writable('../config.php'),
+                'success' => TranslationUtil::t('settings.success1'),
+            ]);
+        } catch (Exception $e) {
+            LogUtil::logAction(
+                LogType::ERROR,
+                'AdminController',
+                'updateAzureSsoSettings',
+                'Failed to update Azure SSO settings: ' . $e->getMessage(),
+                SessionUtil::get('user')['username']
+            );
+
+            $config = include '../config.php';
+            Flight::latte()->render('admin/settings.latte', [
+                'mail' => $config['mail'],
+                'bruteForceSettings' => $config['bruteForceSettings'],
+                'application' => $config['application'],
+                'logging' => $config['logging'],
+                'ldap' => $config['ldapSettings'],
+                'azureSso' => $config['azureSso'] ?? [],
+                'security' => $config['security'] ?? [],
+                'clientIp' => $this->getClientIp(),
+                'title' => 'Settings',
+                'user' => $user,
+                'sessionTimeout' => SessionUtil::getRemainingTime(),
+                'configWritable' => is_writable('../config.php'),
+                'error' => $e->getMessage(),
+            ]);
         }
     }
 
@@ -360,6 +467,7 @@ class AdminController
                         'user' => $user,
                         'sessionTimeout' => SessionUtil::getRemainingTime(),
                         'configWritable' => is_writable('../config.php'),
+                        'azureSso' => $config['azureSso'] ?? [],
                     ]);
 
                     return;
@@ -434,6 +542,7 @@ class AdminController
                 'user' => $user,
                 'sessionTimeout' => SessionUtil::getRemainingTime(),
                 'configWritable' => $isWritable,
+                'azureSso' => $savedconfig['azureSso'] ?? [],
             ]);
         } else {
             Flight::redirect('/login');
@@ -525,6 +634,7 @@ class AdminController
                         'sessionTimeout' => SessionUtil::getRemainingTime(),
                         'configWritable' => is_writable('../config.php'),
                         'error' => 'LDAP Host must start with ldap:// or ldaps://',
+                        'azureSso' => $config['azureSso'] ?? [],
                     ]);
 
                     return;
@@ -548,6 +658,7 @@ class AdminController
                     'sessionTimeout' => SessionUtil::getRemainingTime(),
                     'configWritable' => is_writable('../config.php'),
                     'error' => 'Invalid LDAP port. Must be between 1 and 65535.',
+                    'azureSso' => $config['azureSso'] ?? [],
                 ]);
 
                 return;
@@ -611,6 +722,7 @@ class AdminController
                 'user' => $user,
                 'sessionTimeout' => SessionUtil::getRemainingTime(),
                 'configWritable' => $isWritable,
+                'azureSso' => $savedConfig['azureSso'] ?? [],
             ]);
         } else {
             Flight::redirect('/login');
@@ -706,6 +818,7 @@ class AdminController
                 'user' => $user,
                 'sessionTimeout' => SessionUtil::getRemainingTime(),
                 'configWritable' => $isWritable,
+                'azureSso' => $savedConfig['azureSso'] ?? [],
             ]);
         } else {
             Flight::redirect('/login');
@@ -804,6 +917,7 @@ class AdminController
                 'user' => $user,
                 'sessionTimeout' => SessionUtil::getRemainingTime(),
                 'configWritable' => $isWritable,
+                'azureSso' => $savedConfig['azureSso'] ?? [],
             ]);
         } else {
             Flight::redirect('/login');
@@ -892,6 +1006,7 @@ class AdminController
                 'user' => $user,
                 'sessionTimeout' => SessionUtil::getRemainingTime(),
                 'configWritable' => $isWritable,
+                'azureSso' => $savedConfig['azureSso'] ?? [],
             ]);
         } else {
             Flight::redirect('/login');
@@ -984,6 +1099,7 @@ class AdminController
                 'user' => $user,
                 'sessionTimeout' => SessionUtil::getRemainingTime(),
                 'configWritable' => $isWritable,
+                'azureSso' => $savedConfig['azureSso'] ?? [],
             ]);
         } else {
             Flight::redirect('/login');
@@ -1035,11 +1151,16 @@ class AdminController
 
         $roles = ORM::for_table('roles')->find_array();
 
+        // Config laden für Azure SSO Status
+        $configFile = '../config.php';
+        $config = include $configFile;
+
         Flight::latte()->render('admin/createUser.latte', [
             'title' => TranslationUtil::t('user.new.title'),
             'user' => SessionUtil::get('user'),
             'sessionTimeout' => SessionUtil::getRemainingTime(),
             'roles' => $roles,
+            'azureSsoEnabled' => $config['azureSso']['enabled'] ?? false,  // NEU
         ]);
     }
 
@@ -1083,6 +1204,9 @@ class AdminController
         $rules['ldapEnabled'] = [
             InputValidator::RULE_REQUIRED,
         ];
+        $rules['entraIdEnabled'] = [
+            InputValidator::RULE_REQUIRED,
+        ];
 
         try {
             // Validate all input data
@@ -1098,6 +1222,17 @@ class AdminController
             $roles = $validated['roles'] ?? '';
             $ldapEnabled = $validated['ldapEnabled'] ?? false;
 
+            $entraIdEnabled = $validated['entraIdEnabled'] ?? false;
+
+            // Validierung: User kann nicht beide SSO-Methoden gleichzeitig haben
+            if ($ldapEnabled && $entraIdEnabled) {
+                Flight::json([
+                    'success' => false,
+                    'message' => TranslationUtil::t('user.error.multipleSSO')
+                ]);
+                return;
+            }
+
             // Check if user already exists
             $userCheck = User::checkIfUserExists($user, $email);
             if ($userCheck !== 'false') {
@@ -1107,7 +1242,17 @@ class AdminController
             }
 
             // Create new user
-            $newUser = User::createUser($user, $email, $firstname, $lastname, $status, $password, $roles, $ldapEnabled == true ? 1 : 0);
+            $newUser = User::createUser(
+                $user,
+                $email,
+                $firstname,
+                $lastname,
+                $status,
+                $password,
+                $roles,
+                $ldapEnabled == true ? 1 : 0,
+                $entraIdEnabled == true ? 1 : 0
+            );
 
             if (!$newUser) {
                 Flight::json(['success' => false, 'message' => TranslationUtil::t('user.new.error2')]);
@@ -1150,13 +1295,17 @@ class AdminController
 
         $roles = ORM::for_table('roles')->find_array();
 
+        // Config laden für Azure SSO Status
+        $configFile = '../config.php';
+        $config = include $configFile;
+
         Flight::latte()->render('admin/editUser.latte', [
             'title' => TranslationUtil::t('user.edit.title'),
             'user' => SessionUtil::get('user'),
             'sessionTimeout' => SessionUtil::getRemainingTime(),
             'roles' => $roles,
-            'user' => SessionUtil::get('user'),
             'userToEdit' => User::findUserById($userId),
+            'azureSsoEnabled' => $config['azureSso']['enabled'] ?? false,  // NEU
         ]);
     }
 
@@ -1222,6 +1371,9 @@ class AdminController
         $rules['ldapEnabled'] = [
             InputValidator::RULE_REQUIRED,
         ];
+        $rules['entraIdEnabled'] = [
+            InputValidator::RULE_REQUIRED,
+        ];
         $rules['id'] = [
             InputValidator::RULE_REQUIRED,
         ];
@@ -1243,9 +1395,30 @@ class AdminController
                 $password = password_hash($validated['password'], PASSWORD_DEFAULT);
             }
             $ldapEnabled = $validated['ldapEnabled'] ?? 0;
+            $entraIdEnabled = $validated['entraIdEnabled'] ?? 0;
+
+            // Validierung: User kann nicht beide SSO-Methoden gleichzeitig haben
+            if ($ldapEnabled && $entraIdEnabled) {
+                Flight::json([
+                    'success' => false,
+                    'message' => TranslationUtil::t('user.error.multipleSSO')
+                ]);
+                return;
+            }
 
             // Update user
-            $erg = User::updateuser($userId, $email, $username, $firstname, $lastname, $status, $roles, $password, $ldapEnabled);
+            $erg = User::updateuser(
+                $userId,
+                $email,
+                $username,
+                $firstname,
+                $lastname,
+                $status,
+                $roles,
+                $password,
+                $ldapEnabled,
+                $entraIdEnabled
+            );
 
             // log action
             LogUtil::logAction(LogType::AUDIT, 'AdminController', 'updateUser', 'SUCCESS: updated user ' . $username . '.');

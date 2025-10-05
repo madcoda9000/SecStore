@@ -31,38 +31,38 @@ $application = [
   'sessionTimeout' => 600,
   'allowPublicRegister' => true,
   'allowPublicPasswordReset' => true,
-  'environment' => 'production', // oder 'development'
+  'environment' => 'production', // 'production' or 'development'
 ];
 
 // Rate Limiting Konfiguration
 $rateLimiting = [
   'enabled' => true,
 
-  // Custom Limits (überschreibt Defaults)
+  // Custom Limits (overwriting Defaults)
   'limits' => [
-    // Authentifizierung - sehr restriktiv
-    'login' => ['requests' => 15, 'window' => 300], // Login Versuche
-    'register' => ['requests' => 5, 'window' => 300], // Registrierungen pro Stunde
-    'forgot-password' => ['requests' => 5, 'window' => 3600], // Password-Resets pro Stunde
-    'reset-password' => ['requests' => 5, 'window' => 3600], // Reset-Versuche pro Stunde
-    '2fa' => ['requests' => 25, 'window' => 300], // 2FA Versuche in 5 Minuten
+    // Authentication - most restrictive
+    'login' => ['requests' => 15, 'window' => 300], // logint try'S in 5 minutes
+    'register' => ['requests' => 5, 'window' => 300], // registrations per hour
+    'forgot-password' => ['requests' => 5, 'window' => 3600], // Password-Resets per hour
+    'reset-password' => ['requests' => 5, 'window' => 3600], // Reset-try's per hour
+    '2fa' => ['requests' => 25, 'window' => 300], // 2FA try's in 5 minutes
 
-    // Session extend - restriktiv
-    'session-extend' => ['requests' => 20, 'window' => 900], // 20 Verlängerungen in 15 Minuten
+    // Session extend - restrictive
+    'session-extend' => ['requests' => 20, 'window' => 900], // 20 extends in 15 minutes
 
-    // Admin Bereiche - restriktiv
+    // Admin pages - restrictive
     'admin' => ['requests' => 200, 'window' => 300], // Admin-Actions
 
-    // Globales Limit als Fallback
-    'global' => ['requests' => 1500, 'window' => 300] // Requests pro Stunde
+    // Global Limit as Fallback
+    'global' => ['requests' => 1500, 'window' => 300] // Requests per hour
   ],
-  // Erweiterte Einstellungen
+  // further rate limit Settings
   'settings' => [
     'cleanup_interval' => 300, // Session cleanup Intervall
-    'max_violations_per_hour' => 25, // Max Violations bevor schärfere Maßnahmen
-    'block_repeat_offenders' => true, // Repeat Offenders härter bestrafen
-    'log_violations' => true, // Violations loggen
-    'auto_refresh_on_limit' => true, // Automatischer Refresh nach Ablauf
+    'max_violations_per_hour' => 25, // Max Violations bevor harder restrictions
+    'block_repeat_offenders' => true, // restrict repeat Offenders harder
+    'log_violations' => true, // Violations logging
+    'auto_refresh_on_limit' => true, // Automatic refresh after expiary
   ]
 ];
 
@@ -74,6 +74,18 @@ $ldapSettings = [
   'ldapPort' => 'YOUR_LDAP_PORT',
   'domainPrefix' => 'YOUR_DOMAIN_PREFIX z.b.: DOMAINNAME\\',
   '' => '',
+];
+
+/**
+* Azure / EntraId SSO Settings
+*/
+$azureSso = [
+    'enabled' => false,
+    'mockMode' => true,         // enable mock mode for testing. NOTE: $application ['enviroment'] have to be set to development too!
+    'tenantId' => '',           // Azure AD Tenant ID (GUID)
+    'clientId' => '',           // Application (client) ID
+    'clientSecret' => '',       // Client secret value
+    'redirectUri' => '',        // e.g. https://your-domain.com/auth/azure/callback
 ];
 
 /**
@@ -118,13 +130,13 @@ $mail = [
 $security = [
   'key' => 'ENTER_YOUR_SECRET_KEY_HERE',
   'adminIpWhitelist' => [
-    '192.168.1.0/24',  // Firmen-Netzwerk
-    '10.0.0.5',        // Einzelne IP
+    '192.168.1.0/24',  // whole network
+    '10.0.0.5',        // single ip address
   ],
-  'enableIpWhitelist' => false, // Default: deaktiviert
+  'enableIpWhitelist' => false, // Default: deactivated
 ];
 
-// Alle Konfigurationen in einem Array zusammenfassen
+// export all config arrays as a global settings array
 return [
     'db' => $db,
     'allowedHosts' => $allowedHosts,
@@ -135,4 +147,5 @@ return [
     'security' => $security,
     'ldapSettings' => $ldapSettings,
     'rateLimiting' => $rateLimiting,
+    'azureSso' => $azureSso,
 ];

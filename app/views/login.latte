@@ -19,7 +19,23 @@
                 <span id="loginSpinner" class="spinner-border spinner-border-sm d-none me-2" role="status" aria-hidden="true"></span>
                 <span id="loginText">{trans('login.submit')}</span>
             </button>
-        </form>
+            {if $azureSso['enabled'] ?? false}
+            <div class="text-center my-3">
+                <span class="text-muted">— {trans('login.or')} —</span>
+            </div>
+
+            {* Link geht IMMER zu /auth/azure/login - Controller entscheidet dann Mock vs Real *}
+            <a href="/auth/azure/login" class="btn btn-outline-primary w-100">
+                <i class="bi-microsoft"></i> {trans('login.azure.button')}
+            </a>
+
+            {* Optional: Zeige Mock-Warnung im Development *}
+            {if $azureSso['mockMode'] ?? false}
+                <small class="text-muted d-block text-center mt-2">
+                    <i class="bi-exclamation-triangle"></i> Mock Mode Active (Development)
+                </small>
+            {/if}
+            {/if}
 
         {ifset $error}
             <div class="alert alert-danger mt-3" role="alert">

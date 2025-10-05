@@ -30,6 +30,7 @@
         {/if}
 
         <div class="accordion" id="accordionExample">
+            {* Mail Settings Accordion Item *}
             <div class="accordion-item">
                 <h2 class="accordion-header">
                 <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
@@ -93,6 +94,7 @@
                     </form>
                 </div>
             </div>
+            {* application Settings Accordion Item *}
             <div class="accordion-item">
                 <h2 class="accordion-header">
                 <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
@@ -128,6 +130,7 @@
                     </div>
                 </div>
             </div>
+            {* brute force Settings Accordion Item *}
             <div class="accordion-item">
                 <h2 class="accordion-header">
                 <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
@@ -160,6 +163,7 @@
                 </div>
                 </div>
             </div>
+            {* logging Settings Accordion Item *}
             <div class="accordion-item">
                 <h2 class="accordion-header">
                 <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapsefour" aria-expanded="false" aria-controls="collapsefour">
@@ -217,6 +221,7 @@
                 </div>
                 </div>
             </div>
+            {* ldap Settings Accordion Item *}
             <div class="accordion-item">
                 <h2 class="accordion-header">
                 <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapsefive" aria-expanded="false" aria-controls="collapsefive">
@@ -248,64 +253,117 @@
                 </div>
                 </div>
             </div>
+            {* ip-whitelist Settings Accordion Item *}
             <div class="accordion-item">
-    <h2 class="accordion-header">
-        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSix" aria-expanded="false" aria-controls="collapseSix">
-            <i class="bi-shield-lock-fill" style="margin-right:10px;"></i>{trans('security.ip_whitelist.title')}
-        </button>
-    </h2>
-    <div id="collapseSix" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
-        <div class="accordion-body">
-            <form id="securityForm" method="post" action="/admin/updateSecuritySettings" style="padding:10px;">
-                
-                {if $security['enableIpWhitelist'] ?? false}
-                    <div class="alert alert-warning" role="alert">
-                        <i class="bi-exclamation-triangle-fill"></i> {trans('security.ip_whitelist.warning')}
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSix" aria-expanded="false" aria-controls="collapseSix">
+                        <i class="bi-shield-lock-fill" style="margin-right:10px;"></i>{trans('security.ip_whitelist.title')}
+                    </button>
+                </h2>
+                <div id="collapseSix" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
+                    <div class="accordion-body">
+                        <form id="securityForm" method="post" action="/admin/updateSecuritySettings" style="padding:10px;">
+                            
+                            {if $security['enableIpWhitelist'] ?? false}
+                                <div class="alert alert-warning" role="alert">
+                                    <i class="bi-exclamation-triangle-fill"></i> {trans('security.ip_whitelist.warning')}
+                                </div>
+                            {/if}
+
+                            <div class="form-check mb-3">
+                                <input class="form-check-input" type="checkbox" name="enableIpWhitelist" id="enableIpWhitelist" n:attr="checked: $security['enableIpWhitelist'] ?? false">
+                                <label for="enableIpWhitelist" class="form-check-label">
+                                    {trans('security.ip_whitelist.enable')}
+                                </label>
+                                <div class="form-text">{trans('security.ip_whitelist.enable_help')}</div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="currentIp" class="form-label">{trans('security.ip_whitelist.current_ip')}:</label>
+                                <input type="text" class="form-control" id="currentIp" value="{$clientIp}" readonly>
+                                <div class="form-text text-danger">
+                                    <i class="bi-exclamation-circle-fill"></i> {trans('security.ip_whitelist.current_ip_help')}
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="adminIpWhitelist" class="form-label">{trans('security.ip_whitelist.addresses')}:</label>
+                                <textarea 
+                                    class="form-control font-monospace" 
+                                    name="adminIpWhitelist" 
+                                    id="adminIpWhitelist" 
+                                    rows="8" 
+                                    style="font-size: 0.9rem;"
+                                    placeholder="{trans('security.ip_whitelist.placeholder')}"
+                                >{implode("\n", $security['adminIpWhitelist'] ?? [])}</textarea>
+                                <div class="form-text">{trans('security.ip_whitelist.addresses_help')}</div>
+                            </div>
+
+                            <div class="mb-3" style="display:none;">
+                                <label for="securityKey" class="form-label">Security Key:</label>
+                                <input type="text" class="form-control" name="securityKey" id="securityKey" value="{$security['key'] ?? 'ENTER_YOUR_SECRET_KEY_HERE'}" readonly>
+                            </div>
+
+                            <input type="hidden" name="csrf_token" value="{$_SESSION['csrf_token']}">
+                            <button class="btn btn-primary w-100 mt-2" type="submit">
+                                {trans('security.ip_whitelist.submit')}
+                            </button>
+                        </form>
                     </div>
-                {/if}
-
-                <div class="form-check mb-3">
-                    <input class="form-check-input" type="checkbox" name="enableIpWhitelist" id="enableIpWhitelist" n:attr="checked: $security['enableIpWhitelist'] ?? false">
-                    <label for="enableIpWhitelist" class="form-check-label">
-                        {trans('security.ip_whitelist.enable')}
-                    </label>
-                    <div class="form-text">{trans('security.ip_whitelist.enable_help')}</div>
                 </div>
+            </div>
+            {* Azure SSO / Entra ID Settings Accordion Item *}
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" 
+                            data-bs-target="#collapseAzure" aria-expanded="false" aria-controls="collapseAzure">
+                        <i class="bi-microsoft" style="margin-right:10px;"></i>{trans('settings.title.azure')}
+                    </button>
+                </h2>
+                <div id="collapseAzure" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
+                    <div class="accordion-body">
+                        <form id="azureForm" method="post" action="/admin/updateAzureSsoSettings" style="padding:10px;">
+                            
+                            <div class="form-check mb-3">
+                                <input class="form-check-input" type="checkbox" name="azureEnabled" id="azureEnabled" 
+                                    {if $azureSso['enabled'] ?? false}checked{/if}>
+                                <label for="azureEnabled" class="form-check-label">
+                                    {trans('settings.azure.enable')}
+                                </label>
+                            </div>
 
-                <div class="mb-3">
-                    <label for="currentIp" class="form-label">{trans('security.ip_whitelist.current_ip')}:</label>
-                    <input type="text" class="form-control" id="currentIp" value="{$clientIp}" readonly>
-                    <div class="form-text text-danger">
-                        <i class="bi-exclamation-circle-fill"></i> {trans('security.ip_whitelist.current_ip_help')}
+                            <div class="mb-3">
+                                <label for="azureTenantId">{trans('settings.azure.tenantId')}:</label>
+                                <input class="form-control" type="text" name="azureTenantId" id="azureTenantId" 
+                                    value="{$azureSso['tenantId'] ?? ''}" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx">
+                                <small class="text-muted">{trans('settings.azure.tenantId.hint')}</small>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="azureClientId">{trans('settings.azure.clientId')}:</label>
+                                <input class="form-control" type="text" name="azureClientId" id="azureClientId" 
+                                    value="{$azureSso['clientId'] ?? ''}" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx">
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="azureClientSecret">{trans('settings.azure.clientSecret')}:</label>
+                                <input class="form-control" type="password" name="azureClientSecret" id="azureClientSecret" 
+                                    value="{$azureSso['clientSecret'] ?? ''}" placeholder="•••••••••••••••••">
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="azureRedirectUri">{trans('settings.azure.redirectUri')}:</label>
+                                <input class="form-control" type="text" name="azureRedirectUri" id="azureRedirectUri" 
+                                    value="{$azureSso['redirectUri'] ?? ''}" placeholder="https://your-domain.com/auth/azure/callback">
+                                <small class="text-muted">{trans('settings.azure.redirectUri.hint')}</small>
+                            </div>
+
+                            <input type="hidden" name="csrf_token" value="{$_SESSION['csrf_token']}">
+                            <button class="btn btn-primary w-100 mt-2" type="submit">{trans('settings.azure.submit')}</button>
+                        </form>
                     </div>
                 </div>
-
-                <div class="mb-3">
-                    <label for="adminIpWhitelist" class="form-label">{trans('security.ip_whitelist.addresses')}:</label>
-                    <textarea 
-                        class="form-control font-monospace" 
-                        name="adminIpWhitelist" 
-                        id="adminIpWhitelist" 
-                        rows="8" 
-                        style="font-size: 0.9rem;"
-                        placeholder="{trans('security.ip_whitelist.placeholder')}"
-                    >{implode("\n", $security['adminIpWhitelist'] ?? [])}</textarea>
-                    <div class="form-text">{trans('security.ip_whitelist.addresses_help')}</div>
-                </div>
-
-                <div class="mb-3" style="display:none;">
-                    <label for="securityKey" class="form-label">Security Key:</label>
-                    <input type="text" class="form-control" name="securityKey" id="securityKey" value="{$security['key'] ?? 'ENTER_YOUR_SECRET_KEY_HERE'}" readonly>
-                </div>
-
-                <input type="hidden" name="csrf_token" value="{$_SESSION['csrf_token']}">
-                <button class="btn btn-primary w-100 mt-2" type="submit">
-                    {trans('security.ip_whitelist.submit')}
-                </button>
-            </form>
-        </div>
-    </div>
-</div>
+            </div>
         </div>    
     </div>
 <script src="/js/admin/settings.latte-min.js"></script>

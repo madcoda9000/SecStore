@@ -274,6 +274,7 @@ class AuthController
             'title' => TranslationUtil::t('login.title'),
             'sessionTimeout' => SessionUtil::getSessionTimeout(),
             'lang' => Flight::get('lang'),
+            'azureSso' => $config['azureSso']
         ]);
         return;
     }
@@ -428,6 +429,27 @@ class AuthController
                 'sessionTimeout' => SessionUtil::getSessionTimeout(),
                 'lang' => Flight::get('lang'),
                 "application" => $config["application"],
+            ]);
+            return;
+        }
+
+        // Check if user must use Entra ID login instead of password ***
+        if ($user->entraIdEnabled === 1) {
+            LogUtil::logAction(
+                LogType::SECURITY,
+                'AuthController',
+                'login',
+                'BLOCKED: User must use Entra ID login instead of password',
+                $username
+            );
+
+            Flight::latte()->render('login.latte', [
+                'title' => TranslationUtil::t('login.title'),
+                'error' => TranslationUtil::t('login.msg.useEntraid'),
+                'sessionTimeout' => SessionUtil::getSessionTimeout(),
+                'lang' => Flight::get('lang'),
+                'application' => $config['application'],
+                'azureSso' => $config['azureSso']
             ]);
             return;
         }

@@ -1,0 +1,59 @@
+{extends '../_authLayout.latte'}
+
+{block content}
+<div class="container">
+    <div class="card p-4 shadow-sm login-card shadow-lg" style="width: 100%; max-width: 500px;">
+        
+        <div class="alert alert-warning mb-4">
+            <i class="bi-exclamation-triangle-fill"></i> <strong>MOCK MODE</strong><br>
+            Dies ist eine Simulation des Azure Login. Nur für Testing!
+        </div>
+
+        <h3 class="text-center text-primary mb-4">
+            <i class="bi-microsoft"></i> Mock Microsoft Login
+        </h3>
+
+        <form method="POST" action="/auth/azure/callback">
+            <input type="hidden" name="state" value="{$state}">
+            
+            <div class="mb-3">
+                <label for="mock_email" class="form-label">Wähle einen Test-Benutzer:</label>
+                <select class="form-select" id="mock_email" name="mock_email" required>
+                    <option value="">-- Benutzer auswählen --</option>
+                    {foreach $users as $user}
+                        <option value="{$user->email}">
+                            {$user->email} ({$user->firstname} {$user->lastname})
+                        </option>
+                    {/foreach}
+                </select>
+                <small class="text-muted">
+                    Nur Benutzer mit aktiviertem Entra ID Login werden angezeigt.
+                </small>
+            </div>
+
+            {if count($users) == 0}
+                <div class="alert alert-info">
+                    <i class="bi-info-circle"></i> 
+                    Keine Benutzer mit aktiviertem Entra ID gefunden.<br>
+                    Erstelle zuerst einen Benutzer mit "Enable Entra ID Login".
+                </div>
+            {/if}
+
+            <button type="submit" class="btn btn-primary w-100" {if count($users) == 0}disabled{/if}>
+                <i class="bi-box-arrow-in-right"></i> Mock Login durchführen
+            </button>
+        </form>
+
+        <div class="mt-3 text-center">
+            <a href="/login" class="btn btn-link">Zurück zum normalen Login</a>
+        </div>
+
+        <hr class="my-4">
+
+        <div class="alert alert-info small">
+            <strong>Info:</strong> Im Mock-Modus wird kein echter Azure AD Tenant benötigt. 
+            Der OAuth2 Flow wird lokal simuliert.
+        </div>
+    </div>
+</div>
+{/block}

@@ -73,19 +73,21 @@
             <div class="accordion" id="accordionExample">
                 <div class="accordion-item">
                     <h2 class="accordion-header">
-                        <button class="accordion-button collapsed {if $user->ldapEnabled === 1} bg-warning text-dark fw-bold{/if}"
-                            {if $user->ldapEnabled === 1}disabled title="Deaktiviert wegen LDAP-Authentifizierung"{/if}
+                        <button class="accordion-button collapsed {if $user->ldapEnabled === 1 || $user->entraIdEnabled === 1} bg-warning text-dark fw-bold{/if}"
+                            {if $user->ldapEnabled === 1 || $user->entraIdEnabled === 1}disabled title="{trans('profile.sso.disabled')}"{/if}
                             type="button" 
                             data-bs-toggle="collapse" 
                             data-bs-target="#collapseOne" 
                             aria-expanded="true" 
                             aria-controls="collapseOne">                        
-                        <i class="bi-key-fill" style="margin-right:15px;"></i>
-                        
+                        <i class="bi-key-fill" style="margin-right:15px;margin-left:15px;"></i>
+
                         {if $user->ldapEnabled === 1}
-                            Password change not possible because LDAP authenticated!
+                            {trans('profile.ldap.warning')}
+                        {elseif $user->entraIdEnabled === 1}
+                            {trans('profile.entraid.warning')}
                         {else}
-                            Change your password..
+                            {trans('profile.password.change')}
                         {/if}
                     </button>
                     </h2>
@@ -112,8 +114,14 @@
                 </div>
                 <div class="accordion-item">
                     <h2 class="accordion-header">
-                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
-                            <i class="bi-envelope-fill" style="margin-right:15px;"></i>Change your email address..
+                        <button class="accordion-button collapsed {if $user->entraIdEnabled === 1} bg-warning text-dark fw-bold{/if}"
+                            {if $user->entraIdEnabled === 1}disabled title="{trans('profile.email.entraid.warning')}"{/if}
+                            type="button" 
+                            data-bs-toggle="collapse" 
+                            data-bs-target="#collapseOne" 
+                            aria-expanded="true" 
+                            aria-controls="collapseOne">
+                            <i class="bi-envelope-fill" style="margin-right:15px;margin-left:15px;"></i>{trans('profile.email.entraid.warning')}
                         </button>
                     </h2>
                     <div id="collapseTwo" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
@@ -139,8 +147,14 @@
                 </div>
                 <div class="accordion-item">
                     <h2 class="accordion-header">
-                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
-                        <i class="bi-shield-fill-exclamation" style="margin-right:10px;margin-bottom:-2px;"></i>2FA Authentication
+                    <button class="accordion-button collapsed {if $user->entraIdEnabled === 1} bg-warning text-dark fw-bold{/if}"
+                            {if $user->entraIdEnabled === 1}disabled title="{trans('profile.2fa.entraid.warning')}"{/if}
+                            type="button" 
+                            data-bs-toggle="collapse" 
+                            data-bs-target="#collapseOne" 
+                            aria-expanded="true" 
+                            aria-controls="collapseOne">
+                        <i class="bi-shield-fill-exclamation" style="margin-right:15px;margin-left:15px;"></i>{trans('profile.2fa.entraid.warning')}
                     </button>
                     </h2>
                     <div id="collapseThree" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
@@ -198,42 +212,42 @@
                                 </div>  
                             {/if}   
                              {* Backup Codes Section - Only show if 2FA is enabled *}
-{if $user['mfaEnabled'] === 1 && $user['mfaSecret'] !== ''}
-<hr class="my-4">
-<div class="mb-4">
-    <h4 class="mb-3">
-        <i class="bi bi-key-fill"></i> {trans('profile.backupcodes.title')}
-    </h4>
+                            {if $user['mfaEnabled'] === 1 && $user['mfaSecret'] !== ''}
+                            <hr class="my-4">
+                            <div class="mb-4">
+                                <h4 class="mb-3">
+                                    <i class="bi bi-key-fill"></i> {trans('profile.backupcodes.title')}
+                                </h4>
 
-    <div class="card">
-        <div class="card-body">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <div>
-                    <h6 class="mb-1">{trans('profile.backupcodes.remaining')}</h6>
-                    <p class="text-muted mb-0" id="backup-codes-count">
-                        <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                        Loading...
-                    </p>
-                </div>
-                <button type="button" class="btn btn-primary" id="regenerate-backup-codes">
-                    <i class="bi bi-arrow-clockwise"></i> {trans('profile.backupcodes.regenerate')}
-                </button>
-            </div>
+                                <div class="card">
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between align-items-center mb-3">
+                                            <div>
+                                                <h6 class="mb-1">{trans('profile.backupcodes.remaining')}</h6>
+                                                <p class="text-muted mb-0" id="backup-codes-count">
+                                                    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                                                    Loading...
+                                                </p>
+                                            </div>
+                                            <button type="button" class="btn btn-primary" id="regenerate-backup-codes">
+                                                <i class="bi bi-arrow-clockwise"></i> {trans('profile.backupcodes.regenerate')}
+                                            </button>
+                                        </div>
 
-            {* Warning for low backup codes *}
-            <div id="backup-codes-warning" class="alert alert-warning d-none" role="alert">
-                <i class="bi bi-exclamation-triangle-fill"></i> 
-                <span id="backup-codes-warning-text"></span>
-            </div>
+                                        {* Warning for low backup codes *}
+                                        <div id="backup-codes-warning" class="alert alert-warning d-none" role="alert">
+                                            <i class="bi bi-exclamation-triangle-fill"></i> 
+                                            <span id="backup-codes-warning-text"></span>
+                                        </div>
 
-            <div class="alert alert-info mb-0">
-                <i class="bi bi-info-circle-fill"></i>
-                <small>{trans('2fasetup.backupcodes.description')}</small>
-            </div>
-        </div>
-    </div>
-</div>
-{/if}                          
+                                        <div class="alert alert-info mb-0">
+                                            <i class="bi bi-info-circle-fill"></i>
+                                            <small>{trans('2fasetup.backupcodes.description')}</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {/if}                          
                         </form>                            
                         {if $user['mfaEnforced'] === 0 && $user['mfaEnabled']===1 && !$user['mfaSecret']}
                             <br>

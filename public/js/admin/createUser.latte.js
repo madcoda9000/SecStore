@@ -125,4 +125,26 @@ document.addEventListener("DOMContentLoaded", function () {
     let newPassword = generatePassword(); // Zufälliges Passwort generieren
     passwordField.value = newPassword;
   });
+
+  // ========================================
+  // SSO-Enforcement: LDAP und Entra ID schließen sich gegenseitig aus
+  // ========================================
+  const ldapCheckbox = document.getElementById("ldapEnabled");
+  const entraCheckbox = document.getElementById("entraIdEnabled");
+
+  if (ldapCheckbox && entraCheckbox) {
+    // Wenn LDAP aktiviert wird, Entra deaktivieren
+    ldapCheckbox.addEventListener("change", function () {
+      if (this.checked && !entraCheckbox.disabled) {
+        entraCheckbox.checked = false;
+      }
+    });
+
+    // Wenn Entra aktiviert wird, LDAP deaktivieren
+    entraCheckbox.addEventListener("change", function () {
+      if (this.checked && !ldapCheckbox.disabled) {
+        ldapCheckbox.checked = false;
+      }
+    });
+  }
 });

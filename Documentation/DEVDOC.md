@@ -9,14 +9,16 @@
 1. [🔧 Setting up Development Environment](#-setting-up-development-environment)
 2. [📦 SecStore Installation](#-secstore-installation)  
 3. [🎯 Web-Based Setup (Recommended)](#-web-based-setup-recommended)
-4. [🆕 Creating Your First Custom Page](#-creating-your-first-custom-page)
-5. [📄 Creating Latte Templates](#-creating-latte-templates)
-6. [🎮 Developing Controllers](#-developing-controllers)
-7. [🛣️ Adding Routes](#️-adding-routes)
-8. [🧭 Extending Navigation](#-extending-navigation)
-9. [💾 JavaScript Integration](#-javascript-integration)
-10. [🌍 Implementing Multilingual Support](#-implementing-multilingual-support)
-11. [📚 Best Practices & Guidelines](#-best-practices--guidelines)
+4. [🔄 Development Workflow](#-development-workflow)
+5. [🔒 Using Azure Mock-Mode for local Development](#azure-sso-mock-mode)
+6. [🆕 Creating Your First Custom Page](#-creating-your-first-custom-page)
+7. [📄 Creating Latte Templates](#-creating-latte-templates)
+8. [🎮 Developing Controllers](#-developing-controllers)
+9. [🛣️ Adding Routes](#-adding-routes)
+10. [🧭 Extending Navigation](#-extending-navigation)
+11. [💾 JavaScript Integration](#-javascript-integration)
+12. [🌍 Implementing Multilingual Support](#-implementing-multilingual-support)
+13. [📚 Best Practices & Guidelines](#-best-practices--guidelines)
 
 ---
 
@@ -422,11 +424,467 @@ qc
 
 ---
 
-## 🆕 Creating Your First Custom Page
+## Azure SSO Mock Mode
+
+### 📋 Overview
+
+The Azure SSO Mock Mode allows you to develop and test Azure/Entra ID authentication **without a real Azure tenant**. It simulates the complete OAuth2 flow locally, making it perfect for:
+
+- 🚀 **Rapid Development** - No Azure setup required
+- 🧪 **Local Testing** - Test SSO logic offline
+- 🔄 **CI/CD Pipelines** - Automated testing without external dependencies
+- 📺 **Demos** - Show SSO functionality without Azure credentials
+
+⚠️ **Important**: Mock Mode is for development only. Never use in production!
+
+---
+
+### 🎯 When to Use Mock Mode
+
+| Use Case | Mock Mode | Real Azure |
+|----------|-----------|------------|
+| Local Development | ✅ Perfect | ❌ Overkill |
+| Testing SSO Logic | ✅ Perfect | ❌ Slower |
+| Integration Tests | ✅ Fast | ❌ Complex |
+| Demo/Presentation | ✅ Easy | ⚠️ Requires setup |
+| Production | ❌ NEVER | ✅ Required |
+| Testing MFA/Policies | ❌ Not supported | ✅ Required |
+
+---
+
+### ⚙️ Configuration
+
+#### **Enable Mock Mode**
+
+In your `config.php`, you need **TWO settings**:
+
+**1. Set Application Environment to Development:**
+
+```php
+$application = [
+    'appUrl' => 'http://localhost:8000',
+    'sessionTimeout' => 1800,
+    'allowPublicRegister' => false,
+    'allowPublicPasswordReset' => false,
+    'environment' => 'development',  // ⚠️ REQUIRED for Mock Mode!
+];
+```
+
+**2. Enable Azure SSO Mock Mode:**
+
+```php
+$azureSso = [
+    'enabled' => true,      // Enable Azure SSO feature
+    'mockMode' => true,     // ⚠️ MOCK MODE - Development only!
+    'tenantId' => '',       // Not needed in Mock Mode
+    'clientId' => '',       // Not needed in Mock Mode
+    'clientSecret' => '',   // Not needed in Mock Mode
+    'redirectUri' => 'http://localhost:8000/auth/azure/callback', // set here the correct hostname and port for your dev enviroment!
+];
+```
+
+⚠️ **CRITICAL**: If `environment` is NOT set to `'development'`, the Mock Methods will not work for security reasons!
+
+#### **Disable Mock Mode (Production)**
+
+**1. Set Application Environment to Production:**
+
+```php
+$application = [
+    'appUrl' => 'https://your-domain.com',
+    'sessionTimeout' => 1800,
+    'allowPublicRegister' => false,
+    'allowPublicPasswordReset' => false,
+    'environment' => 'production',  // ⚠️ Disables development mode!
+];
+```
+
+**2. Configure Real Azure:**
+
+```php
+$azureSso = [
+    'enabled' => true,
+    'mockMode' => false,    // ⚠️ Use real Azure
+    'tenantId' => 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx',
+    'clientId' => 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx',
+    'clientSecret' => 'your-client-secret-value',
+    'redirectUri' => 'https://your-domain.com/auth/azure/callback',
+];
+```
+
+---
+
+### 🚀 Usage Guide
+
+#### **Step 1: Create Test User with Entra ID**
+
+```bash
+# 1. Log in as Admin
+# 2. Navigate to Admin → Users → Create User
+# 3. Fill in user details
+# 4. ✅ Check "Enable Entra ID Login"
+# 5. ❌ Uncheck "LDAP Login" (mutually exclusive)
+# 6. Save
+```
+
+**Example:**
+- Username: `test.azure`
+- Email: `test.azure@company.com`
+- Entra ID: **Enabled**
+
+#### **Step 2: Test Mock Login**
+
+```bash
+# 1. Navigate to /login
+# 2. Click "Sign in with Microsoft / Entra ID" button
+# 3. Select user from dropdown
+# 4. Click "Mock Login durchführen"
+# ✅ Automatic login without password/2FA
+```
+
+#### **Step 3: Verify Behavior**
+
+**Check Profile Restrictions:**
+```bash
+# 1. Log in as Entra ID user (via Mock)
+# 2. Navigate to Profile
+# 3. Verify:
+#    ✅ Password change: DISABLED
+#    ✅ Email change: DISABLED
+#    ✅ 2FA settings: DISABLED
+```
+
+**Check Normal Login Block:**
+```bash
+# 1. Log out
+# 2. Try normal login with username/password
+# 3. ✅ Error: "Your account requires login via Microsoft/Entra ID"
+```
+
+---
+
+### 🔄 Mock Mode Flow
+
+```
+User clicks Azure button
+        ↓
+Redirect to /auth/azure/login (Mock login page will automatically loaded if moch mode enabled)
+        ↓
+User selects email from dropdown
+        ↓
+POST to /auth/azure/callback
+        ↓
+Generate fake azure login
+        ↓
+Redirect to /auth/azure/callback (normal app flow)
+        ↓
+AzureSsoUtil detects mockMode = true
+        ↓
+Read email from session (instead of Azure API)
+        ↓
+Find user by email → Check entraIdEnabled = 1
+        ↓
+✅ Login successful (bypass brute force + 2FA)
+```
+
+---
+
+### 🧪 Testing Scenarios
+
+#### **Scenario 1: Successful Mock Login**
+
+```php
+✅ User exists in database
+✅ entraIdEnabled = 1
+✅ status = 1 (active)
+→ Result: Automatic login
+```
+
+#### **Scenario 2: User Not Found**
+
+```php
+✅ Email selected from dropdown
+❌ Email not in database
+→ Result: Error "User not found"
+```
+
+#### **Scenario 3: Entra ID Not Enabled**
+
+```php
+✅ User exists
+❌ entraIdEnabled = 0
+→ Result: User not shown in dropdown
+```
+
+#### **Scenario 4: Normal Login Blocked**
+
+```php
+✅ User has entraIdEnabled = 1
+❌ Tries normal login with password
+→ Result: Error "Must use Entra ID login"
+```
+
+---
+
+### 🔍 Debugging
+
+#### **Check Logs**
+
+```sql
+SELECT * FROM logs 
+WHERE context LIKE '%Azure%' OR context LIKE '%Mock%' 
+ORDER BY datum_zeit DESC 
+LIMIT 20;
+```
+
+**Expected log entries:**
+- `MOCK MODE: Login for test.azure@company.com`
+- `Successful Azure SSO login for: test.azure@company.com`
+
+#### **Verify User Configuration**
+
+```sql
+SELECT id, username, email, entraIdEnabled, ldapEnabled, status 
+FROM users 
+WHERE email = 'test.azure@company.com';
+```
+
+**Expected:**
+```
+id | username   | email                  | entraIdEnabled | ldapEnabled | status
+---+------------+------------------------+----------------+-------------+-------
+1  | test.azure | test.azure@company.com | 1              | 0           | 1
+```
+
+#### **Common Issues**
+
+| Problem | Cause | Solution |
+|---------|-------|----------|
+| Azure button not visible | `enabled = false` | Set `enabled = true` in config |
+| Mock routes return 404 | `environment != 'development'` | Set `environment = 'development'` in config |
+| No users in dropdown | No user with `entraIdEnabled = 1` | Create user with Entra enabled |
+| "Invalid state" error | Session issue | Clear browser cookies |
+| Redirect loop | Wrong `redirectUri` | Check config.php URL |
+
+---
+
+### 🔒 Security Considerations
+
+#### **Why Mock Mode is NOT Production-Safe**
+
+❌ **No Real Authentication** - Anyone can select any user  
+❌ **No Password Verification** - Email selection is sufficient  
+❌ **No MFA** - Multi-factor authentication is bypassed  
+❌ **No Azure AD Policies** - Conditional access not enforced  
+
+
+#### **Best Practices**
+
+1. ✅ Use Mock Mode only on localhost/development
+2. ✅ Check environment variables before enabling
+3. ✅ Remove Mock routes in production deployments
+4. ✅ Use `.gitignore` for config.php
+5. ✅ Set `mockMode = false` before production deployment
+
+---
+
+### 🔄 Switching to Real Azure
+
+When ready for production testing:
+
+#### **Step 1: Get Azure Credentials**
+
+```bash
+# Option A: Azure Free Account
+https://azure.microsoft.com/free
+
+# Option B: Microsoft 365 Developer Program
+https://developer.microsoft.com/microsoft-365/dev-program
+```
+
+#### **Step 2: Register App in Azure Portal**
+
+```bash
+# 1. Go to https://portal.azure.com
+# 2. Azure Active Directory → App registrations → New registration
+# 3. Set Redirect URI: https://your-domain.com/auth/azure/callback
+# 4. Create client secret
+# 5. Set API permissions: User.Read, openid, profile, email
+# 6. Copy: Tenant ID, Client ID, Client Secret
+```
+
+#### **Step 3: Update Config**
+
+```php
+$azureSso = [
+    'enabled' => true,
+    'mockMode' => false,  // ⚠️ Switch to real Azure
+    'tenantId' => 'your-tenant-id',
+    'clientId' => 'your-client-id',
+    'clientSecret' => 'your-client-secret',
+    'redirectUri' => 'https://your-domain.com/auth/azure/callback',
+];
+```
+
+#### **Step 4: Test Real Azure**
+
+```bash
+# 1. Navigate to /login
+# 2. Click Azure button
+# 3. Redirected to real Microsoft login
+# 4. Sign in with Azure account
+# 5. Redirected back to app
+# ✅ Real authentication with MFA/policies
+```
+
+---
+
+### 📊 Mock vs Real Comparison
+
+| Feature | Mock Mode | Real Azure |
+|---------|-----------|------------|
+| Setup Time | 5 minutes | 30 minutes |
+| Cost | Free | Free (Developer) |
+| Authentication | Fake | Real |
+| MFA Support | No | Yes |
+| Conditional Access | No | Yes |
+| User Management | Local DB | Azure Portal |
+| Production Ready | ❌ NO | ✅ YES |
+| Offline Testing | ✅ YES | ❌ NO |
+
+---
+
+### 💡 Development Workflow
+
+#### **Recommended Approach**
+
+```bash
+# Phase 1: Local Development (Mock Mode)
+1. Develop SSO features locally
+2. Test user flows with Mock Mode
+3. Debug and refine logic
+4. Write integration tests
+
+# Phase 2: Staging (Real Azure)
+1. Set up Azure Free/Developer tenant
+2. Switch mockMode = false
+3. Test with real authentication
+4. Test MFA/policies
+5. Verify production behavior
+
+# Phase 3: Production
+1. Use company Azure tenant
+2. Remove Mock Mode code (optional)
+3. Monitor logs
+4. Handle edge cases
+```
+
+---
+
+### 🎓 Quick Reference
+
+#### **Check Configuration**
+```php
+// Verify Mock Mode is properly configured
+$config = include 'config.php';
+
+// Both must be true for Mock Mode to work:
+echo "Environment: " . ($config['application']['environment'] ?? 'not set');
+// Must be: 'development'
+
+echo "Mock Mode: " . ($config['azureSso']['mockMode'] ? 'true' : 'false');
+// Must be: true
+```
+
+#### **Enable Mock Mode**
+```php
+// In config.php - TWO settings required:
+$application = [
+    'environment' => 'development',  // 1. Set environment
+];
+
+$azureSso = [
+    'mockMode' => true,  // 2. Enable mock
+];
+```
+
+#### **Disable Mock Mode**
+```php
+// In config.php:
+$application = [
+    'environment' => 'production',  // Disables Mock routes
+];
+
+$azureSso = [
+    'mockMode' => false,  // Use real Azure
+];
+```
+
+#### **Mock Login URL**
+```
+http://localhost:8000/login
+→ Click Azure button
+→ Redirects to /dev/azure-mock/login
+```
+
+#### **Clear Mock Session**
+```php
+unset($_SESSION['mock_azure_email']);
+unset($_SESSION['mock_azure_code']);
+unset($_SESSION['oauth2state']);
+```
+
+---
+
+### ✅ Testing Checklist
+
+Before switching to real Azure, verify:
+
+- [ ] `environment = 'development'` in config.php
+- [ ] `mockMode = true` in config.php
+- [ ] Mock login works for Entra-enabled users
+- [ ] Non-Entra users don't appear in dropdown
+- [ ] Normal login blocked for Entra users
+- [ ] Profile restrictions work (password/email/2FA)
+- [ ] LDAP and Entra are mutually exclusive
+- [ ] Logs show correct Mock entries
+- [ ] No errors in browser console
+- [ ] Session cleanup works properly
+
+---
+
+### 🔗 Related Documentation
+
+- **Full Azure Setup Guide**: See `AZURE_SSO_INSTALLATION.md`
+- **Production Deployment**: See `INSTALL.md`
+- **Security Guidelines**: See `SECURITY.md`
+
+---
+
+### 💬 Support
+
+**Issues with Mock Mode?**
+
+1. Check logs: `SELECT * FROM logs WHERE context LIKE '%Mock%'`
+2. Verify config: `mockMode = true` and `enabled = true`
+3. Clear cache: `rm -rf cache/*.php`
+4. Check user: `entraIdEnabled = 1` in database
+
+**Ready for Production?**
+
+Set `mockMode = false` and follow `AZURE_SSO_INSTALLATION.md` for Azure setup.
+
+---
+
+**Happy Testing! 🎉**
+
+---
+
+### 🆕 Creating Your First Custom Page
 
 Let's create an example **"FAQ"** page to demonstrate all concepts.
 
-### **Step-by-Step Guide:**
+#### **Step-by-Step Guide:**
 
 1. **📄 Create template** → `app/views/faq.latte`
 2. **🎮 Develop controller** → `app/Controllers/FaqController.php`

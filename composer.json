@@ -27,29 +27,31 @@
     },
     "require": {
         "php": ">=8.3",
+        "ext-bcmath": "*",
+        "ext-ctype": "*",
         "ext-curl": "*",
+        "ext-fileinfo": "*",
+        "ext-filter": "*",
+        "ext-gd": "*",
+        "ext-iconv": "*",
         "ext-json": "*",
+        "ext-mbstring": "*",
         "ext-openssl": "*",
         "ext-pdo": "*",
         "ext-pdo_mysql": "*",
+        "ext-simplexml": "*",
+        "ext-tokenizer": "*",
         "ext-xml": "*",
         "ext-xmlwriter": "*",
-        "ext-simplexml": "*",
         "ext-zip": "*",
-        "ext-bcmath": "*",
-        "ext-gd": "*",
-        "ext-ctype": "*",
-        "ext-iconv": "*",
-        "ext-fileinfo": "*",
-        "ext-mbstring": "*",
-        "ext-tokenizer": "*",
-        "ext-filter": "*",
-        "mikecao/flight": "^3.13",
-        "latte/latte": "^3.0",
+        "endroid/qr-code": "^3.0",
         "j4mie/idiorm": "^1.5",
+        "latte/latte": "^3.0",
+        "league/oauth2-client": "^2.8",
+        "microsoft/microsoft-graph": "^2.48",
+        "mikecao/flight": "^3.13",
         "phpmailer/phpmailer": "^6.9",
-        "robthree/twofactorauth": "^3.0",
-        "endroid/qr-code": "^3.0"
+        "robthree/twofactorauth": "^3.0"
     },
     "autoload": {
         "psr-4": {
@@ -83,7 +85,11 @@
     "config": {
         "optimize-autoloader": true,
         "sort-packages": true,
-        "preferred-install": "dist"
+        "preferred-install": "dist",
+        "allow-plugins": {
+            "php-http/discovery": true,
+            "tbachert/spi": true
+        }
     },
     "minimum-stability": "stable",
     "prefer-stable": true

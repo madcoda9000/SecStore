@@ -7,6 +7,8 @@ use App\Controllers\LogController;
 use App\Controllers\ProfileController;
 use App\Controllers\RateLimitController;
 use App\Controllers\SetupController;
+use App\Controllers\AzureSsoController;
+use App\Controllers\AzureMockController;
 use App\Middleware\AdminCheckMiddleware;
 use App\Middleware\AuthCheckMiddleware;
 use App\Middleware\CsrfMiddleware;
@@ -242,6 +244,22 @@ authRoute('POST', '/reset-password', function () {
     (new AuthController())->resetPassword();
 }, 'reset-password');
 
+// ========================================
+// Azure SSO / Entra ID Routes
+// Handles BOTH Mock Mode AND Real Azure!
+// ========================================
+Flight::route('GET /auth/azure/login', function () {
+    (new AzureSsoController())->redirectToAzure();
+});
+
+Flight::route('POST /auth/azure/callback', function () {
+    (new AzureSsoController())->handleCallback();
+});
+
+Flight::route('GET /auth/azure/callback', function () {
+    (new AzureSsoController())->handleCallback();
+});
+
 // ==========================================
 // USER ROUTES (Authenticated)
 // ==========================================
@@ -412,6 +430,10 @@ secureRoute('POST /admin/roles/delete', function () {
 
 secureRoute('GET /admin/roles/checkUsers', function () {
     (new AdminController())->listRoles();
+}, 'admin', true);
+
+secureRoute('POST /admin/updateAzureSsoSettings', function () {
+    (new AdminController())->updateAzureSsoSettings($_POST);
 }, 'admin', true);
 
 // ==========================================

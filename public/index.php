@@ -74,7 +74,7 @@ $app->register('latte', LatteEngine::class, [], function (LatteEngine $latte) us
 
 
 /**
- * SETUP-PRÜFUNG 
+ * SETUP-PRÜFUNG
  * Ersetzt das ursprüngliche "require '../app/DatabaseSetup.php';"
  */
 
@@ -128,7 +128,7 @@ if (!$needsSetup) {
  */
 if (!$needsSetup) {
     $CorsUtil = new CorsUtil($config['allowedHosts']);
-    $app->before('start', function() use ($CorsUtil) {
+    $app->before('start', function () use ($CorsUtil) {
         $CorsUtil->setupCors(false);  // false for normal operation
     });
 }
@@ -199,10 +199,10 @@ $app->map('error', function (Throwable $ex) use ($app) {
     http_response_code($code);
     LogUtil::logAction(LogType::ERROR, 'index', 'map->error', 'ERROR ' . $code . ': ' . $ex->getMessage());
 
-    $app->latte()->render('errors/error.latte', [
-        'code' => $code,
-        'message' => $ex->getMessage()
-    ]);
+    //$app->latte()->render('errors/error.latte', [
+    //    'code' => $code,
+    //    'message' => $ex->getMessage()
+    //]);
 });
 
 // Add the headers in a filter
