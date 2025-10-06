@@ -19,6 +19,7 @@ ALLOWED_TEMPLATES=(
 ALLOWED_PATTERNS=(
     "admin-backup-codes-display.js"
     "admin-backup-codes-display-min.js"
+    "2fa-backup-codes.png"
 )
 
 # Funktion: Prüfen ob Dateiname erlaubt ist

@@ -395,6 +395,7 @@ We welcome contributions! 🎉
 | 🏗️ **[ARCHITECTURE.md](Documentation/ARCHITECTURE.md)** | **Complete technical architecture and request lifecycle** |
 | 📖 **[INSTALL.md](Documentation/INSTALL.md)** | Complete manual installation and setup guide |
 | 🐳 **[README_DOCKER.md](Documentation/README_DOCKER.md)** | Docker installation guide (recommended) |
+| 📘 **[HANDBOOK.md](Documentation/HANDBOOK.md)** | **Complete Handbook for Users & Adminstrators**|
 | 🧑‍💻 **[DEVDOC.md](Documentation/DEVDOC.md)** | Developer guide for extending SecStore |
 | 🧪 **[TESTING.md](Documentation/TESTING.md)** | Testing strategy and pragmatic approach |
 | 🔒 **[SECURITY.md](Documentation/SECURITY.md)** | Security policies and vulnerability reporting |

@@ -460,6 +460,8 @@ Wenn Sie LDAP für diesen Benutzer aktivieren, generieren Sie einfach ein belieb
     'profile.2fa.entraid.warning' => '2fa-Setup nicht möglich - 2FA wird über Entra ID verwaltet',
     'profile.password.change' => 'Passwort ändern ...',
     'profile.ldap.warning' => 'Passwort-Änderung nicht möglich. - LDAP Authentifizierung!',
+    'profile.email.change' => 'Emailadresse ändern...',
+    'profile.2fa.settings' => '2fa Einstellungen..',
 
     // Setup-Übersetzungen
     'setup.title' => 'SecStore Setup',

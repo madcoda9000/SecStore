@@ -463,6 +463,8 @@ return [
     'profile.2fa.entraid.warning' => '2fa-Setup not possible - 2FA is managed by Entra ID',
     'profile.password.change' => 'Change password ...',
     'profile.ldap.warning' => 'Password-Change not possible. - LDAP Authentication!',
+    'profile.email.change' => 'Change your email address..',
+    'profile.2fa.settings' => 'Your 2fa Settings..',
 
     // Setup translations
     'setup.title' => 'SecStore Setup',

@@ -118,10 +118,17 @@
                             {if $user->entraIdEnabled === 1}disabled title="{trans('profile.email.entraid.warning')}"{/if}
                             type="button" 
                             data-bs-toggle="collapse" 
-                            data-bs-target="#collapseOne" 
+                            data-bs-target="#collapseTwo" 
                             aria-expanded="true" 
-                            aria-controls="collapseOne">
-                            <i class="bi-envelope-fill" style="margin-right:15px;margin-left:15px;"></i>{trans('profile.email.entraid.warning')}
+                            aria-controls="collapseTwo">
+                            <i class="bi-envelope-fill" style="margin-right:15px;margin-left:15px;"></i>
+                            {if $user->ldapEnabled === 1}
+                                {trans('profile.ldap.warning')}
+                            {elseif $user->entraIdEnabled === 1}
+                                {trans('profile.entraid.warning')}
+                            {else}
+                                {trans('profile.email.change')}
+                            {/if}
                         </button>
                     </h2>
                     <div id="collapseTwo" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
@@ -151,10 +158,17 @@
                             {if $user->entraIdEnabled === 1}disabled title="{trans('profile.2fa.entraid.warning')}"{/if}
                             type="button" 
                             data-bs-toggle="collapse" 
-                            data-bs-target="#collapseOne" 
+                            data-bs-target="#collapseThree" 
                             aria-expanded="true" 
-                            aria-controls="collapseOne">
-                        <i class="bi-shield-fill-exclamation" style="margin-right:15px;margin-left:15px;"></i>{trans('profile.2fa.entraid.warning')}
+                            aria-controls="collapseThree">
+                        <i class="bi-shield-fill-exclamation" style="margin-right:15px;margin-left:15px;"></i>
+                        {if $user->ldapEnabled === 1}
+                                {trans('profile.ldap.warning')}
+                            {elseif $user->entraIdEnabled === 1}
+                                {trans('profile.entraid.warning')}
+                            {else}
+                                {trans('profile.2fa.settings')}
+                            {/if}
                     </button>
                     </h2>
                     <div id="collapseThree" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
