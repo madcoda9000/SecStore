@@ -102,6 +102,8 @@ class CsrfMiddleware
             '/admin/rate-limits/reset',  // Rate Limit Resets
             '/admin/rate-limits/clear', // Rate Limit Clear All
             '/admin/analytics/data', // Analytics Data Fetching
+            '/admin/system-info',           // system info
+            '/admin/phpinfo',               // phpinfo
         ];
 
         foreach ($noRefreshRoutes as $route) {
@@ -125,7 +127,7 @@ class CsrfMiddleware
             '/profileChangePassword',      // Passwort ändern
             '/profileChangeEmail',         // Email ändern
             '/2fa-verify',                        // 2FA
-            '/enable-2fa',                 // 2FA aktivieren
+            '/enable-2fa',                 // 2FA aktivieren            
         ];
 
         foreach ($refreshRoutes as $route) {

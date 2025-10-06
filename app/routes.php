@@ -322,6 +322,16 @@ secureRoute('GET /admin/security/metrics', function () {
     (new AdminController())->getSecurityMetrics();
 }, 'admin', true);
 
+// System Information (Admin)
+secureRoute('GET /admin/system-info', function () {
+    (new AdminController())->showSystemInfo();
+}, 'admin', true);
+
+// PHP Info (Admin) - GET statt POST
+secureRoute('GET /admin/phpinfo', function () {
+    (new AdminController())->showPhpInfo();
+}, 'admin', true);
+
 // Admin Settings
 secureRoute('GET /admin/settings', function () {
     (new AdminController())->showSettings();

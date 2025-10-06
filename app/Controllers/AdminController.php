@@ -14,6 +14,7 @@ use Exception;
 use Flight;
 use InvalidArgumentException;
 use ORM;
+use PDO;
 
 /**
  * Class Name: AdminController
@@ -29,6 +30,277 @@ use ORM;
  */
 class AdminController
 {
+
+    /**
+     * Displays PHP info.
+     *
+     * Only accessible for admin users via POST.
+     *
+     * @return void
+     */
+    public function showPhpInfo()
+    {
+        if (SessionUtil::get('user')['id'] === null) {
+            Flight::halt(403, 'Unauthorized');
+        }
+
+        $user = User::findUserById(SessionUtil::get('user')['id']);
+        if ($user === false) {
+            Flight::halt(403, 'Unauthorized');
+        }
+
+        $roles = explode(',', $user->roles);
+        if (!in_array('Admin', $roles)) {
+            Flight::halt(403, 'Access denied');
+        }
+
+        // Output phpinfo
+        phpinfo();
+        exit;
+    }
+
+    /**
+     * Shows the system information page.
+     *
+     * Displays PHP configuration, disk usage, memory usage, server info, and database info.
+     * Only accessible for admin users.
+     *
+     * @return void
+     */
+    public function showSystemInfo()
+    {
+        if (SessionUtil::get('user')['id'] === null) {
+            Flight::redirect('/login');
+        }
+
+        $user = User::findUserById(SessionUtil::get('user')['id']);
+        if ($user === false) {
+            Flight::redirect('/login');
+        }
+
+        $roles = explode(',', $user->roles);
+        if (!in_array('Admin', $roles)) {
+            Flight::halt(403, 'Access denied');
+        }
+
+        // Collect system information
+        $systemInfo = $this->collectSystemInfo();
+
+        Flight::latte()->render('admin/system-info.latte', [
+            'title' => TranslationUtil::t('system_info.title'),
+            'user' => SessionUtil::get('user'),
+            'sessionTimeout' => SessionUtil::getRemainingTime(),
+            'systemInfo' => $systemInfo,
+        ]);
+    }
+
+    /**
+     * Collects comprehensive system information.
+     *
+     * Gathers PHP config, disk usage, memory usage, server info, and database info.
+     *
+     * @return array Associative array with system information
+     */
+    private function collectSystemInfo(): array
+    {
+        $config = include __DIR__ . '/../../config.php';
+
+        $info = [
+            'php' => $this->getPhpInfo(),
+            'disk' => $this->getDiskInfo(),
+            'memory' => $this->getMemoryInfo(),
+            'server' => $this->getServerInfo(),
+            'database' => $this->getDatabaseInfo($config),
+            'app' => $this->getAppInfo($config),
+        ];
+
+        return $info;
+    }
+
+    /**
+     * Gets PHP configuration information.
+     *
+     * @return array PHP version and configuration settings
+     */
+    private function getPhpInfo(): array
+    {
+        return [
+            'version' => phpversion(),
+            'memory_limit' => ini_get('memory_limit'),
+            'max_execution_time' => ini_get('max_execution_time') . 's',
+            'upload_max_filesize' => ini_get('upload_max_filesize'),
+            'post_max_size' => ini_get('post_max_size'),
+            'extensions' => get_loaded_extensions(),
+            'zend_version' => zend_version(),
+        ];
+    }
+
+    /**
+     * Gets disk usage information.
+     *
+     * @return array Disk space statistics
+     */
+    private function getDiskInfo(): array
+    {
+        $docRoot = $_SERVER['DOCUMENT_ROOT'];
+        $totalSpace = disk_total_space($docRoot);
+        $freeSpace = disk_free_space($docRoot);
+        $usedSpace = $totalSpace - $freeSpace;
+        $usagePercent = $totalSpace > 0 ? round(($usedSpace / $totalSpace) * 100, 2) : 0;
+
+        return [
+            'total' => $this->formatBytes($totalSpace),
+            'used' => $this->formatBytes($usedSpace),
+            'free' => $this->formatBytes($freeSpace),
+            'usage_percent' => $usagePercent,
+            'total_bytes' => $totalSpace,
+            'used_bytes' => $usedSpace,
+            'free_bytes' => $freeSpace,
+        ];
+    }
+
+    /**
+     * Gets memory usage information (Linux only).
+     *
+     * @return array|null Memory statistics or null if not available
+     */
+    private function getMemoryInfo(): ?array
+    {
+        if (PHP_OS_FAMILY !== 'Linux') {
+            return null;
+        }
+
+        if (!file_exists('/proc/meminfo')) {
+            return null;
+        }
+
+        $meminfo = file_get_contents('/proc/meminfo');
+        if ($meminfo === false) {
+            return null;
+        }
+
+        preg_match('/MemTotal:\s+(\d+)/', $meminfo, $totalMatch);
+        preg_match('/MemFree:\s+(\d+)/', $meminfo, $freeMatch);
+        preg_match('/Cached:\s+(\d+)/', $meminfo, $cachedMatch);
+
+        if (empty($totalMatch) || empty($freeMatch)) {
+            return null;
+        }
+
+        $total = (int)$totalMatch[1] * 1024; // Convert KB to bytes
+        $free = (int)$freeMatch[1] * 1024;
+        $cached = isset($cachedMatch[1]) ? (int)$cachedMatch[1] * 1024 : 0;
+        $used = $total - $free - $cached;
+
+        return [
+            'total' => $this->formatBytes($total),
+            'used' => $this->formatBytes($used),
+            'free' => $this->formatBytes($free),
+            'cached' => $this->formatBytes($cached),
+            'total_bytes' => $total,
+            'used_bytes' => $used,
+            'free_bytes' => $free,
+        ];
+    }
+
+    /**
+     * Gets server information.
+     *
+     * @return array Server details
+     */
+    private function getServerInfo(): array
+    {
+        return [
+            'software' => $_SERVER['SERVER_SOFTWARE'] ?? 'Unknown',
+            'os' => php_uname(),
+            'hostname' => gethostname(),
+            'document_root' => $_SERVER['DOCUMENT_ROOT'] ?? 'Unknown',
+            'current_time' => date('Y-m-d H:i:s'),
+        ];
+    }
+
+    /**
+     * Gets database information.
+     *
+     * @param array $config Application configuration
+     * @return array Database statistics
+     */
+    private function getDatabaseInfo(array $config): array
+    {
+        try {
+            $db = ORM::get_db();
+
+            // Get database version
+            $versionResult = $db->query('SELECT VERSION() as version');
+            $version = $versionResult ? $versionResult->fetchColumn() : 'Unknown';
+
+            // Get database size
+            $dbName = $config['database']['dbname'] ?? 'secstore';
+            $sizeQuery = "SELECT 
+            SUM(data_length + index_length) as size 
+            FROM information_schema.TABLES 
+            WHERE table_schema = :dbname";
+
+            $stmt = $db->prepare($sizeQuery);
+            $stmt->execute(['dbname' => $dbName]);
+            $sizeResult = $stmt->fetch(PDO::FETCH_ASSOC);
+            $dbSize = $sizeResult && $sizeResult['size'] ? (int)$sizeResult['size'] : 0;
+
+            return [
+                'version' => $version,
+                'size' => $this->formatBytes($dbSize),
+                'size_bytes' => $dbSize,
+                'name' => $dbName,
+            ];
+        } catch (Exception $e) {
+            LogUtil::logAction(
+                LogType::ERROR,
+                'AdminController',
+                'getDatabaseInfo',
+                'Error getting database info: ' . $e->getMessage()
+            );
+
+            return [
+                'version' => 'Error',
+                'size' => 'N/A',
+                'size_bytes' => 0,
+                'name' => $config['database']['dbname'] ?? 'Unknown',
+            ];
+        }
+    }
+
+    /**
+     * Gets application information.
+     *
+     * @param array $config Application configuration
+     * @return array Application details
+     */
+    private function getAppInfo(array $config): array
+    {
+        return [
+            'version' => '1.4.0', // Update this as needed
+            'environment' => $config['application']['environment'] ?? 'production',
+        ];
+    }
+
+    /**
+     * Formats bytes to human-readable format.
+     *
+     * @param int $bytes Number of bytes
+     * @param int $precision Decimal precision
+     * @return string Formatted string (e.g., "1.5 GB")
+     */
+    private function formatBytes(int $bytes, int $precision = 2): string
+    {
+        $units = ['B', 'KB', 'MB', 'GB', 'TB'];
+
+        for ($i = 0; $bytes > 1024 && $i < count($units) - 1; $i++) {
+            $bytes /= 1024;
+        }
+
+        return round($bytes, $precision) . ' ' . $units[$i];
+    }
+
     /**
      * Resets (clears) backup codes for a user.
      *

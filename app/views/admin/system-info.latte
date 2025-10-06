@@ -1,0 +1,239 @@
+{extends '../_mainLayout.latte'}
+
+{block content}
+<div class="container py-4" style="flex:1">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1><span class="bi bi-info-circle-fill"></span>&nbsp;{trans('system_info.title')}</h1>
+        <button class="btn btn-primary" id="refreshBtn">
+            <i class="bi bi-arrow-clockwise"></i> {trans('system_info.refresh')}
+        </button>
+    </div>
+
+    <div class="row g-3">
+        {* PHP Configuration *}
+        <div class="col-md-6">
+            <div class="card h-100">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="bi bi-filetype-php"></i> {trans('system_info.php.title')}</h5>
+                </div>
+                <div class="card-body">
+                    <table class="table table-sm table-borderless">
+                        <tbody>
+                            <tr>
+                                <th style="width: 60%">{trans('system_info.php.version')}:</th>
+                                <td><span class="badge bg-success">{$systemInfo['php']['version']}</span></td>
+                            </tr>
+                            <tr>
+                                <th>{trans('system_info.php.memory_limit')}:</th>
+                                <td>{$systemInfo['php']['memory_limit']}</td>
+                            </tr>
+                            <tr>
+                                <th>{trans('system_info.php.max_execution_time')}:</th>
+                                <td>{$systemInfo['php']['max_execution_time']}</td>
+                            </tr>
+                            <tr>
+                                <th>{trans('system_info.php.upload_max_filesize')}:</th>
+                                <td>{$systemInfo['php']['upload_max_filesize']}</td>
+                            </tr>
+                            <tr>
+                                <th>{trans('system_info.php.post_max_size')}:</th>
+                                <td>{$systemInfo['php']['post_max_size']}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="mt-3">
+                     <input type="hidden" name="csrf_token" value="{$_SESSION['csrf_token']}">
+                        <button class="btn btn-sm btn-outline-primary w-100" id="showPhpInfoBtn">
+                            <i class="bi bi-eye"></i> {trans('system_info.php.show_full_info')}
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {* Disk Usage *}
+        <div class="col-md-6">
+            <div class="card h-100">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0"><i class="bi bi-hdd-fill"></i> {trans('system_info.disk.title')}</h5>
+                </div>
+                <div class="card-body">
+                    <table class="table table-sm table-borderless">
+                        <tbody>
+                            <tr>
+                                <th style="width: 60%">{trans('system_info.disk.total')}:</th>
+                                <td>{$systemInfo['disk']['total']}</td>
+                            </tr>
+                            <tr>
+                                <th>{trans('system_info.disk.used')}:</th>
+                                <td>{$systemInfo['disk']['used']}</td>
+                            </tr>
+                            <tr>
+                                <th>{trans('system_info.disk.free')}:</th>
+                                <td>{$systemInfo['disk']['free']}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="mt-3">
+                        <div class="d-flex justify-content-between mb-1">
+                            <span>{trans('system_info.disk.usage_percent')}:</span>
+                            <span><strong>{$systemInfo['disk']['usage_percent']}%</strong></span>
+                        </div>
+                        <div class="progress" style="height: 20px;">
+                            <div class="progress-bar {$systemInfo['disk']['usage_percent'] > 90 ? 'bg-danger' : ($systemInfo['disk']['usage_percent'] > 75 ? 'bg-warning' : 'bg-success')}" 
+                                 role="progressbar" 
+                                 style="width: {$systemInfo['disk']['usage_percent']}%" 
+                                 aria-valuenow="{$systemInfo['disk']['usage_percent']}" 
+                                 aria-valuemin="0" 
+                                 aria-valuemax="100">
+                                {$systemInfo['disk']['usage_percent']}%
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {* Memory Usage *}
+        <div class="col-md-6">
+            <div class="card h-100">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0"><i class="bi bi-memory"></i> {trans('system_info.memory.title')}</h5>
+                </div>
+                <div class="card-body">
+                    {if $systemInfo['memory']}
+                        <table class="table table-sm table-borderless">
+                            <tbody>
+                                <tr>
+                                    <th style="width: 60%">{trans('system_info.memory.total')}:</th>
+                                    <td>{$systemInfo['memory']['total']}</td>
+                                </tr>
+                                <tr>
+                                    <th>{trans('system_info.memory.used')}:</th>
+                                    <td>{$systemInfo['memory']['used']}</td>
+                                </tr>
+                                <tr>
+                                    <th>{trans('system_info.memory.free')}:</th>
+                                    <td>{$systemInfo['memory']['free']}</td>
+                                </tr>
+                                <tr>
+                                    <th>{trans('system_info.memory.cached')}:</th>
+                                    <td>{$systemInfo['memory']['cached']}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    {else}
+                        <p class="text-muted">{trans('system_info.memory.not_available')}</p>
+                    {/if}
+                </div>
+            </div>
+        </div>
+
+        {* Server Information *}
+        <div class="col-md-6">
+            <div class="card h-100">
+                <div class="card-header bg-secondary text-white">
+                    <h5 class="mb-0"><i class="bi bi-server"></i> {trans('system_info.server.title')}</h5>
+                </div>
+                <div class="card-body">
+                    <table class="table table-sm table-borderless">
+                        <tbody>
+                            <tr>
+                                <th style="width: 60%">{trans('system_info.server.software')}:</th>
+                                <td><small>{$systemInfo['server']['software']}</small></td>
+                            </tr>
+                            <tr>
+                                <th>{trans('system_info.server.os')}:</th>
+                                <td><small>{$systemInfo['server']['os']}</small></td>
+                            </tr>
+                            <tr>
+                                <th>{trans('system_info.server.hostname')}:</th>
+                                <td>{$systemInfo['server']['hostname']}</td>
+                            </tr>
+                            <tr>
+                                <th>{trans('system_info.server.document_root')}:</th>
+                                <td><small>{$systemInfo['server']['document_root']}</small></td>
+                            </tr>
+                            <tr>
+                                <th>{trans('system_info.server.current_time')}:</th>
+                                <td>{$systemInfo['server']['current_time']}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        {* Database Information *}
+        <div class="col-md-6">
+            <div class="card h-100">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0"><i class="bi bi-database-fill"></i> {trans('system_info.database.title')}</h5>
+                </div>
+                <div class="card-body">
+                    <table class="table table-sm table-borderless">
+                        <tbody>
+                            <tr>
+                                <th style="width: 60%">{trans('system_info.database.name')}:</th>
+                                <td>{$systemInfo['database']['name']}</td>
+                            </tr>
+                            <tr>
+                                <th>{trans('system_info.database.version')}:</th>
+                                <td><small>{$systemInfo['database']['version']}</small></td>
+                            </tr>
+                            <tr>
+                                <th>{trans('system_info.database.size')}:</th>
+                                <td>{$systemInfo['database']['size']}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        {* Application Information *}
+        <div class="col-md-6">
+            <div class="card h-100">
+                <div class="card-header bg-dark text-white">
+                    <h5 class="mb-0"><i class="bi bi-app-indicator"></i> {trans('system_info.app.title')}</h5>
+                </div>
+                <div class="card-body">
+                    <table class="table table-sm table-borderless">
+                        <tbody>
+                            <tr>
+                                <th style="width: 60%">{trans('system_info.app.version')}:</th>
+                                <td><span class="badge bg-primary">{$systemInfo['app']['version']}</span></td>
+                            </tr>
+                            <tr>
+                                <th>{trans('system_info.app.environment')}:</th>
+                                <td>
+                                    <span class="badge {$systemInfo['app']['environment'] === 'production' ? 'bg-success' : 'bg-warning'}">
+                                        {$systemInfo['app']['environment']}
+                                    </span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{* PHP Info Modal *}
+<div class="modal fade" id="phpInfoModal" tabindex="-1">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">PHP Info</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <iframe id="phpInfoFrame" style="width:100%;height:70vh;border:none;"></iframe>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="/js/admin/system-info.latte-min.js"></script>
+{/block}
