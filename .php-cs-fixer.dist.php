@@ -90,4 +90,3 @@ return $config
     ->setRiskyAllowed(false)
     ->setUsingCache(true)
     ->setCacheFile(__DIR__ . '/.php-cs-fixer.cache');
-    

@@ -47,7 +47,7 @@ class AzureSsoController
         }
 
         // *** MOCK MODE: Show Mock-Login page directly ***
-        if ($config['azureSso']['mockMode'] ?? false) {
+        if ($config['azureSso']['mockMode'] === true && $config['application']['enviroment'] === 'development') {
             // Generate state for CSRF protection
             $state = bin2hex(random_bytes(16));
             $_SESSION['oauth2state'] = $state;
@@ -113,7 +113,7 @@ class AzureSsoController
         }
 
         // *** MOCK MODE: Handle Mock Login ***
-        if ($config['azureSso']['mockMode'] ?? false) {
+        if ($config['azureSso']['mockMode'] === true && $config['application']['enviroment'] === 'development') {
             $this->handleMockLogin($config);
             return;
         }
