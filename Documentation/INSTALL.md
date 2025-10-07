@@ -17,11 +17,13 @@
 - [🗄️ Database Setup](#️-database-setup)
 - [📁 Configuration](#-configuration)
 - [🌐 Webserver Configuration](#-webserver-configuration)
+- [⚙️ GDPR Cronjob](#-gdpr-cronjob-setup)
 - [✅ Verify Installation](#-verify-installation)
 - [🔒 Post-Installation Security](#-post-installation-security)
 - [🛠️ Development Environment](#️-development-environment)
 - [🔧 Troubleshooting](#-troubleshooting)
 - [📞 Support](#-support)
+- [✅ Conclusion](#-conclusion)
 
 ---
 
@@ -549,6 +551,207 @@ sudo nginx -t
 # Restart Nginx
 sudo systemctl restart nginx
 ```
+
+---
+
+## 🔄 GDPR Cronjob Setup
+
+For GDPR compliance, SecStore includes an automated account deletion process. After users request account deletion and confirm via email, their accounts are scheduled for deletion after a 30-day grace period. A cronjob is required to process these scheduled deletions automatically.
+
+### **What the Cronjob Does**
+
+The GDPR deletion cronjob:
+1. Checks for confirmed deletion requests past their scheduled date
+2. Permanently deletes user accounts
+3. Anonymizes usernames in audit logs (`deleted_user_{ID}`)
+4. Removes failed login attempts
+5. Logs all actions for compliance
+
+### **Setup Instructions**
+
+#### **Step 1: Generate Secure Token**
+
+First, generate a secure random token to protect the cronjob endpoint:
+
+```bash
+# Generate a secure 32-character token
+openssl rand -hex 16
+
+# Example output: 8a7f3c2e9b1d4f6a8e5c7b3d9f2a6e4c
+```
+
+#### **Step 2: Update routes.php**
+
+Edit `app/routes.php` and replace the default token:
+
+```php
+// Find this line (around line 450)
+($_GET['token'] ?? '') !== 'your-secret-cron-token'
+
+// Replace with your generated token:
+($_GET['token'] ?? '') !== '8a7f3c2e9b1d4f6a8e5c7b3d9f2a6e4c'
+```
+
+**⚠️ CRITICAL:** Never commit this token to version control!
+
+#### **Step 3: Configure Crontab**
+
+**Recommended Schedule:** Daily at 2:00 AM
+
+```bash
+# Edit crontab
+crontab -e
+
+# Add this line (replace YOUR_TOKEN and your-domain.com):
+0 2 * * * curl -s "https://your-domain.com/cron/process-deletions?token=YOUR_TOKEN" >> /var/log/secstore-gdpr.log 2>&1
+```
+
+**Cron Expression Explained:**
+```
+0 2 * * *
+│ │ │ │ └── Day of week (0-7)
+│ │ │ └──── Month (1-12)
+│ │ └────── Day of month (1-31)
+│ └──────── Hour (0-23)
+└────────── Minute (0-59)
+```
+
+**Alternative Schedules:**
+
+| Frequency | Cron Expression | Description |
+|-----------|----------------|-------------|
+| **Daily at 2 AM** | `0 2 * * *` | Recommended |
+| **Every 6 hours** | `0 */6 * * *` | More frequent |
+| **Twice daily** | `0 2,14 * * *` | 2 AM and 2 PM |
+| **Weekly** | `0 2 * * 0` | Sundays at 2 AM |
+
+#### **Step 4: Test the Cronjob**
+
+```bash
+# Test manually
+curl "https://your-domain.com/cron/process-deletions?token=YOUR_TOKEN"
+
+# Expected response:
+{
+  "status": "success",
+  "timestamp": "2025-01-15 14:30:00"
+}
+
+# Check logs
+tail -f /var/log/secstore-gdpr.log
+```
+
+### **Docker Users**
+
+If using Docker, add a cron service to `docker-compose.yml`:
+
+```yaml
+services:
+  # ... existing services ...
+
+  cron:
+    image: alpine:latest
+    command: sh -c "echo '0 2 * * * curl -s http://web:80/cron/process-deletions?token=YOUR_TOKEN' | crontab - && crond -f"
+    depends_on:
+      - web
+    networks:
+      - secstore_network
+```
+
+### **Systemd Timer (Modern Linux)**
+
+For systemd-based systems, you can use a timer instead of cron:
+
+**Create service file:**
+```bash
+sudo nano /etc/systemd/system/secstore-gdpr.service
+```
+
+```ini
+[Unit]
+Description=SecStore GDPR Deletion Job
+
+[Service]
+Type=oneshot
+User=www-data
+ExecStart=/usr/bin/curl -s "https://your-domain.com/cron/process-deletions?token=YOUR_TOKEN"
+```
+
+**Create timer file:**
+```bash
+sudo nano /etc/systemd/system/secstore-gdpr.timer
+```
+
+```ini
+[Unit]
+Description=SecStore GDPR Deletion Timer
+
+[Timer]
+OnCalendar=daily
+OnCalendar=02:00
+Persistent=true
+
+[Install]
+WantedBy=timers.target
+```
+
+**Enable and start:**
+```bash
+sudo systemctl daemon-reload
+sudo systemctl enable secstore-gdpr.timer
+sudo systemctl start secstore-gdpr.timer
+
+# Verify
+sudo systemctl status secstore-gdpr.timer
+sudo systemctl list-timers | grep secstore
+```
+
+### **Monitoring**
+
+**Check Deletion Requests:**
+```sql
+-- View pending deletions
+SELECT * FROM deletion_requests 
+WHERE status = 'confirmed' 
+AND deletion_scheduled_date <= CURDATE();
+
+-- View completed deletions
+SELECT * FROM deletion_requests 
+WHERE status = 'completed' 
+ORDER BY deletion_scheduled_date DESC;
+```
+
+**Check Logs:**
+- **Cronjob execution:** `/var/log/secstore-gdpr.log`
+- **Application logs:** Admin → Logs → Security Logs
+- Look for entries like: `GDPR deletion completed for user X`
+
+### **Troubleshooting**
+
+| Issue | Solution |
+|-------|----------|
+| **403 Forbidden** | Token mismatch - verify token in URL and `routes.php` |
+| **Connection refused** | Check if SecStore is running and accessible |
+| **404 Not Found** | Verify URL path `/cron/process-deletions` |
+| **No deletions processing** | Check database for confirmed requests with past dates |
+| **Cron not executing** | Verify cron service: `sudo systemctl status cron` |
+
+**Manual Processing:**
+```bash
+# Force immediate processing
+curl "https://your-domain.com/cron/process-deletions?token=YOUR_TOKEN"
+
+# Check result
+mysql -u root -p secstore -e "SELECT * FROM deletion_requests WHERE status='completed';"
+```
+
+### **Security Notes**
+
+- ✅ **Use HTTPS** in production to protect the token
+- ✅ **Long random token** (32+ characters)
+- ✅ **Restrict to localhost** if possible (`127.0.0.1` check in code)
+- ✅ **Monitor failed attempts** in security logs
+- ✅ **Regular backups** before deletions are processed
 
 ---
 

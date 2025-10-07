@@ -14,6 +14,7 @@
 6. [Logs](#6-logs)
 7. [Login](#7-login)
 8. [User Profile](#8-user-profile)
+9. [Privacy & GDPR Features](#9-privacy--gdpr-features)
 
 ---
 
@@ -1780,7 +1781,7 @@ All authenticated users can access their profile page to manage personal setting
 
 #### 8.1.4 Two-Factor Authentication (2FA)
 
-![2FA Section](Screenshots/profile-2fa.png)
+![2FA Section](Screenshots/profile-2fa-setup.png)
 
 **Status Display:**
 
@@ -1989,6 +1990,414 @@ Instead of change form, warning displayed:
 - Only user-controlled setting
 - Saved locally in SecStore
 - Not synced with Azure
+
+---
+
+## 9. Privacy & GDPR Features
+
+SecStore provides comprehensive GDPR (General Data Protection Regulation) compliance features, allowing users to exercise their data protection rights.
+
+**Location:** Click username in top-right → "Privacy & Data Protection"
+
+![Privacy Overview](Screenshots/privacy-overview.png)
+
+### 9.1 Overview
+
+The Privacy page provides three main sections in an accordion layout:
+
+| Section | GDPR Article | Purpose |
+|---------|--------------|----------|
+| **Export Your Data** | Art. 15 | Right of access |
+| **Delete Your Account** | Art. 17 | Right to erasure ("Right to be Forgotten") |
+| **Your GDPR Rights** | Info | Overview of data protection rights |
+
+### 9.2 Export Your Data (Right of Access)
+
+**GDPR Article 15:** Right to obtain a copy of personal data
+
+**Purpose:** Download all your personal data stored in SecStore in a machine-readable format.
+
+#### What is Exported:
+
+**User Profile Data:**
+- Username
+- Email address
+- First name and last name
+- Account status (active/inactive)
+- Assigned roles
+- Account creation date
+- LDAP/Azure SSO status
+
+**Security Settings:**
+- 2FA enabled status
+- 2FA enforcement status
+- Last known IP address
+
+**Activity Logs:**
+- All audit logs related to your account
+- Login history
+- Actions you performed
+- Password changes
+- Profile updates
+
+**Failed Login Attempts:**
+- Failed login attempts associated with your email
+- Timestamps and IP addresses
+
+**Export Metadata:**
+- Export date and time
+- Export format (JSON)
+- GDPR article reference
+
+#### Export Process:
+
+1. **Navigate to Privacy Page**
+   - Click your username → "Privacy & Data Protection"
+   - Or directly access `/privacy`
+
+2. **Open Export Section**
+   - Expand "Export Your Data" accordion item
+
+3. **Click Export Button**
+   - Button: "Download My Data"
+   - File downloads automatically
+
+4. **File Details:**
+   - **Format:** JSON (machine-readable)
+   - **Filename:** `gdpr_data_export_{username}_{date}.json`
+   - **Example:** `gdpr_data_export_john.doe_2025-01-15.json`
+   - **Encoding:** UTF-8
+   - **Size:** Typically 10-500 KB depending on activity
+
+#### Example Export Structure:
+
+```json
+{
+  "user_profile": {
+    "id": 42,
+    "username": "john.doe",
+    "email": "john.doe@company.com",
+    "firstname": "John",
+    "lastname": "Doe",
+    "status": "active",
+    "roles": "User,Manager",
+    "created_at": "2024-01-15 10:30:00",
+    "ldap_enabled": false,
+    "entra_id_enabled": false
+  },
+  "security_settings": {
+    "mfa_enabled": true,
+    "mfa_enforced": false,
+    "last_known_ip": "192.168.1.100"
+  },
+  "logs": [
+    {
+      "id": 1234,
+      "type": "AUDIT",
+      "datum_zeit": "2025-01-15 14:30:00",
+      "user": "john.doe",
+      "context": "AuthController/login",
+      "message": "User logged in successfully",
+      "ip_address": "192.168.1.100"
+    }
+  ],
+  "failed_login_attempts": [],
+  "export_metadata": {
+    "export_date": "2025-01-15 15:00:00",
+    "export_format": "JSON",
+    "gdpr_article": "Article 15 - Right of Access"
+  }
+}
+```
+
+#### Security & Logging:
+
+- ✅ Export action logged in audit log
+- ✅ CSRF token protected
+- ✅ Requires active authenticated session
+- ✅ No sensitive data (passwords) included
+- ✅ Rate limited to prevent abuse
+
+### 9.3 Delete Your Account (Right to Erasure)
+
+**GDPR Article 17:** Right to erasure ("Right to be Forgotten")
+
+**Purpose:** Request permanent deletion of your account and all associated personal data.
+
+#### Deletion Process (4 Steps):
+
+##### **Step 1: Request Deletion**
+
+![Request Deletion](Screenshots/privacy-deletion-request.png)
+
+**Access:**
+- Navigate to Privacy page
+- Expand "Delete Your Account" section
+- Click "Request Account Deletion" button
+
+**Confirmation Modal:**
+> ⚠️ **This action is permanent!**
+>
+> Are you absolutely sure you want to delete your account?
+>
+> - Your account will be permanently deleted after 30 days
+> - All your personal data will be removed from our systems
+> - This action cannot be reversed
+
+**Action:**
+- Click "Yes, Delete My Account"
+- Deletion request created
+- Confirmation email sent immediately
+
+##### **Step 2: Email Confirmation**
+
+**Email Subject:** "Confirm Your Account Deletion Request"
+
+**Email Content:**
+```
+Hello {username},
+
+You have requested to delete your account. Please click the link 
+below to confirm:
+
+{confirmation_link}
+
+If you did not request this, please ignore this email.
+```
+
+**Email Details:**
+- Sent to registered email address
+- Contains unique confirmation token
+- Token valid for 24 hours
+- **IMPORTANT:** Must click link to proceed
+
+**Status During This Phase:**
+- Account: ✅ Still active
+- Login: ✅ Can still login
+- Status in database: `pending`
+- Can cancel request anytime
+
+##### **Step 3: Confirm via Email Link**
+
+**User clicks confirmation link → Redirected to confirmation page**
+
+![Deletion Confirmed](Screenshots/privacy-deletion-confirmed.png)
+
+**Confirmation Page:**
+> ✅ **Account Deletion Confirmed**
+>
+> Your account deletion has been confirmed.
+>
+> **Important Information:**
+> - Your account is now deactivated and you cannot log in anymore
+> - All your data will be permanently deleted on: **{scheduled_date}**
+> - This action cannot be reversed after the deletion date
+
+**What Happens:**
+- Account immediately deactivated
+- User logged out
+- Deletion scheduled for 30 days from now
+- Status changed to: `confirmed`
+- Cannot login anymore
+
+**Grace Period:**
+- 30 days until permanent deletion
+- Allows time to change mind
+- Data still in database (but account disabled)
+- Can contact admin to cancel within 30 days
+
+##### **Step 4: Automatic Deletion (After 30 Days)**
+
+**Triggered by:** Automated cronjob (see [Administration → Cronjob Setup](#58-gdpr-cronjob-setup))
+
+**Deletion Process:**
+
+1. **User Account:**
+   - User record deleted from `users` table
+   - Username, email, password hash removed
+   - All profile data removed
+
+2. **Logs Anonymization:**
+   - Audit logs: Username replaced with `deleted_user_{ID}`
+   - Security logs: Username anonymized
+   - IP addresses: Optionally anonymized
+   - **Logs kept** for legal/audit trail requirements
+
+3. **Failed Login Attempts:**
+   - All failed logins for this email: Deleted
+
+4. **Deletion Request:**
+   - Status changed to: `completed`
+   - Kept for compliance records
+
+**Final State:**
+- ❌ User cannot login
+- ❌ User data removed
+- ✅ Audit trail preserved (anonymized)
+- ✅ Compliance requirements met
+
+#### Cancel Deletion Request
+
+![Cancel Deletion](Screenshots/privacy-cancel-deletion.png)
+
+**Available During:**
+- After request submitted but before clicking email link
+- After confirming via email (during 30-day grace period)
+
+**How to Cancel:**
+
+**Option 1: Before Email Confirmation**
+1. Login to your account (still active)
+2. Go to Privacy page
+3. Click "Cancel Deletion Request" button
+4. Confirm cancellation
+5. Request cancelled, account remains active
+
+**Option 2: After Confirmation (Grace Period)**
+1. Cannot login (account deactivated)
+2. Contact system administrator
+3. Admin can manually cancel deletion
+4. Account reactivated
+
+**Cancellation Effect:**
+- Deletion request status: `cancelled`
+- Account reactivated (if was deactivated)
+- Can login again
+- All data preserved
+
+#### What is Deleted vs. What is Kept
+
+**✅ Deleted:**
+- User account record
+- Username
+- Email address
+- First name, last name
+- Password hash
+- 2FA secrets and backup codes
+- Active session IDs
+- Failed login attempts
+
+**✅ Anonymized (Kept for Legal Compliance):**
+- Audit logs (username → `deleted_user_{ID}`)
+- Security logs (anonymized)
+- System logs (if referencing user)
+
+**❌ NOT Deleted:**
+- Database structure (tables remain)
+- Application settings
+- Other users' data
+- System logs unrelated to user
+
+### 9.4 Your GDPR Rights (Information Page)
+
+**Purpose:** Educational section explaining GDPR rights in plain language.
+
+**Rights Explained:**
+
+#### **Right of Access (Art. 15)**
+> **What it means:**
+> You have the right to obtain a copy of your personal data that we process.
+>
+> **How to exercise:**
+> Use the "Export Your Data" feature above.
+
+#### **Right to Rectification (Art. 16)**
+> **What it means:**
+> You have the right to request correction of inaccurate personal data.
+>
+> **How to exercise:**
+> Update your information in your Profile settings.
+
+#### **Right to Erasure (Art. 17)**
+> **What it means:**
+> You have the right to request deletion of your personal data.
+>
+> **How to exercise:**
+> Use the "Delete Your Account" feature above.
+
+#### **Right to Data Portability (Art. 20)**
+> **What it means:**
+> You have the right to receive your personal data in a structured, 
+> machine-readable format.
+>
+> **How to exercise:**
+> The exported JSON file from "Export Your Data" satisfies this right.
+
+**Additional Notes:**
+- Rights apply to all EU residents
+- Rights apply regardless of citizenship
+- Some exceptions may apply (legal requirements)
+- Contact admin for questions
+
+### 9.5 Privacy Features for Different User Types
+
+#### Database Users
+- ✅ Full data export
+- ✅ Full account deletion
+- ✅ All privacy features available
+
+#### LDAP Users
+- ✅ Full data export
+- ✅ Full account deletion
+- ⚠️ **Note:** Only SecStore data deleted (LDAP account unaffected)
+- ⚠️ **Note:** After deletion, LDAP user cannot login to SecStore anymore
+
+#### Azure SSO Users
+- ✅ Full data export
+- ✅ Full account deletion
+- ⚠️ **Note:** Only SecStore data deleted (Azure account unaffected)
+- ⚠️ **Note:** After deletion, Azure user cannot login to SecStore anymore
+- ⚠️ **Note:** Email address in Azure remains unchanged
+
+### 9.6 Admin View of Deletion Requests
+
+**Location:** Admin → Users (future feature) or Database table: `deletion_requests`
+
+**Admin Capabilities:**
+- View all pending deletion requests
+- View deletion schedule
+- Cancel deletion (during grace period)
+- View completed deletions (compliance records)
+
+**Database Table:**
+```sql
+SELECT * FROM deletion_requests;
+```
+
+**Columns:**
+- `id` - Request ID
+- `user_id` - User being deleted
+- `username` - Username (for reference)
+- `email` - Email (for reference)
+- `requested_at` - Initial request timestamp
+- `confirmed_at` - Email confirmation timestamp
+- `deletion_scheduled_date` - Date of permanent deletion
+- `status` - Current status (pending/confirmed/completed/cancelled)
+- `ip_address` - Request origin IP
+
+### 9.7 Security Considerations
+
+**Data Export:**
+- ✅ Requires active session
+- ✅ CSRF protected
+- ✅ Rate limited (1 export per 5 minutes)
+- ✅ Logged in audit trail
+- ❌ No passwords included
+- ❌ No 2FA secrets included (only status)
+
+**Account Deletion:**
+- ✅ Email confirmation required (prevents accidental deletion)
+- ✅ 30-day grace period (allows reversal)
+- ✅ CSRF protected
+- ✅ Fully logged
+- ✅ IP address tracked
+- ✅ Cannot delete admin's own account if last admin
+
+**Anonymization:**
+- ✅ Audit logs preserved for compliance
+- ✅ Usernames replaced with `deleted_user_{ID}`
+- ✅ IP addresses optionally anonymized
+- ✅ Irreversible process
 
 ---
 
