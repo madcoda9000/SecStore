@@ -18,16 +18,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Implemented Azure SSO login**
 - **implemented truncate logs**
 - **Implemented Logs Export function**
+- **Implemented System-Info Dashboard**
+- **Implemented DSGVO compliance (Art. 15, Art. 17)**
 
 
 ### 🐛 Fixed
 - **added missing columns to TestCase.php**
 - **various Azure SSO fixes**
+- **excluded privacy settings for super.admin user**
 
 
 ### 📝 Documentation
 - **updated Documentation**
 - **updated README**
+- **updated Documentation for GDPR Cronjob**
 
 ---
 
