@@ -983,4 +983,131 @@ class User extends ORM
 
         return $users;
     }
+
+    /**
+     * Anonymizes user data in logs (GDPR-compliant deletion).
+     *
+     * @param int $userId The user ID to anonymize
+     * @return bool True if anonymization was successful, false otherwise
+     */
+    public static function anonymizeUserInLogs(int $userId): bool
+    {
+        try {
+            ORM::configure('logging', true);
+            $user = self::findUserById($userId);
+            if ($user === false) {
+                return false;
+            }
+
+            $username = $user->username;
+            $anonymizedIdentifier = "deleted_user_{$userId}";
+
+            // Anonymize username in logs
+            $pdo = ORM::get_db();
+            $stmt = $pdo->prepare(
+                "UPDATE logs SET user = :anonymized WHERE user = :username"
+            );
+            $stmt->execute([
+                ':anonymized' => $anonymizedIdentifier,
+                ':username' => $username
+            ]);
+
+            LogUtil::logAction(
+                LogType::AUDIT,
+                'User.php',
+                'anonymizeUserInLogs',
+                "Anonymized user {$username} in logs as {$anonymizedIdentifier}"
+            );
+
+            return true;
+        } catch (\PDOException $e) {
+            LogUtil::logAction(
+                LogType::ERROR,
+                'User.php',
+                'anonymizeUserInLogs',
+                'Failed to anonymize user in logs: ' . $e->getMessage()
+            );
+            return false;
+        }
+    }
+
+    /**
+     * Deletes failed login attempts for a user's email.
+     *
+     * @param string $email The user's email
+     * @return bool True if deletion was successful, false otherwise
+     */
+    public static function deleteFailedLoginAttempts(string $email): bool
+    {
+        try {
+            ORM::configure('logging', true);
+            $pdo = ORM::get_db();
+            $stmt = $pdo->prepare("DELETE FROM failed_logins WHERE email = :email");
+            $result = $stmt->execute([':email' => $email]);
+
+            LogUtil::logAction(
+                LogType::AUDIT,
+                'User.php',
+                'deleteFailedLoginAttempts',
+                "Deleted failed login attempts for {$email}"
+            );
+
+            return $result;
+        } catch (\PDOException $e) {
+            LogUtil::logAction(
+                LogType::ERROR,
+                'User.php',
+                'deleteFailedLoginAttempts',
+                'Failed to delete failed login attempts: ' . $e->getMessage()
+            );
+            return false;
+        }
+    }
+
+    /**
+     * Completely deletes a user and anonymizes all related data (GDPR Art. 17).
+     *
+     * @param int $userId The user ID to delete
+     * @return bool True if deletion was successful, false otherwise
+     */
+    public static function gdprCompleteDelete(int $userId): bool
+    {
+        try {
+            $user = self::findUserById($userId);
+            if ($user === false) {
+                return false;
+            }
+
+            $email = $user->email;
+            $username = $user->username;
+
+            // Step 1: Anonymize logs (keep audit trail)
+            self::anonymizeUserInLogs($userId);
+
+            // Step 2: Delete failed login attempts
+            self::deleteFailedLoginAttempts($email);
+
+            // Step 3: Delete the user account
+            $deleteResult = self::deleteUser($userId);
+
+            if ($deleteResult) {
+                LogUtil::logAction(
+                    LogType::SECURITY,
+                    'User.php',
+                    'gdprCompleteDelete',
+                    "GDPR deletion completed for user {$username} (ID: {$userId})"
+                );
+            }
+
+            return $deleteResult;
+        } catch (\Exception $e) {
+            LogUtil::logAction(
+                LogType::ERROR,
+                'User.php',
+                'gdprCompleteDelete',
+                'Failed to complete GDPR deletion: ' . $e->getMessage()
+            );
+            return false;
+        }
+    }
 }

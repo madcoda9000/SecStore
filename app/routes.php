@@ -8,7 +8,7 @@ use App\Controllers\ProfileController;
 use App\Controllers\RateLimitController;
 use App\Controllers\SetupController;
 use App\Controllers\AzureSsoController;
-use App\Controllers\AzureMockController;
+use App\Controllers\PrivacyController;
 use App\Middleware\AdminCheckMiddleware;
 use App\Middleware\AuthCheckMiddleware;
 use App\Middleware\CsrfMiddleware;
@@ -569,6 +569,48 @@ secureRoute('POST /extend-session', function () {
         ]);
     }
 }, 'session-extend', false);
+
+// ==========================================
+// GDPR / PRIVACY ROUTES
+// ==========================================
+
+// Privacy Overview
+secureRoute('GET /privacy', function () {
+    (new PrivacyController())->showPrivacyOverview();
+});
+
+// Data Export (GDPR Art. 15)
+secureRoute('GET /privacy/export', function () {
+    (new PrivacyController())->requestDataExport();
+}, 'data-export');
+
+// Account Deletion Request (GDPR Art. 17)
+securePostRoute('/privacy/request-deletion', function () {
+    (new PrivacyController())->requestDeletion();
+}, 'account-deletion');
+
+// Deletion Confirmation (from email link - no auth required)
+authRoute('GET', '/privacy/confirm-deletion/@token', function ($token) {
+    (new PrivacyController())->confirmDeletion($token);
+}, 'account-deletion');
+
+// Cancel Deletion Request
+securePostRoute('/privacy/cancel-deletion', function () {
+    (new PrivacyController())->cancelDeletion();
+});
+
+// Process Due Deletions (Admin/Cron)
+Flight::route('GET /cron/process-deletions', function () {
+    // Only allow from localhost or with special token
+    if ($_SERVER['REMOTE_ADDR'] !== '127.0.0.1' &&
+        ($_GET['token'] ?? '') !== 'your-secret-cron-token'
+    ) {
+        Flight::halt(403, 'Access denied');
+    }
+
+    PrivacyController::processDueDeletions();
+    Flight::json(['status' => 'success', 'timestamp' => date('Y-m-d H:i:s')]);
+});
 
 // Logout (kein Rate Limiting nötig)
 Flight::route('/logout', [new ProfileController(), 'logout']);

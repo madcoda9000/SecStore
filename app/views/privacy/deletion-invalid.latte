@@ -1,0 +1,42 @@
+{extends '../_authLayout.latte'}
+
+{block content}
+
+<div class="container d-flex justify-content-center align-items-center" style="min-height: 80vh;">
+    <div class="card shadow-lg" style="max-width: 600px; width: 100%;">
+        <div class="card-header bg-danger text-white text-center">
+            <h4 class="mb-0">
+                <i class="bi bi-x-circle-fill"></i> {$title}
+            </h4>
+        </div>
+        <div class="card-body text-center p-5">
+            <div class="mb-4">
+                <i class="bi bi-exclamation-triangle-fill text-danger" style="font-size: 4rem;"></i>
+            </div>
+            
+            <p class="lead mb-4">{$message}</p>
+            
+            <div class="alert alert-info text-start">
+                <h6><i class="bi bi-info-circle-fill"></i> {trans('privacy.deletion.invalid.reasons')}</h6>
+                <ul class="mb-0">
+                    <li>{trans('privacy.deletion.invalid.reason1')}</li>
+                    <li>{trans('privacy.deletion.invalid.reason2')}</li>
+                    <li>{trans('privacy.deletion.invalid.reason3')}</li>
+                </ul>
+            </div>
+
+            <p class="text-muted">{trans('privacy.deletion.invalid.contact')}</p>
+
+            <div class="d-grid gap-2">
+                <a href="/login" class="btn btn-primary">
+                    <i class="bi bi-box-arrow-in-right"></i> {trans('privacy.deletion.invalid.backToLogin')}
+                </a>
+                <a href="/privacy" class="btn btn-outline-secondary">
+                    <i class="bi bi-shield-lock-fill"></i> {trans('privacy.deletion.invalid.privacySettings')}
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+{/block}

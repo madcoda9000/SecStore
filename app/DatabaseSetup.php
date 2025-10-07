@@ -116,6 +116,28 @@ try {
     if ($stmt->fetchColumn() == 0) {
         $pdo->exec("INSERT INTO roles (roleName) VALUES ('User')");
     }
+
+    // Prüfen ob tabelle deletion_requests existiert
+    $stmt = $pdo->query("SHOW TABLES LIKE 'deletion_requests'");
+    if ($stmt->rowCount() == 0) {
+        $pdo->exec("CREATE TABLE `deletion_requests` (
+            `id` INT(11) NOT NULL AUTO_INCREMENT,
+            `user_id` INT(11) NOT NULL,
+            `username` VARCHAR(255) NOT NULL,
+            `email` VARCHAR(255) NOT NULL,
+            `requested_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            `confirmation_token` VARCHAR(255) DEFAULT NULL,
+            `confirmed_at` TIMESTAMP NULL DEFAULT NULL,
+            `deletion_scheduled_date` DATE NULL DEFAULT NULL,
+            `status` ENUM('pending', 'confirmed', 'completed', 'cancelled') DEFAULT 'pending',
+            `ip_address` VARCHAR(45) NOT NULL,
+            PRIMARY KEY (`id`),
+            INDEX `idx_user_id` (`user_id`),
+            INDEX `idx_status` (`status`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;");
+        //echo "Tabelle 'deletion_requests' wurde erstellt.\n";
+    }
+
     // Verbindung schließen
     unset($pdo);
 } catch (PDOException $e) {

@@ -52,6 +52,7 @@
 - **Granular role management** (RBAC)
 - **Comprehensive audit logging** of all actions
 - **Multi-language support** (DE/EN)
+- **DSGVO Compliant** Art. 15, Art. 17
 
 </td>
 <td>

@@ -1,0 +1,228 @@
+{extends '../_mainLayout.latte'}
+
+{block content}
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-labelledby="deleteConfirmModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="deleteConfirmModalLabel">
+                    <i class="bi bi-exclamation-triangle-fill"></i> {trans('privacy.deletion.modal.title')}
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-danger">
+                    <strong>{trans('privacy.deletion.modal.warning')}</strong>
+                </div>
+                <p>{trans('privacy.deletion.modal.text')}</p>
+                <ul class="text-danger">
+                    <li>{trans('privacy.deletion.modal.list1')}</li>
+                    <li>{trans('privacy.deletion.modal.list2')}</li>
+                    <li>{trans('privacy.deletion.modal.list3')}</li>
+                </ul>
+                <p><strong>{trans('privacy.deletion.modal.confirm')}</strong></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    {trans('privacy.deletion.modal.cancel')}
+                </button>
+                <button type="button" class="btn btn-danger" id="confirmDeleteBtn">
+                    <i class="bi bi-trash-fill"></i> {trans('privacy.deletion.modal.confirmButton')}
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Cancel Deletion Modal -->
+<div class="modal fade" id="cancelDeleteModal" tabindex="-1" aria-labelledby="cancelDeleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="cancelDeleteModalLabel">
+                    <i class="bi bi-x-circle-fill"></i> {trans('privacy.deletion.cancel.title')}
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>{trans('privacy.deletion.cancel.text')}</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    {trans('privacy.deletion.cancel.no')}
+                </button>
+                <button type="button" class="btn btn-primary" id="confirmCancelBtn">
+                    <i class="bi bi-check-circle"></i> {trans('privacy.deletion.cancel.yes')}
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Main Content -->
+<div class="container py-4" style="flex:1">
+    <h1 class="mb-4">
+        <i class="bi bi-shield-lock-fill"></i> {trans('privacy.title')}
+    </h1>
+
+    <!-- Pending Deletion Alert -->
+    {if $pendingDeletion !== false}
+        <div class="alert alert-warning d-flex align-items-center" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+            <div>
+                <strong>{trans('privacy.deletion.pending.title')}</strong><br>
+                {if $pendingDeletion->status === 'pending'}
+                    {trans('privacy.deletion.pending.awaitingConfirmation')}
+                {else}
+                    {trans('privacy.deletion.pending.scheduled', ['date' => $pendingDeletion->deletion_scheduled_date])}
+                {/if}
+            </div>
+        </div>
+    {/if}
+
+    <!-- Privacy Settings Accordion -->
+    <div class="accordion" id="privacyAccordion">
+        
+        <!-- Data Export Section -->
+        <div class="accordion-item">
+            <h2 class="accordion-header">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseExport" aria-expanded="false" aria-controls="collapseExport">
+                    <i class="bi bi-download me-3"></i>
+                    {trans('privacy.export.title')}
+                </button>
+            </h2>
+            <div id="collapseExport" class="accordion-collapse collapse" data-bs-parent="#privacyAccordion">
+                <div class="accordion-body">
+                    <div class="alert alert-info d-flex align-items-center" role="alert">
+                        <i class="bi bi-info-circle-fill me-2"></i>
+                        <div>
+                            {trans('privacy.export.description')}
+                        </div>
+                    </div>
+                    
+                    <h5 class="mb-3">{trans('privacy.export.includes')}</h5>
+                    <ul>
+                        <li>{trans('privacy.export.list1')}</li>
+                        <li>{trans('privacy.export.list2')}</li>
+                        <li>{trans('privacy.export.list3')}</li>
+                        <li>{trans('privacy.export.list4')}</li>
+                    </ul>
+
+                    <button class="btn btn-primary w-100" id="exportDataBtn">
+                        <i class="bi bi-download"></i> {trans('privacy.export.button')}
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Account Deletion Section -->
+        <div class="accordion-item">
+            <h2 class="accordion-header">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseDeletion" aria-expanded="false" aria-controls="collapseDeletion">
+                    <i class="bi bi-trash-fill me-3"></i>
+                    {trans('privacy.deletion.title')}
+                </button>
+            </h2>
+            <div id="collapseDeletion" class="accordion-collapse collapse" data-bs-parent="#privacyAccordion">
+                <div class="accordion-body">
+                    {if $pendingDeletion === false}
+                        <div class="alert alert-danger d-flex align-items-center" role="alert">
+                            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                            <div>
+                                <strong>{trans('privacy.deletion.warning')}</strong>
+                            </div>
+                        </div>
+
+                        <p>{trans('privacy.deletion.description')}</p>
+
+                        <h5 class="mb-3">{trans('privacy.deletion.process')}</h5>
+                        <ol>
+                            <li>{trans('privacy.deletion.step1')}</li>
+                            <li>{trans('privacy.deletion.step2')}</li>
+                            <li>{trans('privacy.deletion.step3')}</li>
+                            <li>{trans('privacy.deletion.step4')}</li>
+                        </ol>
+
+                        <button class="btn btn-danger w-100" id="requestDeleteBtn">
+                            <i class="bi bi-trash-fill"></i> {trans('privacy.deletion.button')}
+                        </button>
+                    {else}
+                        {if $pendingDeletion->status === 'pending'}
+                            <div class="alert alert-info">
+                                <i class="bi bi-info-circle-fill"></i> {trans('privacy.deletion.pending.checkEmail')}
+                            </div>
+                        {else}
+                            <div class="alert alert-warning">
+                                <i class="bi bi-clock-fill"></i> 
+                                {trans('privacy.deletion.scheduled.message', ['date' => $pendingDeletion->deletion_scheduled_date])}
+                            </div>
+                            
+                            <button class="btn btn-primary w-100" id="cancelDeleteBtn">
+                                <i class="bi bi-x-circle"></i> {trans('privacy.deletion.cancel.button')}
+                            </button>
+                        {/if}
+                    {/if}
+                </div>
+            </div>
+        </div>
+
+        <!-- Privacy Rights Section -->
+        <div class="accordion-item">
+            <h2 class="accordion-header">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseRights" aria-expanded="false" aria-controls="collapseRights">
+                    <i class="bi bi-file-text-fill me-3"></i>
+                    {trans('privacy.rights.title')}
+                </button>
+            </h2>
+            <div id="collapseRights" class="accordion-collapse collapse" data-bs-parent="#privacyAccordion">
+                <div class="accordion-body">
+                    <p>{trans('privacy.rights.description')}</p>
+                    
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <h6 class="card-title">
+                                <i class="bi bi-eye-fill text-primary"></i> {trans('privacy.rights.access.title')}
+                            </h6>
+                            <p class="card-text text-muted small">{trans('privacy.rights.access.description')}</p>
+                        </div>
+                    </div>
+
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <h6 class="card-title">
+                                <i class="bi bi-pencil-fill text-success"></i> {trans('privacy.rights.rectification.title')}
+                            </h6>
+                            <p class="card-text text-muted small">{trans('privacy.rights.rectification.description')}</p>
+                        </div>
+                    </div>
+
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <h6 class="card-title">
+                                <i class="bi bi-trash-fill text-danger"></i> {trans('privacy.rights.erasure.title')}
+                            </h6>
+                            <p class="card-text text-muted small">{trans('privacy.rights.erasure.description')}</p>
+                        </div>
+                    </div>
+
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <h6 class="card-title">
+                                <i class="bi bi-shield-fill text-info"></i> {trans('privacy.rights.portability.title')}
+                            </h6>
+                            <p class="card-text text-muted small">{trans('privacy.rights.portability.description')}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<input type="hidden" id="csrf-token" value="{$_SESSION['csrf_token']}">
+
+<script src="/js/privacy-overview-min.js"></script>
+
+{/block}

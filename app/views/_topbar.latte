@@ -45,6 +45,7 @@
           <div class="dropdown">
             <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">{$user->username}</button>
             <ul class="dropdown-menu">
+              <li><a class="dropdown-item" href="/privacy">{trans('menu.privacy')}</a></li>
               <li><a class="dropdown-item" href="/profile">{trans('menu.profile')}</a></li>
               <li><a class="dropdown-item" href="/logout">{trans('menu.logout')}</a></li>
             </ul>
@@ -106,6 +107,9 @@
           <!-- Darkmode + user links can live here too for mobile -->
           <li class="nav-item mt-5">
             <a class="nav-link" href="/profile"><i class="bi bi-person-fill text-primary"></i>&nbsp;{trans('menu.profile')}</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/privacy"><i class="bi bi-shield-lock-fill text-primary"></i>&nbsp;{trans('menu.privacy')}</a>
           </li>
           <li class="nav-item">
             <a class="nav-link" href="/logout"><i class="bi bi-box-arrow-right text-primary"></i>&nbsp;{trans('menu.logout')}</a>

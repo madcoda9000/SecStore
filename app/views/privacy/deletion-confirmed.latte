@@ -1,0 +1,46 @@
+{extends '../_authLayout.latte'}
+
+{block content}
+
+<div class="container d-flex justify-content-center align-items-center" style="min-height: 80vh;">
+    <div class="card shadow-lg" style="max-width: 600px; width: 100%;">
+        <div class="card-header bg-success text-white text-center">
+            <h4 class="mb-0">
+                <i class="bi bi-check-circle-fill"></i> {$title}
+            </h4>
+        </div>
+        <div class="card-body text-center p-5">
+            <div class="mb-4">
+                <i class="bi bi-clock-history text-warning" style="font-size: 4rem;"></i>
+            </div>
+            
+            <p class="lead mb-4">{$message}</p>
+            
+            {if isset($scheduledDate)}
+                <div class="alert alert-info">
+                    <i class="bi bi-info-circle-fill"></i>
+                    <strong>{trans('privacy.deletion.scheduled.date')}:</strong>
+                    <br>
+                    {$scheduledDate}
+                </div>
+            {/if}
+
+            <div class="alert alert-warning text-start">
+                <h6><i class="bi bi-exclamation-triangle-fill"></i> {trans('privacy.deletion.confirmed.important')}</h6>
+                <ul class="mb-0">
+                    <li>{trans('privacy.deletion.confirmed.info1')}</li>
+                    <li>{trans('privacy.deletion.confirmed.info2')}</li>
+                    <li>{trans('privacy.deletion.confirmed.info3')}</li>
+                </ul>
+            </div>
+
+            <p class="text-muted">{trans('privacy.deletion.confirmed.goodbye')}</p>
+
+            <a href="/login" class="btn btn-primary mt-3">
+                <i class="bi bi-box-arrow-in-right"></i> {trans('privacy.deletion.confirmed.backToLogin')}
+            </a>
+        </div>
+    </div>
+</div>
+
+{/block}
