@@ -84,7 +84,7 @@
 
     <!-- Privacy Settings Accordion -->
     <div class="accordion" id="privacyAccordion">
-        
+        {if $user->username !== 'super.admin'}
         <!-- Data Export Section -->
         <div class="accordion-item">
             <h2 class="accordion-header">
@@ -167,7 +167,7 @@
                 </div>
             </div>
         </div>
-
+        {/if}
         <!-- Privacy Rights Section -->
         <div class="accordion-item">
             <h2 class="accordion-header">
