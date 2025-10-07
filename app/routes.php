@@ -332,6 +332,16 @@ secureRoute('GET /admin/phpinfo', function () {
     (new AdminController())->showPhpInfo();
 }, 'admin', true);
 
+// System Information - AJAX endpoint
+secureRoute('GET /admin/system-info/json', function () {
+    (new AdminController())->getSystemInfoJson();
+}, 'admin', true);
+
+// System Information - Export
+secureRoute('GET /admin/system-info/export', function () {
+    (new AdminController())->exportSystemInfo();
+}, 'admin', true);
+
 // Admin Settings
 secureRoute('GET /admin/settings', function () {
     (new AdminController())->showSettings();

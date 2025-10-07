@@ -32,6 +32,296 @@ class AdminController
 {
 
     /**
+     * Gets session statistics based on PHP session files.
+     *
+     * @return array Session information
+     */
+    private function getSessionStats(): array
+    {
+        try {
+            // Get session save path
+            $sessionPath = session_save_path();
+            if (empty($sessionPath)) {
+                $sessionPath = sys_get_temp_dir();
+            }
+
+            if (!is_dir($sessionPath) || !is_readable($sessionPath)) {
+                return [
+                    'active' => 'N/A',
+                    'total' => 'N/A',
+                    'path' => $sessionPath,
+                    'error' => 'Session directory not accessible',
+                ];
+            }
+
+            // Count session files
+            $sessionFiles = glob($sessionPath . '/sess_*');
+            $totalSessions = $sessionFiles ? count($sessionFiles) : 0;
+
+            // Count active sessions (modified in last session timeout period)
+            $timeout = self::$config['application']['sessionTimeout'] ?? 1800;
+            $activeSessions = 0;
+            $now = time();
+
+            if ($sessionFiles) {
+                foreach ($sessionFiles as $file) {
+                    $lastModified = filemtime($file);
+                    if (($now - $lastModified) < $timeout) {
+                        $activeSessions++;
+                    }
+                }
+            }
+
+            return [
+                'active' => $activeSessions,
+                'total' => $totalSessions,
+                'path' => $sessionPath,
+                'timeout' => $timeout,
+            ];
+        } catch (Exception $e) {
+            LogUtil::logAction(LogType::ERROR, 'AdminController', 'getSessionStats', 'Error getting session stats: ' . $e->getMessage());
+            return [
+                'active' => 0,
+                'total' => 0,
+                'path' => 'Error',
+                'error' => $e->getMessage(),
+            ];
+        }
+    }
+
+    /**
+     * Gets cache information.
+     *
+     * @return array Cache statistics
+     */
+    private function getCacheInfo(): array
+    {
+        $cachePath = __DIR__ . '/../../cache/';
+        
+        if (!is_dir($cachePath)) {
+            return [
+                'files' => 0,
+                'size' => 'N/A',
+                'size_bytes' => 0,
+                'path' => $cachePath,
+            ];
+        }
+        
+        $fileCount = 0;
+        $totalSize = 0;
+        
+        // Einfache Methode mit scandir
+        $files = scandir($cachePath);
+        
+        foreach ($files as $file) {
+            // Skip . und ..
+            if ($file === '.' || $file === '..') {
+                continue;
+            }
+            
+            $filePath = $cachePath . $file;
+            
+            if (is_file($filePath)) {
+                $fileCount++;
+                $totalSize += filesize($filePath);
+            }
+        }
+        
+        return [
+            'files' => $fileCount,
+            'size' => $this->formatBytes($totalSize),
+            'size_bytes' => $totalSize,
+            'path' => realpath($cachePath),
+        ];
+    }
+
+    /**
+     * Gets process information.
+     *
+     * @return array Process details
+     */
+    private function getProcessInfo(): array
+    {
+        return [
+            'pid' => getmypid(),
+            'user' => get_current_user(),
+            'memory_usage' => $this->formatBytes(memory_get_usage(true)),
+            'memory_usage_bytes' => memory_get_usage(true),
+            'peak_memory' => $this->formatBytes(memory_get_peak_usage(true)),
+            'peak_memory_bytes' => memory_get_peak_usage(true),
+        ];
+    }
+
+    /**
+     * Returns system info as JSON for AJAX updates.
+     *
+     * @return void
+     */
+    public function getSystemInfoJson()
+    {
+        if (SessionUtil::get('user')['id'] === null) {
+            Flight::json(['error' => 'Unauthorized'], 403);
+            return;
+        }
+
+        $user = User::findUserById(SessionUtil::get('user')['id']);
+        if ($user === false) {
+            Flight::json(['error' => 'Unauthorized'], 403);
+            return;
+        }
+
+        $roles = explode(',', $user->roles);
+        if (!in_array('Admin', $roles)) {
+            Flight::json(['error' => 'Access denied'], 403);
+            return;
+        }
+
+        $systemInfo = $this->collectSystemInfo();
+
+        Flight::json([
+            'success' => true,
+            'data' => $systemInfo,
+            'timestamp' => date('Y-m-d H:i:s'),
+        ]);
+    }
+
+    /**
+     * Exports system information in requested format.
+     *
+     * @return void
+     */
+    public function exportSystemInfo()
+    {
+        if (SessionUtil::get('user')['id'] === null) {
+            Flight::halt(403, 'Unauthorized');
+        }
+
+        $user = User::findUserById(SessionUtil::get('user')['id']);
+        if ($user === false) {
+            Flight::halt(403, 'Unauthorized');
+        }
+
+        $roles = explode(',', $user->roles);
+        if (!in_array('Admin', $roles)) {
+            Flight::halt(403, 'Access denied');
+        }
+
+        $format = $_GET['format'] ?? 'json';
+        $systemInfo = $this->collectSystemInfo();
+        $filename = 'system-info-' . date('Y-m-d-His');
+
+        if ($format === 'json') {
+            header('Content-Type: application/json');
+            header('Content-Disposition: attachment; filename="' . $filename . '.json"');
+            echo json_encode($systemInfo, JSON_PRETTY_PRINT);
+        } else {
+            // Text format
+            header('Content-Type: text/plain');
+            header('Content-Disposition: attachment; filename="' . $filename . '.txt"');
+            echo $this->formatSystemInfoAsText($systemInfo);
+        }
+
+        exit;
+    }
+
+    /**
+     * Formats system info as readable text.
+     *
+     * @param array $systemInfo System information array
+     * @return string Formatted text
+     */
+    private function formatSystemInfoAsText(array $systemInfo): string
+    {
+        $output = "SECSTORE SYSTEM INFORMATION REPORT\n";
+        $output .= "Generated: " . date('Y-m-d H:i:s') . "\n";
+        $output .= str_repeat('=', 80) . "\n\n";
+
+        // PHP Info
+        $output .= "PHP CONFIGURATION\n";
+        $output .= str_repeat('-', 80) . "\n";
+        $output .= "Version:              {$systemInfo['php']['version']}\n";
+        $output .= "Memory Limit:         {$systemInfo['php']['memory_limit']}\n";
+        $output .= "Max Execution Time:   {$systemInfo['php']['max_execution_time']}\n";
+        $output .= "Upload Max Filesize:  {$systemInfo['php']['upload_max_filesize']}\n";
+        $output .= "Post Max Size:        {$systemInfo['php']['post_max_size']}\n";
+        $output .= "Loaded Extensions:    " . count($systemInfo['php']['extensions']) . "\n\n";
+
+        // Disk
+        $output .= "DISK SPACE\n";
+        $output .= str_repeat('-', 80) . "\n";
+        $output .= "Total:                {$systemInfo['disk']['total']}\n";
+        $output .= "Used:                 {$systemInfo['disk']['used']}\n";
+        $output .= "Free:                 {$systemInfo['disk']['free']}\n";
+        $output .= "Usage:                {$systemInfo['disk']['usage_percent']}%\n\n";
+
+        // Memory
+        if ($systemInfo['memory']) {
+            $output .= "MEMORY USAGE\n";
+            $output .= str_repeat('-', 80) . "\n";
+            $output .= "Total RAM:            {$systemInfo['memory']['total']}\n";
+            $output .= "Used:                 {$systemInfo['memory']['used']}\n";
+            $output .= "Free:                 {$systemInfo['memory']['free']}\n";
+            $output .= "Cached:               {$systemInfo['memory']['cached']}\n\n";
+        }
+
+        // Server
+        $output .= "SERVER INFORMATION\n";
+        $output .= str_repeat('-', 80) . "\n";
+        $output .= "Software:             {$systemInfo['server']['software']}\n";
+        $output .= "OS:                   {$systemInfo['server']['os']}\n";
+        $output .= "Hostname:             {$systemInfo['server']['hostname']}\n";
+        $output .= "Document Root:        {$systemInfo['server']['document_root']}\n";
+        $output .= "Current Time:         {$systemInfo['server']['current_time']}\n\n";
+
+        // Database
+        $output .= "DATABASE INFORMATION\n";
+        $output .= str_repeat('-', 80) . "\n";
+        $output .= "Name:                 {$systemInfo['database']['name']}\n";
+        $output .= "Version:              {$systemInfo['database']['version']}\n";
+        $output .= "Size:                 {$systemInfo['database']['size']}\n\n";
+
+        // Sessions
+        if (isset($systemInfo['sessions'])) {
+            $output .= "SESSION STATISTICS\n";
+            $output .= str_repeat('-', 80) . "\n";
+            $output .= "Active Sessions:      {$systemInfo['sessions']['active']}\n";
+            $output .= "Total Sessions:       {$systemInfo['sessions']['total']}\n";
+            $output .= "Session Timeout:      {$systemInfo['sessions']['timeout']}s\n";
+            $output .= "Session Path:         {$systemInfo['sessions']['path']}\n\n";
+        }
+
+        // Cache
+        if (isset($systemInfo['cache'])) {
+            $output .= "CACHE INFORMATION\n";
+            $output .= str_repeat('-', 80) . "\n";
+            $output .= "Cache Files:          {$systemInfo['cache']['files']}\n";
+            $output .= "Cache Size:           {$systemInfo['cache']['size']}\n";
+            $output .= "Cache Path:           {$systemInfo['cache']['path']}\n\n";
+        }
+
+        // Process
+        if (isset($systemInfo['process'])) {
+            $output .= "PROCESS INFORMATION\n";
+            $output .= str_repeat('-', 80) . "\n";
+            $output .= "Process ID:           {$systemInfo['process']['pid']}\n";
+            $output .= "User:                 {$systemInfo['process']['user']}\n";
+            $output .= "Memory Usage (PHP):   {$systemInfo['process']['memory_usage']}\n";
+            $output .= "Peak Memory:          {$systemInfo['process']['peak_memory']}\n\n";
+        }
+
+        // App
+        $output .= "APPLICATION INFORMATION\n";
+        $output .= str_repeat('-', 80) . "\n";
+        $output .= "Version:              {$systemInfo['app']['version']}\n";
+        $output .= "Environment:          {$systemInfo['app']['environment']}\n\n";
+
+        $output .= str_repeat('=', 80) . "\n";
+        $output .= "End of Report\n";
+
+        return $output;
+    }
+
+    /**
      * Displays PHP info.
      *
      * Only accessible for admin users via POST.
@@ -111,6 +401,9 @@ class AdminController
             'memory' => $this->getMemoryInfo(),
             'server' => $this->getServerInfo(),
             'database' => $this->getDatabaseInfo($config),
+            'sessions' => $this->getSessionStats(),
+            'cache' => $this->getCacheInfo(),
+            'process' => $this->getProcessInfo(),
             'app' => $this->getAppInfo($config),
         ];
 
@@ -888,7 +1181,8 @@ class AdminController
             // Zusätzliche Validierung
             if (!empty($newConfig['ldapHost'])) {
                 // Host muss mit ldap:// oder ldaps:// beginnen
-                if (!str_starts_with($newConfig['ldapHost'], 'ldap://') &&
+                if (
+                    !str_starts_with($newConfig['ldapHost'], 'ldap://') &&
                     !str_starts_with($newConfig['ldapHost'], 'ldaps://')
                 ) {
                     $configFile = '../config.php';
@@ -1788,7 +2082,8 @@ class AdminController
         );
 
         // Prüfen, ob es eine AJAX-Anfrage ist
-        if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) &&
+        if (
+            !empty($_SERVER['HTTP_X_REQUESTED_WITH']) &&
             strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest'
         ) {
             // JSON-Antwort für AJAX
@@ -2108,7 +2403,8 @@ class AdminController
      */
     private static function handleResponse(bool $success, ?string $errorMessage = null)
     {
-        if (empty($_SERVER['HTTP_X_REQUESTED_WITH']) &&
+        if (
+            empty($_SERVER['HTTP_X_REQUESTED_WITH']) &&
             strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest'
         ) {
             Flight::json(['success' => $success]);
