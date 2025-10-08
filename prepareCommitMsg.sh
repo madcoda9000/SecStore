@@ -46,18 +46,6 @@ echo "CHANGELOG found: $CHANGELOG" >> "$DEBUG_LOG"
 # Conventional Commits Mapping
 # ============================================================================
 
-declare -A CATEGORY_MAP
-CATEGORY_MAP["feat"]="### ✨ Added"
-CATEGORY_MAP["fix"]="### 🐛 Fixed"
-CATEGORY_MAP["docs"]="### 📝 Documentation"
-CATEGORY_MAP["refactor"]="### 🔄 Changed"
-CATEGORY_MAP["test"]="### 🧪 Testing"
-CATEGORY_MAP["chore"]="### 🔧 Maintenance"
-CATEGORY_MAP["style"]="### 💅 Style"
-CATEGORY_MAP["perf"]="### ⚡ Performance"
-CATEGORY_MAP["security"]="### 🔒 Security"
-CATEGORY_MAP["breaking"]="### ⚠️ Breaking"
-
 # Commit-Typ und Message extrahieren
 COMMIT_TYPE=""
 COMMIT_TEXT="$COMMIT_MSG"
@@ -67,15 +55,56 @@ if [[ "$COMMIT_MSG" =~ ^([a-z]+)(\(.*\))?:\ (.+)$ ]]; then
     COMMIT_TEXT="${BASH_REMATCH[3]}"
 fi
 
-# Kategorie bestimmen
-if [ -n "$COMMIT_TYPE" ] && [ -n "${CATEGORY_MAP[$COMMIT_TYPE]}" ]; then
-    TARGET_CATEGORY="${CATEGORY_MAP[$COMMIT_TYPE]}"
-    EMOJI_TYPE="$COMMIT_TYPE"
-else
-    # Fallback: Keine Kategorisierung erkannt -> "Added"
-    TARGET_CATEGORY="### ✨ Added"
-    EMOJI_TYPE="added"
-fi
+echo "COMMIT_TYPE extracted: $COMMIT_TYPE" >> "$DEBUG_LOG"
+
+# Kategorie bestimmen mit case statt assoziativem Array (macOS kompatibel)
+case "$COMMIT_TYPE" in
+    feat)
+        TARGET_CATEGORY="### ✨ Added"
+        EMOJI_TYPE="feat"
+        ;;
+    fix)
+        TARGET_CATEGORY="### 🐛 Fixed"
+        EMOJI_TYPE="fix"
+        ;;
+    docs)
+        TARGET_CATEGORY="### 📝 Documentation"
+        EMOJI_TYPE="docs"
+        ;;
+    refactor)
+        TARGET_CATEGORY="### 🔄 Changed"
+        EMOJI_TYPE="refactor"
+        ;;
+    test)
+        TARGET_CATEGORY="### 🧪 Testing"
+        EMOJI_TYPE="test"
+        ;;
+    chore)
+        TARGET_CATEGORY="### 🔧 Maintenance"
+        EMOJI_TYPE="chore"
+        ;;
+    style)
+        TARGET_CATEGORY="### 💅 Style"
+        EMOJI_TYPE="style"
+        ;;
+    perf)
+        TARGET_CATEGORY="### ⚡ Performance"
+        EMOJI_TYPE="perf"
+        ;;
+    security)
+        TARGET_CATEGORY="### 🔒 Security"
+        EMOJI_TYPE="security"
+        ;;
+    breaking)
+        TARGET_CATEGORY="### ⚠️ Breaking"
+        EMOJI_TYPE="breaking"
+        ;;
+    *)
+        # Fallback: Keine Kategorisierung erkannt -> "Added"
+        TARGET_CATEGORY="### ✨ Added"
+        EMOJI_TYPE="added"
+        ;;
+esac
 
 # ============================================================================
 # Datum und Version ermitteln
@@ -85,7 +114,7 @@ fi
 CURRENT_DATE=$(date +%Y-%m-%d)
 echo "CURRENT_DATE: $CURRENT_DATE" >> "$DEBUG_LOG"
 
-# Letzte Version finden (z.B. [1.3.2])
+# Letzte Version finden (z.B. [1.3.2]) - macOS kompatibel mit sed
 LAST_VERSION=$(sed -n 's/^## \[\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\)\].*/\1/p' "$CHANGELOG" | head -n 1)
 echo "LAST_VERSION: $LAST_VERSION" >> "$DEBUG_LOG"
 
