@@ -23,6 +23,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 
 ### 🐛 Fixed
+- **updated prepareCommitMsg.sh to be mac bash compatible**
 - **added missing columns to TestCase.php**
 - **various Azure SSO fixes**
 - **excluded privacy settings for super.admin user**

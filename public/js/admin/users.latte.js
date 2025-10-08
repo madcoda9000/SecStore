@@ -251,24 +251,30 @@ document.addEventListener("DOMContentLoaded", function () {
     [desktopIcon, mobileIcon].forEach((icon) => {
       if (!icon) return;
 
+      // WICHTIG: Erst Tooltip verstecken und disposen
+      const tooltip = bootstrap.Tooltip.getInstance(icon);
+      if (tooltip) {
+        tooltip.hide();
+        // Warten bis Tooltip versteckt ist, dann disposen
+        setTimeout(() => tooltip.dispose(), 200);
+      }
+
       if (operation === "enable") {
         // Change to enabled state
         icon.className = "bi-check-circle-fill text-success user-action-btn";
         icon.dataset.operation = "disable";
-        icon.title = icon.dataset.bsOriginalTitle = "Disable Useraccount";
+        icon.title = "Disable Useraccount";
       } else {
         // Change to disabled state
         icon.className = "bi-x-circle-fill text-danger user-action-btn";
         icon.dataset.operation = "enable";
-        icon.title = icon.dataset.bsOriginalTitle = "Enable Useraccount";
+        icon.title = "Enable Useraccount";
       }
 
-      // Update tooltip
-      const tooltip = bootstrap.Tooltip.getInstance(icon);
-      if (tooltip) {
-        tooltip.dispose();
+      // Neuen Tooltip nach kurzer Verzögerung erstellen
+      setTimeout(() => {
         new bootstrap.Tooltip(icon);
-      }
+      }, 250);
     });
   }
 
@@ -284,24 +290,29 @@ document.addEventListener("DOMContentLoaded", function () {
     [desktopIcon, mobileIcon].forEach((icon) => {
       if (!icon) return;
 
+      // WICHTIG: Erst Tooltip verstecken und disposen
+      const tooltip = bootstrap.Tooltip.getInstance(icon);
+      if (tooltip) {
+        tooltip.hide();
+        setTimeout(() => tooltip.dispose(), 200);
+      }
+
       if (operation === "enable") {
         // Change to enabled state
         icon.className = "bi-check-circle-fill text-success user-action-btn";
         icon.dataset.operation = "disable";
-        icon.title = icon.dataset.bsOriginalTitle = "Disable 2FA";
+        icon.title = "Disable 2FA";
       } else {
         // Change to disabled state
         icon.className = "bi-x-circle-fill text-danger user-action-btn";
         icon.dataset.operation = "enable";
-        icon.title = icon.dataset.bsOriginalTitle = "Enable 2FA";
+        icon.title = "Enable 2FA";
       }
 
-      // Update tooltip
-      const tooltip = bootstrap.Tooltip.getInstance(icon);
-      if (tooltip) {
-        tooltip.dispose();
+      // Neuen Tooltip nach kurzer Verzögerung erstellen
+      setTimeout(() => {
         new bootstrap.Tooltip(icon);
-      }
+      }, 250);
     });
   }
 
@@ -317,24 +328,29 @@ document.addEventListener("DOMContentLoaded", function () {
     [desktopIcon, mobileIcon].forEach((icon) => {
       if (!icon) return;
 
+      // WICHTIG: Erst Tooltip verstecken und disposen
+      const tooltip = bootstrap.Tooltip.getInstance(icon);
+      if (tooltip) {
+        tooltip.hide();
+        setTimeout(() => tooltip.dispose(), 200);
+      }
+
       if (operation === "enable") {
         // Change to enforced state
         icon.className = "bi-check-circle-fill text-warning user-action-btn";
         icon.dataset.operation = "disable";
-        icon.title = icon.dataset.bsOriginalTitle = "Click to unenforce 2FA for user";
+        icon.title = "Click to unenforce 2FA for user";
       } else {
         // Change to unenforced state
-        icon.className = "bi-x-circle-fill text-danger user-action-btn";
+        icon.className = "bi-x-circle-fill text-secondary user-action-btn";
         icon.dataset.operation = "enable";
-        icon.title = icon.dataset.bsOriginalTitle = "Click to enforce 2FA for user";
+        icon.title = "Click to enforce 2FA for user";
       }
 
-      // Update tooltip
-      const tooltip = bootstrap.Tooltip.getInstance(icon);
-      if (tooltip) {
-        tooltip.dispose();
+      // Neuen Tooltip nach kurzer Verzögerung erstellen
+      setTimeout(() => {
         new bootstrap.Tooltip(icon);
-      }
+      }, 250);
     });
   }
 

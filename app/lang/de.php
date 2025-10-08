@@ -183,6 +183,7 @@ return [
     'users.popup.dbuser' => 'DB-Benutzer',
     'users.popup.entraid' => 'Entra ID / Azure AD Benutzer',
     'users.popup.disableUser' => 'Benutzer deaktivieren',
+    'users.popup.activateUser' => 'Benutzer aktivieren',
     'users.popup.noDisableUser' => 'Super-Admin-Account kann nicht geändert werden.',
     'users.popup.enableUser' => 'Benutzer aktivieren',
     'users.popup.disable2fa' => '2fa deaktivieren',

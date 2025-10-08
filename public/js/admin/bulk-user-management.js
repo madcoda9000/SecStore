@@ -43,7 +43,6 @@ class BulkUserManager {
       confirmModalIcon: document.getElementById("confirmModalIcon"),
       confirmDeleteBtn: document.getElementById("confirmDeleteBtn2"),
     };
-
     this.init();
   }
 
@@ -144,6 +143,7 @@ class BulkUserManager {
     if (action === "toggle-select-all" || action === "update-selection") {
       return; // Let handleChange deal with these
     }
+    
     // Bulk actions
     if (bulkAction) {
       event.preventDefault();
@@ -151,8 +151,15 @@ class BulkUserManager {
       return;
     }
 
-    // Regular actions
-    if (action) {
+    // Define actions that this script should handle
+    const bulkManagedActions = [
+      'clear-selection',
+      'refresh-user-list',
+      'confirm-delete'
+    ];
+
+    // Regular actions - only handle bulk-managed actions
+    if (action && bulkManagedActions.includes(action)) {
       event.preventDefault();
       this.handleAction(action);
       return;
@@ -164,6 +171,9 @@ class BulkUserManager {
       this.handleExport(exportAction);
       return;
     }
+    
+    // All other actions (like toggle-mfa-enforcement, toggle-account-status, etc.) 
+    // are handled by users.latte.js - don't interfere
   }
 
   /**
