@@ -86,7 +86,7 @@ CURRENT_DATE=$(date +%Y-%m-%d)
 echo "CURRENT_DATE: $CURRENT_DATE" >> "$DEBUG_LOG"
 
 # Letzte Version finden (z.B. [1.3.2])
-LAST_VERSION=$(grep -oP '## \[\K[0-9]+\.[0-9]+\.[0-9]+' "$CHANGELOG" | head -n 1)
+LAST_VERSION=$(sed -n 's/^## \[\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\)\].*/\1/p' "$CHANGELOG" | head -n 1)
 echo "LAST_VERSION: $LAST_VERSION" >> "$DEBUG_LOG"
 
 if [ -z "$LAST_VERSION" ]; then
