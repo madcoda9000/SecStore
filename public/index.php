@@ -10,7 +10,6 @@ use App\Utils\LogUtil;
 use App\Utils\LogType;
 use App\Utils\SessionUtil;
 use App\Utils\TranslationUtil;
-use App\Controllers\SetupController; // HINZUGEFÜGT für Setup
 
 /**
  * log all errors to a file
@@ -199,10 +198,10 @@ $app->map('error', function (Throwable $ex) use ($app) {
     http_response_code($code);
     LogUtil::logAction(LogType::ERROR, 'index', 'map->error', 'ERROR ' . $code . ': ' . $ex->getMessage());
 
-    //$app->latte()->render('errors/error.latte', [
-    //    'code' => $code,
-    //    'message' => $ex->getMessage()
-    //]);
+    $app->latte()->render('errors/error.latte', [
+        'code' => $code,
+        'message' => $ex->getMessage()
+    ]);
 });
 
 // Add the headers in a filter

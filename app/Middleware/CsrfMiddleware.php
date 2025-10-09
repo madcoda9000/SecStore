@@ -127,7 +127,7 @@ class CsrfMiddleware
             '/profileChangePassword',      // Passwort ändern
             '/profileChangeEmail',         // Email ändern
             '/2fa-verify',                        // 2FA
-            '/enable-2fa',                 // 2FA aktivieren            
+            '/enable-2fa',                 // 2FA aktivieren
         ];
 
         foreach ($refreshRoutes as $route) {

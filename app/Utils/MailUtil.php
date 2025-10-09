@@ -99,10 +99,10 @@ class MailUtil
             $mail->Body = $latte->renderToString($templatePath, $data);
 
             if ($template == 'welcome' && self::$config['mail']['enableWelcomeMail'] === true) {
-                LogUtil::logAction(LogType::MAIL, "MailUtil", "sendMail", "Welcome Mail an {$to} wurde versendet");
+                LogUtil::logAction(LogType::MAIL, "MailUtil", "sendMail", "Sending Welcome Mail to {$to}");
                 return $mail->send();
             } elseif ($template !== "welcome") {
-                LogUtil::logAction(LogType::MAIL, "MailUtil", "sendMail", "{$template} Mail an {$to} wurde versendet");
+                LogUtil::logAction(LogType::MAIL, "MailUtil", "sendMail", "Sending {$template} Mail to {$to}");
                 return $mail->send();
             }
         } catch (Exception $e) {
