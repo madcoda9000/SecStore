@@ -3,8 +3,6 @@
 namespace App\Middleware;
 
 use App\Utils\MailSchedulerService;
-use App\Utils\LogUtil;
-use App\Utils\LogType;
 
 /**
  * Class Name: SchedulerAutoStartMiddleware
@@ -61,16 +59,8 @@ class SchedulerAutoStartMiddleware
         // This is lightweight - just checks PID file
         try {
             if (!MailSchedulerService::isRunning()) {
-                $result = MailSchedulerService::autoStart();
-                
-                if ($result) {
-                    LogUtil::logAction(
-                        LogType::MAILSCHEDULER,
-                        'SchedulerAutoStartMiddleware',
-                        'checkAndStart',
-                        'Scheduler auto-started on request to ' . $currentPath
-                    );
-                }
+                MailSchedulerService::autoStart();
+                // Auto-start is logged in MailSchedulerService::startWorker()
             }
         } catch (\Exception $e) {
             // Silent fail - don't interrupt request

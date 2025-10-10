@@ -17,31 +17,54 @@ if (php_sapi_name() !== 'cli') {
 }
 
 // Load configuration and dependencies
-require_once __DIR__ . '/../../config.php';
-require_once __DIR__ . '/../../vendor/autoload.php';
+try {
+    require_once __DIR__ . '/../../config.php';
+    require_once __DIR__ . '/../../vendor/autoload.php';
+    echo "[" . date('Y-m-d H:i:s') . "] Configuration and autoloader loaded successfully\n";
+} catch (Exception $e) {
+    error_log("Failed to load configuration: " . $e->getMessage());
+    die("FATAL: Failed to load configuration: " . $e->getMessage() . "\n");
+}
 
 use App\Models\MailJob;
 use App\Utils\MailUtil;
 use App\Utils\MailSchedulerService;
-use App\Utils\LogUtil;
-use App\Utils\LogType;
 
 // Set up database connection
 try {
-    ORM::configure("mysql:host={$db['host']};dbname={$db['name']}", null, null, [
-        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
-    ]);
+    echo "[" . date('Y-m-d H:i:s') . "] Configuring database connection...\n";
+    
+    // Configure ORM with DSN
+    $dsn = "mysql:host={$db['host']};dbname={$db['name']};charset=utf8mb4";
+    ORM::configure($dsn);
     ORM::configure('username', $db['user']);
     ORM::configure('password', $db['pass']);
     ORM::configure('driver_options', [PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8mb4']);
+    ORM::configure('error_mode', PDO::ERRMODE_EXCEPTION);
+    ORM::configure('logging', false);
+    
+    // Force ORM to establish connection immediately to verify it works
+    $testQuery = ORM::for_table('logs')->limit(1)->find_one();
+    
+    echo "[" . date('Y-m-d H:i:s') . "] Database configured and tested successfully\n";
 } catch (Exception $e) {
-    error_log("Worker DB connection failed: " . $e->getMessage());
+    $errorMsg = "Worker DB connection failed: " . $e->getMessage();
+    error_log($errorMsg);
+    echo "FATAL: " . $errorMsg . "\n";
     exit(1);
 }
 
 // Write PID file
 $pid = getmypid();
+echo "[" . date('Y-m-d H:i:s') . "] Worker PID: {$pid}\n";
 MailSchedulerService::writePidFile($pid);
+echo "[" . date('Y-m-d H:i:s') . "] PID file written\n";
+
+// Ensure log directory exists
+$logDir = __DIR__ . '/../logs/';
+if (!is_dir($logDir)) {
+    mkdir($logDir, 0750, true);
+}
 
 // Initial status
 MailSchedulerService::updateStatus([
@@ -50,13 +73,12 @@ MailSchedulerService::updateStatus([
     'jobs_failed' => 0,
     'last_run' => null
 ]);
+echo "[" . date('Y-m-d H:i:s') . "] Initial status written\n";
 
-LogUtil::logAction(
-    LogType::MAILSCHEDULER,
-    'MailSchedulerWorker',
-    'startup',
-    "Mail scheduler worker started with PID {$pid}"
-);
+// Log startup to file instead of database to avoid ORM issues
+$logMsg = "[" . date('Y-m-d H:i:s') . "] [MAILSCHEDULER] Mail scheduler worker started with PID {$pid}\n";
+file_put_contents($logDir . 'mail_scheduler.log', $logMsg, FILE_APPEND | LOCK_EX);
+echo "[" . date('Y-m-d H:i:s') . "] Startup logged to file\n";
 
 echo "Mail Scheduler Worker started (PID: {$pid})\n";
 echo "Press Ctrl+C to stop or use admin interface\n";
@@ -65,20 +87,20 @@ $jobsProcessed = 0;
 $jobsFailed = 0;
 $cycleCount = 0;
 
+echo "[" . date('Y-m-d H:i:s') . "] Entering main worker loop\n";
+
 // Main worker loop
 while (true) {
     $cycleCount++;
+    echo "[" . date('Y-m-d H:i:s') . "] Cycle #{$cycleCount} started\n";
     
     // Check for stop signal
     if (MailSchedulerService::shouldStop()) {
         echo "Stop signal received, shutting down gracefully...\n";
         
-        LogUtil::logAction(
-            LogType::MAILSCHEDULER,
-            'MailSchedulerWorker',
-            'shutdown',
-            "Scheduler stopped gracefully. Processed: {$jobsProcessed}, Failed: {$jobsFailed}"
-        );
+        // Log shutdown to file
+        $logMsg = "[" . date('Y-m-d H:i:s') . "] [MAILSCHEDULER] Scheduler stopped gracefully. Processed: {$jobsProcessed}, Failed: {$jobsFailed}\n";
+        file_put_contents(__DIR__ . '/../logs/mail_scheduler.log', $logMsg, FILE_APPEND | LOCK_EX);
         
         break;
     }
@@ -129,12 +151,9 @@ while (true) {
 
                     echo "  ✓ Job #{$job->id} completed successfully\n";
 
-                    LogUtil::logAction(
-                        LogType::MAILSCHEDULER,
-                        'MailSchedulerWorker',
-                        'processJob',
-                        "Successfully sent email to {$job->recipient} using template '{$job->template}'"
-                    );
+                    // Log success to file
+                    $logMsg = "[" . date('Y-m-d H:i:s') . "] [MAILSCHEDULER] Successfully sent email to {$job->recipient} using template '{$job->template}'\n";
+                    file_put_contents(__DIR__ . '/../logs/mail_scheduler.log', $logMsg, FILE_APPEND | LOCK_EX);
                 } else {
                     // Mark as failed
                     $errorMsg = "Failed to send email";
@@ -143,12 +162,9 @@ while (true) {
 
                     echo "  ✗ Job #{$job->id} failed: {$errorMsg}\n";
 
-                    LogUtil::logAction(
-                        LogType::MAILSCHEDULER,
-                        'MailSchedulerWorker',
-                        'processJob',
-                        "Failed to send email to {$job->recipient}: {$errorMsg}"
-                    );
+                    // Log failure to file
+                    $logMsg = "[" . date('Y-m-d H:i:s') . "] [MAILSCHEDULER] Failed to send email to {$job->recipient}: {$errorMsg}\n";
+                    file_put_contents(__DIR__ . '/../logs/mail_scheduler.log', $logMsg, FILE_APPEND | LOCK_EX);
                 }
             } catch (Exception $e) {
                 // Handle job-specific errors
@@ -158,12 +174,9 @@ while (true) {
 
                 echo "  ✗ Job #{$job->id} exception: {$errorMsg}\n";
 
-                LogUtil::logAction(
-                    LogType::MAILSCHEDULER,
-                    'MailSchedulerWorker',
-                    'processJob',
-                    "Exception processing job #{$job->id}: {$errorMsg}"
-                );
+                // Log exception to file
+                $logMsg = "[" . date('Y-m-d H:i:s') . "] [MAILSCHEDULER] Exception processing job #{$job->id}: {$errorMsg}\n";
+                file_put_contents(__DIR__ . '/../logs/mail_scheduler.log', $logMsg, FILE_APPEND | LOCK_EX);
             }
 
             // Small delay between jobs
@@ -180,12 +193,9 @@ while (true) {
     } catch (Exception $e) {
         echo "Worker error: " . $e->getMessage() . "\n";
         
-        LogUtil::logAction(
-            LogType::MAILSCHEDULER,
-            'MailSchedulerWorker',
-            'error',
-            "Worker loop error: " . $e->getMessage()
-        );
+        // Log worker error to file
+        $logMsg = "[" . date('Y-m-d H:i:s') . "] [MAILSCHEDULER] Worker loop error: " . $e->getMessage() . "\n";
+        file_put_contents(__DIR__ . '/../logs/mail_scheduler.log', $logMsg, FILE_APPEND | LOCK_EX);
 
         // Wait before retrying after error
         sleep(30);

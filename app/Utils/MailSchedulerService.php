@@ -210,13 +210,15 @@ class MailSchedulerService
                 // macOS + Linux
                 $phpBin = PHP_BINARY; // Vermeide PATH-Probleme auf macOS/Homebrew
                 $pidFile = self::$pidFile;
+                $logFile = __DIR__ . '/../../cache/mail_scheduler_debug.log';
 
                 // Starten, vollständig detachen, PID zurückgeben und selbst ins PID-File schreiben
                 // - nohup: überlebt aufrufende Shell
                 // - setsid: neue Session (nicht immer nötig, aber sauber)
                 // - echo $!: PID des letzten Background-Commands
+                // WICHTIG: Fehler in Log-Datei schreiben für Debugging
                 $sh = 'nohup ' . escapeshellarg($phpBin) . ' ' . escapeshellarg($workerPath) .
-                    ' > /dev/null 2>&1 & echo $!';
+                    ' >> ' . escapeshellarg($logFile) . ' 2>&1 & echo $!';
 
                 // Wichtig: über /bin/sh laufen lassen, sonst bekommst du $! nicht
                 $pid = (int) shell_exec($sh);
@@ -241,23 +243,28 @@ class MailSchedulerService
 
             if ($started) {
                 $pid = self::getPid(); // liest aus dem PID-File
-                LogUtil::logAction(
-                    LogType::MAILSCHEDULER,
-                    'MailSchedulerService',
-                    'startWorker',
-                    'Mail scheduler started successfully (PID ' . (int)$pid . ')'
-                );
+                
+                // Log to file instead of database
+                $logDir = __DIR__ . '/../logs/';
+                if (!is_dir($logDir)) {
+                    mkdir($logDir, 0750, true);
+                }
+                $logMsg = "[" . date('Y-m-d H:i:s') . "] [MAILSCHEDULER] Mail scheduler started successfully (PID " . (int)$pid . ")\n";
+                @file_put_contents($logDir . 'mail_scheduler.log', $logMsg, FILE_APPEND | LOCK_EX);
+                
                 return ['success' => true, 'message' => 'Scheduler started successfully', 'pid' => (int)$pid];
             }
 
             return ['success' => false, 'message' => 'Failed to start scheduler worker'];
         } catch (Exception $e) {
-            LogUtil::logAction(
-                LogType::MAILSCHEDULER,
-                'MailSchedulerService',
-                'startWorker',
-                'Failed to start scheduler: ' . $e->getMessage()
-            );
+            // Log to file instead of database
+            $logDir = __DIR__ . '/../logs/';
+            if (!is_dir($logDir)) {
+                mkdir($logDir, 0750, true);
+            }
+            $logMsg = "[" . date('Y-m-d H:i:s') . "] [MAILSCHEDULER] Failed to start scheduler: " . $e->getMessage() . "\n";
+            @file_put_contents($logDir . 'mail_scheduler.log', $logMsg, FILE_APPEND | LOCK_EX);
+            
             return ['success' => false, 'message' => 'Exception: ' . $e->getMessage()];
         }
     }
@@ -303,32 +310,32 @@ class MailSchedulerService
                 sleep(1);
             }
 
-            // Clean up files
+            // Clean up PID file only
+            // Keep stop signal file so auto-start middleware respects manual stop
             if (file_exists(self::$pidFile)) {
                 unlink(self::$pidFile);
             }
-            if (file_exists(self::$stopSignalFile)) {
-                unlink(self::$stopSignalFile);
-            }
 
-            LogUtil::logAction(
-                LogType::MAILSCHEDULER,
-                'MailSchedulerService',
-                'stopWorker',
-                'Mail scheduler stopped successfully'
-            );
+            // Log to file instead of database
+            $logDir = __DIR__ . '/../logs/';
+            if (!is_dir($logDir)) {
+                mkdir($logDir, 0750, true);
+            }
+            $logMsg = "[" . date('Y-m-d H:i:s') . "] [MAILSCHEDULER] Mail scheduler stopped successfully (manual stop)\n";
+            @file_put_contents($logDir . 'mail_scheduler.log', $logMsg, FILE_APPEND | LOCK_EX);
 
             return [
                 'success' => true,
                 'message' => 'Scheduler stopped successfully'
             ];
         } catch (Exception $e) {
-            LogUtil::logAction(
-                LogType::MAILSCHEDULER,
-                'MailSchedulerService',
-                'stopWorker',
-                'Failed to stop scheduler: ' . $e->getMessage()
-            );
+            // Log to file instead of database
+            $logDir = __DIR__ . '/../logs/';
+            if (!is_dir($logDir)) {
+                mkdir($logDir, 0750, true);
+            }
+            $logMsg = "[" . date('Y-m-d H:i:s') . "] [MAILSCHEDULER] Failed to stop scheduler: " . $e->getMessage() . "\n";
+            @file_put_contents($logDir . 'mail_scheduler.log', $logMsg, FILE_APPEND | LOCK_EX);
 
             return [
                 'success' => false,
