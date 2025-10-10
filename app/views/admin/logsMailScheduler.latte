@@ -1,0 +1,131 @@
+{extends '../_mainLayout.latte'}
+
+{block content}
+
+<link rel="stylesheet" href="/css/mobile-logs.css">
+
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="mb-0"><span class="bi-envelope-paper-fill">&nbsp;</span>Mail Scheduler Logs</h1>
+        <div>
+            <button type="button" class="btn btn-success me-2" id="exportLogsBtn">
+                <span class="bi-download"></span>&nbsp;Export Logs
+            </button>
+            <button type="button" class="btn btn-danger" id="truncateLogsBtn">
+                <span class="bi-trash"></span>&nbsp;Delete All
+            </button>
+        </div>
+    </div>
+
+    <div class="d-flex justify-content-between mb-3">
+        <div>
+            <label for="pageSize" class="me-2 desktop-pager-label">Page Size:</label>
+            <select id="pageSize" class="form-select d-inline w-auto">
+                <option value="10">10</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+            </select>
+        </div>
+        <div>
+            <div class="input-group">
+                <input type="text" id="search" class="form-control" placeholder="Search logs...">
+            </div>
+        </div>
+    </div>
+    
+    <!-- Loading Indicator -->
+    <div id="loadingSpinner" class="text-center d-none">
+        <div class="spinner-border" role="status">
+            <span class="visually-hidden">Loading logs...</span>
+        </div>
+    </div>
+
+    <!-- Desktop Table -->
+    <table class="table table-striped desktop-table">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Type</th>
+                <th>Date/Time</th>
+                <th>User</th>
+                <th>Context</th>
+                <th>Message</th>
+            </tr>
+        </thead>
+        <tbody id="logTableBody">
+        </tbody>
+    </table>
+
+    <!-- Mobile Cards -->
+    <div id="logCardsBody" class="d-block d-md-none desktop-table"></div>
+    
+    <!-- Pagination -->
+    <div class="d-flex justify-content-between">
+        <span id="paginationInfo" class="desktop-pager-summary">Page 1 of X</span>
+        <nav>
+            <ul class="pagination" id="pagination"></ul>
+        </nav>
+    </div>
+</div>
+
+<!-- Truncate Confirmation Modal -->
+<div class="modal fade" id="truncateModal" tabindex="-1" aria-labelledby="truncateModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="truncateModalLabel">
+                    <span class="bi-exclamation-triangle-fill"></span>&nbsp;Delete All Logs
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-warning">
+                    <strong>Warning!</strong> This action cannot be undone.
+                </div>
+                <p>Consider exporting logs before deletion.</p>
+                <p id="truncateConfirmText" class="fw-bold"></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    Cancel
+                </button>
+                <button type="button" class="btn btn-success" id="exportFirstBtn">
+                    <span class="bi-download"></span>&nbsp;Export First
+                </button>
+                <button type="button" class="btn btn-danger" id="confirmTruncateBtn">
+                    <span class="bi-trash"></span>&nbsp;Delete All
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Data-Attribute für Truncate Messages -->
+<div id="truncate-messages" 
+     data-confirm="Are you sure you want to delete ALL mail scheduler logs?"
+     data-success="Logs deleted successfully"
+     data-error="Error deleting logs"
+     class="d-none">
+</div>
+
+<!-- Data-Attribute für Messages -->
+<div id="log-messages" 
+     data-msg4="Page"
+     data-msg5="of"
+     data-msg6="Error loading logs"
+     class="d-none">
+</div>
+
+<!-- Data-Attribute für Config -->
+<div id="log-config" 
+     data-type="mailscheduler"
+     data-fetch-url="/admin/logs/fetchMailSchedulerLogs"
+     data-auto-fetch="true"
+     class="d-none">
+</div>
+
+<!-- External Scripts -->
+<script src="/js/utils/logs-universal-min.js"></script>
+<script src="/js/utils/logs-export-min.js"></script>
+<script src="/js/utils/logs-truncate-min.js"></script>
+{/block}

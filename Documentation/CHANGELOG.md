@@ -13,7 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [1.4.0] - 2025-10-08
+## [1.4.0] - 2025-10-09
 ### ✨ Added
 - **Implemented Azure SSO login**
 - **implemented truncate logs**
@@ -23,6 +23,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 
 ### 🐛 Fixed
+- **fixed various translation typos and imports**
 - **fixed various js errors**
 - **updated prepareCommitMsg.sh to be mac bash compatible**
 - **added missing columns to TestCase.php**

@@ -14,6 +14,7 @@ use App\Middleware\AuthCheckMiddleware;
 use App\Middleware\CsrfMiddleware;
 use App\Middleware\RateLimiter;
 use App\Middleware\IpWhitelistMiddleware;
+use App\Middleware\SchedulerAutoStartMiddleware;
 use App\Utils\LogType;
 use App\Utils\LogUtil;
 use App\Utils\SecurityMetrics;
@@ -44,7 +45,11 @@ if ($needsSetup) {
     return;
 }
 
+// get csrf middleware instance
 $csrfMiddleware = new CsrfMiddleware();
+
+// Auto-start mail scheduler on each request
+SchedulerAutoStartMiddleware::checkAndStart();
 
 /**
  * Helper-Funktionen für sauberere Route-Definitionen
@@ -611,6 +616,43 @@ Flight::route('GET /cron/process-deletions', function () {
     PrivacyController::processDueDeletions();
     Flight::json(['status' => 'success', 'timestamp' => date('Y-m-d H:i:s')]);
 });
+
+// ==========================================
+// MAIL SCHEDULER ROUTES (Admin)
+// ==========================================
+
+secureRoute('GET /admin/mail-scheduler', function () {
+    (new AdminController())->showMailScheduler();
+}, 'admin', true);
+
+secureRoute('GET /admin/mail-scheduler/status', function () {
+    (new AdminController())->getSchedulerStatus();
+}, 'admin', true);
+
+secureRoute('POST /admin/mail-scheduler/start', function () {
+    (new AdminController())->startScheduler();
+}, 'admin', true);
+
+secureRoute('POST /admin/mail-scheduler/stop', function () {
+    (new AdminController())->stopScheduler();
+}, 'admin', true);
+
+secureRoute('GET /admin/mail-scheduler/jobs', function () {
+    (new AdminController())->getMailJobs();
+}, 'admin', true);
+
+secureRoute('POST /admin/mail-scheduler/jobs/delete', function () {
+    (new AdminController())->deleteMailJob();
+}, 'admin', true);
+
+// Scheduler Logs
+secureRoute('GET /admin/logsMailScheduler', function () {
+    (new LogController())->showMailSchedulerLogs();
+}, 'admin', true);
+
+secureRoute('GET /admin/logs/fetchMailSchedulerlogs', function () {
+    (new LogController())->fetchMailSchedulerLogs();
+}, 'admin', true);
 
 // Logout (kein Rate Limiting nötig)
 Flight::route('/logout', [new ProfileController(), 'logout']);

@@ -7,6 +7,8 @@ use PHPMailer\PHPMailer\Exception;
 use Latte\Engine;
 use App\Utils\LogType;
 use App\Utils\LogUtil;
+use App\Utils\MailSchedulerService;
+use App\Models\MailJob;
 
 class MailUtil
 {
@@ -48,7 +50,7 @@ class MailUtil
         $mail->SMTPSecure = self::$config['mail']['encryption'];
         $mail->Port = self::$config['mail']['port'];
         $mail->Timeout = 4; // Set a timeout for the connection attempt
-        
+
         try {
             $mail->SmtpConnect();
             $mail->SmtpClose();
@@ -110,5 +112,34 @@ class MailUtil
             error_log("Mail konnte nicht gesendet werden: {$mail->ErrorInfo}");
             return false;
         }
+    }
+
+    /**
+     * Queue an email for background processing
+     *
+     * @param string $to Recipient email
+     * @param string $subject Email subject
+     * @param string $template Template name
+     * @param array $data Template data
+     * @param int $maxAttempts Maximum retry attempts
+     * @return bool|object Job object or false on failure
+     */
+    public static function queueMail(string $to, string $subject, string $template, array $data = [], int $maxAttempts = 3)
+    {
+        $job = MailJob::createJob($to, $subject, $template, $data, $maxAttempts);
+
+        if ($job) {
+            LogUtil::logAction(
+                LogType::MAILSCHEDULER,
+                'MailUtil',
+                'queueMail',
+                "Mail job #{$job->id} queued for {$to}"
+            );
+
+            // Auto-start scheduler if not running
+            MailSchedulerService::autoStart();
+        }
+
+        return $job;
     }
 }

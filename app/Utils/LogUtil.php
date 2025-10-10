@@ -71,6 +71,9 @@ class LogUtil
         } elseif ($type == LogType::ERROR) {
             $context = "$file/$method";
             self::log($type, $context, $message);
+        } elseif ($type == LogType::MAILSCHEDULER) {
+            $context = "$file/$method";
+            self::log($type, $context, $message);
         }
         ORM::configure('logging', false);
     }

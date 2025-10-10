@@ -24,4 +24,5 @@ enum LogType: string
     case MAIL = 'MAIL';
     case SQL = 'SQL';
     case SECURITY = 'SECURITY';
+    case MAILSCHEDULER = 'MAILSCHEDULER';
 }

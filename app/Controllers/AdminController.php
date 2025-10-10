@@ -10,6 +10,8 @@ use App\Utils\LogUtil;
 use App\Utils\SecurityMetrics;
 use App\Utils\SessionUtil;
 use App\Utils\TranslationUtil;
+use App\Models\MailJob;
+use App\Utils\MailSchedulerService;
 use Exception;
 use Flight;
 use InvalidArgumentException;
@@ -97,7 +99,7 @@ class AdminController
     private function getCacheInfo(): array
     {
         $cachePath = __DIR__ . '/../../cache/';
-        
+
         if (!is_dir($cachePath)) {
             return [
                 'files' => 0,
@@ -106,27 +108,27 @@ class AdminController
                 'path' => $cachePath,
             ];
         }
-        
+
         $fileCount = 0;
         $totalSize = 0;
-        
+
         // Einfache Methode mit scandir
         $files = scandir($cachePath);
-        
+
         foreach ($files as $file) {
             // Skip . und ..
             if ($file === '.' || $file === '..') {
                 continue;
             }
-            
+
             $filePath = $cachePath . $file;
-            
+
             if (is_file($filePath)) {
                 $fileCount++;
                 $totalSize += filesize($filePath);
             }
         }
-        
+
         return [
             'files' => $fileCount,
             'size' => $this->formatBytes($totalSize),
@@ -3103,5 +3105,258 @@ class AdminController
         );
 
         exit;
+    }
+
+    /**
+     * Displays the mail scheduler management page
+     *
+     * Shows scheduler status, statistics, and job queue
+     *
+     * @return void
+     */
+    public function showMailScheduler()
+    {
+        if (SessionUtil::get('user')['id'] === null) {
+            Flight::redirect('/login');
+        }
+
+        $user = User::findUserById(SessionUtil::get('user')['id']);
+        if ($user === false) {
+            Flight::redirect('/login');
+        }
+
+        $roles = explode(',', $user->roles);
+        if (!in_array('Admin', $roles)) {
+            Flight::halt(403, 'Access denied');
+        }
+
+        // Get scheduler status
+        $schedulerStatus = MailSchedulerService::getStatus();
+
+        // Get job statistics
+        $jobStats = MailJob::getStatistics();
+
+        Flight::latte()->render('admin/mail-scheduler.latte', [
+            'title' => 'Mail Scheduler',
+            'user' => SessionUtil::get('user'),
+            'sessionTimeout' => SessionUtil::getRemainingTime(),
+            'schedulerStatus' => $schedulerStatus,
+            'jobStats' => $jobStats,
+            'enviroment' => PHP_OS_FAMILY
+        ]);
+    }
+
+    /**
+     * Returns scheduler status as JSON for AJAX updates
+     *
+     * @return void
+     */
+    public function getSchedulerStatus()
+    {
+        if (SessionUtil::get('user')['id'] === null) {
+            Flight::json(['error' => 'Unauthorized'], 403);
+            return;
+        }
+
+        $user = User::findUserById(SessionUtil::get('user')['id']);
+        if ($user === false) {
+            Flight::json(['error' => 'Unauthorized'], 403);
+            return;
+        }
+
+        $roles = explode(',', $user->roles);
+        if (!in_array('Admin', $roles)) {
+            Flight::json(['error' => 'Access denied'], 403);
+            return;
+        }
+
+        $status = MailSchedulerService::getStatus();
+        $stats = MailJob::getStatistics();
+
+        Flight::json([
+            'success' => true,
+            'status' => $status,
+            'stats' => $stats,
+            'timestamp' => date('Y-m-d H:i:s')
+        ]);
+    }
+
+    /**
+     * Starts the mail scheduler worker
+     *
+     * @return void
+     */
+    public function startScheduler()
+    {
+        if (SessionUtil::get('user')['id'] === null) {
+            Flight::json(['error' => 'Unauthorized'], 403);
+            return;
+        }
+
+        $user = User::findUserById(SessionUtil::get('user')['id']);
+        if ($user === false) {
+            Flight::json(['error' => 'Unauthorized'], 403);
+            return;
+        }
+
+        $roles = explode(',', $user->roles);
+        if (!in_array('Admin', $roles)) {
+            Flight::json(['error' => 'Access denied'], 403);
+            return;
+        }
+
+        $result = MailSchedulerService::startWorker();
+
+        if ($result['success']) {
+            LogUtil::logAction(
+                LogType::MAILSCHEDULER,
+                'AdminController',
+                'startScheduler',
+                'Scheduler started by ' . $user->username
+            );
+        }
+
+        Flight::json($result);
+    }
+
+    /**
+     * Stops the mail scheduler worker
+     *
+     * @return void
+     */
+    public function stopScheduler()
+    {
+        if (SessionUtil::get('user')['id'] === null) {
+            Flight::json(['error' => 'Unauthorized'], 403);
+            return;
+        }
+
+        $user = User::findUserById(SessionUtil::get('user')['id']);
+        if ($user === false) {
+            Flight::json(['error' => 'Unauthorized'], 403);
+            return;
+        }
+
+        $roles = explode(',', $user->roles);
+        if (!in_array('Admin', $roles)) {
+            Flight::json(['error' => 'Access denied'], 403);
+            return;
+        }
+
+        $result = MailSchedulerService::stopWorker();
+
+        if ($result['success']) {
+            LogUtil::logAction(
+                LogType::MAILSCHEDULER,
+                'AdminController',
+                'stopScheduler',
+                'Scheduler stopped by ' . $user->username
+            );
+        }
+
+        Flight::json($result);
+    }
+
+    /**
+     * Fetches paginated list of mail jobs
+     *
+     * @return void
+     */
+    public function getMailJobs()
+    {
+        if (SessionUtil::get('user')['id'] === null) {
+            Flight::json(['error' => 'Unauthorized'], 403);
+            return;
+        }
+
+        $user = User::findUserById(SessionUtil::get('user')['id']);
+        if ($user === false) {
+            Flight::json(['error' => 'Unauthorized'], 403);
+            return;
+        }
+
+        $roles = explode(',', $user->roles);
+        if (!in_array('Admin', $roles)) {
+            Flight::json(['error' => 'Access denied'], 403);
+            return;
+        }
+
+        $page = isset($_GET['page']) ? max(1, (int) $_GET['page']) : 1;
+        $pageSize = isset($_GET['pageSize']) ? max(1, min(100, (int) $_GET['pageSize'])) : 20;
+        $status = isset($_GET['status']) ? $_GET['status'] : null;
+
+        $result = MailJob::getJobsPaged($page, $pageSize, $status);
+
+        Flight::json([
+            'success' => true,
+            'jobs' => array_map(function ($job) {
+                return [
+                    'id' => $job->id,
+                    'status' => $job->status,
+                    'recipient' => $job->recipient,
+                    'subject' => $job->subject,
+                    'template' => $job->template,
+                    'attempts' => $job->attempts,
+                    'max_attempts' => $job->max_attempts,
+                    'last_error' => $job->last_error,
+                    'created_at' => $job->created_at,
+                    'scheduled_at' => $job->scheduled_at,
+                    'completed_at' => $job->completed_at
+                ];
+            }, $result['jobs']),
+            'pagination' => [
+                'page' => $result['page'],
+                'pageSize' => $result['pageSize'],
+                'totalJobs' => $result['totalJobs'],
+                'totalPages' => $result['totalPages']
+            ]
+        ]);
+    }
+
+    /**
+     * Deletes a mail job
+     *
+     * @return void
+     */
+    public function deleteMailJob()
+    {
+        if (SessionUtil::get('user')['id'] === null) {
+            Flight::json(['error' => 'Unauthorized'], 403);
+            return;
+        }
+
+        $user = User::findUserById(SessionUtil::get('user')['id']);
+        if ($user === false) {
+            Flight::json(['error' => 'Unauthorized'], 403);
+            return;
+        }
+
+        $roles = explode(',', $user->roles);
+        if (!in_array('Admin', $roles)) {
+            Flight::json(['error' => 'Access denied'], 403);
+            return;
+        }
+
+        $jobId = isset($_POST['id']) ? (int) $_POST['id'] : null;
+
+        if (!$jobId) {
+            Flight::json(['success' => false, 'message' => 'Invalid job ID']);
+            return;
+        }
+
+        $success = MailJob::deleteJob($jobId);
+
+        if ($success) {
+            LogUtil::logAction(
+                LogType::MAILSCHEDULER,
+                'AdminController',
+                'deleteMailJob',
+                'Job #' . $jobId . ' deleted by ' . $user->username
+            );
+
+            Flight::json(['success' => true, 'message' => 'Job deleted successfully']);
+        } else {
+            Flight::json(['success' => false, 'message' => 'Failed to delete job']);
+        }
     }
 }

@@ -84,7 +84,7 @@ try {
         $pdo->exec("CREATE TABLE `logs` (
             `id` int(11) NOT NULL AUTO_INCREMENT,
             `datum_zeit` datetime DEFAULT current_timestamp(),
-            `type` enum('ERROR','AUDIT','REQUEST','SYSTEM','MAIL','SQL', 'SECURITY') NOT NULL,
+            `type` enum('ERROR','AUDIT','REQUEST','SYSTEM','MAIL','SQL', 'SECURITY', 'MAILSCHEDULER') NOT NULL,
             `user` varchar(255) NOT NULL,
             `context` text NOT NULL,
             `message` text NOT NULL,
@@ -136,6 +136,30 @@ try {
             INDEX `idx_status` (`status`)
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;");
         //echo "Tabelle 'deletion_requests' wurde erstellt.\n";
+    }
+
+    // Prüfen ob tabelle mail_jobs existiert
+    $stmt = $pdo->query("SHOW TABLES LIKE 'mail_jobs'");
+    if ($stmt->rowCount() == 0) {
+        $pdo->exec("CREATE TABLE `mail_jobs` (
+            `id` INT(11) NOT NULL AUTO_INCREMENT,
+            `status` ENUM('pending', 'processing', 'completed', 'failed') NOT NULL DEFAULT 'pending',
+            `recipient` VARCHAR(255) NOT NULL,
+            `subject` VARCHAR(500) NOT NULL,
+            `template` VARCHAR(255) NOT NULL,
+            `template_data` TEXT NULL DEFAULT NULL,
+            `attempts` INT(11) NOT NULL DEFAULT 0,
+            `max_attempts` INT(11) NOT NULL DEFAULT 3,
+            `last_error` TEXT NULL DEFAULT NULL,
+            `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            `scheduled_at` TIMESTAMP NULL DEFAULT NULL,
+            `started_at` TIMESTAMP NULL DEFAULT NULL,
+            `completed_at` TIMESTAMP NULL DEFAULT NULL,
+            PRIMARY KEY (`id`),
+            INDEX `idx_status` (`status`),
+            INDEX `idx_scheduled` (`scheduled_at`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;");
+        //echo "Tabelle 'mail_jobs' wurde erstellt.\n";
     }
 
     // Verbindung schließen

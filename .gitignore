@@ -503,3 +503,8 @@ tests/reports/*.html
 
 # Backup files
 backups/
+
+# scheduler files
+/cache/*.pid
+/cache/*.json
+/cache/*.txt
