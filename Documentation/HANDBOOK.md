@@ -15,6 +15,7 @@
 7. [Login](#7-login)
 8. [User Profile](#8-user-profile)
 9. [Privacy & GDPR Features](#9-privacy--gdpr-features)
+10. [Mailscheduler](#10-mail-scheduler)
 
 ---
 
@@ -2470,6 +2471,1039 @@ Role:     Admin
 | **Security Policy** | [SECURITY.md](SECURITY.md) |
 | **GitHub Issues** | https://github.com/madcoda9000/SecStore/issues |
 | **Discussions** | https://github.com/madcoda9000/SecStore/discussions |
+
+---
+
+## 10. Mail Scheduler
+
+SecStore features a **background mail scheduler** that processes email sending asynchronously. Instead of sending emails directly during user requests (which can slow down the application), emails are queued and processed by a separate background worker.
+
+**Location:** Administration → Mail Scheduler
+
+### 10.1 Overview
+
+**What is the Mail Scheduler?**
+
+The Mail Scheduler is a background service that:
+- Queues emails for asynchronous processing
+- Sends emails in the background without blocking user requests
+- Retries failed emails automatically
+- Provides monitoring and management interface
+- Tracks all jobs with detailed status information
+
+**Benefits:**
+
+| Benefit | Description |
+|---------|-------------|
+| **Performance** | User requests complete faster (no email sending delay) |
+| **Reliability** | Failed emails retry automatically up to 3 times |
+| **Monitoring** | Full visibility into email queue and history |
+| **Scalability** | Handles high email volumes without impacting app performance |
+| **Error Handling** | Failed emails logged with detailed error messages |
+
+**Architecture:**
+
+```
+User Action → Queue Email (instant) → Background Worker → SMTP Server
+                  ↓                           ↓
+            mail_jobs table              Process & Retry
+```
+
+**Email Types Handled:**
+
+- Welcome emails (new user registration)
+- Password reset emails
+- Account deletion confirmation emails
+- Admin notifications
+- Any custom email templates
+
+### 10.2 Accessing Mail Scheduler
+
+**Navigation:** Administration menu → Mail Scheduler
+
+**Requirements:**
+- User must have `Admin` role
+- Admin whitelist restrictions apply (if enabled)
+
+**Page URL:** `/admin/mail-scheduler`
+
+### 10.3 Scheduler Status & Control
+
+![Mail Scheduler Status](Screenshots/mail-scheduler-status.png)
+
+**Location:** Top card on Mail Scheduler page
+
+#### 10.3.1 Status Display
+
+**Status Indicator:**
+
+| State | Display | Color |
+|-------|---------|-------|
+| **Running** | ✅ Running | 🟢 Green |
+| **Stopped** | ❌ Stopped | 🔴 Red |
+
+**Status Information:**
+
+| Field | Description | Example |
+|-------|-------------|---------|
+| **PID** | Process ID of background worker | `12345` |
+| **Started at** | When scheduler was last started | `2025-01-15 14:30:00` |
+| **Jobs processed** | Total emails sent since start | `42` |
+| **Jobs failed** | Total failures since start | `3` |
+| **Last Tick** | Last activity timestamp | `5 seconds ago` |
+
+**Heartbeat:**
+- Worker updates "Last Tick" every 10 seconds
+- If "Last Tick" > 30 seconds ago: Worker may be stuck
+- Automatic restart recommended if heartbeat stops
+
+#### 10.3.2 Start Scheduler
+
+**Button:** "Start Scheduler" (green button)
+
+**Availability:** Only when scheduler is stopped
+
+**Process:**
+
+1. **Click "Start Scheduler"**
+2. **System checks:**
+   - PHP CLI available
+   - Write permissions for PID file
+   - No existing scheduler running
+3. **Worker starts in background**
+   - PHP process spawned: `MailSchedulerWorker.php`
+   - PID file created: `cache/mail_scheduler.pid`
+   - Status file created: `cache/mail_scheduler_status.json`
+4. **Status updated:**
+   - Status indicator: ✅ Running
+   - PID displayed
+   - "Started at" timestamp set
+5. **Success message:** "Scheduler started successfully"
+
+**Auto-Start Feature:**
+
+The scheduler can auto-start when emails are queued:
+```php
+// When queueMail() is called
+MailSchedulerService::autoStart();
+```
+
+This means the scheduler often starts automatically when the first email is queued after a system restart.
+
+**Logging:**
+
+Start action logged to:
+- **Type:** `MAILSCHEDULER`
+- **Context:** `AdminController/startScheduler`
+- **Message:** `Scheduler started by {username}`
+
+#### 10.3.3 Stop Scheduler
+
+**Button:** "Stop Scheduler" (red button)
+
+**Availability:** Only when scheduler is running
+
+**Process:**
+
+1. **Click "Stop Scheduler"**
+2. **System creates stop signal:**
+   - Signal file: `cache/mail_scheduler_stop_signal`
+3. **Worker graceful shutdown:**
+   - Worker checks for stop signal every 10 seconds
+   - Completes current email job
+   - Does NOT start new jobs
+   - Writes final statistics
+   - Removes PID file
+4. **Status updated:**
+   - Status indicator: ❌ Stopped
+   - Final statistics saved
+5. **Success message:** "Scheduler stopped successfully"
+
+**Graceful Shutdown:**
+
+The worker does NOT terminate immediately:
+- ✅ Finishes email currently being sent
+- ✅ Saves final statistics
+- ✅ Logs shutdown event
+- ❌ Does NOT start new jobs
+- ❌ Does NOT interrupt SMTP connection
+
+**Typical shutdown time:** 5-15 seconds
+
+**Logging:**
+
+Stop action logged to:
+- **Type:** `MAILSCHEDULER`
+- **Context:** `AdminController/stopScheduler`
+- **Message:** `Scheduler stopped by {username}`
+
+Worker shutdown logged as:
+- **Message:** `Scheduler stopped gracefully. Processed: X, Failed: Y`
+
+#### 10.3.4 Status Auto-Refresh
+
+**Feature:** Status updates automatically every 5 seconds
+
+**Auto-updated information:**
+- Status indicator (Running/Stopped)
+- Last Tick timestamp
+- Job statistics (pending, processing, completed, failed)
+
+**No page reload required** - uses AJAX polling
+
+### 10.4 Job Statistics
+
+![Job Statistics Cards](Screenshots/mail-scheduler-stats.png)
+
+**Location:** Four colored cards below status section
+
+**Real-time Metrics:**
+
+| Card | Color | Description |
+|------|-------|-------------|
+| **Pending** | 🟡 Yellow | Jobs waiting to be processed |
+| **Processing** | 🔵 Blue | Jobs currently being sent |
+| **Completed** | 🟢 Green | Successfully sent emails |
+| **Failed** | 🔴 Red | Emails that failed after all retries |
+
+**Statistics Scope:**
+- **All-time:** Shows total counts from `mail_jobs` table
+- **Not** limited to current scheduler session
+- Includes historical jobs
+
+**Auto-refresh:** Updates every 5 seconds via AJAX
+
+### 10.5 Job Queue Management
+
+![Job Queue Table](Screenshots/mail-scheduler-queue.png)
+
+**Location:** Bottom section of Mail Scheduler page
+
+#### 10.5.1 Job Table Columns
+
+**Desktop View (Table):**
+
+| Column | Description |
+|--------|-------------|
+| **#** | Job ID |
+| **Status** | Current job status with colored badge |
+| **Recipient** | Email address |
+| **Subject** | Email subject line |
+| **Template** | Template name (e.g., `welcome`, `password-reset`) |
+| **Attempts** | Retry attempts (format: `current/max`) |
+| **Scheduled** | When job was created |
+| **Actions** | View details / Delete buttons |
+
+**Mobile View (Cards):**
+- Responsive card layout for small screens
+- Same information as table
+- Stacked vertical layout
+
+#### 10.5.2 Job Status Values
+
+**Status Badges:**
+
+| Status | Badge Color | Meaning |
+|--------|-------------|---------|
+| **pending** | 🟡 Yellow | Waiting in queue |
+| **processing** | 🔵 Blue | Currently being sent |
+| **completed** | 🟢 Green | Successfully sent |
+| **failed** | 🔴 Red | Failed after all retries |
+
+**Status Flow:**
+
+```
+pending → processing → completed ✅
+                    ↘ failed ❌ (if max retries exceeded)
+```
+
+#### 10.5.3 Filter & Pagination
+
+**Status Filter:**
+
+Dropdown: "All Status" / "Pending" / "Processing" / "Completed" / "Failed"
+
+**Process:**
+1. Select desired status from dropdown
+2. Table updates immediately (AJAX)
+3. Only jobs with selected status shown
+4. Pagination resets to page 1
+
+**Page Size:**
+
+Dropdown: 6 / 10 / 20 / 50 / 100 per page
+
+**Default:** 6 jobs per page
+
+**Pagination:**
+
+- Page numbers displayed
+- "Previous" / "Next" buttons
+- Shows: "Page X of Y"
+
+#### 10.5.4 View Job Details
+
+**Button:** 👁️ View icon in Actions column
+
+**Details Modal:**
+
+![Job Details Modal](Screenshots/mail-scheduler-details.png)
+
+**Information Displayed:**
+
+| Field | Description |
+|-------|-------------|
+| **Job ID** | Unique job identifier |
+| **Status** | Current status with badge |
+| **Recipient** | Email address |
+| **Subject** | Email subject line |
+| **Template** | Template file used |
+| **Template Data** | JSON data passed to template (formatted) |
+| **Scheduled At** | Queue timestamp |
+| **Started At** | When processing began |
+| **Completed At** | When email was sent |
+| **Failed At** | When job failed (if failed) |
+| **Attempts** | Retry count (current/max) |
+| **Error Message** | Failure reason (if failed) |
+
+**Example Template Data:**
+
+```json
+{
+  "username": "john.doe",
+  "resetLink": "https://example.com/reset/abc123",
+  "expiryTime": "24 hours"
+}
+```
+
+**Use Cases:**
+- Debug failed emails
+- Verify template data correctness
+- Check retry history
+- Investigate timing issues
+
+#### 10.5.5 Delete Job
+
+**Button:** 🗑️ Delete icon in Actions column
+
+**Confirmation Modal:**
+
+**Warning:**
+> Are you sure you want to delete this mail job?
+
+**Details Shown:**
+- Job ID
+- Recipient email
+- Subject line
+- Current status
+
+**Process:**
+
+1. **Click delete icon**
+2. **Confirmation modal appears**
+3. **Review job details**
+4. **Click "Delete" button**
+5. **Job deleted from database**
+6. **Success message:** "Job deleted successfully"
+7. **Table refreshes automatically**
+
+**Restrictions:**
+
+| Status | Can Delete? | Reason |
+|--------|-------------|--------|
+| **pending** | ✅ Yes | Safe to remove from queue |
+| **processing** | ⚠️ Yes (but risky) | May cause worker error |
+| **completed** | ✅ Yes | Historical cleanup |
+| **failed** | ✅ Yes | Historical cleanup |
+
+**Best Practice:**
+- Only delete `completed` or `failed` jobs
+- Avoid deleting `processing` jobs
+- Use for cleanup of old jobs
+
+**Logging:**
+
+Delete action logged to:
+- **Type:** `MAILSCHEDULER`
+- **Message:** `Mail job #{ID} deleted by {username}`
+
+### 10.6 Job Processing & Retries
+
+#### 10.6.1 How Jobs Are Processed
+
+**Worker Loop:**
+
+```
+1. Check for stop signal
+2. Update heartbeat
+3. Fetch pending jobs (up to 5)
+4. For each job:
+   a. Mark as 'processing'
+   b. Increment attempts counter
+   c. Send email via SMTP
+   d. If success → mark as 'completed'
+   e. If failure → mark as 'failed' (if max attempts reached)
+5. Sleep 1 second between jobs
+6. If no jobs → sleep 10 seconds
+7. Repeat
+```
+
+**Batch Processing:**
+- Worker processes up to **5 jobs** per cycle
+- 1 second delay between jobs (throttling)
+- 10 second wait if queue is empty
+
+#### 10.6.2 Retry Logic
+
+**Default Settings:**
+
+| Setting | Value |
+|---------|-------|
+| **Max Attempts** | 3 |
+| **Retry Delay** | Immediate (next worker cycle) |
+| **Retry Backoff** | None (could be added) |
+
+**Retry Process:**
+
+1. **First attempt fails:**
+   - Attempts: `1/3`
+   - Status: `pending` (reset for retry)
+   - Error logged
+
+2. **Second attempt fails:**
+   - Attempts: `2/3`
+   - Status: `pending`
+   - Error logged
+
+3. **Third attempt fails:**
+   - Attempts: `3/3`
+   - Status: `failed` (permanent)
+   - Final error logged
+
+**Common Failure Reasons:**
+
+| Error | Cause | Solution |
+|-------|-------|----------|
+| **SMTP connection failed** | Network issue / Wrong host | Check SMTP settings |
+| **Authentication failed** | Wrong credentials | Verify username/password |
+| **Recipient rejected** | Invalid email address | Check recipient email |
+| **Timeout** | Slow SMTP server | Increase timeout in config |
+| **TLS error** | SSL/TLS config wrong | Check encryption setting |
+
+#### 10.6.3 Job Timestamps
+
+**Timestamp Fields:**
+
+| Field | When Set | Purpose |
+|-------|----------|---------|
+| **scheduled_at** | Job creation | When job was queued |
+| **started_at** | First processing | When worker started sending |
+| **completed_at** | Success | When email successfully sent |
+| **failed_at** | Final failure | When job permanently failed |
+
+**Typical Timeline:**
+
+```
+scheduled_at:  2025-01-15 14:00:00
+started_at:    2025-01-15 14:00:05 (5 seconds later)
+completed_at:  2025-01-15 14:00:07 (2 seconds to send)
+```
+
+### 10.7 Scheduler Logs
+
+**Location:** Logs menu → Mail Scheduler Logs
+
+**Alternative Access:** Button on Mail Scheduler page: "View Logs"
+
+**Log Type:** `MAILSCHEDULER`
+
+#### 10.7.1 What Is Logged
+
+**Worker Events:**
+
+| Event | Example Message |
+|-------|----------------|
+| **Start** | `Mail scheduler worker started with PID {pid}` |
+| **Stop** | `Scheduler stopped gracefully. Processed: X, Failed: Y` |
+| **Job Success** | `Successfully sent email to {recipient} using template '{template}'` |
+| **Job Failure** | `Failed to send email to {recipient}: {error}` |
+| **Job Queued** | `Mail job #{id} queued for {recipient}` |
+
+**Admin Actions:**
+
+| Action | Message |
+|--------|---------|
+| **Start Scheduler** | `Scheduler started by {username}` |
+| **Stop Scheduler** | `Scheduler stopped by {username}` |
+| **Delete Job** | `Mail job #{id} deleted by {username}` |
+
+#### 10.7.2 Log Table
+
+**Columns:**
+
+| Column | Description |
+|--------|-------------|
+| **ID** | Log entry ID |
+| **Date/Time** | When event occurred |
+| **User** | Who triggered action (or `SYSTEM`) |
+| **Context** | Controller/Method or Worker name |
+| **Message** | Detailed event description |
+
+**Example Entries:**
+
+```
+2025-01-15 14:00:00 | SYSTEM | MailSchedulerWorker | Mail scheduler worker started with PID 12345
+2025-01-15 14:00:05 | SYSTEM | MailSchedulerWorker | Successfully sent email to user@example.com using template 'welcome'
+2025-01-15 14:00:12 | SYSTEM | MailSchedulerWorker | Failed to send email to invalid@bad.com: SMTP Error
+2025-01-15 14:30:00 | super.admin | AdminController | Scheduler stopped by super.admin
+```
+
+#### 10.7.3 Log Features
+
+**Search:**
+- Search by recipient email
+- Search by template name
+- Search by error messages
+- Search by user who triggered action
+
+**Export:**
+- Export to CSV
+- All logs or filtered results
+- Includes all fields
+
+**Truncate:**
+- Delete all scheduler logs
+- Warning: irreversible
+- Backup recommended before truncating
+
+### 10.8 Developer Usage
+
+For developers building features that send emails, SecStore provides a simple API to queue emails.
+
+#### 10.8.1 Queue Email (Recommended)
+
+**Method:** `MailUtil::queueMail()`
+
+**Signature:**
+
+```php
+MailUtil::queueMail(
+    string $to,           // Recipient email
+    string $subject,      // Email subject
+    string $template,     // Template name (without .latte)
+    array $data = [],     // Template data
+    int $maxAttempts = 3  // Retry attempts
+)
+```
+
+**Example Usage:**
+
+```php
+use App\Utils\MailUtil;
+
+// Queue a password reset email
+MailUtil::queueMail(
+    'user@example.com',
+    'Password Reset Request',
+    'password-reset',
+    [
+        'username' => 'john.doe',
+        'resetLink' => 'https://example.com/reset/abc123',
+        'expiryTime' => '24 hours'
+    ],
+    3 // Max retries
+);
+```
+
+**Benefits:**
+- ✅ Non-blocking (returns immediately)
+- ✅ Automatic retries on failure
+- ✅ Full monitoring in admin interface
+- ✅ Auto-starts scheduler if needed
+
+#### 10.8.2 Direct Send (Synchronous)
+
+**Method:** `MailUtil::sendMail()` (existing method)
+
+**When to use:**
+- Critical emails that must be sent immediately
+- Email sending must complete before continuing code
+- You need immediate success/failure feedback
+
+**Example:**
+
+```php
+use App\Utils\MailUtil;
+
+// Send immediately (blocks until complete)
+$success = MailUtil::sendMail(
+    'user@example.com',
+    'Critical Alert',
+    'alert',
+    ['alertMessage' => 'Your account was accessed from new location']
+);
+
+if ($success) {
+    // Email sent successfully
+} else {
+    // Handle failure
+}
+```
+
+**Trade-offs:**
+
+| Queue (Recommended) | Direct Send |
+|---------------------|-------------|
+| Non-blocking | Blocking |
+| Automatic retries | No retries |
+| Monitored | Not tracked in queue |
+| Async | Synchronous |
+
+#### 10.8.3 Creating Email Templates
+
+**Location:** `app/views/emails/`
+
+**Template Format:** Latte (`.latte` files)
+
+**Example Template:** `app/views/emails/custom-notification.latte`
+
+```latte
+{* Custom Notification Email Template *}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>{$subject}</title>
+</head>
+<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+    <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
+        <h2>Hello {$username}!</h2>
+        
+        <p>{$message}</p>
+        
+        {if isset($actionUrl)}
+        <div style="margin: 30px 0;">
+            <a href="{$actionUrl}" 
+               style="background-color: #007bff; color: white; padding: 12px 24px; 
+                      text-decoration: none; border-radius: 4px; display: inline-block;">
+                {$actionText}
+            </a>
+        </div>
+        {/if}
+        
+        <hr style="margin: 30px 0; border: none; border-top: 1px solid #ddd;">
+        
+        <p style="font-size: 12px; color: #666;">
+            This is an automated message from SecStore.
+        </p>
+    </div>
+</body>
+</html>
+```
+
+**Usage:**
+
+```php
+MailUtil::queueMail(
+    'user@example.com',
+    'Important Notification',
+    'custom-notification',
+    [
+        'username' => 'John Doe',
+        'message' => 'Your account settings have been updated.',
+        'actionUrl' => 'https://example.com/verify',
+        'actionText' => 'Verify Changes'
+    ]
+);
+```
+
+**Template Best Practices:**
+- ✅ Use inline styles (email clients don't support external CSS)
+- ✅ Keep width ≤ 600px for mobile compatibility
+- ✅ Escape all variables with Latte's auto-escaping
+- ✅ Provide plain text alternative (optional but recommended)
+- ✅ Test in multiple email clients (Gmail, Outlook, Apple Mail)
+
+### 10.9 Troubleshooting
+
+#### 10.9.1 Scheduler Won't Start
+
+**Symptom:** Clicking "Start Scheduler" shows error or no response
+
+**Possible Causes:**
+
+| Cause | Solution |
+|-------|----------|
+| **PHP CLI not found** | Install PHP CLI: `apt-get install php-cli` |
+| **Permission denied** | Set permissions: `chmod +x Workers/MailSchedulerWorker.php` |
+| **Cache directory not writable** | Fix permissions: `chown www-data:www-data cache/` |
+| **Port already in use** | Kill existing process: `kill $(cat cache/mail_scheduler.pid)` |
+
+**Verification:**
+
+```bash
+# Check if PHP CLI is available
+which php
+php --version
+
+# Check cache directory permissions
+ls -la cache/
+
+# Check for existing process
+ps aux | grep MailSchedulerWorker
+```
+
+#### 10.9.2 Scheduler Stops Automatically
+
+**Symptom:** Scheduler shows "Running" but jobs aren't processed
+
+**Possible Causes:**
+
+| Cause | Solution |
+|-------|----------|
+| **Worker crashed** | Check error logs: `tail -f storage/logs/error.log` |
+| **Database connection lost** | Restart scheduler, check DB credentials |
+| **Out of memory** | Increase `memory_limit` in php.ini |
+| **Timeout** | Increase `max_execution_time` in php.ini |
+
+**Check Worker Status:**
+
+```bash
+# Check if worker process is running
+ps aux | grep MailSchedulerWorker
+
+# Check PID file
+cat cache/mail_scheduler.pid
+```
+
+#### 10.9.3 Jobs Stay in "Processing" Forever
+
+**Symptom:** Jobs stuck in "processing" status, never complete
+
+**Cause:** Worker crashed mid-job
+
+**Solution:**
+
+1. **Stop Scheduler** (if running)
+2. **Manually reset stuck jobs:**
+
+```sql
+UPDATE mail_jobs 
+SET status = 'pending', 
+    started_at = NULL 
+WHERE status = 'processing';
+```
+
+3. **Start Scheduler** again
+
+**Prevention:**
+- Monitor "Last Tick" regularly
+- Set up alerts for stale heartbeats
+- Implement timeout for stuck jobs (future feature)
+
+#### 10.9.4 All Jobs Fail
+
+**Symptom:** All queued emails fail immediately
+
+**Possible Causes:**
+
+| Cause | Solution |
+|-------|----------|
+| **SMTP settings wrong** | Verify Settings → Email settings |
+| **SMTP server down** | Test: `telnet smtp.example.com 587` |
+| **Authentication failed** | Check username/password |
+| **Port blocked by firewall** | Open port 587 or 465 |
+
+**Test SMTP Connection:**
+
+```bash
+# Test SMTP server connectivity
+telnet smtp.gmail.com 587
+
+# Expected: 220 smtp.gmail.com ESMTP
+```
+
+**Check Job Error Messages:**
+
+1. Navigate to Mail Scheduler
+2. Filter: "Failed" status
+3. Click "View Details" on failed job
+4. Read "Error Message" field
+
+#### 10.9.5 Jobs Not Being Queued
+
+**Symptom:** Calling `queueMail()` but no jobs appear in queue
+
+**Debugging:**
+
+```php
+// Add error checking
+$job = MailUtil::queueMail(/*...*/);
+
+if ($job === false) {
+    error_log("Failed to queue email!");
+    // Check error_log for details
+}
+
+// Verify job was created
+echo "Job ID: " . $job->id;
+```
+
+**Possible Causes:**
+
+| Cause | Solution |
+|-------|----------|
+| **Database error** | Check DB connection and permissions |
+| **JSON encoding failed** | Verify template data is JSON-serializable |
+| **Table doesn't exist** | Run migrations: check `mail_jobs` table exists |
+
+### 10.10 Performance Considerations
+
+#### 10.10.1 Queue Size Management
+
+**Recommended Actions:**
+
+| Queue Size | Action |
+|------------|--------|
+| **< 100** | Normal operation |
+| **100-500** | Monitor closely |
+| **500-1000** | Increase batch size (modify worker) |
+| **> 1000** | Investigate root cause, consider multiple workers |
+
+**Clean Up Old Jobs:**
+
+```sql
+-- Delete completed jobs older than 30 days
+DELETE FROM mail_jobs 
+WHERE status = 'completed' 
+AND completed_at < DATE_SUB(NOW(), INTERVAL 30 DAY);
+
+-- Delete failed jobs older than 7 days
+DELETE FROM mail_jobs 
+WHERE status = 'failed' 
+AND failed_at < DATE_SUB(NOW(), INTERVAL 7 DAY);
+```
+
+#### 10.10.2 Worker Optimization
+
+**Current Settings:**
+- Batch size: 5 jobs per cycle
+- Delay between jobs: 1 second
+- Empty queue sleep: 10 seconds
+
+**For High Volume:**
+
+Modify `MailSchedulerWorker.php`:
+
+```php
+// Increase batch size
+$jobs = MailJob::getPendingJobs(20); // Instead of 5
+
+// Reduce delay
+sleep(0.5); // Instead of 1 second
+```
+
+**Trade-offs:**
+- ⚡ Faster processing
+- ⚠️ Higher SMTP server load
+- ⚠️ Higher risk of SMTP rate limiting
+
+#### 10.10.3 Database Indexing
+
+**Recommended Indexes:**
+
+```sql
+-- Optimize job fetching
+CREATE INDEX idx_status_scheduled 
+ON mail_jobs(status, scheduled_at);
+
+-- Optimize filtering
+CREATE INDEX idx_recipient 
+ON mail_jobs(recipient);
+
+-- Optimize statistics queries
+CREATE INDEX idx_status 
+ON mail_jobs(status);
+```
+
+### 10.11 Security Considerations
+
+#### 10.11.1 Access Control
+
+**Admin Only:**
+- ✅ All scheduler endpoints require `Admin` role
+- ✅ IP whitelist applies (if configured)
+- ✅ CSRF protection on all POST requests
+
+**Worker Process:**
+- ✅ CLI-only execution (no web access)
+- ✅ PID file protection
+- ✅ Signal-based control (stop signal)
+
+#### 10.11.2 Email Data Security
+
+**Template Data:**
+- ⚠️ Stored as JSON in database
+- ⚠️ Avoid storing sensitive data (passwords, tokens)
+- ✅ Use secure links with expiring tokens
+
+**Example - Good:**
+
+```php
+MailUtil::queueMail(
+    $user->email,
+    'Reset Your Password',
+    'password-reset',
+    [
+        'username' => $user->username,
+        'resetLink' => generateSecureResetLink($user) // Temporary token
+    ]
+);
+```
+
+**Example - Bad:**
+
+```php
+// ❌ NEVER DO THIS
+MailUtil::queueMail(
+    $user->email,
+    'Your Password',
+    'plain-password',
+    [
+        'password' => $user->password // NEVER store passwords in emails!
+    ]
+);
+```
+
+#### 10.11.3 Rate Limiting
+
+**SMTP Rate Limits:**
+
+Many SMTP providers have rate limits:
+
+| Provider | Limit |
+|----------|-------|
+| **Gmail** | 500/day (free), 2000/day (workspace) |
+| **SendGrid** | Varies by plan |
+| **Mailgun** | Varies by plan |
+
+**Recommendations:**
+- Monitor "Jobs Failed" counter
+- Check SMTP provider error messages
+- Implement queue throttling if needed
+
+---
+
+## Appendix: Mail Scheduler
+
+### A. Database Schema
+
+**Table:** `mail_jobs`
+
+```sql
+CREATE TABLE `mail_jobs` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `status` enum('pending','processing','completed','failed') DEFAULT 'pending',
+  `recipient` varchar(255) NOT NULL,
+  `subject` varchar(255) NOT NULL,
+  `template` varchar(100) NOT NULL,
+  `template_data` text,
+  `max_attempts` int(11) DEFAULT 3,
+  `attempts` int(11) DEFAULT 0,
+  `scheduled_at` datetime NOT NULL,
+  `started_at` datetime DEFAULT NULL,
+  `completed_at` datetime DEFAULT NULL,
+  `failed_at` datetime DEFAULT NULL,
+  `error_message` text,
+  PRIMARY KEY (`id`),
+  KEY `idx_status_scheduled` (`status`,`scheduled_at`),
+  KEY `idx_recipient` (`recipient`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+```
+
+### B. Status Files
+
+**PID File:** `cache/mail_scheduler.pid`
+
+```
+12345
+```
+
+**Status File:** `cache/mail_scheduler_status.json`
+
+```json
+{
+  "pid": 12345,
+  "started_at": "2025-01-15 14:00:00",
+  "jobs_processed": 42,
+  "jobs_failed": 3,
+  "last_run": "2025-01-15 14:30:00",
+  "last_heartbeat": "2025-01-15 14:30:05"
+}
+```
+
+**Stop Signal:** `cache/mail_scheduler_stop_signal`
+
+```
+1
+```
+
+### C. CLI Commands
+
+**Manual Worker Start:**
+
+```bash
+# From project root
+php app/Workers/MailSchedulerWorker.php
+
+# With output
+php app/Workers/MailSchedulerWorker.php 2>&1 | tee scheduler.log
+
+# Background (Linux)
+nohup php app/Workers/MailSchedulerWorker.php > /dev/null 2>&1 &
+```
+
+**Check Worker Status:**
+
+```bash
+# Check if running
+ps aux | grep MailSchedulerWorker
+
+# Check PID
+cat cache/mail_scheduler.pid
+
+# Check status file
+cat cache/mail_scheduler_status.json | jq .
+```
+
+**Stop Worker:**
+
+```bash
+# Via signal file
+touch cache/mail_scheduler_stop_signal
+
+# Via kill (not recommended)
+kill $(cat cache/mail_scheduler.pid)
+```
+
+### D. API Endpoints
+
+**Admin Endpoints:**
+
+| Endpoint | Method | Purpose |
+|----------|--------|---------|
+| `/admin/mail-scheduler` | GET | Show scheduler page |
+| `/admin/mail-scheduler/status` | GET | Get current status (AJAX) |
+| `/admin/mail-scheduler/start` | POST | Start worker |
+| `/admin/mail-scheduler/stop` | POST | Stop worker |
+| `/admin/mail-scheduler/jobs` | GET | Get job list (AJAX) |
+| `/admin/mail-scheduler/jobs/delete` | POST | Delete job |
+| `/admin/logsMailScheduler` | GET | View scheduler logs |
+
+**All endpoints require:**
+- ✅ Active session
+- ✅ `Admin` role
+- ✅ CSRF token (POST requests)
 
 ---
 

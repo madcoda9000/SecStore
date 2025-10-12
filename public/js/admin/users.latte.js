@@ -70,18 +70,19 @@ document.addEventListener("DOMContentLoaded", function () {
     if (!userId || !operation) return;
 
     const url = operation === "enable" ? "/admin/enableUser" : "/admin/disableUser";
-    const formData = new FormData();
-    formData.append("id", userId);
-    formData.append("csrf_token", document.getElementById("csrf_token").value);
 
     showLoading(true);
 
     fetch(url, {
       method: "POST",
       headers: {
+        "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
         "X-Requested-With": "XMLHttpRequest",
       },
-      body: formData,
+      body: new URLSearchParams({
+        id: userId,
+        csrf_token: document.getElementById("csrf_token").value,
+      }),
     })
       .then((response) => response.json())
       .then((data) => {
@@ -109,18 +110,19 @@ document.addEventListener("DOMContentLoaded", function () {
     if (!userId || !operation) return;
 
     const url = operation === "enable" ? "/admin/enableMfa" : "/admin/disableMfa";
-    const formData = new FormData();
-    formData.append("id", userId);
-    formData.append("csrf_token", document.getElementById("csrf_token").value);
 
     showLoading(true);
 
     fetch(url, {
       method: "POST",
       headers: {
+        "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
         "X-Requested-With": "XMLHttpRequest",
       },
-      body: formData,
+      body: new URLSearchParams({
+        id: userId,
+        csrf_token: document.getElementById("csrf_token").value,
+      }),
     })
       .then((response) => response.json())
       .then((data) => {
@@ -148,18 +150,19 @@ document.addEventListener("DOMContentLoaded", function () {
     if (!userId || !operation) return;
 
     const url = operation === "enable" ? "/admin/enforceMfa" : "/admin/unenforceMfa";
-    const formData = new FormData();
-    formData.append("id", userId);
-    formData.append("csrf_token", document.getElementById("csrf_token").value);
 
     showLoading(true);
 
     fetch(url, {
       method: "POST",
       headers: {
+        "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
         "X-Requested-With": "XMLHttpRequest",
       },
-      body: formData,
+      body: new URLSearchParams({
+        id: userId,
+        csrf_token: document.getElementById("csrf_token").value,
+      }),
     })
       .then((response) => response.json())
       .then((data) => {
@@ -200,10 +203,6 @@ document.addEventListener("DOMContentLoaded", function () {
     const userId = deleteUserId.value;
     if (!userId) return;
 
-    const formData = new FormData();
-    formData.append("id", userId);
-    formData.append("csrf_token", document.getElementById("csrf_token").value);
-
     // Disable delete button
     confirmDeleteBtn.disabled = true;
     confirmDeleteBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Deleting...';
@@ -211,9 +210,13 @@ document.addEventListener("DOMContentLoaded", function () {
     fetch("/admin/deleteUser", {
       method: "POST",
       headers: {
+        "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
         "X-Requested-With": "XMLHttpRequest",
       },
-      body: formData,
+      body: new URLSearchParams({
+        id: userId,
+        csrf_token: document.getElementById("csrf_token").value,
+      }),
     })
       .then((response) => response.json())
       .then((data) => {

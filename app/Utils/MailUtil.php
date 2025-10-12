@@ -99,16 +99,25 @@ class MailUtil
             $latte = new Engine();
             $templatePath = __DIR__ . '/../views/emails/' . $template . '.latte';
             $mail->Body = $latte->renderToString($templatePath, $data);
+            $erg = false;
 
             if ($template == 'welcome' && self::$config['mail']['enableWelcomeMail'] === true) {
-                LogUtil::logAction(LogType::MAIL, "MailUtil", "sendMail", "Sending Welcome Mail to {$to}");
-                return $mail->send();
+                LogUtil::logAction(LogType::MAILSCHEDULER, "MailUtil", "sendMail", "Try to send Welcome Mail to {$to}");
+                $erg = $mail->send();
+                if ($erg === false) {
+                    LogUtil::logAction(LogType::MAILSCHEDULER, "MailUtil", "sendMail", "Successfully send Welcome Mail to {$to}");
+                }
+                return $erg;
             } elseif ($template !== "welcome") {
-                LogUtil::logAction(LogType::MAIL, "MailUtil", "sendMail", "Sending {$template} Mail to {$to}");
-                return $mail->send();
+                LogUtil::logAction(LogType::MAILSCHEDULER, "MailUtil", "sendMail", "Try to send {$template} Mail to {$to}");
+                $erg = $mail->send();
+                if ($erg === false) {
+                    LogUtil::logAction(LogType::MAILSCHEDULER, "MailUtil", "sendMail", "Successfully send {$template} Mail to {$to}");
+                }
+                return $erg;
             }
         } catch (Exception $e) {
-            LogUtil::logAction(LogType::MAIL, "MailUtil", "sendMail", $e->getMessage());
+            LogUtil::logAction(LogType::MAILSCHEDULER, "MailUtil", "sendMail", $e->getMessage());
             error_log("Mail konnte nicht gesendet werden: {$mail->ErrorInfo}");
             return false;
         }

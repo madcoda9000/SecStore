@@ -350,7 +350,7 @@
                             <tr>
                                 <th>{trans('system_info.app.environment')}:</th>
                                 <td>
-                                    <span class="badge" id="envBadge" data-field="app.environment" data-env="{$systemInfo['app']['environment']}">
+                                    <span class="badge {$systemInfo['app']['environment']=='production' ? bg-success : bg-warning}" id="envBadge" data-field="app.environment" data-env="{$systemInfo['app']['environment']}">
                                         {$systemInfo['app']['environment']}
                                     </span>
                                 </td>

@@ -44,13 +44,13 @@
 </div>
 
 <!-- Main Content -->
-<div class="container py-4">
+<div class="container py-4" style="flex:1">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1 class="mb-0">
             <span class="bi-envelope-paper-fill">&nbsp;</span>Mail Scheduler
         </h1>
         <div>
-            <a href="/admin/logs/mailscheduler" class="btn btn-secondary">
+            <a href="/admin/logsMail" class="btn btn-secondary">
                 <span class="bi-file-text"></span>&nbsp;View Logs
             </a>
         </div>
@@ -74,7 +74,8 @@
 
     <!-- Scheduler Status Card -->
     <div class="card mb-4">
-        <div class="card-header bg-primary text-white">
+    <input id="csrf_token" type="hidden" name="csrf_token" value="{$_SESSION['csrf_token']}">
+        <div class="card-header bg-secondary text-white">
             <h5 class="mb-0">
                 <span class="bi-gear-fill"></span>&nbsp;Scheduler Status
             </h5>
@@ -84,35 +85,41 @@
                 <div class="col-md-6 mb-3">
                     <div class="d-flex align-items-center">
                         <div id="statusIndicator" class="me-3">
+                            Status:&nbsp;
                             {if $schedulerStatus['running']}
-                                <span class="badge bg-success fs-5">
-                                    <span class="bi-check-circle-fill"></span>&nbsp;Running
+                                <span class=" p-2">
+                                    <span class="bi-check-circle-fill text-success">&nbsp;Running</span>
                                 </span>
                             {else}
-                                <span class="badge bg-danger fs-5">
-                                    <span class="bi-x-circle-fill"></span>&nbsp;Stopped
+                                <span class="p-2">
+                                    <span class="bi-x-circle-fill text-danger">&nbsp;Stopped</span>
                                 </span>
                             {/if}
                         </div>
                         <div>
-                            {if $schedulerStatus['running']}
-                                <button type="button" class="btn btn-danger" data-action="stop-scheduler">
-                                    <span class="bi-stop-circle"></span>&nbsp;Stop Scheduler
-                                </button>
-                            {else}
-                                <button type="button" class="btn btn-success" data-action="start-scheduler">
-                                    <span class="bi-play-circle"></span>&nbsp;Start Scheduler
-                                </button>
-                            {/if}
+                            
                         </div>
                     </div>
                 </div>
                 <div class="col-md-6 mb-3">
                     <div class="text-md-end">
-                        <small class="text-muted">Last Tick:</small><br>
-                        <span id="lastTick" class="fw-bold">
-                            {$schedulerStatus['lastTick'] ?? 'Never'}
-                        </span>
+                        <div id="schedulerButtonContainer">
+                                {if $schedulerStatus['running']}
+                                    <button type="button" class="btn btn-danger" data-action="stop-scheduler">
+                                        <span class="bi-stop-circle"></span>&nbsp;Stop Scheduler
+                                    </button>
+                                {else}
+                                    <button type="button" class="btn btn-success" data-action="start-scheduler">
+                                        <span class="bi-play-circle"></span>&nbsp;Start Scheduler
+                                    </button>
+                                {/if}
+                            </div>
+                            <div id="schedulerLoadingSpinner" class="d-none">
+                                <button class="btn btn-secondary" disabled>
+                                    <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                                    Processing...
+                                </button>
+                            </div>
                     </div>
                 </div>
             </div>
@@ -120,9 +127,11 @@
             {if $schedulerStatus}
                 <div class="alert alert-info mb-0 mt-2">
                     <small>
-                        <span class="bi-info-circle"></span>
-                        PID: <code>{$schedulerStatus['pid'] ?? 'N/A'}</code> | 
-                        Lock File: <code>{$enviroment}</code>
+                        PID: <code>{$schedulerStatus['pid'] ?? 'N/A'}</code> <br>
+                        Started at: <code>{$schedulerStatus['started_at'] ?? 'N/A'}</code> <br>
+                        Jobs failed (since start): <code>{$schedulerStatus['jobs_failed'] ?? 'N/A'}</code> <br>
+                        Jobs processed (since start): <code>{$schedulerStatus['jobs_processed'] ?? 'N/A'}</code> <br>
+                        Last Tick: <code>{$schedulerStatus['last_heartbeat_human'] ?? 'N/A'}</code> <br>
                     </small>
                 </div>
             {/if}
@@ -185,8 +194,9 @@
                 </div>
                 <div class="col-md-4">
                     <select id="pageSize" class="form-select" data-action="change-page-size">
+                        <option value="6">6 per page</option>
                         <option value="10">10 per page</option>
-                        <option value="20" selected>20 per page</option>
+                        <option value="20">20 per page</option>
                         <option value="50">50 per page</option>
                         <option value="100">100 per page</option>
                     </select>

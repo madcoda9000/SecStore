@@ -53,9 +53,12 @@ class LogUtil
         if (self::$config['logging']['enableSqlLogging'] === true && $type == LogType::SQL) {
             $context = "$file/$method";
             self::log($type, $context, $message);
-        } elseif (self::$config['logging']['enableMailLogging'] === true && $type == LogType::MAIL) {
+        } elseif (self::$config['logging']['enableMailLogging'] === true && $type == LogType::MAILSCHEDULER) {
             $context = "$file/$method";
             self::log($type, $context, $message);
+        } elseif (self::$config['logging']['enableMailLogging'] === true && $type == LogType::MAIL) {
+            $context = "$file/$method";
+            self::log(LogType::MAILSCHEDULER, $context, $message);
         } elseif (self::$config['logging']['enableSystemLogging'] === true && $type == LogType::SYSTEM) {
             $context = "$file/$method";
             self::log($type, $context, $message);
@@ -71,10 +74,7 @@ class LogUtil
         } elseif ($type == LogType::ERROR) {
             $context = "$file/$method";
             self::log($type, $context, $message);
-        } elseif ($type == LogType::MAILSCHEDULER) {
-            $context = "$file/$method";
-            self::log($type, $context, $message);
-        }
+        } 
         ORM::configure('logging', false);
     }
 

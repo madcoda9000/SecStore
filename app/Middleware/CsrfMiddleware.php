@@ -25,7 +25,7 @@ class CsrfMiddleware
     {
         if (Flight::request()->method == 'POST') {
             // DEBUG LOGGING
-            if ($params != null && $params['debug'] === true && !self::isProduction()) {
+            if (!self::isProduction()) {
                 // DEBUG-Modus: Nur unkritische Informationen loggen
                 LogUtil::logAction(
                     LogType::SECURITY,
@@ -69,6 +69,7 @@ class CsrfMiddleware
 
             if (!$token) {
                 LogUtil::logAction(LogType::SECURITY, 'CsrfMiddleware', 'before', 'No CSRF token provided in request', '');
+
                 Flight::halt(400, 'Missing CSRF token. Please refresh the page and try again.');
                 return;
             }
@@ -94,7 +95,7 @@ class CsrfMiddleware
     {
         $uri = $_SERVER['REQUEST_URI'] ?? '';
 
-        // KEINE Token-Rotation bei diesen Routen (UX-kritisch):
+        // KEINE Token-Rotation bei diesen Routen (UX-kritisch weil ajax request):
         $noRefreshRoutes = [
             '/admin/users/bulk',           // Bulk User Operations
             '/admin/roles/bulk',           // Falls du das später implementierst
@@ -104,6 +105,21 @@ class CsrfMiddleware
             '/admin/analytics/data', // Analytics Data Fetching
             '/admin/system-info',           // system info
             '/admin/phpinfo',               // phpinfo
+            '/admin/mail-scheduler/status',
+            '/admin/mail-scheduler/start',
+            '/admin/mail-scheduler/stop',
+            '/admin/mail-scheduler/jobs',
+            '/admin/mail-scheduler/jobs/delete',
+            '/admin/enforceMfa',
+            '/admin/unenforceMfa',
+            '/admin/deleteUser',
+            '/admin/disableMfa',
+            '/admin/enableMfa',
+            '/admin/disableUser',
+            '/admin/enableUser',
+            '/admin/roles/add',
+            '/admin/roles/delete',
+            '/admin/logs/truncate',
         ];
 
         foreach ($noRefreshRoutes as $route) {

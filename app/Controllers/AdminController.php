@@ -1508,13 +1508,7 @@ class AdminController
             Flight::redirect('/login');
         }
         $user = User::findUserById(SessionUtil::get('user')['id']);
-        if ($user !== false) {
-            $newConfig = [
-                'appUrl' => $formData['appUrl'],
-                'sessionTimeout' => (int) $formData['sessionTimeout'],
-                'allowPublicRegister' => (bool) $formData['allowPublicRegister'],
-                'allowPublicPasswordReset' => (bool) $formData['allowPublicPasswordReset'],
-            ];
+        if ($user !== false) {           
 
             // Alte Konfiguration einlesen
             $configFile = '../config.php';
@@ -1525,6 +1519,14 @@ class AdminController
             if ($configContent === false) {
                 throw new Exception(TranslationUtil::t('error2'));
             }
+
+            $newConfig = [
+                'appUrl' => $formData['appUrl'],
+                'sessionTimeout' => (int) $formData['sessionTimeout'],
+                'allowPublicRegister' => (bool) $formData['allowPublicRegister'],
+                'allowPublicPasswordReset' => (bool) $formData['allowPublicPasswordReset'],
+                'enviroment' => $config['application']['enviroment'] ?? 'production',
+            ];
 
             // Aktuelles `$application`-Array suchen und ersetzen
             $pattern = '/(\$application\s*=\s*\[)(.*?)(\];)/s';
@@ -3301,7 +3303,8 @@ class AdminController
                     'last_error' => $job->last_error,
                     'created_at' => $job->created_at,
                     'scheduled_at' => $job->scheduled_at,
-                    'completed_at' => $job->completed_at
+                    'completed_at' => $job->completed_at,
+                    'template_data' => $job->template_data,
                 ];
             }, $result['jobs']),
             'pagination' => [
@@ -3340,7 +3343,7 @@ class AdminController
         $jobId = isset($_POST['id']) ? (int) $_POST['id'] : null;
 
         if (!$jobId) {
-            Flight::json(['success' => false, 'message' => 'Invalid job ID']);
+            Flight::json(['success' => false, 'message' => 'Invalid job ID<br>']);
             return;
         }
 

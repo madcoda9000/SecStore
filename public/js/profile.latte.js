@@ -51,32 +51,42 @@ document.addEventListener("DOMContentLoaded", function () {
 document.getElementById("setEnable2faBtn").addEventListener("click", function () {
   const button = this;
   const originalText = button.innerHTML;
-  
+  const csrfToken = document.getElementById("csrf_token")?.value;
+
+  if (!csrfToken) {
+    throw new Error("CSRF token not found");
+  }
+
   // Button während der Anfrage deaktivieren (verhindert Doppelklicks)
   button.disabled = true;
-  button.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Wird aktiviert...';
-  
+  button.innerHTML =
+    '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Wird aktiviert...';
+
   // Timeout für lange Anfragen (nach 10 Sekunden)
   const timeoutId = setTimeout(() => {
     if (button.disabled) {
       showToast(
-        "Die Anfrage dauert ungewöhnlich lange. Bitte überprüfen Sie Ihre Internetverbindung und versuchen Sie es erneut.", 
-        "warning", 
+        "Die Anfrage dauert ungewöhnlich lange. Bitte überprüfen Sie Ihre Internetverbindung und versuchen Sie es erneut.",
+        "warning",
         "Zeitüberschreitung"
       );
       resetButton();
     }
   }, 10000);
-  
-  fetch("/initiate2faSetup", { 
+
+  fetch("/initiate2faSetup", {
     method: "POST",
     headers: {
-      'X-Requested-With': 'XMLHttpRequest'  // Explizit als AJAX markieren
-    }
+      "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
+      "X-Requested-With": "XMLHttpRequest", // Explizit als AJAX markieren
+    },
+      body: new URLSearchParams({
+        csrf_token: csrfToken,
+      }),
   })
     .then((response) => {
       clearTimeout(timeoutId); // Timeout löschen
-      
+
       if (!response.ok) {
         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
@@ -86,40 +96,36 @@ document.getElementById("setEnable2faBtn").addEventListener("click", function ()
       if (data.success) {
         // Erfolgs-Toast anzeigen
         showToast(
-          data.message || "2FA Setup wurde erfolgreich initiiert. Sie werden ausgeloggt...", 
-          "success", 
+          data.message || "2FA Setup wurde erfolgreich initiiert. Sie werden ausgeloggt...",
+          "success",
           "2FA Setup"
         );
-        
+
         // Kurz warten, damit der Toast sichtbar ist, dann ausloggen
         setTimeout(() => {
           window.location.href = "/logout";
         }, 1500);
       } else {
         // Fehler-Toast anzeigen
-        showToast(
-          data.message || "Fehler beim Initiieren des 2FA Setups.", 
-          "error", 
-          "2FA Setup Fehler"
-        );
-        
+        showToast(data.message || "Fehler beim Initiieren des 2FA Setups.", "error", "2FA Setup Fehler");
+
         resetButton();
       }
     })
     .catch((error) => {
       clearTimeout(timeoutId); // Timeout löschen
-      console.error('Error:', error);
-      
+      console.error("Error:", error);
+
       // Netzwerk- oder andere unerwartete Fehler
       showToast(
-        "Ein unerwarteter Fehler ist aufgetreten. Bitte versuchen Sie es erneut oder kontaktieren Sie den Administrator.", 
-        "error", 
+        "Ein unerwarteter Fehler ist aufgetreten. Bitte versuchen Sie es erneut oder kontaktieren Sie den Administrator.",
+        "error",
         "Verbindungsfehler"
       );
-      
+
       resetButton();
     });
-  });
+});
 
 // Hilfsfunktion zum Zurücksetzen des Buttons
 function resetButton() {

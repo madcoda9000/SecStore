@@ -185,40 +185,55 @@ function goToPage(page) {
 
 function addRole() {
     let roleName = document.getElementById("newRoleName").value;
-    let formData = new FormData();
-    formData.append("roleName", roleName);
     
     fetch("/admin/roles/add", {
         method: "POST",
-        body: formData,
-    }).then(() => {
-        fetchRoles();
-        document.getElementById("newRoleName").value = "";
-        
-        // ✅ LÖSUNG 1: Sichere Modal-Schließung
-        const modalElement = document.getElementById("addRoleModal");
-        const modalInstance = bootstrap.Modal.getInstance(modalElement);
-        if (modalInstance) {
-            modalInstance.hide();
-        } else {
-            // Fallback: Neue Instanz erstellen und schließen
-            const newModal = new bootstrap.Modal(modalElement);
-            newModal.hide();
-        }
-        
-        // ✅ LÖSUNG 2: Backdrop manuell entfernen (Backup)
-        setTimeout(() => {
-            const backdrop = document.querySelector('.modal-backdrop');
-            if (backdrop) {
-                backdrop.remove();
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
+          "X-Requested-With": "XMLHttpRequest",
+        },
+        body: new URLSearchParams({
+          roleName: roleName,
+          csrf_token: document.getElementById("csrf_token")?.value,
+        }),
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Success case
+            fetchRoles();
+            document.getElementById("newRoleName").value = "";
+            
+            // Modal schließen
+            const modalElement = document.getElementById("addRoleModal");
+            const modalInstance = bootstrap.Modal.getInstance(modalElement);
+            if (modalInstance) {
+                modalInstance.hide();
+            } else {
+                const newModal = new bootstrap.Modal(modalElement);
+                newModal.hide();
             }
-            // Body-Klasse entfernen
-            document.body.classList.remove('modal-open');
-            document.body.style.overflow = '';
-            document.body.style.paddingRight = '';
-        }, 300);
-        
-        showToast(`${messages.msg6} "${roleName}" ${messages.msg7}`, "success", "Success");
+            
+            // Backdrop cleanup
+            setTimeout(() => {
+                const backdrop = document.querySelector('.modal-backdrop');
+                if (backdrop) {
+                    backdrop.remove();
+                }
+                document.body.classList.remove('modal-open');
+                document.body.style.overflow = '';
+                document.body.style.paddingRight = '';
+            }, 300);
+            
+            showToast(data.message || `${messages.msg6} "${roleName}" ${messages.msg7}`, "success", "Success");
+        } else {
+            // Error case
+            showToast(data.message || `${messages.msg6} "${roleName}" ${messages.msg8}`, "error", "Error");
+        }
+    })
+    .catch(error => {
+        showToast("An error occurred while adding the role.", "error", "Error");
+        console.error('Error:', error);
     });
 }
 function confirmDelete(id, roleName) {
@@ -249,36 +264,53 @@ function confirmDelete(id, roleName) {
 
 function deleteRole(id) {
     let roleName = document.getElementById("deleteMessage").textContent.match(/"([^"]+)"/)[1];
-    let formData = new FormData();
-    formData.append("roleId", id);
     
     fetch(`/admin/roles/delete`, {
         method: "POST",
-        body: formData,
-    }).then(() => {
-        fetchRoles();
-        
-        // ✅ SICHERE MODAL-SCHLIEBUNG
-        const modalElement = document.getElementById("confirmDeleteModal");
-        const modalInstance = bootstrap.Modal.getInstance(modalElement);
-        if (modalInstance) {
-            modalInstance.hide();
-        } else {
-            const newModal = new bootstrap.Modal(modalElement);
-            newModal.hide();
-        }
-        
-        // ✅ BACKDROP CLEANUP
-        setTimeout(() => {
-            const backdrop = document.querySelector('.modal-backdrop');
-            if (backdrop) {
-                backdrop.remove();
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
+          "X-Requested-With": "XMLHttpRequest",
+        },
+        body: new URLSearchParams({
+          id: id,
+          csrf_token: document.getElementById("csrf_token")?.value,
+        }),
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Success case
+            fetchRoles();
+            
+            // Modal schließen
+            const modalElement = document.getElementById("confirmDeleteModal");
+            const modalInstance = bootstrap.Modal.getInstance(modalElement);
+            if (modalInstance) {
+                modalInstance.hide();
+            } else {
+                const newModal = new bootstrap.Modal(modalElement);
+                newModal.hide();
             }
-            document.body.classList.remove('modal-open');
-            document.body.style.overflow = '';
-            document.body.style.paddingRight = '';
-        }, 300);
-        
-        showToast(`${messages.msg6} "${roleName}" ${messages.msg11}`, "success", "Success");
+            
+            // Backdrop cleanup
+            setTimeout(() => {
+                const backdrop = document.querySelector('.modal-backdrop');
+                if (backdrop) {
+                    backdrop.remove();
+                }
+                document.body.classList.remove('modal-open');
+                document.body.style.overflow = '';
+                document.body.style.paddingRight = '';
+            }, 300);
+            
+            showToast(data.message || `${messages.msg6} "${roleName}" ${messages.msg11}`, "success", "Success");
+        } else {
+            // Error case
+            showToast(data.message || `Error deleting role "${roleName}"`, "error", "Error");
+        }
+    })
+    .catch(error => {
+        showToast("An error occurred while deleting the role.", "error", "Error");
+        console.error('Error:', error);
     });
 }

@@ -61,9 +61,13 @@ document.addEventListener("DOMContentLoaded", function () {
     fetch("/admin/logs/truncate", {
       method: "POST",
       headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
+        "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
+        "X-Requested-With": "XMLHttpRequest",
       },
-      body: `type=${logType}&csrf_token=${getCSRFToken()}`
+      body: new URLSearchParams({
+        logType: logType,
+        csrf_token: getCSRFToken(),
+      }),
     })
       .then(response => response.json())
       .then(data => {

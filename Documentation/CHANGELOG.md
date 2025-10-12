@@ -24,6 +24,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 
 ### 🐛 Fixed
+- **various mail scheduler fixes**
 - **fixed various translation typos and imports**
 - **fixed various js errors**
 - **updated prepareCommitMsg.sh to be mac bash compatible**

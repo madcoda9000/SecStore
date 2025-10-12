@@ -395,7 +395,7 @@ class LogController
         $page = isset($_GET['page']) ? (int) $_GET['page'] : 1;
         $pageSize = isset($_GET['pageSize']) ? (int) $_GET['pageSize'] : 10;
         $search = isset($_GET['search']) ? trim($_GET['search']) : '';
-        self::listLogs('MAIL', $search, $page, $pageSize);
+        self::listLogs('MAILSCHEDULER', $search, $page, $pageSize);
     }
 
     /**
@@ -489,115 +489,5 @@ class LogController
             'page' => $page,
             'pageSize' => $pageSize,
         ]);
-    }
-
-    /**
-     * Shows mail scheduler logs page
-     *
-     * @return void
-     */
-    public function showMailSchedulerLogs()
-    {
-        if (SessionUtil::get('user')['id'] === null) {
-            Flight::redirect('/login');
-        }
-
-        $user = SessionUtil::get('user');
-        if ($user === false) {
-            Flight::redirect('/login');
-        }
-
-        Flight::latte()->render('admin/logsMailScheduler.latte', [
-            'title' => 'Mail Scheduler Logs',
-            'user' => SessionUtil::get('user'),
-            'sessionTimeout' => SessionUtil::getRemainingTime(),
-        ]);
-    }
-
-    /**
-     * Fetches mail scheduler logs with pagination
-     *
-     * @return void
-     */
-    public function fetchMailSchedulerLogs()
-    {
-        if (SessionUtil::get('user')['id'] === null) {
-            Flight::json(['error' => 'Unauthorized'], 403);
-            return;
-        }
-
-        $user = SessionUtil::get('user');
-        if ($user === false) {
-            Flight::json(['error' => 'Unauthorized'], 403);
-            return;
-        }
-
-        $roles = explode(',', $user->roles);
-        if (!in_array('Admin', $roles)) {
-            Flight::json(['error' => 'Access denied'], 403);
-            return;
-        }
-
-        $page = isset($_GET['page']) ? max(1, (int) $_GET['page']) : 1;
-        $pageSize = isset($_GET['pageSize']) ? max(1, (int) $_GET['pageSize']) : 10;
-        $search = isset($_GET['search']) ? trim($_GET['search']) : '';
-
-        $offset = ($page - 1) * $pageSize;
-
-        try {
-            ORM::configure('logging', true);
-
-            // Count total logs
-            $query = ORM::for_table('logs')->where('type', 'MAILSCHEDULER');
-
-            if (!empty($search)) {
-                $query->where_raw(
-                    "(message LIKE ? OR context LIKE ? OR user LIKE ?)",
-                    ["%{$search}%", "%{$search}%", "%{$search}%"]
-                );
-            }
-
-            $totalLogs = $query->count();
-
-            // Fetch logs
-            $logsQuery = ORM::for_table('logs')->where('type', 'MAILSCHEDULER');
-
-            if (!empty($search)) {
-                $logsQuery->where_raw(
-                    "(message LIKE ? OR context LIKE ? OR user LIKE ?)",
-                    ["%{$search}%", "%{$search}%", "%{$search}%"]
-                );
-            }
-
-            $logs = $logsQuery
-                ->order_by_desc('datum_zeit')
-                ->limit($pageSize)
-                ->offset($offset)
-                ->find_array();
-
-            // Log last query
-            $queries = ORM::get_query_log();
-            if (!empty($queries)) {
-                $lastQuery = end($queries);
-                LogUtil::logAction(LogType::SQL, 'LogController', 'fetchMailSchedulerLogs', $lastQuery);
-            }
-
-            Flight::json([
-                'logs' => $logs,
-                'page' => $page,
-                'pageSize' => $pageSize,
-                'totalLogs' => $totalLogs,
-                'search' => $search,
-            ]);
-        } catch (Exception $e) {
-            LogUtil::logAction(
-                LogType::ERROR,
-                'LogController',
-                'fetchMailSchedulerLogs',
-                'Error: ' . $e->getMessage()
-            );
-
-            Flight::json(['error' => 'Failed to fetch logs'], 500);
-        }
     }
 }

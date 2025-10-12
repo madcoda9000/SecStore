@@ -48,7 +48,7 @@ if ($needsSetup) {
 // get csrf middleware instance
 $csrfMiddleware = new CsrfMiddleware();
 
-// Auto-start mail scheduler on each request
+// Auto-start mail scheduler on each request (execpt: a /cache/mail_scheduler_stop.sifnale file exists)
 SchedulerAutoStartMiddleware::checkAndStart();
 
 /**
@@ -261,10 +261,6 @@ Flight::route('POST /auth/azure/callback', function () {
     (new AzureSsoController())->handleCallback();
 });
 
-Flight::route('GET /auth/azure/callback', function () {
-    (new AzureSsoController())->handleCallback();
-});
-
 // ==========================================
 // USER ROUTES (Authenticated)
 // ==========================================
@@ -288,11 +284,11 @@ securePostRoute('/profileChangeEmail', function () {
     (new ProfileController())->profileChangeEmail();
 });
 
-secureRoute('POST /disableAndReset2FA', function () {
+securePostRoute('/disableAndReset2FA', function () {
     (new ProfileController())->disableAndReset2FA();
 });
 
-secureRoute('POST /initiate2faSetup', function () {
+securePostRoute('/initiate2faSetup', function () {
     (new ProfileController())->initiate2faSetup();
 });
 
@@ -396,11 +392,11 @@ secureRoute('GET /admin/showEditUser/@id', function ($id) {
     (new AdminController())->showEditeUser($id);
 }, 'admin', true);
 
-secureRoute('POST /admin/updateUser', function () {
+securePostRoute('/admin/updateUser', function () {
     (new AdminController())->updateUser();
 }, 'admin', true);
 
-secureRoute('POST /admin/createUser', function () {
+securePostRoute('/admin/createUser', function () {
     (new AdminController())->createUser();
 }, 'admin', true);
 
@@ -408,31 +404,31 @@ secureRoute('GET /admin/showCreateUser', function () {
     (new AdminController())->showCreateUser();
 }, 'admin', true);
 
-secureRoute('POST /admin/deleteUser', function () {
+securePostRoute('/admin/deleteUser', function () {
     (new AdminController())->deleteUser();
 }, 'admin', true);
 
-secureRoute('POST /admin/disableMfa', function () {
+securePostRoute('/admin/disableMfa', function () {
     (new AdminController())->disableMfa();
 }, 'admin', true);
 
-secureRoute('POST /admin/enableMfa', function () {
+securePostRoute('/admin/enableMfa', function () {
     (new AdminController())->enableMfa();
 }, 'admin', true);
 
-secureRoute('POST /admin/enableUser', function () {
+securePostRoute('/admin/enableUser', function () {
     (new AdminController())->enableUser();
 }, 'admin', true);
 
-secureRoute('POST /admin/disableUser', function () {
+securePostRoute('/admin/disableUser', function () {
     (new AdminController())->disableUser();
 }, 'admin', true);
 
-secureRoute('POST /admin/enforceMfa', function () {
+securePostRoute('/admin/enforceMfa', function () {
     (new AdminController())->enforceMfa();
 }, 'admin', true);
 
-secureRoute('POST /admin/unenforceMfa', function () {
+securePostRoute('/admin/unenforceMfa', function () {
     (new AdminController())->unenforceMfa();
 }, 'admin', true);
 
@@ -445,11 +441,11 @@ secureRoute('GET /admin/roles', function () {
     (new AdminController())->listRoles();
 }, 'admin', true);
 
-secureRoute('POST /admin/roles/add', function () {
+securePostRoute('/admin/roles/add', function () {
     (new AdminController())->addRole();
 }, 'admin', true);
 
-secureRoute('POST /admin/roles/delete', function () {
+securePostRoute('/admin/roles/delete', function () {
     (new AdminController())->deleteRole();
 }, 'admin', true);
 
@@ -457,7 +453,7 @@ secureRoute('GET /admin/roles/checkUsers', function () {
     (new AdminController())->listRoles();
 }, 'admin', true);
 
-secureRoute('POST /admin/updateAzureSsoSettings', function () {
+securePostRoute('/admin/updateAzureSsoSettings', function () {
     (new AdminController())->updateAzureSsoSettings($_POST);
 }, 'admin', true);
 
@@ -534,7 +530,7 @@ secureRoute('GET /admin/logs/export', function () {
 }, 'admin', true);
 
 // Log Truncate Route
-secureRoute('POST /admin/logs/truncate', function () {
+securePostRoute('/admin/logs/truncate', function () {
     (new LogController())->truncateLogs();
 }, 'admin', true);
 
@@ -629,11 +625,11 @@ secureRoute('GET /admin/mail-scheduler/status', function () {
     (new AdminController())->getSchedulerStatus();
 }, 'admin', true);
 
-secureRoute('POST /admin/mail-scheduler/start', function () {
+securePostRoute('/admin/mail-scheduler/start', function () {
     (new AdminController())->startScheduler();
 }, 'admin', true);
 
-secureRoute('POST /admin/mail-scheduler/stop', function () {
+securePostRoute('/admin/mail-scheduler/stop', function () {
     (new AdminController())->stopScheduler();
 }, 'admin', true);
 
@@ -641,17 +637,8 @@ secureRoute('GET /admin/mail-scheduler/jobs', function () {
     (new AdminController())->getMailJobs();
 }, 'admin', true);
 
-secureRoute('POST /admin/mail-scheduler/jobs/delete', function () {
+securePostRoute('/admin/mail-scheduler/jobs/delete', function () {
     (new AdminController())->deleteMailJob();
-}, 'admin', true);
-
-// Scheduler Logs
-secureRoute('GET /admin/logsMailScheduler', function () {
-    (new LogController())->showMailSchedulerLogs();
-}, 'admin', true);
-
-secureRoute('GET /admin/logs/fetchMailSchedulerlogs', function () {
-    (new LogController())->fetchMailSchedulerLogs();
 }, 'admin', true);
 
 // Logout (kein Rate Limiting nötig)
