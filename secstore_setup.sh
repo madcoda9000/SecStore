@@ -3,7 +3,7 @@
 # SecStore PHP Development Environment Setup Script
 # Supports: Debian, Ubuntu, and Fedora-based distributions
 # Author: Generated for SecStore Project
-# Version: 1.0
+# Version: 1.1
 
 set -e  # Exit on any error
 
@@ -54,14 +54,22 @@ detect_distro() {
     fi
     
     case $DISTRO in
-        "ubuntu"|"debian"|"pop"|"linuxmint")
+        "debian")
             PACKAGE_MANAGER="apt"
             PHP_VERSION="8.3"
-            log_success "Debian-basierte Distribution erkannt: $PRETTY_NAME"
+            DISTRO_TYPE="debian"
+            log_success "Debian erkannt: $PRETTY_NAME"
+            ;;
+        "ubuntu"|"pop"|"linuxmint")
+            PACKAGE_MANAGER="apt"
+            PHP_VERSION="8.3"
+            DISTRO_TYPE="ubuntu"
+            log_success "Ubuntu-basierte Distribution erkannt: $PRETTY_NAME"
             ;;
         "fedora"|"centos"|"rhel"|"rocky"|"almalinux")
             PACKAGE_MANAGER="dnf"
             PHP_VERSION="8.3"
+            DISTRO_TYPE="fedora"
             log_success "Fedora-basierte Distribution erkannt: $PRETTY_NAME"
             ;;
         *)
@@ -114,15 +122,26 @@ check_php_version() {
 install_php() {
     log_info "Installiere PHP $PHP_VERSION..."
     
-    case $PACKAGE_MANAGER in
-        "apt")
-            # Add Ondrej PHP repository for latest versions
+    case $DISTRO_TYPE in
+        "debian")
+            # Install prerequisites
+            sudo apt install -y ca-certificates apt-transport-https lsb-release wget
+            
+            # Add Sury repository for Debian
+            sudo wget -O /etc/apt/trusted.gpg.d/php.gpg https://packages.sury.org/php/apt.gpg
+            echo "deb https://packages.sury.org/php/ $(lsb_release -sc) main" | sudo tee /etc/apt/sources.list.d/php.list
+            
+            sudo apt update
+            sudo apt install -y php$PHP_VERSION-cli
+            ;;
+        "ubuntu")
+            # Add Ondrej PHP repository for Ubuntu
             sudo apt install -y software-properties-common
             sudo add-apt-repository -y ppa:ondrej/php
             sudo apt update
             sudo apt install -y php$PHP_VERSION-cli
             ;;
-        "dnf")
+        "fedora")
             # Enable Remi repository for latest PHP versions
             sudo dnf install -y https://rpms.remirepo.net/fedora/remi-release-$(rpm -E %fedora).rpm
             sudo dnf module enable -y php:remi-$PHP_VERSION
