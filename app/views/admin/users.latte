@@ -23,7 +23,7 @@
     </div>
 
    <!-- Main Content -->
-    <div class="container py-4" style="flex:1">
+    <div class="container py-4 FLEX-CONTAINER"">
     <h1 class="mb-5"><span class="bi bi-person-square">&nbsp;</span>{trans('users.title')}</h1>
 
     {ifset $success}
@@ -80,7 +80,7 @@
     </div>
 
     <!-- Loading Indicator -->
-    <div id="loadingIndicator" style="display: none; text-align: center;">
+    <div id="loadingIndicator">
         <div class="spinner-border" role="status">
             <span class="visually-hidden">{trans('users.loading')}</span>
         </div>
@@ -166,7 +166,7 @@
                     <th>{trans('users.type')}</th>
                     <th>Ac</th>
                     <th>2FA</th>
-                    <th style="min-width:50px !important;text-align:center;">Backup</th>
+                    <th class="usersBackupTh">Backup</th>
                     <th>Enf</th>
                     <th>{trans('users.username')}</th>
                     <th>Email</th>                    
@@ -195,54 +195,50 @@
                                 <i class="bi-database-fill text-indigo" data-bs-toggle="tooltip" title="{trans('users.popup.dbuser')}"></i>
                             {/if}
                         </td>
-                        <td style="min-width:40px !important;text-align:center;">
+                        <td class="usersBackupTh">
                             {if $use->username === 'super.admin'}
                                 <i id="accountStatus{$use->id}" class="bi-check-circle-fill text-secondary" data-bs-toggle="tooltip" title="{trans('users.popup.noDisableUser')}"></i>
                             {elseif $use->status === 1}
-                                <i id="accountStatus{$use->id}" class="bi-check-circle-fill text-success user-action-btn" 
+                                <i class="cursor-pointer" id="accountStatus{$use->id}" class="bi-check-circle-fill text-success user-action-btn" 
                                    data-action="toggle-account-status" 
                                    data-user-id="{$use->id}" 
                                    data-operation="disable"
-                                   style="cursor:pointer;" 
                                    data-bs-toggle="tooltip" 
                                    title="{trans('users.popup.disableUser')}"></i>
                             {else}
-                                <i id="accountStatus{$use->id}" class="bi-x-circle-fill text-danger user-action-btn" 
+                                <i class="cursor-pointer" id="accountStatus{$use->id}" class="bi-x-circle-fill text-danger user-action-btn" 
                                    data-action="toggle-account-status" 
                                    data-user-id="{$use->id}" 
-                                   data-operation="enable"
-                                   style="cursor:pointer;" 
+                                   data-operation="enable" 
                                    data-bs-toggle="tooltip" 
                                    title="{trans('users.popup.activateUser')}"></i>
                             {/if}
                         </td>
-                        <td style="min-width:40px !important;text-align:center;">
+                        <td class="usersBackupTh">
                             {if $use->entraIdEnabled === 1}
                                 {* Entra ID: 2FA wird von Azure verwaltet - Icon disabled *}
                                 <i class="bi-shield-lock-fill text-secondary" 
                                 data-bs-toggle="tooltip" 
                                 title="{trans('users.popup.entraid.2fa')}"></i>
                             {elseif $use->mfaSecret !== '' && $use->mfaEnabled === 1}
-                                <i id="mfaEnabled{$use->id}" class="bi-check-circle-fill text-success user-action-btn" 
+                                <i class="cursor-pointer" id="mfaEnabled{$use->id}" class="bi-check-circle-fill text-success user-action-btn" 
                                 data-action="toggle-mfa" 
                                 data-user-id="{$use->id}" 
                                 data-operation="disable"
                                 data-bs-toggle="tooltip" 
-                                title="{trans('users.popup.disable2fa')}" 
-                                style="cursor:pointer;"></i>
+                                title="{trans('users.popup.disable2fa')}"></i>
                             {elseif $use->mfaSecret !== '' && $use->mfaEnabled === 0}
-                                <i id="mfaEnabled{$use->id}" class="bi-x-circle-fill text-danger user-action-btn" 
+                                <i class="cursor-pointer" id="mfaEnabled{$use->id}" class="bi-x-circle-fill text-danger user-action-btn" 
                                 data-action="toggle-mfa" 
                                 data-user-id="{$use->id}" 
                                 data-operation="enable"
                                 data-bs-toggle="tooltip" 
-                                title="{trans('users.popup.enable2fa')}" 
-                                style="cursor:pointer;"></i>
+                                title="{trans('users.popup.enable2fa')}"></i>
                             {elseif $use->mfaSecret === ''}
                                 <i id="mfaEnabled{$use->id}" class="bi-x-circle-fill text-secondary" data-bs-toggle="tooltip" title="{trans('users.popup.no2fa')}"></i>
                             {/if}
                         </td>
-                        <td style="min-width:50px !important;text-align:center;">
+                        <td class="usersBackupTh">
                             {if $use->entraIdEnabled === 1}
                                 {* Entra ID: Backup Codes nicht verfügbar *}
                                 <i class="bi-dash-circle text-secondary" 
@@ -257,7 +253,7 @@
                                 <i class="bi-dash-circle text-secondary" data-bs-toggle="tooltip" title="{trans('users.popup.no2fa')}"></i>
                             {/if}
                         </td>
-                        <td style="min-width:40px !important;text-align:center;">
+                        <td class="usersBackupTh">
                             {if $use->entraIdEnabled === 1}
                                 {* Entra ID: 2FA Enforcement wird von Azure verwaltet *}
                                 <i class="bi-shield-lock-fill text-secondary" 
@@ -268,19 +264,17 @@
                             {elseif $use->mfaSecret !== ''}
                                 <i class="bi-check-circle-fill text-secondary" data-bs-toggle="tooltip" title="{trans('users.popup.2faconfigured')}"></i>
                             {elseif $use->mfaEnforced === 1}
-                                <i id="enforceStatus{$use->id}" class="bi-check-circle-fill text-warning user-action-btn" 
+                                <i class="cursor-pointer" id="enforceStatus{$use->id}" class="bi-check-circle-fill text-warning user-action-btn" 
                                 data-action="toggle-mfa-enforcement" 
                                 data-user-id="{$use->id}" 
                                 data-operation="disable"
-                                style="cursor:pointer;" 
                                 data-bs-toggle="tooltip" 
                                 title="{trans('users.popup.2faenforce')}"></i>
                             {else}
-                                <i id="enforceStatus{$use->id}" class="bi-x-circle-fill text-secondary user-action-btn" 
+                                <i class="cursor-pointer" id="enforceStatus{$use->id}" class="bi-x-circle-fill text-secondary user-action-btn" 
                                 data-action="toggle-mfa-enforcement" 
                                 data-user-id="{$use->id}" 
-                                data-operation="enable"
-                                style="cursor:pointer;" 
+                                data-operation="enable" 
                                 data-bs-toggle="tooltip" 
                                 title="{trans('users.popup.2faenforce')}"></i>
                             {/if}
@@ -346,19 +340,17 @@
                             {if $use->username === 'super.admin'}
                                 <i id="maccountStatus{$use->id}" class="bi-check-circle-fill text-secondary" data-bs-toggle="tooltip" title="{trans('users.popup.noDisableUser')}"></i>
                             {elseif $use->status === 1}
-                                <i id="maccountStatus{$use->id}" class="bi-check-circle-fill text-success user-action-btn" 
+                                <i class="cursor-pointer" id="maccountStatus{$use->id}" class="bi-check-circle-fill text-success user-action-btn" 
                                    data-action="toggle-account-status" 
                                    data-user-id="{$use->id}" 
-                                   data-operation="disable"
-                                   style="cursor:pointer;" 
+                                   data-operation="disable" 
                                    data-bs-toggle="tooltip" 
                                    title="{trans('users.popup.disableUser')}"></i>
                             {else}
-                                <i id="maccountStatus{$use->id}" class="bi-x-circle-fill text-danger user-action-btn" 
+                                <i class="cursor-pointer" id="maccountStatus{$use->id}" class="bi-x-circle-fill text-danger user-action-btn" 
                                    data-action="toggle-account-status" 
                                    data-user-id="{$use->id}" 
                                    data-operation="enable"
-                                   style="cursor:pointer;" 
                                    data-bs-toggle="tooltip" 
                                    title="{trans('users.popup.activateUser')}"></i>
                             {/if}<br>
@@ -368,21 +360,19 @@
                                 data-bs-toggle="tooltip" 
                                 title="{trans('users.popup.entraid.2fa')}"></i>
                             {elseif $use->mfaSecret !== '' && $use->mfaEnabled === 1}
-                                <i id="mmfaEnabled{$use->id}" class="bi-check-circle-fill text-success user-action-btn" 
+                                <i class="cursor-pointer" id="mmfaEnabled{$use->id}" class="bi-check-circle-fill text-success user-action-btn" 
                                 data-action="toggle-mfa" 
                                 data-user-id="{$use->id}" 
                                 data-operation="disable"
                                 data-bs-toggle="tooltip" 
-                                title="{trans('users.popup.disable2fa')}" 
-                                style="cursor:pointer;"></i>
+                                title="{trans('users.popup.disable2fa')}"></i>
                             {elseif $use->mfaSecret !== '' && $use->mfaEnabled === 0}
-                                <i id="mmfaEnabled{$use->id}" class="bi-x-circle-fill text-danger user-action-btn" 
+                                <i class="cursor-pointer" id="mmfaEnabled{$use->id}" class="bi-x-circle-fill text-danger user-action-btn" 
                                 data-action="toggle-mfa" 
                                 data-user-id="{$use->id}" 
                                 data-operation="enable"
                                 data-bs-toggle="tooltip" 
-                                title="{trans('users.popup.enable2fa')}" 
-                                style="cursor:pointer;"></i>
+                                title="{trans('users.popup.enable2fa')}"></i>
                             {elseif $use->mfaSecret === ''}
                                 <i id="mmfaEnabled{$use->id}" class="bi-x-circle-fill text-secondary" data-bs-toggle="tooltip" title="{trans('users.popup.no2fa')}"></i>
                             {/if}<br>
@@ -396,19 +386,17 @@
                             {elseif $use->mfaSecret !== ''}
                                 <i class="bi-check-circle-fill text-secondary" data-bs-toggle="tooltip" title="{trans('users.popup.2faconfigured')}"></i>
                             {elseif $use->mfaEnforced === 1}
-                                <i id="menforceStatus{$use->id}" class="bi-check-circle-fill text-warning user-action-btn" 
+                                <i class="cursor-pointer" id="menforceStatus{$use->id}" class="bi-check-circle-fill text-warning user-action-btn" 
                                 data-action="toggle-mfa-enforcement" 
                                 data-user-id="{$use->id}" 
                                 data-operation="disable"
-                                style="cursor:pointer;" 
                                 data-bs-toggle="tooltip" 
                                 title="{trans('users.popup.2faenforce')}"></i>
                             {else}
-                                <i id="menforceStatus{$use->id}" class="bi-x-circle-fill text-danger user-action-btn" 
+                                <i class="cursor-pointer" id="menforceStatus{$use->id}" class="bi-x-circle-fill text-danger user-action-btn" 
                                 data-action="toggle-mfa-enforcement" 
                                 data-user-id="{$use->id}" 
                                 data-operation="enable"
-                                style="cursor:pointer;" 
                                 data-bs-toggle="tooltip" 
                                 title="{trans('users.popup.2faunenforce')}"></i>
                             {/if}<br>
@@ -481,9 +469,9 @@
                 <div class="text-center mb-3">
                     <div id="progressOperation">Initializing...</div>
                 </div>
-                <div class="progress mb-3" style="height: 20px;">
-                    <div class="progress-bar progress-bar-striped progress-bar-animated" 
-                         id="bulkProgressBar" style="width: 0%"></div>
+                <div class="progress mb-3 height20">
+                    <div class="progress-bar progress-bar-striped progress-bar-animated width0" 
+                         id="bulkProgressBar"></div>
                 </div>
                 <div class="text-center">
                     <small class="text-muted" id="progressStatus">Please wait...</small>
@@ -633,7 +621,7 @@
      data-bulk-mfa-unenforce-subtext="{trans('users.bulk.confirm.mfa_unenforce.subtext')}"
      data-bulk-mfa-unenforce-btn="{trans('users.bulk.confirm.mfa_unenforce.btn')}"
      data-bulk-confirm-finishBtn="{trans('users.bulk.confirm.finishBtn')}"
-     style="display:none;">
+     class="display-none">
 </div>
 
 {* EXTERNE SCRIPTS (CSP-konform) *}

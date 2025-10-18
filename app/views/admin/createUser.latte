@@ -3,7 +3,7 @@
 {block content}
 
 
-<div class="container py-4" style="flex:1">
+<div class="container py-4 flex-container">
 <h1 class="mb-5"><span class="bi bi-person-fill-add">&nbsp;{trans('user.new.title')}..</h1>
     <form id="userForm" class="needs-validation" novalidate>
         <input type="hidden" name="csrf_token" value="{$_SESSION['csrf_token']}">
@@ -80,10 +80,10 @@
         
         <div class="mb-3">
         <label class="form-label">{trans('user.role')}</label>
-        <div class="invalid-feedback d-block text-info" id="roleError" style="display: none;">{trans('user.role.hint')}</div>
+        <div class="invalid-feedback d-block text-info display-none" id="roleError">{trans('user.role.hint')}</div>
         <div id="rolesContainer" class="d-flex flex-wrap gap-2">
             {foreach $roles as $role}
-                <span class="role-badge badge bg-secondary p-2" data-value="{$role['roleName']}" style="cursor:pointer;">
+                <span class="role-badge badge bg-secondary p-2 cursor-pointer" data-value="{$role['roleName']}">
                     {$role['roleName']}
                 </span>
             {/foreach}
@@ -92,7 +92,7 @@
     </div>
     <div class="d-flex justify-content-end gap-3">
         <button type="button" class="btn btn-secondary mr-3" id="backBtn" data-action="back">{trans('user.cancel')}</button>
-        <button type="submit" class="btn btn-primary" style="width:200px;" id="submitBtn">
+        <button type="submit" class="btn btn-primary width200" id="submitBtn">
             <span id="btnText">{trans('user.submit')}</span>
             <span id="spinner" class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
         </button>
@@ -106,7 +106,7 @@
      data-error2="{trans('user.role.error2')}"
      data-error3="{trans('user.role.error3')}"
      data-error4="{trans('user.role.error4')}"
-     style="display:none;">
+     class="display-none">
 </div>
 
 {* EXTERNE SCRIPTS (CSP-konform) *}

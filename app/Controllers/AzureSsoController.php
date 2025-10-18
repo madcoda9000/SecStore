@@ -113,7 +113,7 @@ class AzureSsoController
         }
 
         // *** MOCK MODE: Handle Mock Login ***
-        if ($config['azureSso']['mockMode'] === true && $config['application']['enviroment'] === 'development') {
+        if ($config['azureSso']['mockMode'] === true && $config['application']['environment'] === 'development') {
             $this->handleMockLogin($config);
             return;
         }

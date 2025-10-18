@@ -1,13 +1,13 @@
-{* Finale Version: app/views/admin/security_dashboard.latte *}
+{* Fixed Version: app/views/admin/security_dashboard.latte *}
 {extends '../_mainLayout.latte'}
 
 {block content}
 
  <link rel="stylesheet" href="/css/admin/security-dashboard.css">
 
-<div class="container py-4" style="flex:1">
+<div class="container py-4 flex-container">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1><i class="bi bi-shield-check text-success"></i> Security Dashboard</h1>
+        <h1><i class="bi bi-shield-check text-success"></i> Security Dashboard <small class="text-muted fs-6">(Updated: {date('H:i:s')})</small></h1>
         <div>
             <span class="badge bg-{if $metrics['security_score'] >= 80}success{elseif $metrics['security_score'] >= 60}warning{else}danger{/if} fs-6">
                 Security Score: {$metrics['security_score']}%
@@ -41,37 +41,37 @@
     {* Summary Cards *}
     <div class="row mb-4">
         <div class="col-md-3">
-            <div class="card text-center h-100"> {* h-100 für gleiche Höhe *}
+            <div class="card text-center h-100">
                 <div class="card-body d-flex flex-column justify-content-center">
                     <h5 class="card-title text-success mb-2">Login Success Rate</h5>
-                    <h2 class="text-success mb-2">96.3%</h2>
+                    <h2 class="text-success mb-2">{$metrics['login_success_rate']}%</h2>
                     <small class="text-muted">Last 24 hours</small>
                 </div>
             </div>
         </div>
         <div class="col-md-3">
-            <div class="card text-center h-100"> {* h-100 für gleiche Höhe *}
+            <div class="card text-center h-100">
                 <div class="card-body d-flex flex-column justify-content-center">
                     <h5 class="card-title text-primary mb-2">Total Logins</h5>
-                    <h2 class="text-primary mb-2">27</h2>
-                    <small class="text-muted">26 success / 1 failed</small>
+                    <h2 class="text-primary mb-2">{$metrics['total_login_attempts']}</h2>
+                    <small class="text-muted">{$summary['successful_logins']} success / {$summary['failed_logins']} failed</small>
                 </div>
             </div>
         </div>
         <div class="col-md-3">
-            <div class="card text-center h-100"> {* h-100 für gleiche Höhe *}
+            <div class="card text-center h-100">
                 <div class="card-body d-flex flex-column justify-content-center">
                     <h5 class="card-title text-warning mb-2">Password Resets</h5>
-                    <h2 class="text-warning mb-2">0</h2>
+                    <h2 class="text-warning mb-2">{$summary['password_resets']}</h2>
                     <small class="text-muted">Last 24 hours</small>
                 </div>
             </div>
         </div>
         <div class="col-md-3">
-            <div class="card text-center h-100"> {* h-100 für gleiche Höhe *}
+            <div class="card text-center h-100">
                 <div class="card-body d-flex flex-column justify-content-center">
                     <h5 class="card-title text-info mb-2">New Users</h5>
-                    <h2 class="text-info mb-2">3</h2>
+                    <h2 class="text-info mb-2">{$summary['new_registrations']}</h2>
                     <small class="text-muted">Last 24 hours</small>
                 </div>
             </div>
@@ -81,7 +81,7 @@
     {* Detailed Metrics *}
     <div class="row mb-4">
         <div class="col-md-6">
-            <div class="card h-100"> {* h-100 für gleiche Höhe *}
+            <div class="card h-100">
                 <div class="card-header">
                     <h5 class="mb-0">
                         <i class="bi bi-graph-up"></i> Security Events
@@ -91,27 +91,27 @@
                     <div class="flex-grow-1">
                         <div class="d-flex justify-content-between align-items-center py-1">
                             <span><i class="bi bi-check-circle text-success"></i> Successful Logins</span>
-                            <span class="badge bg-success">26</span>
+                            <span class="badge bg-success">{$summary['successful_logins']}</span>
                         </div>
                         <div class="d-flex justify-content-between align-items-center py-1">
                             <span><i class="bi bi-x-circle text-danger"></i> Failed Logins</span>
-                            <span class="badge bg-danger">1</span>
+                            <span class="badge bg-danger">{$summary['failed_logins']}</span>
                         </div>
                         <div class="d-flex justify-content-between align-items-center py-1">
                             <span><i class="bi bi-key text-secondary"></i> Password Resets</span>
-                            <span class="badge bg-secondary">0</span>
+                            <span class="badge bg-secondary">{$summary['password_resets']}</span>
                         </div>
                         <div class="d-flex justify-content-between align-items-center py-1">
                             <span><i class="bi bi-person-plus text-info"></i> New Registrations</span>
-                            <span class="badge bg-info">3</span>
+                            <span class="badge bg-info">{$summary['new_registrations']}</span>
                         </div>
                         <div class="d-flex justify-content-between align-items-center py-1">
                             <span><i class="bi bi-shield-exclamation text-warning"></i> CSRF Violations</span>
-                            <span class="badge bg-warning">6</span>
+                            <span class="badge bg-warning">{$summary['csrf_violations']}</span>
                         </div>
                         <div class="d-flex justify-content-between align-items-center py-1">
                             <span><i class="bi bi-speedometer text-warning"></i> Rate Limit Hits</span>
-                            <span class="badge bg-warning">4</span>
+                            <span class="badge bg-warning">{$summary['rate_limit_hits']}</span>
                         </div>
                     </div>
                 </div>
@@ -119,102 +119,79 @@
         </div>
         
         <div class="col-md-6">
-            <div class="card h-100"> {* h-100 für gleiche Höhe *}
+            <div class="card h-100">
                 <div class="card-header">
                     <h5 class="mb-0">
                         <i class="bi bi-exclamation-triangle text-warning"></i> Suspicious Activity
                     </h5>
                 </div>
                 <div class="card-body d-flex flex-column justify-content-center">
-                    <div class="alert alert-success text-center">
-                        <i class="bi bi-check-circle-fill me-2"></i>
-                        No suspicious activity detected
-                    </div>
+                    {if $summary['suspicious_activity']['suspicious_ips'] > 0}
+                        <div class="alert alert-danger">
+                            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                            <strong>{$summary['suspicious_activity']['suspicious_ips']} suspicious IP(s) detected</strong>
+                            <div class="mt-2 small">
+                                {foreach $summary['suspicious_activity']['ips'] as $ip}
+                                    <span class="badge bg-danger me-1">{$ip}</span>
+                                {/foreach}
+                            </div>
+                        </div>
+                    {else}
+                        <div class="alert alert-success text-center">
+                            <i class="bi bi-check-circle-fill me-2"></i>
+                            No suspicious activity detected
+                        </div>
+                    {/if}
                 </div>
             </div>
         </div>
     </div>
 
-     <!-- Login Analytics Section -->
-    <div class="row mt-4">
+    {* Login Analytics Section *}
+    <div class="row mb-4">
         <div class="col-12">
             <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h5 class="mb-0">
-                        <i class="bi bi-graph-up text-primary"></i> Login Analytics
+                        <i class="bi bi-graph-up"></i> Login Analytics
                     </h5>
-                    <div class="btn-group btn-group-sm">
-                        <button class="btn btn-outline-secondary" id="refreshAnalyticsBtn">
-                            <i class="bi bi-arrow-clockwise"></i> Refresh
-                        </button>
-                    </div>
+                    <button class="btn btn-sm btn-outline-primary" id="refreshAnalyticsBtn">
+                        <i class="bi bi-arrow-clockwise"></i> Refresh
+                    </button>
                 </div>
                 <div class="card-body">
-                    <!-- Tab Navigation -->
-                    <ul class="nav nav-tabs nav-tabs-improved" id="analyticsTab" role="tablist">
+                    <ul class="nav nav-tabs" role="tablist">
                         <li class="nav-item" role="presentation">
-                            <button class="nav-link active" id="heatmap-tab" data-bs-toggle="tab" 
-                                    data-bs-target="#heatmap" type="button" role="tab">
-                                🔥 Activity Heatmap
+                            <button class="nav-link active" id="heatmap-tab" data-bs-toggle="tab" data-bs-target="#heatmap" type="button" role="tab">
+                                <i class="bi bi-fire"></i> Activity Heatmap
                             </button>
                         </li>
                         <li class="nav-item" role="presentation">
-                            <button class="nav-link" id="hourly-tab" data-bs-toggle="tab" 
-                                    data-bs-target="#hourly" type="button" role="tab">
-                                🕐 Hourly Distribution
+                            <button class="nav-link" id="hourly-tab" data-bs-toggle="tab" data-bs-target="#hourly" type="button" role="tab">
+                                <i class="bi bi-clock-history"></i> Hourly Distribution
                             </button>
                         </li>
                         <li class="nav-item" role="presentation">
-                            <button class="nav-link" id="weekly-tab" data-bs-toggle="tab" 
-                                    data-bs-target="#weekly" type="button" role="tab">
-                                📅 Weekly Trends
+                            <button class="nav-link" id="weekly-tab" data-bs-toggle="tab" data-bs-target="#weekly" type="button" role="tab">
+                                <i class="bi bi-calendar-week"></i> Weekly Trends
                             </button>
                         </li>
                         <li class="nav-item" role="presentation">
-                            <button class="nav-link" id="patterns-tab" data-bs-toggle="tab" 
-                                    data-bs-target="#patterns" type="button" role="tab">
-                                ⚠️ Unusual Patterns
+                            <button class="nav-link" id="patterns-tab" data-bs-toggle="tab" data-bs-target="#patterns" type="button" role="tab">
+                                <i class="bi bi-exclamation-triangle"></i> Unusual Patterns
                             </button>
                         </li>
                     </ul>
-                    
-                    <!-- Tab Content -->
-                    <div class="tab-content" id="analyticsTabContent">
-                        <!-- Heatmap Tab -->
+                    <div class="tab-content mt-3">
                         <div class="tab-pane fade show active" id="heatmap" role="tabpanel">
-                            <div class="row mt-3">
-                                <div class="col-12">
-                                    <div style="height: 400px; position: relative;">
-                                        <canvas id="loginHeatmapChart"></canvas>
-                                    </div>
-                                    <div id="heatmapInsights"></div>
-                                </div>
-                            </div>
+                            <canvas id="loginHeatmapChart" class="maxHeight400"></canvas>
                         </div>
-                        
-                        <!-- Hourly Distribution Tab -->
                         <div class="tab-pane fade" id="hourly" role="tabpanel">
-                            <div class="row mt-3">
-                                <div class="col-12">
-                                    <div style="height: 400px; position: relative;">
-                                        <canvas id="hourlyDistributionChart"></canvas>
-                                    </div>
-                                </div>
-                            </div>
+                            <canvas id="hourlyDistributionChart" class="maxHeight400"></canvas>
                         </div>
-                        
-                        <!-- Weekly Trends Tab -->
                         <div class="tab-pane fade" id="weekly" role="tabpanel">
-                            <div class="row mt-3">
-                                <div class="col-12">
-                                    <div style="height: 400px; position: relative;">
-                                        <canvas id="weeklyTrendsChart"></canvas>
-                                    </div>
-                                </div>
-                            </div>
+                            <canvas id="weeklyTrendsChart" class="maxHeight400"></canvas>
                         </div>
-                        
-                        <!-- Unusual Patterns Tab -->
                         <div class="tab-pane fade" id="patterns" role="tabpanel">
                             <div class="row mt-3">
                                 <div class="col-12">
@@ -258,14 +235,11 @@
     </div>   
 </div>
 
-
-
-
 {* CSP-KONFORME LÖSUNG: Data-Attribute für JavaScript-Konfiguration *}
 <div id="security-dashboard-config" 
      data-refresh-url="/admin/security/metrics"
      data-refresh-interval="300000"
-     style="display:none;">
+     class="display-none">
 </div>
 <div id="analytics-config" 
      data-analytics-url="/admin/analytics/data"
@@ -276,15 +250,12 @@
      data-hourly-data="{json_encode($hourlyDistribution ?? [])|escape}"
      data-weekly-data="{json_encode($weeklyTrends ?? [])|escape}"
      data-patterns-data="{json_encode($unusualPatterns ?? [])|escape}"
-     style="display: none;"></div>
+     class="display-none">
+</div>
 
 {* EXTERNE SCRIPTS (CSP-konform) *}
-<script src="/js/admin/security-dashboard.js"></script>  {* NEU: Ersetzt inline scripts *}
-
-{* Chart.js CDN (add to head section) *}
+<script src="/js/admin/security-dashboard.js"></script>
 <script src="/js/lib/chart.min.js"></script>
-
-{* Include Analytics JavaScript *}
 <script src="/js/admin/login-analytics.js"></script>
 
 {/block}

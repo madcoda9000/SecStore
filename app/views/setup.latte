@@ -3,7 +3,7 @@
 
 {block content}
 <div class="container">
-    <div class="card p-4 shadow-sm login-card shadow-lg" style="width: 100%; max-width: 600px;">
+    <div class="card p-4 shadow-sm login-card shadow-lg twofa-card">
         
         {* Header mit Schritt-Anzeige *}
         <div class="text-center mb-4">
@@ -11,8 +11,8 @@
                 <span class="bi bi-gear-fill"></span>&nbsp;{trans('setup.title')}
             </h3>
             {if $step !== null}
-                <div class="progress mb-3" style="height: 8px;">
-                    <div class="progress-bar" role="progressbar" style="width: {$step * 25}%" aria-valuenow="{$step * 25}" aria-valuemin="0" aria-valuemax="100"></div>
+                <div class="progress mb-3">
+                    <div class="progress-bar progress-step-{$step}" role="progressbar" aria-valuenow="{$step * 25}" aria-valuemin="0" aria-valuemax="100"></div>
                 </div>
                 <small class="text-muted">{trans('setup.step')} {$step} {trans('setup.of')} 4</small>
                 
@@ -25,7 +25,7 @@
                             {else}
                                 <i class="bi bi-circle text-muted"></i>
                             {/if}
-                            <div class="mt-1 text-muted" style="font-size: 0.75rem;">{trans('setup.step1.short')}</div>
+                            <div class="mt-1 text-muted util-text-muted ">{trans('setup.step1.short')}</div>
                         </div>
                         <div class="col-3">
                             {if $step >= 2}
@@ -35,7 +35,7 @@
                             {else}
                                 <i class="bi bi-circle text-muted"></i>
                             {/if}
-                            <div class="mt-1 text-muted" style="font-size: 0.75rem;">{trans('setup.step2.short')}</div>
+                            <div class="mt-1 text-muted util-text-muted ">{trans('setup.step2.short')}</div>
                         </div>
                         <div class="col-3">
                             {if $step >= 3}
@@ -47,7 +47,7 @@
                             {else}
                                 <i class="bi bi-circle text-muted"></i>
                             {/if}
-                            <div class="mt-1 text-muted" style="font-size: 0.75rem;">{trans('setup.step3.short')}</div>
+                            <div class="mt-1 text-muted util-text-muted ">{trans('setup.step3.short')}</div>
                         </div>
                         <div class="col-3">
                             {if $step >= 4}
@@ -59,7 +59,7 @@
                             {else}
                                 <i class="bi bi-circle text-muted"></i>
                             {/if}
-                            <div class="mt-1 text-muted" style="font-size: 0.75rem;">{trans('setup.step4.short')}</div>
+                            <div class="mt-1 text-muted util-text-muted ">{trans('setup.step4.short')}</div>
                         </div>
                     </div>
                 </div>
@@ -85,13 +85,13 @@
         {* Setup-Schritte *}
         {if $setup_step === 'config_missing'}
             <div class="text-center">
-                <i class="bi bi-file-earmark-x text-danger" style="font-size: 4rem;"></i>
+                <i class="bi bi-file-earmark-x text-danger font-4rem"></i>
                 <h4 class="mt-3">{trans('setup.config.missing.title')}</h4>
                 <p class="text-muted">
                     {trans('setup.config.missing.desc')}<br>
                     <div class="mt-3">
                         <details class="text-muted">
-                            <summary style="cursor: pointer;">🔧 Environment Details</summary>
+                            <summary class="cursor-pointer">🔧 Environment Details</summary>
                             <small class="mt-2 d-block">
                                 <strong>Detected Environment:</strong><br>
                                 • Web User: <code>{$env_info['web_user']}</code><br>
@@ -114,13 +114,13 @@
 
         {elseif $setup_step === 'config_not_writable'}
             <div class="text-center">
-                <i class="bi bi-shield-lock text-warning" style="font-size: 4rem;"></i>
+                <i class="bi bi-shield-lock text-warning font-4rem"></i>
                 <h4 class="mt-3">{trans('setup.config.writable.title')}</h4>
                 <p class="text-muted">
                     {trans('setup.config.writable.desc')}<br>
                     <div class="mt-3">
                         <details class="text-muted">
-                            <summary style="cursor: pointer;">🔧 Environment Details</summary>
+                            <summary class="cursor-pointer">🔧 Environment Details</summary>
                             <small class="mt-2 d-block">
                                 <strong>Detected Environment:</strong><br>
                                 • Web User: <code>{$env_info['web_user']}</code><br>
@@ -142,7 +142,7 @@
 
         {elseif $setup_step === 'database_config'}
             {* NEUE ERGÄNZUNG: Info über abgeschlossene Schritte *}
-            <div class="alert alert-info border-0" style="background-color: #e8f4fd;">
+            <div class="alert alert-info border-0 setup-info-bg">
                 <small class="text-primary">
                     <i class="bi bi-info-circle"></i> 
                     {trans('setup.steps.completed')}: {trans('setup.step1.short')} & {trans('setup.step2.short')}
@@ -185,7 +185,7 @@
 
         {elseif $setup_step === 'database_success'}
             <div class="text-center">
-                <i class="bi bi-check-circle text-success" style="font-size: 4rem;"></i>
+                <i class="bi bi-check-circle text-success font-4rem"></i>
                 <h4 class="mt-3 text-success">{trans('setup.database.success.title')}</h4>
                 <p class="text-muted">{trans('setup.database.success.desc')}</p>
                 <a href="/setup" class="btn btn-primary mt-3">
@@ -195,7 +195,7 @@
 
         {elseif $setup_step === 'mail_config'}
             {* NEUE ERGÄNZUNG: Info über abgeschlossene Schritte *}
-            <div class="alert alert-info border-0" style="background-color: #e8f4fd;">
+            <div class="alert alert-info border-0 setup-info-bg">
                 <small class="text-primary">
                     <i class="bi bi-info-circle"></i> 
                     {trans('setup.steps.completed')}: {trans('setup.step1.short')}, {trans('setup.step2.short')} & {trans('setup.step3.short')}
@@ -253,7 +253,7 @@
 
         {elseif $setup_step === 'complete'}
             <div class="text-center">
-                <i class="bi bi-check-circle text-success" style="font-size: 4rem;"></i>
+                <i class="bi bi-check-circle text-success font-4rem"></i>
                 <h4 class="mt-3 text-success">{trans('setup.complete.title')}</h4>
                 <p class="text-muted">{trans('setup.complete.desc')}</p>
                 
@@ -272,7 +272,7 @@
 
         {elseif $setup_step === 'error'}
             <div class="text-center">
-                <i class="bi bi-exclamation-triangle text-danger" style="font-size: 4rem;"></i>
+                <i class="bi bi-exclamation-triangle text-danger font-4rem"></i>
                 <h4 class="mt-3 text-danger">{trans('setup.error.title')}</h4>
                 <a href="/setup" class="btn btn-primary mt-3">
                     <i class="bi bi-arrow-clockwise"></i> {trans('setup.btn.try_again')}

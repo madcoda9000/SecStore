@@ -2,7 +2,7 @@
 
 {block content}
 
-<div class="container py-4" style="flex:1">
+<div class="container py-4 flex-container">
 
     <!-- Bootstrap Modal für Clear Violations Confirmation -->
     <div class="modal fade" id="confirmClearModal" tabindex="-1" aria-labelledby="confirmClearLabel" aria-hidden="true">
@@ -221,9 +221,9 @@
                                         <td class="text-center">{$count}</td>
                                         <td>
                                             {var $percentage = round(($count / $stats['total_violations']) * 100, 1)}
-                                            <div class="progress" style="height: 8px;">
+                                            <div class="progress height8px">
                                                 <div class="progress-bar" role="progressbar" 
-                                                     style="width: {$percentage}%" 
+                                                     data-width="{$percentage}" 
                                                      aria-valuenow="{$percentage}" aria-valuemin="0" aria-valuemax="100">
                                                 </div>
                                             </div>

@@ -3,13 +3,13 @@
 
 {block content}
 <div class="container">
-    <div class="card p-4 shadow-sm login-card shadow-lg" style="width: 100%; max-width: 450px;">
+    <div class="card p-4 shadow-sm login-card shadow-lg twofacard">
         
         {if $success}
             {* Erfolgreiche Verifizierung *}
             <div class="text-center">
                 <div class="verification-icon text-success mb-3">
-                    <i class="bi bi-check-circle-fill" style="font-size: 4rem;"></i>
+                    <i class="bi bi-check-circle-fill font4rem"></i>
                 </div>
                 <h3 class="text-success mb-3">{trans('verify.title')}</h3>
             </div>
@@ -37,7 +37,7 @@
             {* Fehlgeschlagene Verifizierung *}
             <div class="text-center">
                 <div class="verification-icon text-danger mb-3">
-                    <i class="bi bi-x-circle-fill" style="font-size: 4rem;"></i>
+                    <i class="bi bi-x-circle-fill font4rem"></i>
                 </div>
                 <h3 class="text-danger mb-3">{trans('verify.title')}</h3>
             </div>
@@ -78,7 +78,7 @@
         {/if}
 
         {* Sprachauswahl *}
-        <div class="p-3 mt-3" style="display:flex; flex-direction:column; justify-content:center; align-items:center;">
+        <div class="p-3 mt-3" id="twofaLangSel">
             <form method="get" action="">
                 <div class="dropdown">
                     <button class="btn btn-outline-none dropdown-toggle d-flex align-items-center gap-2" type="button" id="langMenu" data-bs-toggle="dropdown" aria-expanded="false">

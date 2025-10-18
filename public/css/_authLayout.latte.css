@@ -28,6 +28,62 @@ body {
   left: 50%;
   transform: translateX(-50%);
 }
+.card {
+  width: 100%; 
+  max-width: 500px;
+}
+#loader {
+  display:none;
+}
+#error-message {
+  color: #fff; 
+  display: none;
+}
+.register_links {
+  display:flex; 
+  flex-direction:column; 
+  justify-content:center; 
+  align-items:center; 
+  gap:5;
+}
+#register-messages {
+  display:none;
+}
+#login-messages {
+  display:none;
+}
+#login-session {
+  display:none;
+}
+.twofa-card {
+  width:100%; 
+  max-width:600px;
+}
+.copy-to-clipboard-link {
+  cursor: pointer;
+}
+#backupCodesDisplay {
+  background: white; 
+  border: 1px solid #dee2e6; 
+  border-radius: 4px; 
+  padding: 10px; 
+  margin: 0; 
+  font-family: 'Courier New', monospace; 
+  font-size: 14px;
+}
+#completeSetup {
+  display:flex; 
+  flex-direction:column; 
+  justify-content:center; 
+  align-items:center; 
+  gap:5;
+}
+#2fa-messages {
+  display: none;
+}
+#backup-codes-data {
+  display: none;
+}
 .login-card {
   background-color: var(--bs-tertiary-bg);
 }
@@ -39,6 +95,35 @@ body {
 .invalid-feedback {
   display: block;
 }
+.progress {
+  height: 8px;
+}
+.setup-info-bg {
+  background-color: #e8f4fd;
+}
+
+.progress-step-1 { width: 25%; }
+.progress-step-2 { width: 50%; }
+.progress-step-3 { width: 75%; }
+.progress-step-4 { width: 100%; }
+
+#twofaLangSel {
+  display:flex; flex-direction:column; justify-content:center; align-items:center; gap:5;
+}
+
+/**
+Utility classes
+*/
+.cursor-pointer {
+  cursor: pointer;
+}
+.font-4rem {
+  font-size: 4rem;
+}
+.util-text-muted {
+  font-size: 0.75rem;
+}
+
 @media (max-width: 576px) {
   .login-card {
     max-width: 90%;

@@ -4,7 +4,7 @@
 {block content}
 
 <div class="container">
-    <div class="card p-4 shadow-sm login-card shadow-lg" style="width: 100%; max-width: 400px;">
+    <div class="card p-4 shadow-sm login-card shadow-lg">
 
         <h3 class="text-center text-primary"><span class="bi bi-box-arrow-in-right text-primary"></span>&nbsp;{trans('login.title')}</h3>
         <form method="POST" action="/login" id="loginForm" class="mt-3">
@@ -61,7 +61,7 @@
             </div>
         {/ifset}
 
-        <div class="p-3" style="display:flex; flex-direction:column; justify-content:center; align-items:center; gap:5;">
+        <div class="p-3 register_links">
             {if $application["allowPublicPasswordReset"] == true}
                 <a href="/forgot-password">{trans('login.forgot')}</a>
             {/if}
@@ -102,14 +102,12 @@
 <div id="login-messages" 
      data-val1="{trans('login.msg.val1')}"
      data-val2="{trans('login.msg.val2')}"
-     data-val3="{trans('login.msg.val3')}"
-     style="display:none;">
+     data-val3="{trans('login.msg.val3')}">
 </div>
 
 {* LÖSUNG 2: Session-Timeout über data-Attribute *}
 <div id="login-session" 
-     data-timeout="{$sessionTimeout}"
-     style="display:none;">
+     data-timeout="{$sessionTimeout}">
 </div>
 
 {* EXTERNE SCRIPTS (CSP-konform) *}

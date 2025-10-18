@@ -22,7 +22,7 @@
 </div>
 
 <div class="container">
-    <div class="card p-4 shadow-sm login-card" style="width: 100%; max-width: 600px;">
+    <div class="card p-4 shadow-sm login-card twofa-card">
         <h3 class="text-primary"><span class="bi bi-file-lock2-fill text-primary"></span>&nbsp;{trans('2fasetup.title')}</h3>
         
         {* Step 1: QR Code *}
@@ -31,7 +31,7 @@
             <div class="text-center my-3">
                 <img n:attr="src => $qrCodeUrl" alt="QR Code">
             </div>
-            <p class="mt-3">{trans('2fasetup.subtitle2')} <strong><span id="mfasec">{$secret}</span></strong>&nbsp;&nbsp;<i class="bi-clipboard text-info" id="cpclpd" style="cursor:pointer;" title="copy to clipboard.."></i></p>
+            <p class="mt-3">{trans('2fasetup.subtitle2')} <strong><span id="mfasec">{$secret}</span></strong>&nbsp;&nbsp;<i class="bi-clipboard text-info copy-to-clipboard-link" id="cpclpd" title="copy to clipboard.."></i></p>
         </div>
 
         <hr class="my-4">
@@ -62,7 +62,7 @@
                         </button>
                     </div>
                 </div>
-                <pre id="backupCodesDisplay" style="background: white; border: 1px solid #dee2e6; border-radius: 4px; padding: 10px; margin: 0; font-family: 'Courier New', monospace; font-size: 14px;">{foreach $backupCodes as $index => $code}{$index + 1}. {$code}
+                <pre id="backupCodesDisplay">{foreach $backupCodes as $index => $code}{$index + 1}. {$code}
 {/foreach}</pre>
             </div>
         </div>
@@ -70,7 +70,7 @@
         <hr class="my-4">
 
         {* Step 3: Complete Setup *}
-        <div class="p-3" style="display:flex; flex-direction:column; justify-content:center; align-items:center; gap:5;">
+        <div id="completeSetup" class="p-3">
             <p><a class="btn btn-success btn-lg" href="/2fa-verify/true">{trans('2fasetup.completeSetup')}</a></p>
             <p><a href="/logout">{trans('2fasetup.cancelLink')}</a></p>
         </div>
@@ -80,12 +80,11 @@
 {* CSP-KONFORME LÖSUNG: Data-Attribute statt inline Script *}
 <div id="2fa-messages" 
      data-error1="{trans('2fasetup.msg.error1')}"
-     data-codes-copied="{trans('2fasetup.backupcodes.copied')}"
-     style="display:none;">
+     data-codes-copied="{trans('2fasetup.backupcodes.copied')}">
 </div>
 
 {* Hidden data for JavaScript *}
-<div id="backup-codes-data" style="display:none;">
+<div id="backup-codes-data">
 {foreach $backupCodes as $index => $code}
 {$index + 1}. {$code}
 {/foreach}

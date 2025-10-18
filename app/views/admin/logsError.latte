@@ -4,7 +4,7 @@
 
 <link rel="stylesheet" href="/css/mobile-logs.css">
 
-<div class="container py-4" style="flex:1">
+<div class="container py-4 flex-container">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1 class="mb-0"><span class="bi bi-shield-fill-exclamation">&nbsp;</span>{trans('logs.error.title')}</h1>
         <div>
@@ -33,7 +33,7 @@
     </div>
     
     <!-- lade indicator -->
-    <div id="loadingSpinner" style="display: none; text-align: center;">
+    <div id="loadingSpinner">
         <div class="spinner-border" role="status">
             <span class="visually-hidden">{trans('logs.loading')}</span>
         </div>
@@ -102,21 +102,21 @@
      data-confirm="{trans('logs.truncate.modal.confirm')}"
      data-success="{trans('logs.truncate.success')}"
      data-error="{trans('logs.truncate.error')}"
-     style="display:none;"></div>
+     class="d-none"></div>
 
 <!-- Data-Attribute für Messages -->
 <div id="log-messages" 
      data-msg4="{trans('pager.page')}"
      data-msg5="{trans('pager.of')}"
      data-msg6="{trans('logs.error1')}"
-     style="display:none;"></div>
+     class="d-none"></div>
 
 <!-- Data-Attribute für Config -->
 <div id="log-config" 
      data-type="error"
      data-fetch-url="/admin/logs/fetchErrorlogs"
      data-auto-fetch="true"
-     style="display:none;"></div>
+     class="d-none"></div>
 
 <!-- Externe Scripts -->
 <script src="/js/utils/logs-universal-min.js"></script>

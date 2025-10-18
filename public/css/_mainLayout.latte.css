@@ -89,6 +89,121 @@ body {
   background-color: var(--bs-danger-border-subtle) !important;
 }
 
+#modal-backup-codes-display {
+  border: 1px solid #dee2e6; 
+  border-radius: 4px; 
+  font-family: 'Courier New', monospace; 
+  font-size: 14px; 
+  max-height: 300px; 
+  overflow-y: auto;
+}
+
+#loadingSpinner {
+  display: none; text-align: center;
+}
+
+#phpInfoFrame {
+  width:100%;height:70vh;border:none;
+}
+
+#ip-whitelist {
+  font-size: 0.9rem;
+}
+.usersBackupTh {
+  min-width:50px !important;text-align:center;
+}
+
+.privacyCard {
+  max-width: 600px; width: 100%;
+}
+
+.twofacard {
+  width: 100%; max-width: 400px;
+}
+
+#twofaLangSel {
+  display:flex; flex-direction:column; justify-content:center; align-items:center; gap:5;
+}
+
+
+/* util classes */
+.display-none {
+  display:none;
+}
+.flex-container {
+  flex:1;
+}
+.bi-helper {
+  margin-right:15px;
+  margin-left:15px;
+}
+.no-border {
+  border:none !important;
+}
+.font4rem {
+  font-size: 4rem;
+}
+.width215 {
+  width:215px;
+}
+.width200 {
+  width:200px;
+}
+.width80 {
+  width:80px;
+}
+.width90 {
+  width:90px;
+}
+.width0 {
+  width: 0%;
+}
+.height20 {
+  height:20px;
+}
+.height8px {
+  height: 8px;;
+}
+.minHeight80vh {
+  min-height: 80vh;
+}
+.maxHeight400 {
+  max-height: 400px;
+}
+.padding-top15 {
+  padding-top:15px;
+}
+.padding10 {
+  padding:10px;
+}
+.marginr-10 {
+  margin-right: 10px;
+}
+.width60percent {
+  width: 60%;
+}
+.purple-bg {
+  background-color: var(--ds-background-accent-purple-bolder);
+}
+.teal-bg {
+  background-color: var(--ds-background-accent-teal-bolder);
+}
+.magenta-bg {
+  background-color: var(--ds-background-accent-magenta-bolder);
+}
+.word-break {
+  word-break: break-all;
+}
+.flex-shrink0 {
+  flex-shrink: 0;
+}
+.cursor-pointer {
+  cursor: pointer;
+}
+.muted-text {
+  color:var(--bs-secondary-text);
+}
+
 /* alert icons */
 svg.bi {
   width: 16px;
@@ -114,6 +229,14 @@ tr.selected {
 
 /* mobilen ansicht */
 @media (max-width: 767px) {
+  .search-container {
+    min-width: 100%;
+    max-width: 100%;
+  }
+  
+  .desktop-pager-label {
+    display: none;
+  }
   .footer .container {
     width: 95%;
   }

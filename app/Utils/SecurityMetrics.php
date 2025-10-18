@@ -118,9 +118,8 @@ class SecurityMetrics
             ->where('type', 'AUDIT')
             ->where_in('context', [
                 'AuthController/login',
-                'AuthController/verify2FA',
             ])
-            ->where_raw("message LIKE 'SUCCESS:%'")
+            ->where_raw("message LIKE '%Login successful%'")
             ->where_gte('datum_zeit', $dateFrom . ' 00:00:00')
             ->where_lt('datum_zeit', $dateTo . ' 23:59:59')
             ->count();
@@ -154,7 +153,7 @@ class SecurityMetrics
             ->where_in('context', [
                 'CsrfMiddleware/before',
             ])
-            ->where_raw("message LIKE '%CSRF token%' OR message LIKE '%token mismatch%'")
+            ->where_raw("message LIKE '%token mismatch%'")
             ->where_gte('datum_zeit', $dateFrom . ' 00:00:00')
             ->where_lt('datum_zeit', $dateTo . ' 23:59:59')
             ->count();
@@ -222,8 +221,8 @@ class SecurityMetrics
     {
         return ORM::for_table('logs')
             ->where('type', 'AUDIT')
-            ->where_in('context', ['AuthController/login', 'AuthController/verify2FA'])
-            ->where_raw("message LIKE 'SUCCESS:%'")
+            ->where_in('context', ['AuthController/login'])
+            ->where_raw("message LIKE '%Login successful%%'")
             ->where_gte('datum_zeit', $from)
             ->where_lt('datum_zeit', $to)
             ->count();

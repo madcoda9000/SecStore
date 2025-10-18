@@ -3,7 +3,7 @@
 
 {block content}
 <div class="container">
-        <div class="card p-4 shadow-sm login-card shadow-lg" style="width: 100%; max-width: 500px;">
+        <div class="card p-4 shadow-sm login-card shadow-lg">
             <h3 class="text-center text-primary"><span class="bi bi-person-fill-add"></span>&nbsp;{trans('register.title')}</h3>
             <form method="POST" action="/register" id="registerForm" class="mt-3">
                 <input type="hidden" name="csrf_token" value="{$_SESSION['csrf_token']}">
@@ -31,12 +31,12 @@
                 <!-- add to css class to disable button if smtp connect error: {if !$smtpInvalid}btn-primary{/if}w-100 {if $smtpInvalid}btn-outline-primary{/if} -->
                 <!-- add to button element to disable if smtp connect erroe:  {if $smtpInvalid}disabled{/if} -->
                 <button type="submit" class="btn btn-primary w-100"  id="submitButton">
-                    <span id="loader" style="display:none;" class="btnloader"></span> 
+                    <span id="loader" class="btnloader"></span> 
                     {trans('register.submit')}
                 </button>
             </form>
             
-            <div id="error-message" style="color: #fff; display: none;"></div>
+            <div id="error-message"></div>
             
             {ifset $error}
             <div class="alert alert-danger mt-3" role="alert">
@@ -62,7 +62,7 @@
                 </div>
             {/ifset}
             
-            <div class="p-3" style="display:flex; flex-direction:column; justify-content:center; align-items:center; gap:5;">
+            <div class="p-3 register_links">
             <a href="/login">{trans('register.loginLink')}</a>
             <form method="get" action="" class="mt-3">
                     <div class="dropdown">
@@ -100,8 +100,7 @@
      data-val3="{trans('register.msg.val3')}"
      data-val4="{trans('register.msg.val4')}"
      data-val5="{trans('register.msg.val5')}"
-     data-val6="{trans('register.msg.val6')}"
-     style="display:none;">
+     data-val6="{trans('register.msg.val6')}">
 </div>
 
 {* EXTERNE SCRIPTS (CSP-konform) *}

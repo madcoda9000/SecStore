@@ -13,7 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [1.4.0] - 2025-10-12
+## [1.4.0] - 2025-10-16
 ### ✨ Added
 - **finished implementing MailScheduler**
 - **started implementing mail scheduler backround service**
@@ -25,6 +25,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 
 ### 🐛 Fixed
+- **Updated setup script to support debian**
 - **various mail scheduler fixes**
 - **fixed various translation typos and imports**
 - **fixed various js errors**

@@ -1,7 +1,7 @@
 {extends '../_mainLayout.latte'}
 
 {block content}
-<div class="container py-4" style="flex:1">
+<div class="container py-4 flex-container">
     <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
         <h1 class="mb-0">
             <span class="bi bi-info-circle-fill"></span>
@@ -76,7 +76,7 @@
                     <table class="table table-sm table-borderless">
                         <tbody>
                             <tr>
-                                <th style="width: 60%">{trans('system_info.php.version')}:</th>
+                                <th class="width60percent">{trans('system_info.php.version')}:</th>
                                 <td><span class="badge bg-success" data-field="php.version">{$systemInfo['php']['version']}</span></td>
                             </tr>
                             <tr>
@@ -116,7 +116,7 @@
                     <table class="table table-sm table-borderless">
                         <tbody>
                             <tr>
-                                <th style="width: 60%">{trans('system_info.disk.total')}:</th>
+                                <th class="width60percent">{trans('system_info.disk.total')}:</th>
                                 <td data-field="disk.total">{$systemInfo['disk']['total']}</td>
                             </tr>
                             <tr>
@@ -134,11 +134,11 @@
                             <span>{trans('system_info.disk.usage_percent')}:</span>
                             <span><strong><span data-field="disk.usage_percent">{$systemInfo['disk']['usage_percent']}</span>%</strong></span>
                         </div>
-                        <div class="progress" style="height: 20px;">
+                        <div class="progress" class="height20">
                             <div class="progress-bar" 
                                  id="diskProgressBar"
                                  role="progressbar" 
-                                 style="width: {$systemInfo['disk']['usage_percent']}%" 
+                                 data-width="{$systemInfo['disk']['usage_percent']}"
                                  data-usage="{$systemInfo['disk']['usage_percent']}">
                                 <span data-field="disk.usage_percent">{$systemInfo['disk']['usage_percent']}</span>%
                             </div>
@@ -159,7 +159,7 @@
                         <table class="table table-sm table-borderless">
                             <tbody>
                                 <tr>
-                                    <th style="width: 60%">{trans('system_info.memory.total')}:</th>
+                                    <th class="width60percent">{trans('system_info.memory.total')}:</th>
                                     <td data-field="memory.total">{$systemInfo['memory']['total']}</td>
                                 </tr>
                                 <tr>
@@ -186,14 +186,14 @@
         {* Session Statistics *}
         <div class="col-md-6 col-lg-4">
             <div class="card h-100">
-                <div class="card-header text-white" style="background-color: var(--ds-background-accent-purple-bolder);">
+                <div class="card-header text-white purple-bg">
                     <h5 class="mb-0"><i class="bi bi-person-check-fill"></i> {trans('system_info.sessions.title')}</h5>
                 </div>
                 <div class="card-body">
                     <table class="table table-sm table-borderless mb-0">
                         <tbody>
                             <tr>
-                                <th style="width: 60%">{trans('system_info.sessions.active')}:</th>
+                                <th class="width60percent">{trans('system_info.sessions.active')}:</th>
                                 <td><span class="badge bg-success" data-field="sessions.active">{$systemInfo['sessions']['active']}</span></td>
                             </tr>
                             <tr>
@@ -208,8 +208,8 @@
                     </table>
                 </div>
                 <div class="card-footer bg-light">
-                    <small class="text-muted d-flex align-items-start" style="word-break: break-all;">
-                        <i class="bi bi-folder me-1 mt-1" style="flex-shrink: 0;"></i>
+                    <small class="text-muted d-flex align-items-start word-break">
+                        <i class="bi bi-folder me-1 mt-1 flex-shrink0"></i>
                         <span data-field="sessions.path">{$systemInfo['sessions']['path']}</span>
                     </small>
                 </div>
@@ -219,14 +219,14 @@
         {* Cache Information *}
         <div class="col-md-6 col-lg-4">
             <div class="card h-100">
-                <div class="card-header text-white" style="background-color: var(--ds-background-accent-teal-bolder);">
+                <div class="card-header text-white teal-bg">
                     <h5 class="mb-0"><i class="bi bi-lightning-charge-fill"></i> {trans('system_info.cache.title')}</h5>
                 </div>
                 <div class="card-body">
                     <table class="table table-sm table-borderless mb-0">
                         <tbody>
                             <tr>
-                                <th style="width: 60%">{trans('system_info.cache.files')}:</th>
+                                <th class="width60percent">{trans('system_info.cache.files')}:</th>
                                 <td data-field="cache.files">{$systemInfo['cache']['files']}</td>
                             </tr>
                             <tr>
@@ -237,8 +237,8 @@
                     </table>
                 </div>
                 <div class="card-footer bg-light">
-                    <small class="text-muted d-flex align-items-start" style="word-break: break-all;">
-                        <i class="bi bi-folder me-1 mt-1" style="flex-shrink: 0;"></i>
+                    <small class="text-muted d-flex align-items-start word-break">
+                        <i class="bi bi-folder me-1 mt-1 flex-shrink0"></i>
                         <span data-field="cache.path">{$systemInfo['cache']['path']}</span>
                     </small>
                 </div>
@@ -248,14 +248,14 @@
         {* Process Information *}
         <div class="col-md-6 col-lg-4">
             <div class="card h-100">
-                <div class="card-header text-white" style="background-color: var(--ds-background-accent-magenta-bolder);">
+                <div class="card-header text-white magenta-bg"">
                     <h5 class="mb-0"><i class="bi bi-cpu-fill"></i> {trans('system_info.process.title')}</h5>
                 </div>
                 <div class="card-body">
                     <table class="table table-sm table-borderless">
                         <tbody>
                             <tr>
-                                <th style="width: 60%">{trans('system_info.process.pid')}:</th>
+                                <th class="width60percent">{trans('system_info.process.pid')}:</th>
                                 <td data-field="process.pid">{$systemInfo['process']['pid']}</td>
                             </tr>
                             <tr>
@@ -286,7 +286,7 @@
                     <table class="table table-sm table-borderless">
                         <tbody>
                             <tr>
-                                <th style="width: 60%">{trans('system_info.server.software')}:</th>
+                                <th class="width60percent">{trans('system_info.server.software')}:</th>
                                 <td><small data-field="server.software">{$systemInfo['server']['software']}</small></td>
                             </tr>
                             <tr>
@@ -317,7 +317,7 @@
                     <table class="table table-sm table-borderless">
                         <tbody>
                             <tr>
-                                <th style="width: 60%">{trans('system_info.database.name')}:</th>
+                                <th class="width60percent">{trans('system_info.database.name')}:</th>
                                 <td data-field="database.name">{$systemInfo['database']['name']}</td>
                             </tr>
                             <tr>
@@ -344,7 +344,7 @@
                     <table class="table table-sm table-borderless">
                         <tbody>
                             <tr>
-                                <th style="width: 60%">{trans('system_info.app.version')}:</th>
+                                <th class="width60percent">{trans('system_info.app.version')}:</th>
                                 <td><span class="badge bg-primary" data-field="app.version">{$systemInfo['app']['version']}</span></td>
                             </tr>
                             <tr>
@@ -372,7 +372,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
-                <iframe id="phpInfoFrame" style="width:100%;height:70vh;border:none;"></iframe>
+                <iframe id="phpInfoFrame"></iframe>
             </div>
         </div>
     </div>

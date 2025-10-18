@@ -3,7 +3,7 @@
 
 {block content}
     <!-- Main Content -->
-    <div class="container py-4" style="flex:1">        
+    <div class="container py-4 flex-container">        
         {* Warning for low backup codes after login with backup code *}
         {if isset($backupCodesWarning) && $backupCodesWarning !== null}
         <div class="alert alert-warning alert-dismissible fade show" role="alert">

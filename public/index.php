@@ -214,7 +214,7 @@ Flight::before('start', function () use ($app) {
     // $app->response()->header("Content-Security-Policy", "default-src 'self' 'unsafe-inline'; img-src data: w3.org/svg/2000:img-src 'self'; style-src 'self' 'unsafe-inline'");
     
     // Option 1: Report-Only Mode for testing
-    $app->response()->header("Content-Security-Policy", "default-src 'self'; img-src data: w3.org/svg/2000 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'");
+    $app->response()->header("Content-Security-Policy", "default-src 'self'; img-src data: w3.org/svg/2000 'self'; script-src 'self'; style-src 'self'");
 
     // Option 2: on successful testing, switch to enforcing mode.
     //$app->response()->header("Content-Security-Policy", "default-src 'self'; img-src data: w3.org/svg/2000 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'");

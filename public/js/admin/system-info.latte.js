@@ -17,6 +17,11 @@ document.addEventListener('DOMContentLoaded', function() {
     let autoRefreshEnabled = false;
     let autoRefreshInterval = null;
 
+    document.querySelectorAll('.progress-bar[data-width]').forEach(bar => {
+        const width = bar.getAttribute('data-width');
+        bar.style.width = width + '%';
+    });
+
     /**
      * Manual refresh (Desktop + Mobile)
      */

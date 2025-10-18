@@ -2,7 +2,7 @@
 
 {block content}
 
-<div class="container py-4" style="flex:1" 
+<div class="container py-4 flex-container" 
      data-messages-save-success="{trans('rate_limit.save_success')}"
      data-messages-save-error="{trans('rate_limit.save_error')}"
      data-messages-reset-confirm="{trans('rate_limit.reset_confirm')}"
@@ -158,16 +158,16 @@
                                             <small class="text-muted">{$description}</small>
                                         </td>
                                         <td class="text-center">
-                                            <input type="number" class="form-control form-control-sm text-center" 
+                                            <input type="number" class="width80 form-control form-control-sm text-center" 
                                                    name="limits[{$limitType}][requests]" 
                                                    value="{$config['limits'][$limitType]['requests'] ?? 0}" 
-                                                   min="1" max="10000" style="width: 80px;">
+                                                   min="1" max="10000">
                                         </td>
                                         <td class="text-center">
-                                            <input type="number" class="form-control form-control-sm text-center" 
+                                            <input type="number" class="width90 form-control form-control-sm text-center" 
                                                    name="limits[{$limitType}][window]" 
                                                    value="{$config['limits'][$limitType]['window'] ?? 3600}" 
-                                                   min="60" max="86400" style="width: 90px;">
+                                                   min="60" max="86400">
                                         </td>
                                         <td class="text-center">
                                             {if isset($status[$limitType])}

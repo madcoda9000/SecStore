@@ -35,6 +35,11 @@ document.addEventListener("DOMContentLoaded", function () {
     search: "",
   };
 
+  document.querySelectorAll('.progress-bar[data-width]').forEach(bar => {
+        const width = bar.getAttribute('data-width');
+        bar.style.width = width + '%';
+    });
+
   // Initialize
   init();
 

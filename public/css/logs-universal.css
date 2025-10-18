@@ -1,0 +1,143 @@
+/**
+ * Logs Universal Styles
+ * CSP-compliant CSS for logs-universal.js
+ */
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   ICON SIZES (used in error/info messages)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+.icon-2rem {
+    font-size: 2rem !important;
+    margin-bottom: 0.5rem;
+    display: block;
+}
+
+.icon-3rem {
+    font-size: 3rem !important;
+    margin-bottom: 1rem;
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   MOBILE LOG CARDS
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+.log-mobile-card {
+    border-radius: 12px;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    min-height: 140px;
+}
+
+.log-mobile-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1) !important;
+}
+
+/* Log Type Cards - Border Colors */
+.log-card-audit {
+    border-left: 3px solid #0d6efd !important;
+}
+
+.log-card-security {
+    border-left: 3px solid #dc3545 !important;
+}
+
+.log-card-error {
+    border-left: 3px solid #ffc107 !important;
+}
+
+.log-card-system {
+    border-left: 3px solid #0dcaf0 !important;
+}
+
+.log-card-sql {
+    border-left: 3px solid #198754 !important;
+}
+
+.log-card-mail {
+    border-left: 3px solid #6c757d !important;
+}
+
+.log-card-request {
+    border-left: 3px solid #212529 !important;
+}
+
+/* Log Type Badges */
+.log-badge-audit {
+    background-color: #0d6efd !important;
+    color: white !important;
+}
+
+.log-badge-security {
+    background-color: #dc3545 !important;
+    color: white !important;
+}
+
+.log-badge-error {
+    background-color: #ffc107 !important;
+    color: #000 !important;
+}
+
+.log-badge-system {
+    background-color: #0dcaf0 !important;
+    color: #000 !important;
+}
+
+.log-badge-sql {
+    background-color: #198754 !important;
+    color: white !important;
+}
+
+.log-badge-mail {
+    background-color: #6c757d !important;
+    color: white !important;
+}
+
+.log-badge-request {
+    background-color: #212529 !important;
+    color: white !important;
+}
+
+.badge-lg {
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   TOAST NOTIFICATIONS
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+.toast-notification {
+    top: 20px;
+    right: 20px;
+    z-index: 9999;
+    min-width: 300px;
+    max-width: 500px;
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   NO LOGS MESSAGE
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+.no-logs-message {
+    padding: 2rem 0;
+}
+
+.no-logs-message i {
+    opacity: 0.5;
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   TEXT SIZES
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+.x-small {
+    font-size: 0.75rem;
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   SCOPED UTILITIES - Only for log-specific elements
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+
+/* NO OVERRIDES - Bootstrap handles d-none, d-block, mb-3 */
