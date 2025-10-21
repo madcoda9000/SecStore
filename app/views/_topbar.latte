@@ -10,15 +10,15 @@
         <div class="d-none d-lg-flex w-100 justify-content-between align-items-center">
           <ul class="navbar-nav">
             <li class="nav-item">
-              <i class="bi bi-house-fill text-light"></i>&nbsp;<a class="nav-link" href="/home">{trans('menu.home')}</a>
+              {include 'components/icons.latte', icon => 'home', class => 'text-light'}&nbsp;<a class="nav-link" href="/home">{trans('menu.home')}</a>
             </li>
 
             {if in_array('Admin', explode(',', $user->roles))}
             <li class="nav-item">
-              <i class="bi bi-gear-fill text-light"></i>&nbsp;<a class="nav-link" href="/admin/settings">{trans('menu.settings')}</a>
+              {include 'components/icons.latte', icon => 'gear', class => 'text-light'}&nbsp;<a class="nav-link" href="/admin/settings">{trans('menu.settings')}</a>
             </li>
             <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle" href="#" id="desktopAdmin" role="button" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi bi-incognito text-light"></i>&nbsp;{trans('menu.admin')}</a>
+              <a class="nav-link dropdown-toggle" href="#" id="desktopAdmin" role="button" data-bs-toggle="dropdown" aria-expanded="false">{include 'components/icons.latte', icon => 'incognito', class => 'text-light'}&nbsp;{trans('menu.admin')}</a>
               <ul class="dropdown-menu" aria-labelledby="desktopAdmin">
                 <li><a class="dropdown-item" href="/admin/users">{trans('menu.admin.users')}</a></li>
                 <li><a class="dropdown-item" href="/admin/showRoles">{trans('menu.admin.roles')}</a></li>
@@ -29,7 +29,7 @@
               </ul>
             </li>
             <li class="nav-item dropdown">
-                  <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown2" role="button" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi bi-list-columns-reverse text-light"></i>&nbsp;{trans('menu.logs')}</a>
+                  <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown2" role="button" data-bs-toggle="dropdown" aria-expanded="false">{include 'components/icons.latte', icon => 'list-columns', class => 'text-light'}&nbsp;{trans('menu.logs')}</a>
                   <ul class="dropdown-menu" aria-labelledby="navbarDropdown2">
                     <li><a class="dropdown-item" href="/admin/logsAudit">{trans('menu.logs.access')}</a></li>
                     <li><a class="dropdown-item" href="/admin/logsRequest">{trans('menu.logs.request')}</a></li>
@@ -73,7 +73,7 @@
             <button class="btn btn-link nav-link w-100 text-start" type="button"
                     data-bs-toggle="collapse" data-bs-target="#mobileAdminCollapse"
                     aria-expanded="false" aria-controls="mobileAdminCollapse">
-              {trans('menu.admin')}&nbsp;<i class="bi bi-caret-down-fill text-subtle"></i>
+              {trans('menu.admin')}&nbsp;{include 'components/icons.latte', icon => 'caret-down', class => 'text-subtle'}
             </button>
             <div class="collapse mobile-submenu" id="mobileAdminCollapse">
               <ul class="list-unstyled">
@@ -89,7 +89,7 @@
             <button class="btn btn-link nav-link w-100 text-start" type="button"
                     data-bs-toggle="collapse" data-bs-target="#mobileLogsCollapse"
                     aria-expanded="false" aria-controls="mobileLogsCollapse">
-              {trans('menu.logs')}&nbsp;<i class="bi bi-caret-down-fill text-subtle"></i>
+              {trans('menu.logs')}&nbsp;{include 'components/icons.latte', icon => 'caret-down', class => 'text-subtle'}
             </button>
             <div class="collapse mobile-submenu ml-3" id="mobileLogsCollapse">
               <ul class="list-unstyled">
@@ -107,20 +107,20 @@
 
           <!-- Darkmode + user links can live here too for mobile -->
           <li class="nav-item mt-5">
-            <a class="nav-link" href="/profile"><i class="bi bi-person-fill text-primary"></i>&nbsp;{trans('menu.profile')}</a>
+            <a class="nav-link" href="/profile">{include 'components/icons.latte', icon => 'person', class => 'text-primary'}&nbsp;{trans('menu.profile')}</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="/privacy"><i class="bi bi-shield-lock-fill text-primary"></i>&nbsp;{trans('menu.privacy')}</a>
+            <a class="nav-link" href="/privacy">{include 'components/icons.latte', icon => 'shield-lock', class => 'text-primary'}&nbsp;{trans('menu.privacy')}</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="/logout"><i class="bi bi-box-arrow-right text-primary"></i>&nbsp;{trans('menu.logout')}</a>
+            <a class="nav-link" href="/logout">{include 'components/icons.latte', icon => 'box-arrow-right', class => 'text-primary'}&nbsp;{trans('menu.logout')}</a>
           </li>
         </ul>
       </div>
     </div>
     <div class="d-flex align-items-center">
-      <button id="darkmodeToggle" class="btn me-2">
-        <i id="darkmodeIcon" class="bi-sun text-light"></i>
+      <button id="darkmodeToggle" class="btn me-2" aria-label="Toggle dark mode">
+        <span id="darkmodeIcon"></span>
       </button>
     </div>
 </nav>

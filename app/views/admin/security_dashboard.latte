@@ -7,7 +7,7 @@
 
 <div class="container py-4 flex-container">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1><i class="bi bi-shield-check text-success"></i> Security Dashboard <small class="text-muted fs-6">(Updated: {date('H:i:s')})</small></h1>
+        <h1><i>{include '../components/icons.latte', icon => 'shield-check', class => "text-success", size => '32'}</i> Security Dashboard <small class="text-muted fs-6">(Updated: {date('H:i:s')})</small></h1>
         <div>
             <span class="badge bg-{if $metrics['security_score'] >= 80}success{elseif $metrics['security_score'] >= 60}warning{else}danger{/if} fs-6">
                 Security Score: {$metrics['security_score']}%
@@ -22,7 +22,7 @@
             <div class="card border-warning">
                 <div class="card-header bg-warning text-dark">
                     <h5 class="card-title mb-0">
-                        <i class="bi bi-exclamation-triangle"></i> Security Alerts
+                        <i>{include '../components/icons.latte', icon => 'exclamation-triangle', size => '14'}</i> Security Alerts
                     </h5>
                 </div>
                 <div class="card-body">
@@ -84,33 +84,33 @@
             <div class="card h-100">
                 <div class="card-header">
                     <h5 class="mb-0">
-                        <i class="bi bi-graph-up"></i> Security Events
+                        <i>{include '../components/icons.latte', icon => 'graph-up', size => '16'}</i> Security Events
                     </h5>
                 </div>
                 <div class="card-body d-flex flex-column">
                     <div class="flex-grow-1">
                         <div class="d-flex justify-content-between align-items-center py-1">
-                            <span><i class="bi bi-check-circle text-success"></i> Successful Logins</span>
+                            <span><i>{include '../components/icons.latte', icon => 'check-circle', class => "text-success", size => '14'}</i> Successful Logins</span>
                             <span class="badge bg-success">{$summary['successful_logins']}</span>
                         </div>
                         <div class="d-flex justify-content-between align-items-center py-1">
-                            <span><i class="bi bi-x-circle text-danger"></i> Failed Logins</span>
+                            <span><i>{include '../components/icons.latte', icon => 'x-circle', class => "text-danger", size => '14'}</i> Failed Logins</span>
                             <span class="badge bg-danger">{$summary['failed_logins']}</span>
                         </div>
                         <div class="d-flex justify-content-between align-items-center py-1">
-                            <span><i class="bi bi-key text-secondary"></i> Password Resets</span>
+                            <span><i>{include '../components/icons.latte', icon => 'key', class => "text-secondary", size => '14'}</i> Password Resets</span>
                             <span class="badge bg-secondary">{$summary['password_resets']}</span>
                         </div>
                         <div class="d-flex justify-content-between align-items-center py-1">
-                            <span><i class="bi bi-person-plus text-info"></i> New Registrations</span>
+                            <span><i>{include '../components/icons.latte', icon => 'person-plus', class => "text-info", size => '14'}</i> New Registrations</span>
                             <span class="badge bg-info">{$summary['new_registrations']}</span>
                         </div>
                         <div class="d-flex justify-content-between align-items-center py-1">
-                            <span><i class="bi bi-shield-exclamation text-warning"></i> CSRF Violations</span>
+                            <span><i>{include '../components/icons.latte', icon => 'shield-exclamation', class => "text-warning", size => '14'}</i> CSRF Violations</span>
                             <span class="badge bg-warning">{$summary['csrf_violations']}</span>
                         </div>
                         <div class="d-flex justify-content-between align-items-center py-1">
-                            <span><i class="bi bi-speedometer text-warning"></i> Rate Limit Hits</span>
+                            <span><i>{include '../components/icons.latte', icon => 'speedometer', class => "text-warning", size => '14'}</i> Rate Limit Hits</span>
                             <span class="badge bg-warning">{$summary['rate_limit_hits']}</span>
                         </div>
                     </div>
@@ -122,13 +122,13 @@
             <div class="card h-100">
                 <div class="card-header">
                     <h5 class="mb-0">
-                        <i class="bi bi-exclamation-triangle text-warning"></i> Suspicious Activity
+                        <i>{include '../components/icons.latte', icon => 'exclamation-triangle-fill', class => "text-warning", size => '16'}</i> Suspicious Activity
                     </h5>
                 </div>
                 <div class="card-body d-flex flex-column justify-content-center">
                     {if $summary['suspicious_activity']['suspicious_ips'] > 0}
                         <div class="alert alert-danger">
-                            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                            <i class="me-2">{include '../components/icons.latte', icon => 'exclamation-triangle-fill', class => "text-danger", size => '16'}</i>
                             <strong>{$summary['suspicious_activity']['suspicious_ips']} suspicious IP(s) detected</strong>
                             <div class="mt-2 small">
                                 {foreach $summary['suspicious_activity']['ips'] as $ip}
@@ -138,7 +138,7 @@
                         </div>
                     {else}
                         <div class="alert alert-success text-center">
-                            <i class="bi bi-check-circle-fill me-2"></i>
+                            <i class="me-2">{include '../components/icons.latte', icon => 'check-circle-fill', class => "text-success", size => '16'}</i>
                             No suspicious activity detected
                         </div>
                     {/if}
@@ -153,32 +153,32 @@
             <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h5 class="mb-0">
-                        <i class="bi bi-graph-up"></i> Login Analytics
+                        <i>{include '../components/icons.latte', icon => 'graph-up', size => '14'}</i> Login Analytics
                     </h5>
                     <button class="btn btn-sm btn-outline-primary" id="refreshAnalyticsBtn">
-                        <i class="bi bi-arrow-clockwise"></i> Refresh
+                        <span>{include '../components/icons.latte', icon => 'arrow-clockwise', size => '14'} Refresh</span>
                     </button>
                 </div>
-                <div class="card-body">
+                <div class="card-body logAnalytics">
                     <ul class="nav nav-tabs" role="tablist">
                         <li class="nav-item" role="presentation">
                             <button class="nav-link active" id="heatmap-tab" data-bs-toggle="tab" data-bs-target="#heatmap" type="button" role="tab">
-                                <i class="bi bi-fire"></i> Activity Heatmap
+                                <i>{include '../components/icons.latte', icon => 'fire', size => '14'}</i> Activity Heatmap
                             </button>
                         </li>
                         <li class="nav-item" role="presentation">
                             <button class="nav-link" id="hourly-tab" data-bs-toggle="tab" data-bs-target="#hourly" type="button" role="tab">
-                                <i class="bi bi-clock-history"></i> Hourly Distribution
+                                <i>{include '../components/icons.latte', icon => 'clock-history', size => '14'}</i> Hourly Distribution
                             </button>
                         </li>
                         <li class="nav-item" role="presentation">
                             <button class="nav-link" id="weekly-tab" data-bs-toggle="tab" data-bs-target="#weekly" type="button" role="tab">
-                                <i class="bi bi-calendar-week"></i> Weekly Trends
+                                <i>{include '../components/icons.latte', icon => 'calendar-week', size => '14'}</i> Weekly Trends
                             </button>
                         </li>
                         <li class="nav-item" role="presentation">
                             <button class="nav-link" id="patterns-tab" data-bs-toggle="tab" data-bs-target="#patterns" type="button" role="tab">
-                                <i class="bi bi-exclamation-triangle"></i> Unusual Patterns
+                                <i>{include '../components/icons.latte', icon => 'exclamation-triangle', size => '14'}</i> Unusual Patterns
                             </button>
                         </li>
                     </ul>
@@ -217,16 +217,16 @@
                 <div class="card-body">
                     <div class="btn-group" role="group">
                         <a href="/admin/logsAudit" class="btn btn-outline-primary">
-                            <i class="bi bi-journal-text"></i> View Audit Logs
+                            <i>{include '../components/icons.latte', icon => 'journal-text', size => '14'}</i> View Audit Logs
                         </a>
                         <a href="/admin/users" class="btn btn-outline-secondary">
-                            <i class="bi bi-people"></i> Manage Users
+                            <i>{include '../components/icons.latte', icon => 'people', size => '14'}</i> Manage Users
                         </a>
                         <a href="/admin/settings" class="btn btn-outline-info">
-                            <i class="bi bi-gear"></i> Security Settings
+                            <i>{include '../components/icons.latte', icon => 'gear', size => '14'}</i> Security Settings
                         </a>
                         <button class="btn btn-outline-success" id="refreshMetricsBtn">
-                            <i class="bi bi-arrow-clockwise"></i> Refresh Data
+                            <i>{include '../components/icons.latte', icon => 'arrow-clockwise', size => '14'}</i> Refresh Data
                         </button>
                     </div>
                 </div>

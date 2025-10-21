@@ -4,29 +4,27 @@
 <div class="container py-4 flex-container">
     <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
         <h1 class="mb-0">
-            <span class="bi bi-info-circle-fill"></span>
-            <span class="d-none d-md-inline">&nbsp;{trans('system_info.title')}</span>
+            <span>{include '../components/icons.latte', icon => 'info-circle-fill', size => '36'}&nbsp;{trans('system_info.title')}</span>
         </h1>
         
         {* Button-Gruppe für Desktop *}
         <div class="btn-group d-none d-lg-flex" role="group">
             <button class="btn btn-outline-secondary" id="toggleAutoRefresh">
-                <i class="bi bi-arrow-repeat"></i> 
-                <span id="autoRefreshText">{trans('system_info.auto_refresh')}</span>
+                <span id="autoRefreshText">{include '../components/icons.latte', icon => 'arrow-repeat', size => '14'} {trans('system_info.auto_refresh')}</span>
             </button>
             <button class="btn btn-primary" id="refreshBtn">
-                <i class="bi bi-arrow-clockwise"></i> {trans('system_info.refresh')}
+                {include '../components/icons.latte', icon => 'arrow-clockwise', size => '14'} {trans('system_info.refresh')}
             </button>
             <div class="btn-group">
                 <button type="button" class="btn btn-success dropdown-toggle" data-bs-toggle="dropdown">
-                    <i class="bi bi-download"></i> {trans('system_info.export.title')}
+                    {include '../components/icons.latte', icon => 'download', size => '14'} {trans('system_info.export.title')}
                 </button>
                 <ul class="dropdown-menu dropdown-menu-end">
                     <li><a class="dropdown-item" href="/admin/system-info/export?format=json">
-                        <i class="bi bi-filetype-json"></i> {trans('system_info.export.json')}
+                        {include '../components/icons.latte', icon => 'filetype-json', size => '14'} {trans('system_info.export.json')}
                     </a></li>
                     <li><a class="dropdown-item" href="/admin/system-info/export?format=text">
-                        <i class="bi bi-filetype-txt"></i> {trans('system_info.export.text')}
+                        {include '../components/icons.latte', icon => 'filetype-txt', size => '14'} {trans('system_info.export.text')}
                     </a></li>
                 </ul>
             </div>
@@ -36,33 +34,32 @@
         <div class="d-flex d-lg-none gap-1" role="group">
             <button class="btn btn-sm btn-outline-secondary" id="toggleAutoRefreshMobile" 
                     data-bs-toggle="tooltip" title="{trans('system_info.auto_refresh')}">
-                <i class="bi bi-arrow-repeat"></i>
+                {include '../components/icons.latte', icon => 'arrow-repeat', size => '14'}
             </button>
             <button class="btn btn-sm btn-primary" id="refreshBtnMobile"
                     data-bs-toggle="tooltip" title="{trans('system_info.refresh')}">
-                <i class="bi bi-arrow-clockwise"></i>
+                {include '../components/icons.latte', icon => 'arrow-clockwise', size => '14'}
             </button>
             <div class="btn-group">
                 <button type="button" class="btn btn-sm btn-success dropdown-toggle" 
                         data-bs-toggle="dropdown"
                         title="{trans('system_info.export.title')}">
-                    <i class="bi bi-download"></i>
+                    {include '../components/icons.latte', icon => 'download', size => '14'}
                 </button>
                 <ul class="dropdown-menu dropdown-menu-end">
                     <li><a class="dropdown-item" href="/admin/system-info/export?format=json">
-                        <i class="bi bi-filetype-json"></i> {trans('system_info.export.json')}
+                        {include '../components/icons.latte', icon => 'filetype-json', size => '14'} {trans('system_info.export.json')}
                     </a></li>
                     <li><a class="dropdown-item" href="/admin/system-info/export?format=text">
-                        <i class="bi bi-filetype-txt"></i> {trans('system_info.export.text')}
+                        {include '../components/icons.latte', icon => 'filetype-txt', size => '14'} {trans('system_info.export.text')}
                     </a></li>
                 </ul>
             </div>
         </div>
     </div>
 
-    <div class="alert alert-info mb-4">
-        <i class="bi bi-clock"></i> 
-        <span id="lastUpdated">{trans('system_info.last_updated')}: {date('Y-m-d H:i:s')}</span>
+    <div class="alert alert-info mb-4">        
+        <span id="lastUpdated">{include '../components/icons.latte', icon => 'clock', size => '14'} {trans('system_info.last_updated')}: {date('Y-m-d H:i:s')}</span>
     </div>
 
     <div class="row g-3" id="systemInfoContainer">
@@ -70,7 +67,7 @@
         <div class="col-md-6 col-lg-4">
             <div class="card h-100">
                 <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0"><i class="bi bi-filetype-php"></i> {trans('system_info.php.title')}</h5>
+                    <h5 class="mb-0">{include '../components/icons.latte', icon => 'filetype-php', size => '18'} {trans('system_info.php.title')}</h5>
                 </div>
                 <div class="card-body">
                     <table class="table table-sm table-borderless">
@@ -110,7 +107,7 @@
         <div class="col-md-6 col-lg-4">
             <div class="card h-100">
                 <div class="card-header bg-warning text-dark">
-                    <h5 class="mb-0"><i class="bi bi-hdd-fill"></i> {trans('system_info.disk.title')}</h5>
+                    <h5 class="mb-0">{include '../components/icons.latte', icon => 'hdd-fill', size => '18'}{trans('system_info.disk.title')}</h5>
                 </div>
                 <div class="card-body">
                     <table class="table table-sm table-borderless">
@@ -152,7 +149,7 @@
         <div class="col-md-6 col-lg-4">
             <div class="card h-100">
                 <div class="card-header bg-info text-white">
-                    <h5 class="mb-0"><i class="bi bi-memory"></i> {trans('system_info.memory.title')}</h5>
+                    <h5 class="mb-0">{include '../components/icons.latte', icon => 'memory', size => '18'} {trans('system_info.memory.title')}</h5>
                 </div>
                 <div class="card-body">
                     {if $systemInfo['memory']}
@@ -187,7 +184,7 @@
         <div class="col-md-6 col-lg-4">
             <div class="card h-100">
                 <div class="card-header text-white purple-bg">
-                    <h5 class="mb-0"><i class="bi bi-person-check-fill"></i> {trans('system_info.sessions.title')}</h5>
+                    <h5 class="mb-0">{include '../components/icons.latte', icon => 'person-check-fill', size => '18'} {trans('system_info.sessions.title')}</h5>
                 </div>
                 <div class="card-body">
                     <table class="table table-sm table-borderless mb-0">
@@ -220,7 +217,7 @@
         <div class="col-md-6 col-lg-4">
             <div class="card h-100">
                 <div class="card-header text-white teal-bg">
-                    <h5 class="mb-0"><i class="bi bi-lightning-charge-fill"></i> {trans('system_info.cache.title')}</h5>
+                    <h5 class="mb-0">{include '../components/icons.latte', icon => 'lightning-charge-fill', size => '18'} {trans('system_info.cache.title')}</h5>
                 </div>
                 <div class="card-body">
                     <table class="table table-sm table-borderless mb-0">
@@ -248,8 +245,8 @@
         {* Process Information *}
         <div class="col-md-6 col-lg-4">
             <div class="card h-100">
-                <div class="card-header text-white magenta-bg"">
-                    <h5 class="mb-0"><i class="bi bi-cpu-fill"></i> {trans('system_info.process.title')}</h5>
+                <div class="card-header text-white magenta-bg">
+                    <h5 class="mb-0">{include '../components/icons.latte', icon => 'cpu-fill', size => '18'} {trans('system_info.process.title')}</h5>
                 </div>
                 <div class="card-body">
                     <table class="table table-sm table-borderless">
@@ -280,7 +277,7 @@
         <div class="col-md-6 col-lg-4">
             <div class="card h-100">
                 <div class="card-header bg-secondary text-white">
-                    <h5 class="mb-0"><i class="bi bi-server"></i> {trans('system_info.server.title')}</h5>
+                    <h5 class="mb-0">{include '../components/icons.latte', icon => 'server', size => '18'}{trans('system_info.server.title')}</h5>
                 </div>
                 <div class="card-body">
                     <table class="table table-sm table-borderless">
@@ -311,7 +308,7 @@
         <div class="col-md-6 col-lg-4">
             <div class="card h-100">
                 <div class="card-header bg-success text-white">
-                    <h5 class="mb-0"><i class="bi bi-database-fill"></i> {trans('system_info.database.title')}</h5>
+                    <h5 class="mb-0">{include '../components/icons.latte', icon => 'database-fill', size => '18'} {trans('system_info.database.title')}</h5>
                 </div>
                 <div class="card-body">
                     <table class="table table-sm table-borderless">
@@ -338,7 +335,7 @@
         <div class="col-md-6 col-lg-4">
             <div class="card h-100">
                 <div class="card-header bg-dark text-white">
-                    <h5 class="mb-0"><i class="bi bi-app-indicator"></i> {trans('system_info.app.title')}</h5>
+                    <h5 class="mb-0">{include '../components/icons.latte', icon => 'app-indicator', size => '18'} {trans('system_info.app.title')}</h5>
                 </div>
                 <div class="card-body">
                     <table class="table table-sm table-borderless">

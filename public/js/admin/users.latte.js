@@ -71,7 +71,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const url = operation === "enable" ? "/admin/enableUser" : "/admin/disableUser";
 
-    showLoading(true);
+    showLoading(false);
 
     fetch(url, {
       method: "POST",
@@ -111,7 +111,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const url = operation === "enable" ? "/admin/enableMfa" : "/admin/disableMfa";
 
-    showLoading(true);
+    showLoading(false);
 
     fetch(url, {
       method: "POST",
@@ -151,7 +151,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const url = operation === "enable" ? "/admin/enforceMfa" : "/admin/unenforceMfa";
 
-    showLoading(true);
+    showLoading(false);
 
     fetch(url, {
       method: "POST",
@@ -246,12 +246,19 @@ document.addEventListener("DOMContentLoaded", function () {
    * Update Account Status Icon (Desktop + Mobile)
    */
   function updateAccountStatusIcon(userId, operation) {
-    // Desktop icons
-    const desktopIcon = document.getElementById(`accountStatus${userId}`);
-    // Mobile icons
-    const mobileIcon = document.getElementById(`maccountStatus${userId}`);
+    const disabledIconSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" class="bi bi-x-circle-fill text-danger" viewBox="0 0 16 16">
+      <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM5.354 4.646a.5.5 0 1 0-.708.708L7.293 8l-2.647 2.646a.5.5 0 0 0 .708.708L8 8.707l2.646 2.647a.5.5 0 0 0 .708-.708L8.707 8l2.647-2.646a.5.5 0 0 0-.708-.708L8 7.293 5.354 4.646z"/>
+    </svg>`;
+    const enabledIconSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" class="bi bi-check-circle-fill text-success" viewBox="0 0 16 16">
+      <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.022-1.06z"/>
+    </svg>`;
 
-    [desktopIcon, mobileIcon].forEach((icon) => {
+    // Desktop icons
+    const desktopIconContainer = document.getElementById(`accountStatus${userId}`);
+    // Mobile icons
+    const mobileIconContainer = document.getElementById(`maccountStatus${userId}`);
+
+    [desktopIconContainer, mobileIconContainer].forEach((icon) => {
       if (!icon) return;
 
       // WICHTIG: Erst Tooltip verstecken und disposen
@@ -264,14 +271,14 @@ document.addEventListener("DOMContentLoaded", function () {
 
       if (operation === "enable") {
         // Change to enabled state
-        icon.className = "bi-check-circle-fill text-success user-action-btn";
         icon.dataset.operation = "disable";
         icon.title = "Disable Useraccount";
+        icon.innerHTML = enabledIconSvg;
       } else {
         // Change to disabled state
-        icon.className = "bi-x-circle-fill text-danger user-action-btn";
         icon.dataset.operation = "enable";
         icon.title = "Enable Useraccount";
+        icon.innerHTML = disabledIconSvg;
       }
 
       // Neuen Tooltip nach kurzer Verzögerung erstellen
@@ -285,12 +292,18 @@ document.addEventListener("DOMContentLoaded", function () {
    * Update 2FA Icon (Desktop + Mobile)
    */
   function updateMfaIcon(userId, operation) {
+    const disabledIconSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" class="bi bi-x-circle-fill text-secondary" viewBox="0 0 16 16">
+      <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM5.354 4.646a.5.5 0 1 0-.708.708L7.293 8l-2.647 2.646a.5.5 0 0 0 .708.708L8 8.707l2.646 2.647a.5.5 0 0 0 .708-.708L8.707 8l2.647-2.646a.5.5 0 0 0-.708-.708L8 7.293 5.354 4.646z"/>
+    </svg>`;
+    const enabledIconSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" class="bi bi-check-circle-fill text-success" viewBox="0 0 16 16">
+      <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.022-1.06z"/>
+    </svg>`;
     // Desktop icons
-    const desktopIcon = document.getElementById(`mfaEnabled${userId}`);
+    const desktopIconContainer = document.getElementById(`mfaEnabled${userId}`);
     // Mobile icons
-    const mobileIcon = document.getElementById(`mmfaEnabled${userId}`);
+    const mobileIconContainer = document.getElementById(`mmfaEnabled${userId}`);
 
-    [desktopIcon, mobileIcon].forEach((icon) => {
+    [desktopIconContainer, mobileIconContainer].forEach((icon) => {
       if (!icon) return;
 
       // WICHTIG: Erst Tooltip verstecken und disposen
@@ -302,14 +315,14 @@ document.addEventListener("DOMContentLoaded", function () {
 
       if (operation === "enable") {
         // Change to enabled state
-        icon.className = "bi-check-circle-fill text-success user-action-btn";
         icon.dataset.operation = "disable";
         icon.title = "Disable 2FA";
+        icon.innerHTML = enabledIconSvg;
       } else {
         // Change to disabled state
-        icon.className = "bi-x-circle-fill text-danger user-action-btn";
         icon.dataset.operation = "enable";
         icon.title = "Enable 2FA";
+        icon.innerHTML = disabledIconSvg;
       }
 
       // Neuen Tooltip nach kurzer Verzögerung erstellen
@@ -323,12 +336,19 @@ document.addEventListener("DOMContentLoaded", function () {
    * Update 2FA Enforcement Icon (Desktop + Mobile)
    */
   function updateMfaEnforcementIcon(userId, operation) {
-    // Desktop icons
-    const desktopIcon = document.getElementById(`enforceStatus${userId}`);
-    // Mobile icons
-    const mobileIcon = document.getElementById(`menforceStatus${userId}`);
+    const disabledIconSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" class="bi bi-x-circle-fill text-secondary" viewBox="0 0 16 16">
+      <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM5.354 4.646a.5.5 0 1 0-.708.708L7.293 8l-2.647 2.646a.5.5 0 0 0 .708.708L8 8.707l2.646 2.647a.5.5 0 0 0 .708-.708L8.707 8l2.647-2.646a.5.5 0 0 0-.708-.708L8 7.293 5.354 4.646z"/>
+    </svg>`;
+    const enabledIconSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" class="bi bi-check-circle-fill text-warning" viewBox="0 0 16 16">
+      <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.022-1.06z"/>
+    </svg>`;
 
-    [desktopIcon, mobileIcon].forEach((icon) => {
+    // Desktop icons
+    const desktopIconContainer = document.getElementById(`enforceStatus${userId}`);
+    // Mobile icons
+    const mobileIconContainer = document.getElementById(`menforceStatus${userId}`);
+
+    [desktopIconContainer, mobileIconContainer].forEach((icon) => {
       if (!icon) return;
 
       // WICHTIG: Erst Tooltip verstecken und disposen
@@ -340,14 +360,14 @@ document.addEventListener("DOMContentLoaded", function () {
 
       if (operation === "enable") {
         // Change to enforced state
-        icon.className = "bi-check-circle-fill text-warning user-action-btn";
         icon.dataset.operation = "disable";
         icon.title = "Click to unenforce 2FA for user";
+        icon.innerHTML = enabledIconSvg;
       } else {
         // Change to unenforced state
-        icon.className = "bi-x-circle-fill text-secondary user-action-btn";
         icon.dataset.operation = "enable";
         icon.title = "Click to enforce 2FA for user";
+        icon.innerHTML = disabledIconSvg;
       }
 
       // Neuen Tooltip nach kurzer Verzögerung erstellen
@@ -362,7 +382,11 @@ document.addEventListener("DOMContentLoaded", function () {
    */
   function showLoading(show) {
     if (loadingIndicator) {
-      loadingIndicator.style.display = show ? "block" : "none";
+      if (show) {
+        loadingIndicator.classList.remove("d-none");
+      } else {
+        loadingIndicator.classList.add("d-none");
+      }
     }
   }
 

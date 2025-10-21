@@ -23,8 +23,8 @@
     </div>
 
    <!-- Main Content -->
-    <div class="container py-4 FLEX-CONTAINER"">
-    <h1 class="mb-5"><span class="bi bi-person-square">&nbsp;</span>{trans('users.title')}</h1>
+    <div class="container py-4 flex-container">
+    <h1 class="mb-5">{include '../components/icons.latte', icon => 'person-square', size => '32'}&nbsp;{trans('users.title')}</h1>
 
     {ifset $success}
         <div class="alert alert-success alert-dismissible fade show d-flex align-items-center" role="alert">
@@ -68,9 +68,9 @@
         <form id="tblHeadBar" method="get" class="d-flex align-items-center gap-2">
             <div class="input-group"> 
                 <input type="text" name="search" id="searchInput" value="{$search}" placeholder="{trans('users.search')}" class="form-control form-control-sm w-auto">
-                <button type="submit" class="btn btn-primary btn-sm"><i class="bi-search"></i></button>
+                <button type="submit" class="btn btn-primary btn-sm">{include '../components/icons.latte', icon => 'search', class => 'text-white', size => '14'}</button>
                 <button type="button" class="btn btn-success btn-sm" data-action="create-user">
-                    <i class="bi-person-add"></i>
+                    {include '../components/icons.latte', icon => 'person-add', class => 'text-white', size => '14'}
                 </button>
             </div>
             <input type="hidden" name="page" value="{$page}">
@@ -80,7 +80,7 @@
     </div>
 
     <!-- Loading Indicator -->
-    <div id="loadingIndicator">
+    <div id="loadingIndicator" class="d-none">
         <div class="spinner-border" role="status">
             <span class="visually-hidden">{trans('users.loading')}</span>
         </div>
@@ -94,7 +94,7 @@
         <div id="selectionSummary" 
             class="d-none d-flex align-items-center" 
             role="alert">
-            <i class="bi bi-info-circle me-2 fs-sm"></i>
+            {include '../components/icons.latte', icon => 'info-circle', class => 'me-2', size => '14'}
             <span id="selectionSummaryText" class="fs-sm">0 users selected</span>
             <button type="button"  
                     class="btn btn-sm btn-link ms-1" 
@@ -108,7 +108,7 @@
             <div class="dropdown">
                 <button class="btn btn-primary dropdown-toggle" type="button" 
                         id="bulkActionsDropdown" data-bs-toggle="dropdown">
-                    <i class="bi bi-lightning"></i> 
+                    {include '../components/icons.latte', icon => 'lightning', size => '14'}
                     <span id="bulkActionText bg-light">{trans('users.bulk.menu.actions')}</span>
                     <span class="badge bg-light text-dark ms-3" id="selectionCount">0</span>
                 </button>
@@ -116,34 +116,34 @@
                     <!-- User Status -->
                     <li><h6 class="dropdown-header">{trans('users.bulk.menu.title.status')}</h6></li>
                     <li><a class="dropdown-item" href="#" data-bulk-action="enable">
-                        <i class="bi bi-check-circle text-success"></i> {trans('users.bulk.menu.enable')}
+                        {include '../components/icons.latte', icon => 'check-circle', class => 'text-success', size => '14'} {trans('users.bulk.menu.enable')}
                     </a></li>
                     <li><a class="dropdown-item" href="#" data-bulk-action="disable">
-                        <i class="bi bi-x-circle text-danger"></i> {trans('users.bulk.menu.disable')}
+                        {include '../components/icons.latte', icon => 'x-circle', class => 'text-danger', size => '14'}{trans('users.bulk.menu.disable')}
                     </a></li>
                     <li><hr class="dropdown-divider"></li>
                     
                     <!-- MFA Operations -->
                     <li><h6 class="dropdown-header">{trans('users.bulk.menu.title.2fa')}</h6></li>
                     <li><a class="dropdown-item" href="#" data-bulk-action="mfa_enforce">
-                        <i class="bi bi-shield-fill-exclamation text-warning"></i> {trans('users.bulk.menu.mfa_enforce')}
+                        {include '../components/icons.latte', icon => 'shield-fill-exclamation', class => 'text-warning', size => '14'} {trans('users.bulk.menu.mfa_enforce')}
                     </a></li>
                     <li><a class="dropdown-item" href="#" data-bulk-action="mfa_unenforce">
-                        <i class="bi bi-shield text-muted"></i> {trans('users.bulk.menu.mfa_unenforce')}
+                        {include '../components/icons.latte', icon => 'shield', class => 'text-mute', size => '14'} {trans('users.bulk.menu.mfa_unenforce')}
                     </a></li>
                     <li><hr class="dropdown-divider"></li>
                     
                     <!-- Export -->
                     <li><h6 class="dropdown-header">{trans('users.bulk.menu.title.export')}</h6></li>
                     <li><a class="dropdown-item" href="#" data-export="csv-selected">
-                        <i class="bi bi-filetype-csv text-primary"></i> {trans('users.bulk.menu.export')}
+                        {include '../components/icons.latte', icon => 'filetype-csv', class => 'text-primary', size => '14'} {trans('users.bulk.menu.export')}
                     </a></li>
                     <li><hr class="dropdown-divider"></li>
                     
                     <!-- Dangerous Actions -->
                     <li><h6 class="dropdown-header text-danger">{trans('users.bulk.menu.title.danger')}</h6></li>
                     <li><a class="dropdown-item text-danger" href="#" data-bulk-action="delete">
-                        <i class="bi bi-trash"></i> {trans('users.bulk.menu.delete')}
+                        {include '../components/icons.latte', icon => 'trash', class => 'text-danger', size => '14'} {trans('users.bulk.menu.delete')}
                     </a></li>
                 </ul>
             </div>
@@ -188,95 +188,120 @@
                         </td>
                         <td>
                             {if $use->entraIdEnabled === 1}
-                                <i class="bi-microsoft text-primary" data-bs-toggle="tooltip" title="{trans('users.popup.entraid')}"></i>
+                                <i data-bs-toggle="tooltip" title="{trans('users.popup.entraid')}">{include '../components/icons.latte', icon => 'microsoft', class => 'text-primary', size => '14'}</i>
                             {elseif $use->ldapEnabled === 1}
-                                <i class="bi-hdd-network-fill text-teal" data-bs-toggle="tooltip" title="{trans('users.popup.ldapuser')}"></i>
+                                <i data-bs-toggle="tooltip" title="{trans('users.popup.ldapuser')}">{include '../components/icons.latte', icon => 'hdd-network-fill', class => 'text-teal', size => '14'}</i>
                             {else}  
-                                <i class="bi-database-fill text-indigo" data-bs-toggle="tooltip" title="{trans('users.popup.dbuser')}"></i>
+                                <i data-bs-toggle="tooltip" title="{trans('users.popup.dbuser')}">{include '../components/icons.latte', icon => 'database-fill', class => 'text-indigo', size => '14'}</i>
                             {/if}
                         </td>
                         <td class="usersBackupTh">
                             {if $use->username === 'super.admin'}
-                                <i id="accountStatus{$use->id}" class="bi-check-circle-fill text-secondary" data-bs-toggle="tooltip" title="{trans('users.popup.noDisableUser')}"></i>
+                                <i id="accountStatus{$use->id}" data-bs-toggle="tooltip" title="{trans('users.popup.noDisableUser')}">
+                                    {include '../components/icons.latte', icon => 'check-circle-fill', class => 'text-secondary', size => '14'}
+                                </i>
                             {elseif $use->status === 1}
-                                <i class="cursor-pointer" id="accountStatus{$use->id}" class="bi-check-circle-fill text-success user-action-btn" 
+                                <i class="cursor-pointer user-action-btn" id="accountStatus{$use->id}"
                                    data-action="toggle-account-status" 
                                    data-user-id="{$use->id}" 
                                    data-operation="disable"
                                    data-bs-toggle="tooltip" 
-                                   title="{trans('users.popup.disableUser')}"></i>
+                                   title="{trans('users.popup.disableUser')}">
+                                    {include '../components/icons.latte', icon => 'check-circle-fill', class => 'text-success', size => '14'}
+                                   </i>
                             {else}
-                                <i class="cursor-pointer" id="accountStatus{$use->id}" class="bi-x-circle-fill text-danger user-action-btn" 
+                                <i class="cursor-pointer user-action-btn" id="accountStatus{$use->id}" 
                                    data-action="toggle-account-status" 
                                    data-user-id="{$use->id}" 
                                    data-operation="enable" 
                                    data-bs-toggle="tooltip" 
-                                   title="{trans('users.popup.activateUser')}"></i>
+                                   title="{trans('users.popup.activateUser')}">
+                                    {include '../components/icons.latte', icon => 'x-circle-fill', class => 'text-danger', size => '14'}
+                                   </i>
                             {/if}
                         </td>
                         <td class="usersBackupTh">
                             {if $use->entraIdEnabled === 1}
                                 {* Entra ID: 2FA wird von Azure verwaltet - Icon disabled *}
-                                <i class="bi-shield-lock-fill text-secondary" 
-                                data-bs-toggle="tooltip" 
-                                title="{trans('users.popup.entraid.2fa')}"></i>
+                                <i data-bs-toggle="tooltip" 
+                                title="{trans('users.popup.entraid.2fa')}">
+                                    {include '../components/icons.latte', icon => 'shield-lock-fill', class => 'text-secondary', size => '14'}
+                                </i>
                             {elseif $use->mfaSecret !== '' && $use->mfaEnabled === 1}
-                                <i class="cursor-pointer" id="mfaEnabled{$use->id}" class="bi-check-circle-fill text-success user-action-btn" 
+                                <i class="cursor-pointer user-action-btn" id="mfaEnabled{$use->id}"
                                 data-action="toggle-mfa" 
                                 data-user-id="{$use->id}" 
                                 data-operation="disable"
                                 data-bs-toggle="tooltip" 
-                                title="{trans('users.popup.disable2fa')}"></i>
+                                title="{trans('users.popup.disable2fa')}">
+                                    {include '../components/icons.latte', icon => 'check-circle-fill', class => 'text-success', size => '14'}
+                                </i>
                             {elseif $use->mfaSecret !== '' && $use->mfaEnabled === 0}
-                                <i class="cursor-pointer" id="mfaEnabled{$use->id}" class="bi-x-circle-fill text-danger user-action-btn" 
+                                <i class="cursor-pointer user-action-btn" id="mfaEnabled{$use->id}"
                                 data-action="toggle-mfa" 
                                 data-user-id="{$use->id}" 
                                 data-operation="enable"
                                 data-bs-toggle="tooltip" 
-                                title="{trans('users.popup.enable2fa')}"></i>
+                                title="{trans('users.popup.enable2fa')}">
+                                    {include '../components/icons.latte', icon => 'x-circle-fill', class => 'text-danger', size => '14'}
+                                </i>
                             {elseif $use->mfaSecret === ''}
-                                <i id="mfaEnabled{$use->id}" class="bi-x-circle-fill text-secondary" data-bs-toggle="tooltip" title="{trans('users.popup.no2fa')}"></i>
+                                <i id="mfaEnabled{$use->id}" data-bs-toggle="tooltip" title="{trans('users.popup.no2fa')}">
+                                    {include '../components/icons.latte', icon => 'x-circle-fill', class => 'text-secondary', size => '14'}
+                                </i>
                             {/if}
                         </td>
                         <td class="usersBackupTh">
                             {if $use->entraIdEnabled === 1}
                                 {* Entra ID: Backup Codes nicht verfügbar *}
-                                <i class="bi-dash-circle text-secondary" 
-                                data-bs-toggle="tooltip" 
-                                title="{trans('users.popup.entraid.backup')}"></i>
+                                <i data-bs-toggle="tooltip" 
+                                title="{trans('users.popup.entraid.backup')}">
+                                    {include '../components/icons.latte', icon => 'dash-circle', class => 'text-secondary', size => '14'}
+                                </i>
                             {elseif $use->mfaEnabled === 1}
                                 <span class="backup-codes-cell text-secondary" 
                                     data-user-id="{$use->id}" role="status">
                                     <span class="visually-hidden">Loading...</span>
                                 </span>
                             {else}
-                                <i class="bi-dash-circle text-secondary" data-bs-toggle="tooltip" title="{trans('users.popup.no2fa')}"></i>
+                                <i data-bs-toggle="tooltip" title="{trans('users.popup.no2fa')}">
+                                    {include '../components/icons.latte', icon => 'dash-circle', class => 'text-secondary', size => '14'}
+                                </i>
                             {/if}
                         </td>
                         <td class="usersBackupTh">
                             {if $use->entraIdEnabled === 1}
                                 {* Entra ID: 2FA Enforcement wird von Azure verwaltet *}
-                                <i class="bi-shield-lock-fill text-secondary" 
-                                data-bs-toggle="tooltip" 
-                                title="{trans('users.popup.entraid.enforce')}"></i>
+                                <i data-bs-toggle="tooltip" 
+                                title="{trans('users.popup.entraid.enforce')}">
+                                    {include '../components/icons.latte', icon => 'shield-lock-fill', class => 'text-secondary', size => '14'}
+                                </i>
                             {elseif $use->username === 'super.admin'}
-                                <i class="bi-check-circle-fill text-secondary" data-bs-toggle="tooltip" title="{trans('users.popup.no2faforadmin')}"></i>
+                                <i data-bs-toggle="tooltip" title="{trans('users.popup.no2faforadmin')}">
+                                    {include '../components/icons.latte', icon => 'check-circle-fill', class => 'text-secondary', size => '14'}
+                                </i>
                             {elseif $use->mfaSecret !== ''}
-                                <i class="bi-check-circle-fill text-secondary" data-bs-toggle="tooltip" title="{trans('users.popup.2faconfigured')}"></i>
+                                <i data-bs-toggle="tooltip" title="{trans('users.popup.2faconfigured')}">
+                                    {include '../components/icons.latte', icon => 'check-circle-fill', class => 'text-secondary', size => '14'}
+                                </i>
                             {elseif $use->mfaEnforced === 1}
-                                <i class="cursor-pointer" id="enforceStatus{$use->id}" class="bi-check-circle-fill text-warning user-action-btn" 
+                                <i class="cursor-pointer user-action-btn" id="enforceStatus{$use->id}"
                                 data-action="toggle-mfa-enforcement" 
                                 data-user-id="{$use->id}" 
                                 data-operation="disable"
                                 data-bs-toggle="tooltip" 
-                                title="{trans('users.popup.2faenforce')}"></i>
+                                title="{trans('users.popup.2faunenforce')}">
+                                    {include '../components/icons.latte', icon => 'check-circle-fill', class => 'text-warning', size => '14'}
+                                </i>
                             {else}
-                                <i class="cursor-pointer" id="enforceStatus{$use->id}" class="bi-x-circle-fill text-secondary user-action-btn" 
+                                <i class="cursor-pointer user-action-btn" id="enforceStatus{$use->id}"
                                 data-action="toggle-mfa-enforcement" 
                                 data-user-id="{$use->id}" 
                                 data-operation="enable" 
                                 data-bs-toggle="tooltip" 
-                                title="{trans('users.popup.2faenforce')}"></i>
+                                title="{trans('users.popup.2faenforce')}">
+                                    {include '../components/icons.latte', icon => 'x-circle-fill', class => 'text-secondary', size => '14'}
+                                </i>
                             {/if}
                         </td>                       
                         <td>
@@ -288,18 +313,18 @@
                         <td class="actions-column">
                             {if $use->username === 'super.admin'}
                                 <button class="btn btn-sm btn-secondary" disabled>
-                                    <i class="bi-trash-fill"></i> {trans('users.btn.delete')}
+                                    {include '../components/icons.latte', icon => 'trash-fill', size => '14'} {trans('users.btn.delete')}
                                 </button>
                             {else}
                                 <button class="btn btn-sm btn-danger user-action-btn" 
                                         data-action="delete-user" 
                                         data-user-id="{$use->id}"
                                         data-username="{$use->username}">
-                                    <i class="bi-trash-fill"></i> {trans('users.btn.delete')}
+                                    {include '../components/icons.latte', icon => 'trash-fill', size => '14'} {trans('users.btn.delete')}
                                 </button>
                             {/if}
                             <a href="/admin/showEditUser/{$use->id}" class="btn btn-sm btn-warning">
-                                <i class="bi-pencil-fill"></i> {trans('users.btn.edit')}
+                                {include '../components/icons.latte', icon => 'pencil-fill', size => '14'}{trans('users.btn.edit')}
                             </a>
                         </td>
                     </tr>
@@ -324,11 +349,17 @@
                     </div>
                     <div>
                         {if $use->entraIdEnabled === 1}
-                            <i class="bi-microsoft text-primary me-2" data-bs-toggle="tooltip" title="{trans('users.popup.entraid')}"></i>
+                            <i class="me-2" data-bs-toggle="tooltip" title="{trans('users.popup.entraid')}">
+                                {include '../components/icons.latte', icon => 'microsoft', class => 'text-primary', size => '14'}
+                            </i>
                         {elseif $use->ldapEnabled === 1}
-                            <i class="bi-hdd-network-fill text-teal me-2" data-bs-toggle="tooltip" title="{trans('users.popup.ldapuser')}"></i>
+                            <i class="me-2" data-bs-toggle="tooltip" title="{trans('users.popup.ldapuser')}">
+                                {include '../components/icons.latte', icon => 'hdd-network-fill', class => 'text-teal', size => '14'}
+                            </i>
                         {else}
-                            <i class="bi-database-fill text-indigo me-2" data-bs-toggle="tooltip" title="{trans('users.popup.dbuser')}"></i>
+                            <i class="me-2" data-bs-toggle="tooltip" title="{trans('users.popup.dbuser')}">
+                                {include '../components/icons.latte', icon => 'database-fill', class => 'text-indigo', size => '14'}
+                            </i>
                         {/if}
                     </div>
                 </div>
@@ -338,80 +369,105 @@
                         <strong>Name:</strong> {$use->firstname} {$use->lastname}<br>
                         <strong>Account: </strong>
                             {if $use->username === 'super.admin'}
-                                <i id="maccountStatus{$use->id}" class="bi-check-circle-fill text-secondary" data-bs-toggle="tooltip" title="{trans('users.popup.noDisableUser')}"></i>
+                                <i id="maccountStatus{$use->id}" data-bs-toggle="tooltip" title="{trans('users.popup.noDisableUser')}">
+                                    {include '../components/icons.latte', icon => 'check-circle-fill', class => 'text-secondary', size => '14'}
+                                </i>
                             {elseif $use->status === 1}
-                                <i class="cursor-pointer" id="maccountStatus{$use->id}" class="bi-check-circle-fill text-success user-action-btn" 
+                                <i class="cursor-pointer user-action-btn" id="maccountStatus{$use->id}"
                                    data-action="toggle-account-status" 
                                    data-user-id="{$use->id}" 
                                    data-operation="disable" 
                                    data-bs-toggle="tooltip" 
-                                   title="{trans('users.popup.disableUser')}"></i>
+                                   title="{trans('users.popup.disableUser')}">
+                                    {include '../components/icons.latte', icon => 'check-circle-fill', class => 'text-success', size => '14'}
+                                   </i>
                             {else}
-                                <i class="cursor-pointer" id="maccountStatus{$use->id}" class="bi-x-circle-fill text-danger user-action-btn" 
+                                <i class="cursor-pointer user-action-btn" id="maccountStatus{$use->id}"
                                    data-action="toggle-account-status" 
                                    data-user-id="{$use->id}" 
                                    data-operation="enable"
                                    data-bs-toggle="tooltip" 
-                                   title="{trans('users.popup.activateUser')}"></i>
+                                   title="{trans('users.popup.activateUser')}">
+                                    {include '../components/icons.latte', icon => 'x-circle-fill', class => 'text-danger', size => '14'}
+                                   </i>
                             {/if}<br>
                         <strong>2FA: </strong>
                             {if $use->entraIdEnabled === 1}
-                                <i class="bi-shield-lock-fill text-secondary" 
-                                data-bs-toggle="tooltip" 
-                                title="{trans('users.popup.entraid.2fa')}"></i>
+                                <i data-bs-toggle="tooltip" 
+                                title="{trans('users.popup.entraid.2fa')}">
+                                    {include '../components/icons.latte', icon => 'shield-lock-fill', class => 'text-secondary', size => '14'}
+                                </i>
                             {elseif $use->mfaSecret !== '' && $use->mfaEnabled === 1}
-                                <i class="cursor-pointer" id="mmfaEnabled{$use->id}" class="bi-check-circle-fill text-success user-action-btn" 
+                                <i class="cursor-pointer user-action-btn" id="mmfaEnabled{$use->id}"
                                 data-action="toggle-mfa" 
                                 data-user-id="{$use->id}" 
                                 data-operation="disable"
                                 data-bs-toggle="tooltip" 
-                                title="{trans('users.popup.disable2fa')}"></i>
+                                title="{trans('users.popup.disable2fa')}">
+                                    {include '../components/icons.latte', icon => 'check-circle-fill', class => 'text-success', size => '14'}
+                                </i>
                             {elseif $use->mfaSecret !== '' && $use->mfaEnabled === 0}
-                                <i class="cursor-pointer" id="mmfaEnabled{$use->id}" class="bi-x-circle-fill text-danger user-action-btn" 
+                                <i class="cursor-pointer user-action-btn" id="mmfaEnabled{$use->id}"
                                 data-action="toggle-mfa" 
                                 data-user-id="{$use->id}" 
                                 data-operation="enable"
                                 data-bs-toggle="tooltip" 
-                                title="{trans('users.popup.enable2fa')}"></i>
+                                title="{trans('users.popup.enable2fa')}">
+                                    {include '../components/icons.latte', icon => 'x-circle-fill', class => 'text-danger', size => '14'}
+                                </i>
                             {elseif $use->mfaSecret === ''}
-                                <i id="mmfaEnabled{$use->id}" class="bi-x-circle-fill text-secondary" data-bs-toggle="tooltip" title="{trans('users.popup.no2fa')}"></i>
+                                <i id="mmfaEnabled{$use->id}" data-bs-toggle="tooltip" title="{trans('users.popup.no2fa')}">
+                                    {include '../components/icons.latte', icon => 'x-circle-fill', class => 'text-secondary', size => '14'}
+                                </i>
                             {/if}<br>
                         <strong>2FA-Enf: </strong>
                             {if $use->entraIdEnabled === 1}
-                                <i class="bi-shield-lock-fill text-secondary" 
-                                data-bs-toggle="tooltip" 
-                                title="{trans('users.popup.entraid.enforce')}"></i>
+                                <i data-bs-toggle="tooltip" 
+                                title="{trans('users.popup.entraid.enforce')}">
+                                    {include '../components/icons.latte', icon => 'shield-lock-fill', class => 'text-secondary', size => '14'}
+                                </i>
                             {elseif $use->username === 'super.admin'}
-                                <i class="bi-check-circle-fill text-secondary" data-bs-toggle="tooltip" title="{trans('users.popup.no2faforadmin')}"></i>
+                                <i data-bs-toggle="tooltip" title="{trans('users.popup.no2faforadmin')}">
+                                    {include '../components/icons.latte', icon => 'check-circle-fill', class => 'text-secondary', size => '14'}
+                                </i>
                             {elseif $use->mfaSecret !== ''}
-                                <i class="bi-check-circle-fill text-secondary" data-bs-toggle="tooltip" title="{trans('users.popup.2faconfigured')}"></i>
+                                <i data-bs-toggle="tooltip" title="{trans('users.popup.2faconfigured')}">
+                                    {include '../components/icons.latte', icon => 'check-circle-fill', class => 'text-secondary', size => '14'}
+                                </i>
                             {elseif $use->mfaEnforced === 1}
-                                <i class="cursor-pointer" id="menforceStatus{$use->id}" class="bi-check-circle-fill text-warning user-action-btn" 
+                                <i class="cursor-pointer user-action-btn" id="menforceStatus{$use->id}"
                                 data-action="toggle-mfa-enforcement" 
                                 data-user-id="{$use->id}" 
                                 data-operation="disable"
                                 data-bs-toggle="tooltip" 
-                                title="{trans('users.popup.2faenforce')}"></i>
+                                title="{trans('users.popup.2faunenforce')}">
+                                    {include '../components/icons.latte', icon => 'check-circle-fill', class => 'text-warning', size => '14'}
+                                </i>
                             {else}
-                                <i class="cursor-pointer" id="menforceStatus{$use->id}" class="bi-x-circle-fill text-danger user-action-btn" 
+                                <i class="cursor-pointer user-action-btn" id="menforceStatus{$use->id}" 
                                 data-action="toggle-mfa-enforcement" 
                                 data-user-id="{$use->id}" 
                                 data-operation="enable"
                                 data-bs-toggle="tooltip" 
-                                title="{trans('users.popup.2faunenforce')}"></i>
+                                title="{trans('users.popup.2faenforce')}">
+                                    {include '../components/icons.latte', icon => 'x-circle-fill', class => 'text-danger', size => '14'}
+                                </i>
                             {/if}<br>
                         <strong>Backup: </strong>
                             {if $use->entraIdEnabled === 1}
-                                <i class="bi-dash-circle text-secondary" 
-                                data-bs-toggle="tooltip" 
-                                title="{trans('users.popup.entraid.backup')}"></i>
+                                <i data-bs-toggle="tooltip" 
+                                title="{trans('users.popup.entraid.backup')}">
+                                    {include '../components/icons.latte', icon => 'dash-circle', class => 'text-secondary', size => '14'}
+                                </i>
                             {elseif $use->mfaEnabled === 1}
                                 <span class="backup-codes-cell-mobile text-secondary" 
                                     data-user-id="{$use->id}" role="status">
                                     <span class="visually-hidden">Loading...</span>
                                 </span>
                             {else}
-                                <i class="bi-dash-circle text-secondary" data-bs-toggle="tooltip" title="{trans('users.popup.no2fa')}"></i>
+                                <i data-bs-toggle="tooltip" title="{trans('users.popup.no2fa')}">
+                                    {include '../components/icons.latte', icon => 'dash-circle', class => 'text-secondary', size => '14'}
+                                </i>
                             {/if}<br>
                     </p>
                     
@@ -419,18 +475,18 @@
                     <div class="d-flex gap-2">
                         {if $use->username === 'super.admin'}
                             <button class="btn btn-sm btn-secondary" disabled>
-                                <i class="bi-trash-fill"></i> {trans('users.btn.delete')}
+                                {include '../components/icons.latte', icon => 'trash-fill', size => '14'} {trans('users.btn.delete')}
                             </button>
                         {else}
                             <button class="btn btn-sm btn-danger user-action-btn" 
                                     data-action="delete-user" 
                                     data-user-id="{$use->id}"
                                     data-username="{$use->username}">
-                                <i class="bi-trash-fill"></i> {trans('users.btn.delete')}
+                                {include '../components/icons.latte', icon => 'trash-fill', size => '14'}{trans('users.btn.delete')}
                             </button>
                         {/if}
                         <a href="/admin/showEditUser/{$use->id}" class="btn btn-sm btn-warning">
-                            <i class="bi-pencil-fill"></i> {trans('users.btn.edit')}
+                            {include '../components/icons.latte', icon => 'pencil-fill', size => '14'} {trans('users.btn.edit')}
                         </a>
                     </div>
                 </div>
@@ -462,7 +518,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">
-                    <i class="bi bi-hourglass-split"></i> Processing Bulk Operation
+                    <i>{include '../components/icons.latte', icon => 'hourglass-split', size => '14'}</i> Processing Bulk Operation
                 </h5>
             </div>
             <div class="modal-body">
@@ -488,14 +544,14 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="confirmDeleteLabel2">
-                    <i class="bi bi-exclamation-triangle text-warning"></i>
+                    <i>{include '../components/icons.latte', icon => 'exclamation-triangle'}</i>
                     <span id="confirmModalTitle2">{trans('users.bulk.confirm.delete.title')}</span>
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
                 <div class="d-flex align-items-start">
-                    <i class="bi bi-shield-exclamation text-warning fs-1 me-3" id="confirmModalIcon2"></i>
+                    <i class="me-3" id="confirmModalIcon2">{include '../components/icons.latte', icon => 'shield-exclamation', class => 'text-warning', size => '14'}</i>
                     <div>
                         <p class="mb-2" id="confirmModalMessage2">{trans('users.bulk.confirm.delete.message')}</p>
                         <div class="alert alert-warning mb-0" id="confirmModalDetails">
@@ -507,10 +563,10 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                    <i class="bi bi-x-circle"></i> {trans('users.modal.btn.cancel')}
+                    {include '../components/icons.latte', icon => 'x-circle', size => '14'} {trans('users.modal.btn.cancel')}
                 </button>
                 <button type="button" class="btn btn-danger" id="confirmDeleteBtn2" data-action="confirm-delete">
-                    <i class="bi bi-trash"></i> 
+                    <i>{include '../components/icons.latte', icon => 'trash', size => '14'}</i> 
                     <span id="confirmModalBtnText2">{trans('users.bulk.confirm.delete.btn')}</span>
                 </button>
             </div>
@@ -524,7 +580,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="resultsModalTitle">
-                    <i class="bi bi-check-circle text-success"></i> Operation Complete
+                    <i>{include '../components/icons.latte', icon => 'check-circle', class => 'text-success', size => '14'}</i> Operation Complete
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
@@ -563,7 +619,7 @@
                         <h2 class="accordion-header">
                             <button class="accordion-button collapsed" type="button" 
                                     data-bs-toggle="collapse" data-bs-target="#detailedResults">
-                                <i class="bi bi-list-ul"></i>&nbsp; Detailed Results
+                                <i>{include '../components/icons.latte', icon => 'list-ul', size => '14'}</i>&nbsp; Detailed Results
                             </button>
                         </h2>
                         <div id="detailedResults" class="accordion-collapse collapse">
@@ -577,7 +633,7 @@
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary d-none" data-bs-dismiss="modal">Close</button>
                 <button type="button" class="btn btn-primary" data-action="refresh-user-list">
-                    <i class="bi bi-arrow-clockwise"></i> <span id="resultsFinishButton">{trans('users.bulk.confirm.modal.finishBtn')}</span>
+                    <i>{include '../components/icons.latte', icon => 'arrow-clockwise', size => '14'}</i> <span id="resultsFinishButton">{trans('users.bulk.confirm.modal.finishBtn')}</span>
                 </button>
             </div>
         </div>

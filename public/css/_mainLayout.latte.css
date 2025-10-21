@@ -35,6 +35,10 @@ body {
   color: var(--bs-light);
 }
 
+.logAnalytics .nav-link {
+  color:#5a6268;
+}
+
 .text-indigo {
   color: var(--bs-indigo);
 }
@@ -49,10 +53,10 @@ body {
 
 /* style for mobile offcanvas menu */
 .offcanvas {
-  max-width:70% !important;
+  max-width: 70% !important;
 }
 .offcanvas-body ul {
-  border:none !important;
+  border: none !important;
 }
 
 .offcanvas-body .nav-link.active {
@@ -90,79 +94,114 @@ body {
 }
 
 #modal-backup-codes-display {
-  border: 1px solid #dee2e6; 
-  border-radius: 4px; 
-  font-family: 'Courier New', monospace; 
-  font-size: 14px; 
-  max-height: 300px; 
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
+  font-family: "Courier New", monospace;
+  font-size: 14px;
+  max-height: 300px;
   overflow-y: auto;
 }
 
 #loadingSpinner {
-  display: none; text-align: center;
+  display: none;
+  text-align: center;
 }
 
 #phpInfoFrame {
-  width:100%;height:70vh;border:none;
+  width: 100%;
+  height: 70vh;
+  border: none;
 }
 
 #ip-whitelist {
   font-size: 0.9rem;
 }
 .usersBackupTh {
-  min-width:50px !important;text-align:center;
+  min-width: 50px !important;
+  text-align: left;
 }
 
 .privacyCard {
-  max-width: 600px; width: 100%;
+  max-width: 600px;
+  width: 100%;
 }
 
 .twofacard {
-  width: 100%; max-width: 400px;
+  width: 100%;
+  max-width: 400px;
 }
 
 #twofaLangSel {
-  display:flex; flex-direction:column; justify-content:center; align-items:center; gap:5;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 5;
 }
-
 
 /* util classes */
 .display-none {
-  display:none;
+  display: none;
 }
 .flex-container {
-  flex:1;
+  flex: 1;
 }
 .bi-helper {
-  margin-right:15px;
-  margin-left:15px;
+  margin-right: 15px;
+  margin-left: 15px;
+}
+h1:has(svg),
+h2:has(svg),
+h3:has(svg),
+h4:has(svg),
+h5:has(svg),
+h6:has(svg),
+h1:has(span svg),
+h2:has(span svg),
+h3:has(span svg),
+h4:has(span svg),
+h5:has(span svg),
+h6:has(span svg) {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+i:has(svg) {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+span:has(svg) {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 .no-border {
-  border:none !important;
+  border: none !important;
 }
 .font4rem {
   font-size: 4rem;
 }
 .width215 {
-  width:215px;
+  width: 215px;
 }
 .width200 {
-  width:200px;
+  width: 200px;
 }
 .width80 {
-  width:80px;
+  width: 80px;
 }
 .width90 {
-  width:90px;
+  width: 90px;
 }
 .width0 {
   width: 0%;
 }
 .height20 {
-  height:20px;
+  height: 20px;
 }
 .height8px {
-  height: 8px;;
+  height: 8px;
 }
 .minHeight80vh {
   min-height: 80vh;
@@ -171,10 +210,10 @@ body {
   max-height: 400px;
 }
 .padding-top15 {
-  padding-top:15px;
+  padding-top: 15px;
 }
 .padding10 {
-  padding:10px;
+  padding: 10px;
 }
 .marginr-10 {
   margin-right: 10px;
@@ -201,26 +240,20 @@ body {
   cursor: pointer;
 }
 .muted-text {
-  color:var(--bs-secondary-text);
-}
-
-/* alert icons */
-svg.bi {
-  width: 16px;
-  height: 16px;
+  color: var(--bs-secondary-text);
 }
 
 .user-select-checkbox:checked {
-    background-color: #007bff;
-    border-color: #007bff;
+  background-color: #007bff;
+  border-color: #007bff;
 }
 
 tr.selected {
-    background-color: rgba(13, 110, 253, 0.1);
+  background-color: rgba(13, 110, 253, 0.1);
 }
 
 #bulkToolbar {
-    transition: all 0.3s ease;
+  transition: all 0.3s ease;
 }
 
 #bulkActionsContainer .dropdown-item {
@@ -233,7 +266,7 @@ tr.selected {
     min-width: 100%;
     max-width: 100%;
   }
-  
+
   .desktop-pager-label {
     display: none;
   }
@@ -261,10 +294,10 @@ tr.selected {
     display: none;
   }
   .usrPageSize {
-    display:none !important;
+    display: none !important;
   }
   .offcanvas .nav-link {
-    color:#5a6268 !important;
+    color: #5a6268 !important;
   }
 
   .modal.fade.flyout .modal-content {
@@ -308,8 +341,15 @@ tr.selected {
     transform: translateY(0) !important;
   }
 
-  .offcanvas .mobile-submenu { margin-left: 20px; margin-top: 3px; margin-bottom: 6px; }
-  .offcanvas .mobile-submenu .nav-link { padding-left: 0; }
-  .collapse.show + .bi-caret-down-fill { transform: rotate(180deg); }
-
+  .offcanvas .mobile-submenu {
+    margin-left: 20px;
+    margin-top: 3px;
+    margin-bottom: 6px;
+  }
+  .offcanvas .mobile-submenu .nav-link {
+    padding-left: 0;
+  }
+  .collapse.show + .bi-caret-down-fill {
+    transform: rotate(180deg);
+  }
 }
