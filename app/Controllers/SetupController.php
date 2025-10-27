@@ -565,29 +565,41 @@ class SetupController
     }
 
     /**
-     * Erkennt die Umgebung und schlägt passende Berechtigungen vor
+     * Detects the environment and suggests appropriate permissions
      *
-     * @return array Assoziatives Array mit Umgebungsinformationen und empfohlenen Berechtigungen
+     * @return array Associative array with environment information and recommended permissions
      */
     private function detectEnvironmentAndPermissions(): array
     {
-        $webUser = posix_getpwuid(posix_geteuid())['name'] ?? 'www-data';
-        $isDocker = file_exists('/.dockerenv');
+        // Check if we're on Windows first
         $isWindows = strtoupper(substr(PHP_OS, 0, 3)) === 'WIN';
-        $isRoot = posix_geteuid() === 0;
+        
+        // Only use POSIX functions if available (not on Windows)
+        if (!$isWindows && function_exists('posix_geteuid') && function_exists('posix_getpwuid')) {
+            $euid = posix_geteuid();
+            $userInfo = posix_getpwuid($euid);
+            $webUser = $userInfo['name'] ?? 'www-data';
+            $isRoot = $euid === 0;
+        } else {
+            // Fallback for Windows or systems without POSIX
+            $webUser = getenv('USERNAME') ?: getenv('USER') ?: 'N/A';
+            $isRoot = false;
+        }
+        
+        $isDocker = file_exists('/.dockerenv');
 
-        // Intelligente Berechtigung basierend auf Umgebung
+        // Intelligent permission suggestions based on environment
         if ($isWindows) {
-            $suggestedChmod = '644';  // Windows chmod ist meist nicht relevant
+            $suggestedChmod = '644';  // Windows chmod is usually not relevant
             $suggestedChown = 'N/A';
         } elseif ($isDocker) {
-            $suggestedChmod = '666';  // Docker braucht oft weniger restriktive Permissions
+            $suggestedChmod = '666';  // Docker often needs less restrictive permissions
             $suggestedChown = "$webUser:$webUser";
         } elseif ($isRoot) {
-            $suggestedChmod = '640';  // Produktions-sicher
+            $suggestedChmod = '640';  // Production-safe
             $suggestedChown = "$webUser:$webUser";
         } else {
-            $suggestedChmod = '664';  // Development-freundlich
+            $suggestedChmod = '664';  // Development-friendly
             $suggestedChown = "$webUser:$webUser";
         }
 

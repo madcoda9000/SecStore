@@ -34,6 +34,16 @@ require '../vendor/autoload.php';
 $app = Flight::app();
 
 /**
+ * Fix for Windows PHP Built-in Webserver redirect issue
+ * PHP's built-in server on Windows incorrectly sets the base path,
+ * causing redirects to use relative paths instead of absolute URLs.
+ */
+if (php_sapi_name() === 'cli-server') {
+    // For built-in server, ensure base is root
+    $app->request()->base = '';
+}
+
+/**
  * tell Flight where are our views
  */
 $app->set('flight.views.path', '../app/views');
